@@ -50,13 +50,18 @@ status: active
 ```
 ## Screenshots
 
-![[Pasted image 20250403164058.png]]
+![Pasted image 20250403164058](https://github.com/user-attachments/assets/34f91046-c577-4d88-a896-f8b94f93e579)
 
-![[Pasted image 20250403164128.png]]
 
-- Status Pane: ![[Pasted image 20250403164202.png]]
-- Dropdown Menu: ![[Pasted image 20250403164151.png]] 
-- File Explorer Icons: ![[Pasted image 20250403164222.png]]
+![Pasted image 20250403164128](https://github.com/user-attachments/assets/0a15a6c6-4630-4605-943b-a7528b4b42de)
+
+
+- Status Pane: ![Pasted image 20250403164202](https://github.com/user-attachments/assets/1b083773-5e48-49a4-a89e-04de5e78b4a3)
+
+- Dropdown Menu: ![Pasted image 20250403164151](https://github.com/user-attachments/assets/3ffc47e1-e23d-46e9-af62-e7fd431cfcc0)
+
+- File Explorer Icons: ![Pasted image 20250403164222](https://github.com/user-attachments/assets/d029b809-747b-4a21-9da6-4c2a067f5206)
+
 
 ## Development
 
