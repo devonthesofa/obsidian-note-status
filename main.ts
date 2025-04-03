@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, Menu, Vault, View, WorkspaceLeaf, addIcon } from 'obsidian';
+import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, Menu, Modal, View, WorkspaceLeaf, addIcon } from 'obsidian';
 
 addIcon('status-pane', `
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -136,7 +136,7 @@ class StatusPaneView extends View {
   }
 
   // Render only the dynamic groups
-  async renderGroups(searchQuery: string = '') {
+  async renderGroups(searchQuery = '') {
     const { containerEl } = this;
     // Remove existing groups, but keep the search bar
     const existingGroups = containerEl.querySelectorAll('.status-group');
@@ -247,7 +247,7 @@ class StatusPaneView extends View {
 export default class NoteStatus extends Plugin {
   settings: NoteStatusSettings;
   statusBarItem: HTMLElement;
-  currentStatus: string = 'unknown';
+  currentStatus = 'unknown';
   statusDropdownContainer?: HTMLElement;
   private statusPaneLeaf: WorkspaceLeaf | null = null;
 
@@ -333,12 +333,14 @@ export default class NoteStatus extends Plugin {
 
     this.registerEvent(
       this.app.workspace.on('editor-menu', (menu, editor, view) => {
-        menu.addItem((item) =>
-          item
-            .setTitle('Change Note Status')
-            .setIcon('tag')
-            .onClick(() => this.showStatusDropdown(editor, view))
-        );
+        if (view instanceof MarkdownView) {
+          menu.addItem((item) =>
+            item
+              .setTitle('Change Note Status')
+              .setIcon('tag')
+              .onClick(() => this.showStatusDropdown(editor, view))
+          );
+        }
       })
     );
 
@@ -406,7 +408,9 @@ export default class NoteStatus extends Plugin {
       await this.updateStatusPane();
     } else {
       const leaf = this.app.workspace.getLeftLeaf(false);
-      await leaf.setViewState({ type: 'status-pane', active: true });
+      if (leaf) {
+        await leaf.setViewState({ type: 'status-pane', active: true });
+      }
     }
   }
 
@@ -415,7 +419,7 @@ export default class NoteStatus extends Plugin {
     const targetFile = file || this.app.workspace.getActiveFile();
     if (!targetFile) return;
 
-    let content = await this.app.vault.read(targetFile);
+    const content = await this.app.vault.read(targetFile);
     let newContent = content;
 
     const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
@@ -531,7 +535,7 @@ export default class NoteStatus extends Plugin {
   }
 
   showStatusDropdown(editor: Editor, view: MarkdownView) {
-    const menu = new Menu(this.app);
+    const menu = new Menu();
     this.settings.customStatuses
       .filter(status => status.name !== 'unknown')
       .forEach(status => {
@@ -545,9 +549,15 @@ export default class NoteStatus extends Plugin {
         );
       });
 
-    const rect = editor.getCursor('to');
-    const pos = editor.coordsAtPos(rect);
-    menu.showAtPosition({ x: pos.x, y: pos.y });
+    const cursor = editor.getCursor('to');
+    editor.posToOffset(cursor);
+    const editorEl = view.contentEl.querySelector('.cm-content');
+    const rect = editorEl?.getBoundingClientRect();
+    if (rect) {
+        menu.showAtPosition({ x: rect.left, y: rect.bottom });
+    } else {
+        menu.showAtPosition({ x: 0, y: 0 }); // Fallback position
+    }
   }
 
   updateStatusDropdown() {
