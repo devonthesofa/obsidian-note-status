@@ -1,94 +1,99 @@
-# Obsidian Sample Plugin
+# Obsidian Note Status Plugin
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+![Version](https://img.shields.io/badge/version-1.0.2-blue) ![Obsidian](https://img.shields.io/badge/Obsidian-Compatible-green)
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+The **Note Status** plugin for Obsidian enhances your workflow by allowing you to assign, manage, and visualize statuses for your notes. Whether you're tracking projects, tasks, or personal notes, this plugin provides a seamless way to organize your vault with customizable statuses, a dedicated status pane, and visual indicators.
+## Features
+- **Status Assignment**: Add statuses (e.g., active, on hold, completed, dropped, unknown) to notes via frontmatter.
+- **Status Pane**: A sidebar view to see all notes grouped by status, with search and collapsible sections.
+- **Dropdown Menu**: Quickly change a note’s status from a dropdown at the top or bottom of the editor.
+- **Status Bar**: Displays the current note’s status at the bottom of the app, with toggleable visibility.
+- **File Explorer Icons**: Shows status icons next to note names in the file explorer for instant recognition.
+- **Customization**: Define your own statuses, icons, and colors in the settings, and adjust UI preferences like position and auto-hiding.
+- **Commands**: Includes commands to refresh statuses, insert status metadata, and open the status pane.
+## Installation
+1. **Download the Plugin**:
+    - Grab the latest release (v1.0.2) from the [GitHub Releases page](https://github.com/devonthesofa/obsidian-note-status/releases).
+    - Extract the zip file to get the plugin folder (obsidian-note-status).
+2. **Install in Obsidian**:
+    - Open your Obsidian vault and navigate to .obsidian/plugins/.
+    - Copy the obsidian-note-status folder into this directory.
+    - If the plugins folder doesn’t exist, create it.
+3. **Enable the Plugin**:
+    - In Obsidian, go to Settings > Community Plugins.
+    - Ensure "Safe Mode" is turned off.
+    - Find "Note Status" in the list and toggle it on.
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+_Note_: This plugin is not yet available in the Obsidian Community Plugin store but will be submitted soon!
+## Usage
 
-## First time developing plugins?
+### Setting a Status
 
-Quick starting guide for new plugin devs:
+- Open a note and use the command Insert Status Metadata to add a status: unknown field in the frontmatter.
+- Change the status manually in the frontmatter, or use the dropdown menu (click the status bar or right-click in the editor and select "Change Note Status").
+### Status Pane
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+- Click the ribbon icon (a bar chart) or use the Open Status Pane command to view all notes grouped by status.
+- Use the search bar to filter notes by name.
+### Customization
 
-## Releasing new releases
+- Go to Settings > Note Status to:
+    - Toggle visibility of the dropdown, status bar, and file explorer icons.
+    - Adjust positions (top/bottom for dropdown, left/right for status bar).
+    - Add, edit, or remove custom statuses with unique icons and colors.
+### Example Frontmatter
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
-
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
-
-## Adding your plugin to the community plugin list
-
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
-
-## How to use
-
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
-
-## Manually installing the plugin
-
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
-
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
-
-## Funding URL
-
-You can include funding URLs where people who use your plugin can financially support it.
-
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
-
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
+```yaml
+---
+status: active
+---
 ```
+## Screenshots
 
-If you have multiple URLs, you can also do:
+![[Pasted image 20250403164058.png]]
 
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
+![[Pasted image 20250403164128.png]]
+
+- Status Pane: ![[Pasted image 20250403164202.png]]
+- Dropdown Menu: ![[Pasted image 20250403164151.png]] 
+- File Explorer Icons: ![[Pasted image 20250403164222.png]]
+
+## Development
+
+### Prerequisites
+
+- Node.js and npm installed.
+- Obsidian API knowledge (TypeScript-based).
+
+### Building the Plugin
+
+1. Clone this repository:
+```bash
+git clone https://github.com/yourusername/obsidian-note-status.git
+cd obsidian-note-status
 ```
+    
+2. Install dependencies:
+```bash
+npm install
+```
+    
+3. Build the plugin:
+```bash
+npm run build
+```
+    
+4. The compiled plugin will be in the root directory, ready to copy into .obsidian/plugins/.
 
-## API Documentation
+### Contributing
 
-See https://github.com/obsidianmd/obsidian-api
+- Fork this repository and submit pull requests with improvements or bug fixes.
+- Report issues or suggest features via the [Issues tab](https://github.com/devonthesofa/obsidian-note-status/issues).
+## Known Limitations
+- Dropdown positioning uses DOM-based workarounds due to limited API support for editor coordinates.
+- Initial release; some edge cases may still need refinement—please report bugs!
+## License
+This plugin is released under the . Feel free to use, modify, and distribute it as you see fit.
+## Acknowledgments
+- Built with help from [xAI’s Grok](https://xai.com) for code assistance and debugging.
+- Inspired by the amazing Obsidian community and its plugin ecosystem.
