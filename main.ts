@@ -667,7 +667,7 @@ export default class NoteStatus extends Plugin {
   }
 
   getStatusIcon(status: string): string {
-    const customStatus = this.settings.customStatuses.find(s => s.name === status);
+    const customStatus = this.settings.customStatuses.find(s => s.name.toLowerCase() === status.toLowerCase());
     return customStatus ? customStatus.icon : '❓';
   }
 
@@ -835,21 +835,16 @@ export default class NoteStatus extends Plugin {
   }
 
   async updateFileExplorerIcons(file: TFile) {
-    if (!this.settings.showStatusIconsInExplorer) return;
-    
+    if (!this.settings.showStatusIconsInExplorer || file.extension !== 'md') return;
 
-    const content = await this.app.vault.read(file);
-    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    const cachedMetadata = this.app.metadataCache.getFileCache(file);
     let status = 'unknown';
 
-    if (frontmatterMatch) {
-      const frontmatter = frontmatterMatch[1];
-      const statusMatch = frontmatter.match(/status:\s*(\w+)/i);
-      if (statusMatch) {
-        const foundStatus = statusMatch[1].toLowerCase();
-        if (this.settings.customStatuses.some(s => s.name === foundStatus)) {
-          status = foundStatus;
-        }
+    if (cachedMetadata?.frontmatter?.status) {
+      const frontmatterStatus = cachedMetadata.frontmatter.status.toLowerCase();
+      const matchingStatus = this.settings.customStatuses.find(s => s.name.toLowerCase() === frontmatterStatus);
+      if (matchingStatus) {
+        status = matchingStatus.name; // Use the exact name from settings
       }
     }
 
@@ -867,7 +862,7 @@ export default class NoteStatus extends Plugin {
             text: this.getStatusIcon(status)
           });
           iconEl.style.marginLeft = '5px';
-          iconEl.style.color = this.settings.statusColors[status] || '#808080';
+          iconEl.style.color = this.settings.statusColors[status];
           iconEl.style.fontSize = '12px';
         }
       }
