@@ -80,60 +80,25 @@ class StatusPaneView extends View {
   async setupPane() {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.addClass('status-pane');
-    containerEl.style.cssText = `
-      padding: 10px;
-      background: var(--background-secondary);
-      color: var(--text-normal);
-      font-family: var(--font-interface);
-      overflow-y: auto;
-      height: 100%;
-    `;
+    containerEl.addClass('note-status-pane', 'nav-files-container');
 
-    const searchContainer = containerEl.createDiv({ cls: 'status-pane-search' });
+    const searchContainer = containerEl.createDiv({ cls: 'note-status-search search-input-container' });
     this.searchInput = searchContainer.createEl('input', {
       type: 'text',
       placeholder: 'Search notes...',
-      cls: 'status-pane-search-input'
-    });
-    this.searchInput.style.cssText = `
-      width: 100%;
-      padding: 8px 12px;
-      margin-bottom: 10px;
-      border: 1px solid var(--background-modifier-border);
-      border-radius: 4px;
-      background: var(--background-primary);
-      color: var(--text-normal);
-      outline: none;
-      transition: border-color 0.2s ease;
-    `;
-    this.searchInput.addEventListener('focus', () => {
-      this.searchInput!.style.borderColor = 'var(--interactive-accent)';
-    });
-    this.searchInput.addEventListener('blur', () => {
-      this.searchInput!.style.borderColor = 'var(--background-modifier-border)';
+      cls: 'note-status-search-input search-input'
     });
     this.searchInput.addEventListener('input', () => {
       this.renderGroups(this.searchInput!.value.toLowerCase());
     });
 
     const actionsContainer = containerEl.createDiv({ cls: 'status-pane-actions-container' });
-
-    // Add refresh button for manual updates
     const refreshButton = actionsContainer.createEl('button', {
       type: 'button',
       title: 'Refresh Statuses',
       text: 'Refresh',
-      cls: 'status-pane-actions-refresh'
+      cls: 'note-status-actions-refresh clickable-icon mod-cta'
     });
-    refreshButton.style.cssText = `
-      padding: 6px 12px;
-      margin: 5px 0 5px 10px;
-      background: var(--background-primary);
-      border: 1px solid var(--background-modifier-border);
-      border-radius: 4px;
-      cursor: pointer;
-    `;
     refreshButton.addEventListener('click', async () => {
       await this.renderGroups(this.searchInput?.value.toLowerCase() || '');
       new Notice('Status pane refreshed');
@@ -155,12 +120,11 @@ class StatusPaneView extends View {
     for (const file of files) {
       const cachedMetadata = this.app.metadataCache.getFileCache(file);
       let status = 'unknown';
-
       if (cachedMetadata?.frontmatter?.status) {
         const frontmatterStatus = cachedMetadata.frontmatter.status.toLowerCase();
         const matchingStatus = this.plugin.settings.customStatuses.find(s => s.name.toLowerCase() === frontmatterStatus);
         if (matchingStatus) {
-          status = matchingStatus.name; // Use the exact name from settings
+          status = matchingStatus.name;
         }
       }
       statusGroups[status].push(file);
@@ -177,15 +141,7 @@ class StatusPaneView extends View {
           text: `${status} ${this.plugin.getStatusIcon(status)} (${filteredFiles.length})`,
           cls: `status-${status}`
         });
-        titleSpan.style.cssText = `
-          color: ${this.plugin.settings.statusColors[status] || '#808080'};
-          font-weight: 600;
-          padding: 8px 12px;
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          transition: background 0.2s ease;
-        `;
+        titleSpan.style.color = this.plugin.settings.statusColors[status]; // Keep color override
         titleEl.style.cursor = 'pointer';
         const isCollapsed = this.plugin.settings.collapsedStatuses[status] ?? false;
         if (isCollapsed) {
@@ -198,23 +154,8 @@ class StatusPaneView extends View {
           this.plugin.settings.collapsedStatuses[status] = !this.plugin.settings.collapsedStatuses[status];
           this.plugin.saveSettings();
         });
-        titleEl.addEventListener('mouseover', () => {
-          titleSpan.style.background = 'var(--background-modifier-hover)';
-        });
-        titleEl.addEventListener('mouseout', () => {
-          titleSpan.style.background = 'transparent';
-        });
 
         const childrenEl = groupEl.createDiv({ cls: 'nav-folder-children' });
-        childrenEl.style.cssText = `
-          padding-left: 20px;
-          border-left: 1px solid var(--background-modifier-border);
-          display: ${isCollapsed ? 'none' : 'block'};
-        `;
-        titleEl.addEventListener('click', () => {
-          childrenEl.style.display = childrenEl.style.display === 'none' ? 'block' : 'none';
-        });
-
         filteredFiles.sort((a, b) => a.basename.localeCompare(b.basename)).forEach(file => {
           const fileEl = childrenEl.createDiv({ cls: 'nav-file' });
           const fileTitleEl = fileEl.createDiv({ cls: 'nav-file-title' });
@@ -222,21 +163,9 @@ class StatusPaneView extends View {
             text: file.basename,
             cls: 'nav-file-title-content'
           });
-          linkEl.style.cssText = `
-            padding: 6px 12px;
-            display: block;
-            color: var(--text-normal);
-            transition: background 0.2s ease;
-          `;
           fileEl.addEventListener('click', (e) => {
             e.preventDefault();
             this.app.workspace.openLinkText(file.path, file.path, true);
-          });
-          fileEl.addEventListener('mouseover', () => {
-            linkEl.style.background = 'var(--background-modifier-hover)';
-          });
-          fileEl.addEventListener('mouseout', () => {
-            linkEl.style.background = 'transparent';
           });
         });
       }
@@ -269,7 +198,7 @@ export default class NoteStatus extends Plugin {
     });
 
     this.statusBarItem = this.addStatusBarItem();
-    this.statusBarItem.style.cursor = 'pointer';
+    this.statusBarItem.addClass('note-status-bar');
     this.statusBarItem.addEventListener('click', () => {
       this.settings.showStatusDropdown = !this.settings.showStatusDropdown;
       this.updateStatusDropdown();
@@ -657,14 +586,18 @@ export default class NoteStatus extends Plugin {
 
   updateStatusBar() {
     this.statusBarItem.empty();
+    this.statusBarItem.removeClass('left', 'hidden', 'auto-hide', 'visible');
+    this.statusBarItem.addClass('note-status-bar');
+
     if (!this.settings.showStatusBar) {
-      this.statusBarItem.style.display = 'none';
+      this.statusBarItem.addClass('hidden');
       return;
     }
 
-    this.statusBarItem.style.display = 'flex';
-    this.statusBarItem.style.justifyContent = this.settings.statusBarPosition === 'left' ? 'flex-start' : 'flex-end';
-    
+    if (this.settings.statusBarPosition === 'left') {
+      this.statusBarItem.addClass('left');
+    }
+
     const statusEl = this.statusBarItem.createEl('span', {
       text: `Status: ${this.currentStatus}`,
       cls: `note-status-${this.currentStatus}`
@@ -672,20 +605,18 @@ export default class NoteStatus extends Plugin {
     statusEl.style.color = this.settings.statusColors[this.currentStatus];
     this.statusBarItem.createEl('span', {
       text: this.getStatusIcon(this.currentStatus),
-      cls: 'status-icon'
+      cls: 'note-status-icon'
     });
 
     if (this.settings.autoHideStatusBar && this.currentStatus === 'unknown') {
-      this.statusBarItem.style.opacity = '0';
-      this.statusBarItem.style.transition = 'opacity 0.5s ease';
+      this.statusBarItem.addClass('auto-hide');
       setTimeout(() => {
         if (this.currentStatus === 'unknown' && this.settings.showStatusBar) {
-          this.statusBarItem.style.display = 'none';
+          this.statusBarItem.addClass('hidden');
         }
       }, 500);
     } else {
-      this.statusBarItem.style.opacity = '1';
-      this.statusBarItem.style.display = 'flex';
+      this.statusBarItem.addClass('visible');
     }
   }
 
@@ -770,47 +701,24 @@ export default class NoteStatus extends Plugin {
       this.statusDropdownContainer = this.settings.dropdownPosition === 'top'
         ? contentEl.insertBefore(document.createElement('div'), contentEl.firstChild)
         : contentEl.appendChild(document.createElement('div'));
-      this.statusDropdownContainer.className = 'note-status-dropdown';
-      this.statusDropdownContainer.style.cssText = `
-        padding: 5px;
-        background: var(--background-secondary);
-        border-${this.settings.dropdownPosition === 'top' ? 'bottom' : 'top'}: 1px solid var(--background-modifier-border);
-        position: sticky;
-        ${this.settings.dropdownPosition}: 0;
-        z-index: 10;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      `;
+      this.statusDropdownContainer.addClass('note-status-dropdown', this.settings.dropdownPosition);
     }
 
     this.statusDropdownContainer.empty();
     const label = this.statusDropdownContainer.createEl('span', {
       text: 'Status:',
-      cls: 'status-label'
+      cls: 'note-status-label'
     });
-    label.style.fontWeight = 'bold';
-
     const select = this.statusDropdownContainer.createEl('select', {
-      cls: 'status-select'
+      cls: 'note-status-select dropdown'
     });
-    select.style.cssText = `
-      padding: 4px 8px;
-      border: 1px solid var(--background-modifier-border);
-      border-radius: 4px;
-      background: var(--background-primary);
-      color: var(--text-normal);
-      cursor: pointer;
-      outline: none;
-      transition: all 0.2s ease;
-    `;
 
     this.settings.customStatuses.forEach(status => {
       const option = select.createEl('option', {
         text: `${status.name} ${status.icon}`,
         value: status.name
       });
-      option.style.color = this.settings.statusColors[status.name] || '#808080';
+      option.style.color = this.settings.statusColors[status.name];
       if (status.name === this.currentStatus) {
         option.selected = true;
       }
@@ -823,37 +731,15 @@ export default class NoteStatus extends Plugin {
       }
     });
 
-    select.addEventListener('mouseover', () => {
-      select.style.boxShadow = '0 2px 4px var(--background-modifier-box-shadow)';
-    });
-    select.addEventListener('mouseout', () => {
-      select.style.boxShadow = 'none';
-    });
-
     const hideButton = this.statusDropdownContainer.createEl('button', {
       text: 'Hide Bar',
-      cls: 'hide-status-bar-button'
+      cls: 'note-status-hide-button clickable-icon mod-cta'
     });
-    hideButton.style.cssText = `
-      padding: 4px 8px;
-      border: 1px solid var(--background-modifier-border);
-      border-radius: 4px;
-      background: var(--background-primary);
-      color: var(--text-normal);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    `;
     hideButton.addEventListener('click', () => {
       this.settings.showStatusDropdown = false;
       this.updateStatusDropdown();
       this.saveSettings();
       new Notice('Status dropdown hidden');
-    });
-    hideButton.addEventListener('mouseover', () => {
-      hideButton.style.backgroundColor = 'var(--background-modifier-hover)';
-    });
-    hideButton.addEventListener('mouseout', () => {
-      hideButton.style.backgroundColor = 'var(--background-primary)';
     });
   }
 
@@ -862,7 +748,6 @@ export default class NoteStatus extends Plugin {
 
     const cachedMetadata = this.app.metadataCache.getFileCache(file);
     let status = 'unknown';
-
     if (cachedMetadata?.frontmatter?.status) {
       const frontmatterStatus = cachedMetadata.frontmatter.status.toLowerCase();
       const matchingStatus = this.settings.customStatuses.find(s => s.name.toLowerCase() === frontmatterStatus);
@@ -881,12 +766,10 @@ export default class NoteStatus extends Plugin {
           if (existingIcon) existingIcon.remove();
 
           const iconEl = titleEl.createEl('span', {
-            cls: 'note-status-icon',
+            cls: 'note-status-icon nav-file-tag',
             text: this.getStatusIcon(status)
           });
-          iconEl.style.marginLeft = '5px';
           iconEl.style.color = this.settings.statusColors[status];
-          iconEl.style.fontSize = '12px';
         }
       }
     }

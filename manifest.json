@@ -15,5 +15,6 @@
 	"icon": "status-pane",
 	"repository": "https://github.com/devonthesofa/obsidian-note-status",
 	"issues": "https://github.com/devonthesofa/obsidian-note-status/issues",
-	"releaseNotes": "Initial release with status management, customizable UI, and file explorer integration."
+	"releaseNotes": "Initial release with status management, customizable UI, and file explorer integration.",
+	"css": "styles.css"
 }

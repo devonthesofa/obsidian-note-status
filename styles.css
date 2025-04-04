@@ -1,8 +1,149 @@
-/*
-
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
-*/
+/* Status Pane */
+.note-status-pane {
+    padding: var(--size-4-2);
+    background: var(--background-secondary);
+    color: var(--text-normal);
+    font-family: var(--font-interface);
+    overflow-y: auto;
+    height: 100%;
+  }
+  
+  .note-status-search {
+    margin-bottom: var(--size-4-2);
+  }
+  
+  .note-status-search-input {
+    width: 100%;
+    padding: var(--input-padding);
+    border: var(--input-border-width) solid var(--background-modifier-border);
+    border-radius: var(--input-radius);
+    background: var(--background-primary);
+    color: var(--text-normal);
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  
+  .note-status-search-input:focus {
+    border-color: var(--interactive-accent);
+  }
+  
+  .note-status-actions-refresh {
+    padding: var(--size-4-1) var(--size-4-3);
+    border: var(--input-border-width) solid var(--background-modifier-border);
+    border-radius: var(--button-radius);
+    background: var(--background-primary);
+    color: var(--text-normal);
+    cursor: pointer;
+  }
+  
+  .note-status-actions-refresh:hover {
+    background: var(--background-modifier-hover);
+  }
+  
+  /* Status Group Titles */
+  .status-group .nav-folder-title .status-active,
+  .status-group .nav-folder-title .status-onHold,
+  .status-group .nav-folder-title .status-completed,
+  .status-group .nav-folder-title .status-dropped,
+  .status-group .nav-folder-title .status-unknown {
+    font-weight: 600;
+    padding: var(--size-4-2) var(--size-4-3);
+    display: flex;
+    align-items: center;
+    gap: var(--size-4-1);
+    transition: background 0.2s ease;
+  }
+  
+  .status-group .nav-folder-title:hover span {
+    background: var(--background-modifier-hover);
+  }
+  
+  /* Status Dropdown */
+.note-status-dropdown {
+    padding: var(--size-4-1);
+    background: var(--background-secondary);
+    position: sticky;
+    z-index: var(--layer-popover);
+    display: flex;
+    align-items: center;
+    gap: var(--size-4-2);
+  }
+  
+  .note-status-dropdown.top {
+    border-bottom: var(--border-width) solid var(--background-modifier-border);
+    top: 0;
+  }
+  
+  .note-status-dropdown.bottom {
+    border-top: var(--border-width) solid var(--background-modifier-border);
+    bottom: 0;
+  }
+  
+  .note-status-label {
+    font-weight: bold;
+  }
+  
+  .note-status-select {
+    padding: var(--input-padding);
+    border: var(--input-border-width) solid var(--background-modifier-border);
+    border-radius: var(--input-radius);
+    background: var(--background-secondary); /* Ensure clean background */
+    color: var(--text-normal);
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    appearance: auto; /* Restore native dropdown styling */
+    min-width: 120px; /* Prevent collapse */
+  }
+  
+  .note-status-select:hover {
+    box-shadow: 0 2px 4px var(--background-modifier-box-shadow);
+  }
+  
+  .note-status-select option {
+    background: var(--background-primary); /* Clean option background */
+    color: var(--text-normal);
+  }
+  
+  .note-status-hide-button {
+    padding: var(--size-4-1) var(--size-4-2);
+    border: var(--input-border-width) solid var(--background-modifier-border);
+    border-radius: var(--button-radius);
+    background: var(--background-primary);
+    color: var(--text-normal);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .note-status-hide-button:hover {
+    background: var(--background-modifier-hover);
+  }
+  
+  /* File Explorer Icons */
+  .note-status-icon {
+    margin-left: var(--size-4-1);
+    font-size: var(--font-ui-small);
+  }
+  
+  /* Status Bar */
+  .note-status-bar {
+    display: flex;
+    justify-content: flex-end; /* Default, will be overridden by settings */
+  }
+  
+  .note-status-bar.left {
+    justify-content: flex-start;
+  }
+  
+  .note-status-bar.hidden {
+    display: none;
+  }
+  
+  .note-status-bar.auto-hide {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  
+  .note-status-bar.auto-hide.visible {
+    opacity: 1;
+  }
