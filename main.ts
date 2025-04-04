@@ -143,7 +143,6 @@ class StatusPaneView extends View {
   // Render only the dynamic groups
   async renderGroups(searchQuery = '') {
     const { containerEl } = this;
-    // Remove existing groups, but keep the search bar
     const existingGroups = containerEl.querySelectorAll('.status-group');
     existingGroups.forEach(group => group.remove());
 
@@ -158,9 +157,10 @@ class StatusPaneView extends View {
       let status = 'unknown';
 
       if (cachedMetadata?.frontmatter?.status) {
-        const foundStatus = cachedMetadata.frontmatter.status.toLowerCase();
-        if (this.plugin.settings.customStatuses.some(s => s.name === foundStatus)) {
-          status = foundStatus;
+        const frontmatterStatus = cachedMetadata.frontmatter.status.toLowerCase();
+        const matchingStatus = this.plugin.settings.customStatuses.find(s => s.name.toLowerCase() === frontmatterStatus);
+        if (matchingStatus) {
+          status = matchingStatus.name; // Use the exact name from settings
         }
       }
       statusGroups[status].push(file);
@@ -193,7 +193,7 @@ class StatusPaneView extends View {
         }
 
         titleEl.addEventListener('click', (e) => {
-          e.preventDefault(); // Prevent any unwanted navigation
+          e.preventDefault();
           groupEl.classList.toggle('is-collapsed');
           this.plugin.settings.collapsedStatuses[status] = !this.plugin.settings.collapsedStatuses[status];
           this.plugin.saveSettings();
