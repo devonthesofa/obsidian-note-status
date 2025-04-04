@@ -87,13 +87,14 @@
     padding: var(--input-padding);
     border: var(--input-border-width) solid var(--background-modifier-border);
     border-radius: var(--input-radius);
-    background: var(--background-secondary); /* Ensure clean background */
+    background: var(--background-primary); /* Base background */
+    background-image: none !important; /* Override theme's SVG */
     color: var(--text-normal);
     cursor: pointer;
     outline: none;
     transition: all 0.2s ease;
-    appearance: auto; /* Restore native dropdown styling */
-    min-width: 120px; /* Prevent collapse */
+    appearance: auto;
+    min-width: 120px;
   }
   
   .note-status-select:hover {
