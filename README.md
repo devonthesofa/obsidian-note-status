@@ -13,7 +13,7 @@ The **Note Status** plugin for Obsidian enhances your workflow by allowing you t
 - **Commands**: Includes commands to refresh statuses, insert status metadata, and open the status pane.
 ## Installation
 1. **Download the Plugin**:
-    - Grab the latest release (v1.0.2) from the [GitHub Releases page](https://github.com/devonthesofa/obsidian-note-status/releases).
+    - Grab the latest release from the [GitHub Releases page](https://github.com/devonthesofa/obsidian-note-status/releases).
     - Extract the zip file to get the plugin folder (obsidian-note-status).
 2. **Install in Obsidian**:
     - Open your Obsidian vault and navigate to .obsidian/plugins/.
