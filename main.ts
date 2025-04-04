@@ -6,10 +6,6 @@ addIcon('status-pane', `
   </svg>
 `);
 
-interface Frontmatter {
-  status?: string;
-  [key: string]: any;
-}
 
 interface NoteStatusSettings {
   mySetting: string;
@@ -159,7 +155,7 @@ class StatusPaneView extends View {
         filteredFiles.sort((a, b) => a.basename.localeCompare(b.basename)).forEach(file => {
           const fileEl = childrenEl.createDiv({ cls: 'nav-file' });
           const fileTitleEl = fileEl.createDiv({ cls: 'nav-file-title' });
-          const linkEl = fileTitleEl.createSpan({
+          fileTitleEl.createSpan({
             text: file.basename,
             cls: 'nav-file-title-content'
           });
@@ -245,7 +241,7 @@ export default class NoteStatus extends Plugin {
               .setTitle('Change Status of Selected Files')
               .setIcon('tag')
               .onClick(() => {
-                this.showBatchStatusContextMenu(mdFiles);
+                this.showBatchStatusContextMenu(mdFiles as TFile[]); // WARNING: Fix the type
               })
           );
         } else {
@@ -465,7 +461,9 @@ export default class NoteStatus extends Plugin {
   // Modified updateNoteStatus to accept optional file parameter
   async updateNoteStatus(newStatus: string, file?: TFile) {
     const targetFile = file || this.app.workspace.getActiveFile();
-    if (!targetFile || !targetFile.extension === 'md') return; // Only process .md files
+    if (!targetFile || targetFile.extension !== 'md') {
+      return; // Only process .md files
+    }
 
     const content = await this.app.vault.read(targetFile);
     let newContent = content;
@@ -473,7 +471,6 @@ export default class NoteStatus extends Plugin {
     const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n?/);
     if (frontmatterMatch) {
       const frontmatter = frontmatterMatch[1];
-      const fullMatch = frontmatterMatch[0];
       if (frontmatter.includes('status:')) {
         // Replace only the status line, preserving other frontmatter
         newContent = content.replace(
@@ -548,7 +545,7 @@ export default class NoteStatus extends Plugin {
 
     const mdFiles = this.app.vault.getMarkdownFiles();
     mdFiles.forEach(file => {
-      const option = fileSelect.createEl('option', {
+      fileSelect.createEl('option', {
         text: file.path,
         value: file.path
       });
@@ -705,7 +702,7 @@ export default class NoteStatus extends Plugin {
     }
 
     this.statusDropdownContainer.empty();
-    const label = this.statusDropdownContainer.createEl('span', {
+    this.statusDropdownContainer.createEl('span', {
       text: 'Status:',
       cls: 'note-status-label'
     });
@@ -917,7 +914,7 @@ class NoteStatusSettingTab extends PluginSettingTab {
     const renderStatuses = () => {
       statusList.empty();
       this.plugin.settings.customStatuses.forEach((status, index) => {
-        const statusSetting = new Setting(statusList)
+        new Setting(statusList)
           .setName(status.name)
           .addText(text => text
             .setPlaceholder('Status Name')
