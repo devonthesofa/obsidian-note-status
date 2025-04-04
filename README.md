@@ -74,7 +74,7 @@ status: active
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/obsidian-note-status.git
+git clone https://github.com/devonthesofa/obsidian-note-status.git
 cd obsidian-note-status
 ```
     
