@@ -6,6 +6,11 @@ addIcon('status-pane', `
   </svg>
 `);
 
+interface Frontmatter {
+  status?: string;
+  [key: string]: any;
+}
+
 interface NoteStatusSettings {
   mySetting: string;
   statusColors: Record<string, string>;
@@ -22,11 +27,11 @@ interface NoteStatusSettings {
 const DEFAULT_SETTINGS: NoteStatusSettings = {
   mySetting: 'default',
   statusColors: {
-    active: '#00ff00',
-    onHold: '#ffa500',
-    completed: '#0000ff',
-    dropped: '#ff0000',
-    unknown: '#808080'
+    active: 'var(--text-success)',
+    onHold: 'var(--text-warning)',
+    completed: 'var(--text-accent)',
+    dropped: 'var(--text-error)',
+    unknown: 'var(--text-muted)'
   },
   showStatusDropdown: true,
   showStatusBar: true,
@@ -274,6 +279,53 @@ export default class NoteStatus extends Plugin {
     this.updateStatusBar();
 
     this.addCommand({
+      id: 'batch-update-status',
+      name: 'Batch Update Status',
+      callback: () => this.showBatchStatusModal()
+    });
+
+    this.registerEvent(
+      this.app.workspace.on('file-menu', (menu, file, source) => {
+        console.log('file-menu triggered:', { source, file: file.path });
+        if (source === 'file-explorer-context-menu' && file instanceof TFile && file.extension === 'md') {
+          menu.addItem((item) =>
+            item
+              .setTitle('Change Status of Selected Files')
+              .setIcon('tag')
+              .onClick(() => {
+                const selectedFiles = this.getSelectedFiles();
+                if (selectedFiles.length > 1) {
+                  this.showBatchStatusContextMenu(selectedFiles);
+                } else {
+                  this.showBatchStatusContextMenu([file]); // Single file fallback
+                }
+              })
+          );
+        }
+      })
+    );
+
+    // Register context menu for multiple files (files-menu)
+    this.registerEvent(
+      this.app.workspace.on('files-menu', (menu, files) => {
+        console.log('files-menu triggered:', { files: files.map(f => f.path) });
+        const mdFiles = files.filter(file => file instanceof TFile && file.extension === 'md');
+        if (mdFiles.length > 0) {
+          menu.addItem((item) =>
+            item
+              .setTitle('Change Status of Selected Files')
+              .setIcon('tag')
+              .onClick(() => {
+                this.showBatchStatusContextMenu(mdFiles);
+              })
+          );
+        } else {
+          console.log('No .md files in selection');
+        }
+      })
+    );
+
+    this.addCommand({
       id: 'refresh-note-status',
       name: 'Refresh Note Status',
       callback: () => {
@@ -414,27 +466,84 @@ export default class NoteStatus extends Plugin {
     }
   }
 
+  private getSelectedFiles(): TFile[] {
+    const fileExplorer = this.app.workspace.getLeavesOfType('file-explorer')[0];
+    if (!fileExplorer || !fileExplorer.view || !(fileExplorer.view as any).fileItems) {
+      console.log('File explorer not found or no file items');
+      return [];
+    }
+
+    const fileItems = (fileExplorer.view as any).fileItems;
+    const selectedFiles: TFile[] = [];
+    
+    Object.entries(fileItems).forEach(([path, item]: [string, any]) => {
+      if (item.el?.classList.contains('is-selected') && item.file instanceof TFile && item.file.extension === 'md') {
+        selectedFiles.push(item.file);
+      }
+    });
+
+    console.log('Selected files:', selectedFiles.map(f => f.path));
+    return selectedFiles;
+  }
+
+  // Show context menu for batch status update
+  private showBatchStatusContextMenu(files: TFile[]) {
+    const menu = new Menu();
+    
+    this.settings.customStatuses
+      .filter(status => status.name !== 'unknown')
+      .forEach(status => {
+        menu.addItem((item) =>
+          item
+            .setTitle(`${status.name} ${status.icon}`)
+            .setIcon('tag')
+            .onClick(async () => {
+              for (const file of files) {
+                await this.updateNoteStatus(status.name, file);
+              }
+              new Notice(`Updated status of ${files.length} file${files.length === 1 ? '' : 's'} to ${status.name}`);
+            })
+        );
+      });
+
+    menu.showAtMouseEvent(new MouseEvent('contextmenu'));
+    console.log('Showing batch status context menu for files:', files.map(f => f.path));
+  }
+
   // Modified updateNoteStatus to accept optional file parameter
   async updateNoteStatus(newStatus: string, file?: TFile) {
     const targetFile = file || this.app.workspace.getActiveFile();
-    if (!targetFile) return;
+    if (!targetFile || !targetFile.extension === 'md') return; // Only process .md files
 
     const content = await this.app.vault.read(targetFile);
     let newContent = content;
 
-    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n?/);
     if (frontmatterMatch) {
       const frontmatter = frontmatterMatch[1];
+      const fullMatch = frontmatterMatch[0];
       if (frontmatter.includes('status:')) {
-        newContent = content.replace(/status:\s*\w+/i, `status: ${newStatus}`);
+        // Replace only the status line, preserving other frontmatter
+        newContent = content.replace(
+          /^---\n([\s\S]*?)status:\s*\w+([\s\S]*?)\n---\n?/,
+          `---\n$1status: ${newStatus}$2\n---\n`
+        );
       } else {
-        newContent = content.replace(/^---\n/, `---\nstatus: ${newStatus}\n`);
+        // Add status to existing frontmatter
+        newContent = content.replace(
+          /^---\n([\s\S]*?)\n---\n?/,
+          `---\n$1\nstatus: ${newStatus}\n---\n`
+        );
       }
     } else {
+      // Create new frontmatter if none exists
       newContent = `---\nstatus: ${newStatus}\n---\n${content.trim()}`;
     }
 
+    // Ensure consistent line endings and remove extra newlines
+    newContent = newContent.replace(/\n{3,}/g, '\n\n');
     await this.app.vault.modify(targetFile, newContent);
+
     if (targetFile === this.app.workspace.getActiveFile()) {
       this.currentStatus = newStatus;
       this.updateStatusBar();
@@ -446,7 +555,7 @@ export default class NoteStatus extends Plugin {
 
   async checkNoteStatus() {
     const activeFile = this.app.workspace.getActiveFile();
-    if (!activeFile) {
+    if (!activeFile || activeFile.extension !== 'md') { // Only process .md files
       this.currentStatus = 'unknown';
       this.updateStatusBar();
       this.updateStatusDropdown();
@@ -458,14 +567,69 @@ export default class NoteStatus extends Plugin {
 
     if (cachedMetadata?.frontmatter?.status) {
       const status = cachedMetadata.frontmatter.status.toLowerCase();
-      if (this.settings.customStatuses.some(s => s.name === status)) {
-        this.currentStatus = status;
+      // Explicitly check against customStatuses
+      const matchingStatus = this.settings.customStatuses.find(s => s.name.toLowerCase() === status);
+      if (matchingStatus) {
+        this.currentStatus = matchingStatus.name;
       }
     }
 
     this.updateStatusBar();
     this.updateStatusDropdown();
     this.updateFileExplorerIcons(activeFile);
+  }
+
+  // New method for batch status update
+  async showBatchStatusModal() {
+    const modal = new Modal(this.app);
+    modal.contentEl.createEl('h2', { text: 'Batch Update Note Status' });
+
+    const fileSelect = modal.contentEl.createEl('select', {
+      cls: 'batch-file-select',
+      attr: { multiple: 'true' }
+    });
+    fileSelect.style.cssText = `
+      width: 100%;
+      height: 200px;
+      margin-bottom: 10px;
+    `;
+
+    const mdFiles = this.app.vault.getMarkdownFiles();
+    mdFiles.forEach(file => {
+      const option = fileSelect.createEl('option', {
+        text: file.path,
+        value: file.path
+      });
+    });
+
+    const statusSelect = modal.contentEl.createEl('select', {
+      cls: 'batch-status-select'
+    });
+    this.settings.customStatuses.forEach(status => {
+      statusSelect.createEl('option', {
+        text: `${status.name} ${status.icon}`,
+        value: status.name
+      });
+    });
+
+    const applyButton = modal.contentEl.createEl('button', {
+      text: 'Apply Status',
+      cls: 'mod-cta'
+    });
+    applyButton.addEventListener('click', async () => {
+      const selectedFiles = Array.from(fileSelect.selectedOptions).map(opt => 
+        mdFiles.find(f => f.path === opt.value)
+      ).filter(Boolean) as TFile[];
+      const newStatus = statusSelect.value;
+
+      for (const file of selectedFiles) {
+        await this.updateNoteStatus(newStatus, file);
+      }
+      new Notice(`Updated status of ${selectedFiles.length} notes to ${newStatus}`);
+      modal.close();
+    });
+
+    modal.open();
   }
 
   updateStatusBar() {
@@ -482,7 +646,7 @@ export default class NoteStatus extends Plugin {
       text: `Status: ${this.currentStatus}`,
       cls: `note-status-${this.currentStatus}`
     });
-    statusEl.style.color = this.settings.statusColors[this.currentStatus] || '#808080';
+    statusEl.style.color = this.settings.statusColors[this.currentStatus];
     this.statusBarItem.createEl('span', {
       text: this.getStatusIcon(this.currentStatus),
       cls: 'status-icon'
@@ -672,6 +836,7 @@ export default class NoteStatus extends Plugin {
 
   async updateFileExplorerIcons(file: TFile) {
     if (!this.settings.showStatusIconsInExplorer) return;
+    
 
     const content = await this.app.vault.read(file);
     const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
@@ -880,7 +1045,7 @@ class NoteStatusSettingTab extends PluginSettingTab {
               this.plugin.updateAllFileExplorerIcons();
             }))
           .addColorPicker(colorPicker => colorPicker
-            .setValue(this.plugin.settings.statusColors[status.name] || '#808080')
+            .setValue(this.plugin.settings.statusColors[status.name])
             .onChange(async (value) => {
               this.plugin.settings.statusColors[status.name] = value;
               await this.plugin.saveSettings();
