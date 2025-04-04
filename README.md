@@ -1,6 +1,6 @@
 # Obsidian Note Status Plugin
 
-![Version](https://img.shields.io/badge/version-1.0.2-blue) ![Obsidian](https://img.shields.io/badge/Obsidian-Compatible-green)
+![Version](https://img.shields.io/badge/version-1.0.6-blue) ![Obsidian](https://img.shields.io/badge/Obsidian-Compatible-green)
 
 The **Note Status** plugin for Obsidian enhances your workflow by allowing you to assign, manage, and visualize statuses for your notes. Whether you're tracking projects, tasks, or personal notes, this plugin provides a seamless way to organize your vault with customizable statuses, a dedicated status pane, and visual indicators.
 ## Features
