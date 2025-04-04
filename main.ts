@@ -446,6 +446,29 @@ export default class NoteStatus extends Plugin {
       })
     );
 
+    // Defer initial icon update until vault and workspace are ready
+    this.registerEvent(
+      this.app.vault.on('modify', (file) => {
+        if (file instanceof TFile && file.extension === 'md') {
+          this.updateFileExplorerIcons(file);
+          this.updateStatusPane();
+        }
+      })
+    );
+    this.registerEvent(
+      this.app.metadataCache.on('resolved', () => {
+        // Called when metadata cache is fully populated
+        this.updateAllFileExplorerIcons();
+      })
+    );
+    // Initial check and update (with slight delay to ensure readiness)
+    this.app.workspace.onLayoutReady(async () => {
+      await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for stability
+      this.checkNoteStatus();
+      this.updateStatusDropdown();
+      this.updateAllFileExplorerIcons();
+    });
+
     this.addSettingTab(new NoteStatusSettingTab(this.app, this));
 
     this.checkNoteStatus();
@@ -844,7 +867,7 @@ export default class NoteStatus extends Plugin {
       const frontmatterStatus = cachedMetadata.frontmatter.status.toLowerCase();
       const matchingStatus = this.settings.customStatuses.find(s => s.name.toLowerCase() === frontmatterStatus);
       if (matchingStatus) {
-        status = matchingStatus.name; // Use the exact name from settings
+        status = matchingStatus.name;
       }
     }
 
@@ -884,7 +907,8 @@ export default class NoteStatus extends Plugin {
       return;
     }
 
-    this.app.vault.getMarkdownFiles().forEach(file => {
+    const files = this.app.vault.getMarkdownFiles();
+    files.forEach(file => {
       this.updateFileExplorerIcons(file);
     });
   }
