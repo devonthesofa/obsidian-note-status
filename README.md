@@ -155,6 +155,20 @@ The v1.0.8 release includes:
     ```
 -  **Improvement:** Further performance optimization for batch status changes
 
+## About the Author
+
+**Aleix Soler** is a professional developer who created this plugin for fun as his first contribution to the Obsidian ecosystem.
+
+- **Website**: [aleixsoler.com](https://aleixsoler.com)
+- **GitHub**: [@soler1212](https://github.com/soler1212)
+- **Organization**: [@devonthesofa](https://github.com/devonthesofa)
+
+As a daily Obsidian user, Aleix wanted to bring better status management to Obsidian to enhance his own workflow.
+
+If you find this plugin helpful:
+- ⭐ Star the repository
+- 📣 Share with other Obsidian users
+
 ## License
 
 This plugin is released under the MIT License. See the LICENSE file for details.
