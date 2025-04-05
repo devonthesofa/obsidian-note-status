@@ -1264,24 +1264,62 @@ class NoteStatusSettingTab extends PluginSettingTab {
 					.setClass('status-item');
 
 				// Name field
-				setting.addText(text => text
-					.setPlaceholder('Status Name')
-					.setValue(status.name)
-					.onChange(async (value) => {
-						if (value && !this.plugin.settings.customStatuses.some(s => s.name === value && s !== status)) {
-							const oldName = status.name;
-							status.name = value;
+				// Fixed name field to maintain focus after value changes
+				setting.addText(text => {
+					text.setPlaceholder('Status Name')
+						.setValue(status.name)
+						.onChange(async (value) => {
+							// Store current selection state and cursor position
+							const inputEl = text.inputEl;
+							const hadFocus = document.activeElement === inputEl;
+							const selectionStart = inputEl.selectionStart;
+							const selectionEnd = inputEl.selectionEnd;
 
-							// Update color mapping
-							if (this.plugin.settings.statusColors[oldName]) {
-								this.plugin.settings.statusColors[value] = this.plugin.settings.statusColors[oldName];
-								delete this.plugin.settings.statusColors[oldName];
+							if (value && !this.plugin.settings.customStatuses.some(s => s.name === value && s !== status)) {
+								const oldName = status.name;
+								status.name = value;
+
+								// Update color mapping
+								if (this.plugin.settings.statusColors[oldName]) {
+									this.plugin.settings.statusColors[value] = this.plugin.settings.statusColors[oldName];
+									delete this.plugin.settings.statusColors[oldName];
+								}
+
+								await this.plugin.saveSettings();
+
+								// Use a small timeout to allow the UI to update
+								setTimeout(() => {
+									// Re-render statuses but restore focus and selection
+									renderStatuses();
+
+									// If the element had focus before, find it again in the new DOM and focus it
+									if (hadFocus) {
+										// Find the new input element for this status
+										// This depends on your DOM structure, you might need to adjust the selector
+										const newStatusItems = document.querySelectorAll('.status-item');
+
+										for (let i = 0; i < newStatusItems.length; i++) {
+											const statusItem = newStatusItems[i];
+											const nameText = statusItem.querySelector('.setting-item-name');
+
+											if (nameText && nameText.textContent === value) {
+												const newInputEl = statusItem.querySelector('input');
+												if (newInputEl) {
+													newInputEl.focus();
+													// Restore cursor position
+													if (selectionStart !== null && selectionEnd !== null) {
+														newInputEl.setSelectionRange(selectionStart, selectionEnd);
+													}
+													break;
+												}
+											}
+										}
+									}
+								}, 10);
 							}
-
-							await this.plugin.saveSettings();
-							renderStatuses(); // Refresh the list
-						}
-					}));
+						});
+					return text;
+				});
 
 				// Icon field
 				setting.addText(text => text
