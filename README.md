@@ -57,17 +57,20 @@ status: active
 
 ## Screenshots
 
-![Pasted image 20250403164058](https://github.com/user-attachments/assets/34f91046-c577-4d88-a896-f8b94f93e579)
+![image](https://github.com/user-attachments/assets/800eac9f-8bb9-4fe5-9da8-061fe0b8e7a2)
+
 
 
 ![Pasted image 20250403164128](https://github.com/user-attachments/assets/0a15a6c6-4630-4605-943b-a7528b4b42de)
 
+![image](https://github.com/user-attachments/assets/3701c7ce-2a21-43ca-ad54-4b85756b4f6a)
 
-- Status Pane: ![Pasted image 20250403164202](https://github.com/user-attachments/assets/1b083773-5e48-49a4-a89e-04de5e78b4a3)
 
-- Dropdown Menu: ![Pasted image 20250403164151](https://github.com/user-attachments/assets/3ffc47e1-e23d-46e9-af62-e7fd431cfcc0)
+- Status Pane: ![image](https://github.com/user-attachments/assets/e7bde491-546b-426f-808f-698bd8315f77)
 
-- File Explorer Icons: ![Pasted image 20250403164222](https://github.com/user-attachments/assets/d029b809-747b-4a21-9da6-4c2a067f5206)
+- Dropdown Menu: ![image](https://github.com/user-attachments/assets/78d89124-04bc-4c13-952a-69fa74694261)
+
+- File Explorer Icons: ![image](https://github.com/user-attachments/assets/a3068268-9067-4a41-80db-24922696aadc)
 
 
 ## Development
