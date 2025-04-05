@@ -1,16 +1,18 @@
 # Obsidian Note Status Plugin
 
-![Version](https://img.shields.io/badge/version-1.0.6-blue) ![Obsidian](https://img.shields.io/badge/Obsidian-Compatible-green)
+![Version](https://img.shields.io/badge/version-1.0.8-blue) ![Obsidian](https://img.shields.io/badge/Obsidian-Compatible-green)
 
 The **Note Status** plugin for Obsidian enhances your workflow by allowing you to assign, manage, and visualize statuses for your notes. Whether you're tracking projects, tasks, or personal notes, this plugin provides a seamless way to organize your vault with customizable statuses, a dedicated status pane, and visual indicators.
+
 ## Features
 - **Status Assignment**: Add statuses (e.g., active, on hold, completed, dropped, unknown) to notes via frontmatter.
 - **Status Pane**: A sidebar view to see all notes grouped by status, with search and collapsible sections.
-- **Dropdown Menu**: Quickly change a note’s status from a dropdown at the top or bottom of the editor.
-- **Status Bar**: Displays the current note’s status at the bottom of the app, with toggleable visibility.
+- **Dropdown Menu**: Quickly change a note's status from a dropdown at the top or bottom of the editor.
+- **Status Bar**: Displays the current note's status at the bottom of the app, with toggleable visibility.
 - **File Explorer Icons**: Shows status icons next to note names in the file explorer for instant recognition.
 - **Customization**: Define your own statuses, icons, and colors in the settings, and adjust UI preferences like position and auto-hiding.
 - **Commands**: Includes commands to refresh statuses, insert status metadata, and open the status pane.
+
 ## Installation
 1. **Download the Plugin**:
     - Grab the latest release from the [GitHub Releases page](https://github.com/devonthesofa/obsidian-note-status/releases).
@@ -25,22 +27,26 @@ The **Note Status** plugin for Obsidian enhances your workflow by allowing you t
     - Find "Note Status" in the list and toggle it on.
 
 _Note_: This plugin is not yet available in the Obsidian Community Plugin store but will be submitted soon!
+
 ## Usage
 
 ### Setting a Status
 
 - Open a note and use the command Insert Status Metadata to add a status: unknown field in the frontmatter.
 - Change the status manually in the frontmatter, or use the dropdown menu (click the status bar or right-click in the editor and select "Change Note Status").
+
 ### Status Pane
 
 - Click the ribbon icon (a bar chart) or use the Open Status Pane command to view all notes grouped by status.
 - Use the search bar to filter notes by name.
+
 ### Customization
 
 - Go to Settings > Note Status to:
     - Toggle visibility of the dropdown, status bar, and file explorer icons.
     - Adjust positions (top/bottom for dropdown, left/right for status bar).
     - Add, edit, or remove custom statuses with unique icons and colors.
+
 ### Example Frontmatter
 
 ```yaml
@@ -48,22 +54,57 @@ _Note_: This plugin is not yet available in the Obsidian Community Plugin store 
 status: active
 ---
 ```
+
 ## Screenshots
 
-![Pasted image 20250403164058](https://github.com/user-attachments/assets/34f91046-c577-4d88-a896-f8b94f93e579)
+![image](https://github.com/user-attachments/assets/800eac9f-8bb9-4fe5-9da8-061fe0b8e7a2)
+
 
 
 ![Pasted image 20250403164128](https://github.com/user-attachments/assets/0a15a6c6-4630-4605-943b-a7528b4b42de)
 
+![image](https://github.com/user-attachments/assets/3701c7ce-2a21-43ca-ad54-4b85756b4f6a)
 
-- Status Pane: ![Pasted image 20250403164202](https://github.com/user-attachments/assets/1b083773-5e48-49a4-a89e-04de5e78b4a3)
 
-- Dropdown Menu: ![Pasted image 20250403164151](https://github.com/user-attachments/assets/3ffc47e1-e23d-46e9-af62-e7fd431cfcc0)
+- Status Pane: ![image](https://github.com/user-attachments/assets/e7bde491-546b-426f-808f-698bd8315f77)
 
-- File Explorer Icons: ![Pasted image 20250403164222](https://github.com/user-attachments/assets/d029b809-747b-4a21-9da6-4c2a067f5206)
+- Dropdown Menu: ![image](https://github.com/user-attachments/assets/78d89124-04bc-4c13-952a-69fa74694261)
+
+- File Explorer Icons: ![image](https://github.com/user-attachments/assets/a3068268-9067-4a41-80db-24922696aadc)
 
 
 ## Development
+
+### Project Structure
+
+The plugin has been recently restructured with a modern, modular architecture:
+
+```
+note-status/
+├── src/
+│   ├── main.ts                 # Main plugin entry point
+│   ├── constants/              # Constants and defaults
+│   │   ├── icons.ts            # SVG icon definitions
+│   │   └── defaults.ts         # Default settings and colors
+│   ├── models/                 # TypeScript interfaces and types
+│   │   └── types.ts            # Core type definitions
+│   ├── ui/                     # UI components
+│   │   ├── status-pane-view.ts # Status pane sidebar
+│   │   ├── status-dropdown.ts  # Dropdown component
+│   │   ├── status-bar.ts       # Status bar component
+│   │   ├── explorer.ts         # File explorer integration
+│   │   ├── modals.ts           # Modal components
+│   │   └── context-menus.ts    # Context menu handlers
+│   ├── services/               # Core services
+│   │   ├── status-service.ts   # Status management logic
+│   │   └── style-service.ts    # Dynamic styling service
+│   ├── utils/                  # Utility functions
+│   │   ├── dom-utils.ts        # DOM helpers
+│   │   └── file-utils.ts       # File-related helpers
+│   └── settings/               # Settings UI
+│       └── settings-tab.ts     # Settings tab definition
+└── styles.css                  # CSS styles
+```
 
 ### Prerequisites
 
@@ -95,9 +136,18 @@ npm run build
 - Fork this repository and submit pull requests with improvements or bug fixes.
 - Report issues or suggest features via the [Issues tab](https://github.com/devonthesofa/obsidian-note-status/issues).
 
-### 🔧 Still in Progress
+## Recent Improvements
 
-- **Bug:** When manually editing the status in the frontmatter **after** tags, a weird behavior occurs:
+The v1.0.8 release includes:
+
+- **Complete Code Restructuring**: Modular architecture with proper separation of concerns
+- **Enhanced TypeScript Usage**: Improved typing and interfaces for better code reliability
+- **Optimized Performance**: More efficient event handling and DOM manipulation
+- **Improved Developer Experience**: Better project structure for easier contributions
+
+## Known Issues (Being Addressed)
+
+- **Bug:** When manually editing the status in the frontmatter **after** tags, a weird behavior occurs:
     ```
     status: ...
     ---
@@ -106,14 +156,27 @@ npm run build
     ---
     It creates a new block of tags, leaving the old one outside. Needs refinement.
     ```
--  **Improvement:** Performance optimization when changing statuses for a large number of notes — currently a bit slow.
--  **Improvement:** Codebase needs cleanup — right now it’s barely readable unless you’re an AI 🤖
+-  **Improvement:** Further performance optimization for batch status changes
 
-## Known Limitations
-- Dropdown positioning uses DOM-based workarounds due to limited API support for editor coordinates.
-- Initial release; some edge cases may still need refinement—please report bugs!
+## About the Author
+
+**Aleix Soler** is a professional developer who created this plugin for fun as his first contribution to the Obsidian ecosystem.
+
+- **Website**: [aleixsoler.com](https://aleixsoler.com)
+- **GitHub**: [@soler1212](https://github.com/soler1212)
+- **Organization**: [@devonthesofa](https://github.com/devonthesofa)
+
+As a daily Obsidian user, Aleix wanted to bring better status management to Obsidian to enhance his own workflow.
+
+If you find this plugin helpful:
+- ⭐ Star the repository
+- 📣 Share with other Obsidian users
+
 ## License
-This plugin is released under a permissive license by _Dynalist Inc. (2020-2025)_. Feel free to use, modify, and distribute it as you see fit.
+
+This plugin is released under the MIT License. See the LICENSE file for details.
+
 ## Acknowledgments
-- Built with help from [xAI’s Grok](https://xai.com) for code assistance and debugging.
-- Inspired by the amazing Obsidian community and its plugin ecosystem.
+
+- Built with assistance from Claude (Anthropic) for code structuring and best practices
+- Inspired by the amazing Obsidian community and its plugin ecosystem
