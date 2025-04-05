@@ -265,14 +265,19 @@ class StatusPaneView extends View {
 
 		titleEl.addEventListener('click', (e) => {
 			e.preventDefault();
-			groupEl.toggleClass('is-collapsed');
-			this.plugin.settings.collapsedStatuses[status] = groupEl.hasClass('is-collapsed');
+			const isCurrentlyCollapsed = groupEl.hasClass('is-collapsed');
 
-			// Update the collapse icon
-			collapseContainer.innerHTML = groupEl.hasClass('is-collapsed')
-				? ICONS.collapseRight
-				: ICONS.collapseDown;
+			// Toggle the collapsed state
+			if (isCurrentlyCollapsed) {
+				groupEl.removeClass('is-collapsed');
+				collapseContainer.innerHTML = ICONS.collapseDown;
+			} else {
+				groupEl.addClass('is-collapsed');
+				collapseContainer.innerHTML = ICONS.collapseRight;
+			}
 
+			// Update the settings
+			this.plugin.settings.collapsedStatuses[status] = !isCurrentlyCollapsed;
 			this.plugin.saveSettings();
 		});
 
@@ -614,7 +619,7 @@ export default class NoteStatus extends Plugin {
 		const menu = new Menu();
 
 		this.settings.customStatuses
-			.filter(status => status.name !== 'unknown')
+			.filter(status => status.name !== 'unknown') // Exclude 'unknown' status
 			.forEach(status => {
 				menu.addItem((item) =>
 					item
@@ -956,20 +961,22 @@ export default class NoteStatus extends Plugin {
 		// Add select element
 		const select = this.statusDropdownContainer.createEl('select', { cls: 'note-status-select dropdown' });
 
-		// Add status options
-		this.settings.customStatuses.forEach(status => {
-			const option = select.createEl('option', {
-				text: `${status.name} ${status.icon}`,
-				value: status.name
-			});
+		// Add status options (excluding 'unknown')
+		this.settings.customStatuses
+			.filter(status => status.name !== 'unknown') // Exclude 'unknown' status
+			.forEach(status => {
+				const option = select.createEl('option', {
+					text: `${status.name} ${status.icon}`,
+					value: status.name
+				});
 
-			if (status.name === this.currentStatus) option.selected = true;
-		});
+				if (status.name === this.currentStatus) option.selected = true;
+			});
 
 		// Add change event listener
 		select.addEventListener('change', async (e) => {
 			const newStatus = (e.target as HTMLSelectElement).value;
-			if (newStatus !== 'unknown') await this.updateNoteStatus(newStatus);
+			await this.updateNoteStatus(newStatus);
 		});
 
 		// Add hide button

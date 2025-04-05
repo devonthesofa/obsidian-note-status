@@ -153,6 +153,7 @@
   align-items: center;
   color: var(--text-muted);
   transition: transform var(--status-transition-time) ease;
+  opacity: 1;
 }
 
 .is-collapsed .collapse-indicator {
@@ -163,6 +164,9 @@
 .status-group .nav-folder-children {
   padding: var(--size-4-1);
   background: var(--background-primary);
+}
+.status-group.nav-folder.is-collapsed .nav-folder-children {
+	display: none;
 }
 
 .nav-file {
