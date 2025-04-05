@@ -1,8 +1,461 @@
-/*
+/* Base styles and variables */
+:root {
+  --status-transition-time: 0.2s;
+  --status-border-radius: 4px;
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+/* Status Pane */
+.note-status-pane {
+  padding: var(--size-4-2);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-family: var(--font-interface);
+  overflow-y: auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 
-If your plugin does not need CSS, delete this file.
+/* Header elements */
+.note-status-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--background-secondary);
+  padding-bottom: var(--size-4-2);
+  border-bottom: 1px solid var(--background-modifier-border);
+  margin-bottom: var(--size-4-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-2);
+}
 
-*/
+/* Search input improvements */
+.note-status-search {
+  width: 100%;
+  position: relative;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-icon {
+  position: absolute;
+  left: var(--size-4-1);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.note-status-search-input {
+  width: 100%;
+  padding: var(--input-padding);
+  padding-left: calc(var(--size-4-1) * 3 + 18px);
+  border: var(--input-border-width) solid var(--background-modifier-border);
+  border-radius: var(--input-radius);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  outline: none;
+  transition: all var(--status-transition-time) ease;
+}
+
+.note-status-search-input:focus {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px rgba(var(--interactive-accent-rgb), 0.2);
+}
+
+.search-input-clear-button {
+  opacity: 0;
+  position: absolute;
+  right: var(--size-4-1);
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  transition: opacity var(--status-transition-time) ease;
+}
+
+.search-input-clear-button.is-visible {
+  opacity: 1;
+}
+
+.search-input-clear-button:hover {
+  color: var(--text-normal);
+}
+
+/* Actions toolbar */
+.status-pane-actions-container {
+  display: flex;
+  gap: var(--size-4-2);
+  justify-content: flex-end;
+  margin-top: var(--size-4-1);
+}
+
+.note-status-view-toggle,
+.note-status-actions-refresh {
+  padding: var(--size-4-1) var(--size-4-2);
+  border: var(--input-border-width) solid var(--background-modifier-border);
+  border-radius: var(--button-radius);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  cursor: pointer;
+  transition: all var(--status-transition-time) ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.note-status-view-toggle:hover,
+.note-status-actions-refresh:hover {
+  background: var(--background-modifier-hover);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Status Groups Container */
+.note-status-groups-container {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Status Group Styling */
+.status-group {
+  margin-bottom: var(--size-4-3);
+  border-radius: var(--status-border-radius);
+  background: var(--background-primary-alt);
+  overflow: hidden;
+}
+
+.status-group .nav-folder-title {
+  padding: var(--size-4-1);
+  background: var(--background-secondary-alt);
+  transition: background var(--status-transition-time) ease;
+}
+
+.status-group .nav-folder-title:hover {
+  background: var(--background-modifier-hover);
+}
+
+.status-group .nav-folder-title-content {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-1);
+}
+
+/* Collapse indicators */
+.collapse-indicator {
+  margin-right: var(--size-4-2);
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  transition: transform var(--status-transition-time) ease;
+  opacity: 1;
+}
+
+.is-collapsed .collapse-indicator {
+  transform: rotate(-90deg);
+}
+
+/* File items */
+.status-group .nav-folder-children {
+  padding: var(--size-4-1);
+  background: var(--background-primary);
+}
+.status-group.nav-folder.is-collapsed .nav-folder-children {
+	display: none;
+}
+
+.nav-file {
+  border-radius: var(--status-border-radius);
+  transition: background var(--status-transition-time) ease;
+  margin-bottom: 2px;
+  position: relative;
+}
+
+.nav-file:hover {
+  background: var(--background-modifier-hover);
+}
+
+.nav-file-title {
+  display: flex;
+  align-items: center;
+  padding: var(--size-4-1);
+}
+
+.nav-file-icon {
+  color: var(--text-muted);
+  margin-right: var(--size-4-2);
+  display: flex;
+  align-items: center;
+}
+
+.nav-file-title-content {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Compact view */
+.compact-view .nav-file-title {
+  padding: var(--size-4-1) var(--size-4-2);
+  font-size: 0.9em;
+}
+
+.compact-view .nav-folder-children {
+  padding: 0;
+}
+
+.compact-view .nav-file {
+  margin-bottom: 0;
+  border-radius: 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.compact-view .nav-file:last-child {
+  border-bottom: none;
+}
+
+/* Status Dropdown */
+.note-status-dropdown {
+  padding: var(--size-4-2);
+  background: var(--background-secondary);
+  position: sticky;
+  z-index: var(--layer-popover);
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.note-status-dropdown.top {
+  border-bottom: var(--border-width) solid var(--background-modifier-border);
+  top: 0;
+}
+
+.note-status-dropdown.bottom {
+  border-top: var(--border-width) solid var(--background-modifier-border);
+  bottom: 0;
+}
+
+.note-status-label {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.note-status-select {
+  padding: var(--input-padding);
+  border: var(--input-border-width) solid var(--background-modifier-border);
+  border-radius: var(--input-radius);
+  background: var(--background-primary);
+  background-image: none !important; /* Override theme's SVG */
+  color: var(--text-normal);
+  cursor: pointer;
+  outline: none;
+  transition: all var(--status-transition-time) ease;
+  appearance: auto;
+  min-width: 150px;
+  flex: 1;
+}
+
+.note-status-select:hover,
+.note-status-select:focus {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px rgba(var(--interactive-accent-rgb), 0.2);
+}
+
+.note-status-select option {
+  background: var(--background-primary);
+  color: var(--text-normal);
+  padding: var(--size-4-1) var(--size-4-2);
+}
+
+.note-status-hide-button {
+  padding: var(--size-4-1) var(--size-4-2);
+  border: var(--input-border-width) solid var(--background-modifier-border);
+  border-radius: var(--button-radius);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  cursor: pointer;
+  transition: all var(--status-transition-time) ease;
+  white-space: nowrap;
+}
+
+.note-status-hide-button:hover {
+  background: var(--background-modifier-hover);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* File Explorer Icons */
+.note-status-icon {
+  margin-left: var(--size-4-1);
+  font-size: var(--font-ui-small);
+}
+
+/* Status Bar */
+.note-status-bar {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--size-4-2);
+  height: 22px;
+  gap: var(--size-4-1);
+  background: var(--background-secondary);
+  border-radius: var(--status-border-radius);
+  margin: 0 var(--size-4-1);
+  transition: opacity var(--status-transition-time) ease;
+  cursor: pointer;
+  border: 1px solid var(--background-modifier-border);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.note-status-bar:hover {
+  background: var(--background-modifier-hover);
+}
+
+.note-status-bar.left {
+  justify-content: flex-start;
+}
+
+.note-status-bar.hidden {
+  display: none;
+}
+
+.note-status-bar.auto-hide {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.note-status-bar.auto-hide.visible {
+  opacity: 1;
+}
+
+/* Batch Modal Styling */
+.note-status-batch-modal {
+  max-width: 500px;
+}
+
+.note-status-batch-modal h2 {
+  margin-bottom: var(--size-4-3);
+  text-align: center;
+  padding-bottom: var(--size-4-2);
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.note-status-modal-search {
+  margin-bottom: var(--size-4-2);
+  position: relative;
+}
+
+.note-status-modal-search-input {
+  width: 100%;
+  padding: var(--input-padding);
+  padding-left: calc(var(--size-4-1) * 3);
+  border: var(--input-border-width) solid var(--background-modifier-border);
+  border-radius: var(--input-radius);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  outline: none;
+  transition: all var(--status-transition-time) ease;
+}
+
+.note-status-modal-search-input:focus {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px rgba(var(--interactive-accent-rgb), 0.2);
+}
+
+.note-status-file-select-container,
+.note-status-status-select-container {
+  margin-bottom: var(--size-4-2);
+}
+
+.note-status-file-select,
+.note-status-status-select {
+  width: 100%;
+  padding: var(--input-padding);
+  border: var(--input-border-width) solid var(--background-modifier-border);
+  border-radius: var(--input-radius);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  outline: none;
+  transition: all var(--status-transition-time) ease;
+}
+
+.note-status-file-select {
+  min-height: 200px;
+}
+
+.note-status-file-select option,
+.note-status-status-select option {
+  padding: var(--size-4-1);
+}
+
+.note-status-modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--size-4-3);
+  gap: var(--size-4-2);
+}
+
+.note-status-modal-buttons button {
+  flex: 1;
+  padding: var(--size-4-2);
+  border: var(--input-border-width) solid var(--background-modifier-border);
+  border-radius: var(--button-radius);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  cursor: pointer;
+  transition: all var(--status-transition-time) ease;
+}
+
+.note-status-modal-buttons button:hover {
+  background: var(--background-modifier-hover);
+}
+
+.note-status-modal-buttons button.mod-cta {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+.note-status-modal-buttons button.mod-cta:hover {
+  background: var(--interactive-accent-hover);
+}
+
+/* Settings Tab Styling */
+.custom-status-list {
+  margin-bottom: var(--size-4-3);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--status-border-radius);
+  background: var(--background-primary-alt);
+  padding: var(--size-4-2);
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  padding: var(--size-4-1) var(--size-4-2);
+  border-bottom: 1px solid var(--background-modifier-border);
+  margin-bottom: var(--size-4-1);
+}
+
+.status-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.status-remove-button {
+  margin-left: auto;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.status-group {
+  animation: fadeIn 0.3s ease;

@@ -160,6 +160,14 @@ The v1.0.8 release includes:
 
 This plugin is released under the MIT License. See the LICENSE file for details.
 
+-  **Improvement:** Performance optimization when changing statuses for a large number of notes — currently a bit slow.
+-  **Improvement:** Codebase needs cleanup — right now it’s barely readable unless you’re an AI 🤖
+
+## Known Limitations
+- Dropdown positioning uses DOM-based workarounds due to limited API support for editor coordinates.
+- Initial release; some edge cases may still need refinement—please report bugs!
+## License
+This plugin is released under a permissive license by _Dynalist Inc. (2020-2025)_. Feel free to use, modify, and distribute it as you see fit.
 ## Acknowledgments
 
 - Built with assistance from Claude (Anthropic) for code structuring and best practices

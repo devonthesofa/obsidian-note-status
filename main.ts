@@ -1,923 +1,367 @@
-import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, Menu, Modal, View, WorkspaceLeaf, addIcon } from 'obsidian';
+import { Editor, MarkdownView, Notice, Plugin, TFile, addIcon, WorkspaceLeaf } from 'obsidian';
 
-addIcon('status-pane', `
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-    <path fill="currentColor" d="M3 3h18v18H3V3zm2 2v14h14V5H5zm2 2h10v2H7V7zm0 4h10v2H7v-2zm0 4h10v2H7v-2z"/>
-  </svg>
-`);
+// Import constants
+import { ICONS } from './constants/icons';
+import { DEFAULT_SETTINGS, DEFAULT_COLORS } from './constants/defaults';
 
-interface NoteStatusSettings {
-  mySetting: string;
-  statusColors: Record<string, string>;
-  showStatusDropdown: boolean;
-  showStatusBar: boolean;
-  dropdownPosition: 'top' | 'bottom';
-  statusBarPosition: 'left' | 'right';
-  autoHideStatusBar: boolean;
-  customStatuses: { name: string; icon: string }[];
-  showStatusIconsInExplorer: boolean;
-  collapsedStatuses: Record<string, boolean>;
-}
+// Import interfaces and types
+import { NoteStatusSettings } from './models/types';
 
-const DEFAULT_SETTINGS: NoteStatusSettings = {
-  mySetting: 'default',
-  statusColors: {
-    active: '#00ff00',
-    onHold: '#ffa500',
-    completed: '#0000ff',
-    dropped: '#ff0000',
-    unknown: '#808080'
-  },
-  showStatusDropdown: true,
-  showStatusBar: true,
-  dropdownPosition: 'top',
-  statusBarPosition: 'right',
-  autoHideStatusBar: false,
-  customStatuses: [
-    { name: 'active', icon: '▶️' },
-    { name: 'onHold', icon: '⏸️' },
-    { name: 'completed', icon: '✅' },
-    { name: 'dropped', icon: '❌' },
-    { name: 'unknown', icon: '❓' }
-  ],
-  showStatusIconsInExplorer: true,
-  collapsedStatuses: {}
-}
+// Import services
+import { StatusService } from './services/status-service';
+import { StyleService } from './services/style-service';
 
-class StatusPaneView extends View {
-  plugin: NoteStatus;
-  searchInput: HTMLInputElement | null = null;
-  buttonToggleStatusPanel: HTMLButtonElement | null = null;
+// Import UI components
+import { StatusBar } from './ui/status-bar';
+import { StatusDropdown } from './ui/status-dropdown';
+import { StatusPaneView } from './ui/status-pane-view';
+import { ExplorerIntegration } from './ui/explorer';
+import { BatchStatusModal } from './ui/modals';
+import { StatusContextMenu } from './ui/context-menus';
 
-  constructor(leaf: WorkspaceLeaf, plugin: NoteStatus) {
-    super(leaf);
-    this.plugin = plugin;
-  }
+// Import settings
+import { NoteStatusSettingTab } from './settings/settings-tab';
 
-  getViewType() {
-    return 'status-pane';
-  }
-
-  getDisplayText() {
-    return 'Status Pane';
-  }
-
-  getIcon() {
-    return 'status-pane';
-  }
-
-  async onOpen() {
-    await this.setupPane();
-    await this.renderGroups('');
-  }
-
-  // Setup the static parts of the pane (search bar)
-  async setupPane() {
-    const { containerEl } = this;
-    containerEl.empty();
-    containerEl.addClass('status-pane');
-    containerEl.style.cssText = `
-      padding: 10px;
-      background: var(--background-secondary);
-      color: var(--text-normal);
-      font-family: var(--font-interface);
-      overflow-y: auto;
-      height: 100%;
-    `;
-
-    const searchContainer = containerEl.createDiv({ cls: 'status-pane-search' });
-    this.searchInput = searchContainer.createEl('input', {
-      type: 'text',
-      placeholder: 'Search notes...',
-      cls: 'status-pane-search-input'
-    });
-    this.searchInput.style.cssText = `
-      width: 100%;
-      padding: 8px 12px;
-      margin-bottom: 10px;
-      border: 1px solid var(--background-modifier-border);
-      border-radius: 4px;
-      background: var(--background-primary);
-      color: var(--text-normal);
-      outline: none;
-      transition: border-color 0.2s ease;
-    `;
-    this.searchInput.addEventListener('focus', () => {
-      this.searchInput!.style.borderColor = 'var(--interactive-accent)';
-    });
-    this.searchInput.addEventListener('blur', () => {
-      this.searchInput!.style.borderColor = 'var(--background-modifier-border)';
-    });
-    this.searchInput.addEventListener('input', () => {
-      this.renderGroups(this.searchInput!.value.toLowerCase());
-    });
-
-    const actionsContainer = containerEl.createDiv({ cls: 'status-pane-actions-container' });
-
-    // Add refresh button for manual updates
-    const refreshButton = actionsContainer.createEl('button', {
-      type: 'button',
-      title: 'Refresh Statuses',
-      text: 'Refresh',
-      cls: 'status-pane-actions-refresh'
-    });
-    refreshButton.style.cssText = `
-      padding: 6px 12px;
-      margin: 5px 0 5px 10px;
-      background: var(--background-primary);
-      border: 1px solid var(--background-modifier-border);
-      border-radius: 4px;
-      cursor: pointer;
-    `;
-    refreshButton.addEventListener('click', async () => {
-      await this.renderGroups(this.searchInput?.value.toLowerCase() || '');
-      new Notice('Status pane refreshed');
-    });
-  }
-
-  // Render only the dynamic groups
-  async renderGroups(searchQuery = '') {
-    const { containerEl } = this;
-    // Remove existing groups, but keep the search bar
-    const existingGroups = containerEl.querySelectorAll('.status-group');
-    existingGroups.forEach(group => group.remove());
-
-    const statusGroups: Record<string, TFile[]> = {};
-    this.plugin.settings.customStatuses.forEach(status => {
-      statusGroups[status.name] = [];
-    });
-
-    const files = this.app.vault.getMarkdownFiles();
-    for (const file of files) {
-      const cachedMetadata = this.app.metadataCache.getFileCache(file);
-      let status = 'unknown';
-
-      if (cachedMetadata?.frontmatter?.status) {
-        const foundStatus = cachedMetadata.frontmatter.status.toLowerCase();
-        if (this.plugin.settings.customStatuses.some(s => s.name === foundStatus)) {
-          status = foundStatus;
-        }
-      }
-      statusGroups[status].push(file);
-    }
-
-    Object.entries(statusGroups).forEach(([status, files]) => {
-      const filteredFiles = files.filter(file => 
-        file.basename.toLowerCase().includes(searchQuery)
-      );
-      if (filteredFiles.length > 0) {
-        const groupEl = containerEl.createDiv({ cls: 'status-group nav-folder' });
-        const titleEl = groupEl.createDiv({ cls: 'nav-folder-title' });
-        const titleSpan = titleEl.createSpan({
-          text: `${status} ${this.plugin.getStatusIcon(status)} (${filteredFiles.length})`,
-          cls: `status-${status}`
-        });
-        titleSpan.style.cssText = `
-          color: ${this.plugin.settings.statusColors[status] || '#808080'};
-          font-weight: 600;
-          padding: 8px 12px;
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          transition: background 0.2s ease;
-        `;
-        titleEl.style.cursor = 'pointer';
-        const isCollapsed = this.plugin.settings.collapsedStatuses[status] ?? false;
-        if (isCollapsed) {
-          groupEl.addClass('is-collapsed');
-        }
-
-        titleEl.addEventListener('click', (e) => {
-          e.preventDefault(); // Prevent any unwanted navigation
-          groupEl.classList.toggle('is-collapsed');
-          this.plugin.settings.collapsedStatuses[status] = !this.plugin.settings.collapsedStatuses[status];
-          this.plugin.saveSettings();
-        });
-        titleEl.addEventListener('mouseover', () => {
-          titleSpan.style.background = 'var(--background-modifier-hover)';
-        });
-        titleEl.addEventListener('mouseout', () => {
-          titleSpan.style.background = 'transparent';
-        });
-
-        const childrenEl = groupEl.createDiv({ cls: 'nav-folder-children' });
-        childrenEl.style.cssText = `
-          padding-left: 20px;
-          border-left: 1px solid var(--background-modifier-border);
-          display: ${isCollapsed ? 'none' : 'block'};
-        `;
-        titleEl.addEventListener('click', () => {
-          childrenEl.style.display = childrenEl.style.display === 'none' ? 'block' : 'none';
-        });
-
-        filteredFiles.sort((a, b) => a.basename.localeCompare(b.basename)).forEach(file => {
-          const fileEl = childrenEl.createDiv({ cls: 'nav-file' });
-          const fileTitleEl = fileEl.createDiv({ cls: 'nav-file-title' });
-          const linkEl = fileTitleEl.createSpan({
-            text: file.basename,
-            cls: 'nav-file-title-content'
-          });
-          linkEl.style.cssText = `
-            padding: 6px 12px;
-            display: block;
-            color: var(--text-normal);
-            transition: background 0.2s ease;
-          `;
-          fileEl.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.app.workspace.openLinkText(file.path, file.path, true);
-          });
-          fileEl.addEventListener('mouseover', () => {
-            linkEl.style.background = 'var(--background-modifier-hover)';
-          });
-          fileEl.addEventListener('mouseout', () => {
-            linkEl.style.background = 'transparent';
-          });
-        });
-      }
-    });
-  }
-
-  onClose() {
-    this.containerEl.empty();
-    return Promise.resolve();
-  }
-}
-
+/**
+ * Main plugin class
+ */
 export default class NoteStatus extends Plugin {
-  settings: NoteStatusSettings;
-  statusBarItem: HTMLElement;
-  currentStatus = 'unknown';
-  statusDropdownContainer?: HTMLElement;
-  private statusPaneLeaf: WorkspaceLeaf | null = null;
+	settings: NoteStatusSettings;
+	statusService: StatusService;
+	styleService: StyleService;
+	statusBar: StatusBar;
+	statusDropdown: StatusDropdown;
+	explorerIntegration: ExplorerIntegration;
+	statusContextMenu: StatusContextMenu;
+	private statusPaneLeaf: WorkspaceLeaf | null = null;
 
-  async onload() {
-    await this.loadSettings();
+	async onload() {
+		// Register custom icons
+		addIcon('status-pane', ICONS.statusPane);
 
-    this.registerView('status-pane', (leaf) => {
-      this.statusPaneLeaf = leaf;
-      return new StatusPaneView(leaf, this);
-    });
+		// Load settings
+		await this.loadSettings();
 
-    this.addRibbonIcon('status-pane', 'Open Status Pane', () => {
-      this.openStatusPane();
-    });
+		// Initialize services
+		this.statusService = new StatusService(this.app, this.settings);
+		this.styleService = new StyleService(this.settings);
 
-    this.statusBarItem = this.addStatusBarItem();
-    this.statusBarItem.style.cursor = 'pointer';
-    this.statusBarItem.addEventListener('click', () => {
-      this.settings.showStatusDropdown = !this.settings.showStatusDropdown;
-      this.updateStatusDropdown();
-      this.saveSettings();
-      new Notice(`Status dropdown ${this.settings.showStatusDropdown ? 'shown' : 'hidden'}`);
-    });
-    this.updateStatusBar();
+		// Initialize UI components
+		this.statusBar = new StatusBar(this.addStatusBarItem(), this.settings, this.statusService);
+		this.statusDropdown = new StatusDropdown(this.app, this.settings, this.statusService);
+		this.explorerIntegration = new ExplorerIntegration(this.app, this.settings, this.statusService);
+		this.statusContextMenu = new StatusContextMenu(this.app, this.settings, this.statusService,);
 
-    this.addCommand({
-      id: 'refresh-note-status',
-      name: 'Refresh Note Status',
-      callback: () => {
-        this.checkNoteStatus();
-        new Notice('Note status refreshed!');
-      }
-    });
+		// Register status pane view
+		this.registerView('status-pane', (leaf) => {
+			this.statusPaneLeaf = leaf;
+			return new StatusPaneView(leaf, this);
+		});
 
-    this.addCommand({
-      id: 'insert-status-metadata',
-      name: 'Insert Status Metadata',
-      editorCallback: (editor: Editor, view: MarkdownView) => {
-        // Get the current note's content
-        const content = editor.getValue();
-        
-        // Define the metadata to insert
-        const statusMetadata = 'status: unknown';
-    
-        // Check if there's already a front matter
-        const frontMatterMatch = content.match(/^---\n([\s\S]+?)\n---/);
-    
-        if (frontMatterMatch) {
-          // If front matter exists, update the status field if it exists, or add it
-          const frontMatter = frontMatterMatch[1];
-          let updatedFrontMatter = frontMatter;
-    
-          // Check if 'status' already exists in front matter
-          if (/^status:/.test(frontMatter)) {
-            // Update the existing status
-            updatedFrontMatter = frontMatter.replace(/^status: .*/m, statusMetadata);
-          } else {
-            // Add the 'status' field to the front matter
-            updatedFrontMatter = `${frontMatter}\n${statusMetadata}`;
-          }
-    
-          // Replace the old front matter with the updated one
-          const updatedContent = content.replace(/^---\n([\s\S]+?)\n---/, `---\n${updatedFrontMatter}\n---`);
-          
-          // Set the updated content back into the editor
-          editor.setValue(updatedContent);
-        } else {
-          // If no front matter exists, create a new one with the status
-          const newFrontMatter = `---\n${statusMetadata}\n---\n${content}`;
-          
-          // Set the new content with front matter
-          editor.setValue(newFrontMatter);
-        }
-      }
-    });
-    
+		// Add ribbon icon
+		this.addRibbonIcon('status-pane', 'Open Status Pane', () => {
+			this.openStatusPane();
+		});
 
-    this.addCommand({
-      id: 'open-status-pane',
-      name: 'Open Status Pane',
-      callback: () => this.openStatusPane()
-    });
+		// Register commands
+		this.registerCommands();
 
-    this.registerEvent(
-      this.app.workspace.on('editor-menu', (menu, editor, view) => {
-        if (view instanceof MarkdownView) {
-          menu.addItem((item) =>
-            item
-              .setTitle('Change Note Status')
-              .setIcon('tag')
-              .onClick(() => this.showStatusDropdown(editor, view))
-          );
-        }
-      })
-    );
+		// Register file menu and context menu handlers
+		this.registerMenuHandlers();
 
-    this.registerEvent(
-      this.app.workspace.on('file-open', () => {
-        this.checkNoteStatus();
-        this.updateStatusDropdown();
-      })
-    );
-    this.registerEvent(
-      this.app.workspace.on('editor-change', () => this.checkNoteStatus())
-    );
-    this.registerEvent(
-      this.app.workspace.on('active-leaf-change', () => {
-        this.updateStatusDropdown();
-        this.updateStatusPane();
-      })
-    );
+		// Register workspace and vault events
+		this.registerEvents();
 
-    this.registerEvent(
-      this.app.vault.on('modify', (file) => {
-        if (file instanceof TFile) {
-          this.updateFileExplorerIcons(file);
-          this.updateStatusPane();
-        }
-      })
-    );
-    this.registerEvent(
-      this.app.vault.on('create', () => {
-        this.updateAllFileExplorerIcons();
-        this.updateStatusPane();
-      })
-    );
-    this.registerEvent(
-      this.app.vault.on('delete', () => {
-        this.updateAllFileExplorerIcons();
-        this.updateStatusPane();
-      })
-    );
-    this.registerEvent(
-      this.app.vault.on('rename', () => {
-        this.updateAllFileExplorerIcons();
-        this.updateStatusPane();
-      })
-    );
-    this.registerEvent(
-      this.app.metadataCache.on('changed', (file) => {
-        this.checkNoteStatus();
-        this.updateFileExplorerIcons(file);
-        this.updateStatusPane();
-      })
-    );
+		// Initialize UI on layout ready
+		this.app.workspace.onLayoutReady(async () => {
+			// Small delay to ensure everything is loaded
+			await new Promise(resolve => setTimeout(resolve, 500));
+			this.checkNoteStatus();
+			this.statusDropdown.update(this.getCurrentStatus());
+			this.explorerIntegration.updateAllFileExplorerIcons();
+		});
 
-    this.addSettingTab(new NoteStatusSettingTab(this.app, this));
+		// Add settings tab
+		this.addSettingTab(new NoteStatusSettingTab(this.app, this));
 
-    this.checkNoteStatus();
-    this.updateStatusDropdown();
-    this.updateAllFileExplorerIcons();
-  }
+		// Set up custom events
+		this.setupCustomEvents();
+	}
 
-  async openStatusPane() {
-    const existing = this.app.workspace.getLeavesOfType('status-pane')[0];
-    if (existing) {
-      this.app.workspace.setActiveLeaf(existing);
-      await this.updateStatusPane();
-    } else {
-      const leaf = this.app.workspace.getLeftLeaf(false);
-      if (leaf) {
-        await leaf.setViewState({ type: 'status-pane', active: true });
-      }
-    }
-  }
+	private setupCustomEvents() {
+		// Listen for settings changes
+		window.addEventListener('note-status:settings-changed', async () => {
+			await this.saveSettings();
+		});
 
-  // Modified updateNoteStatus to accept optional file parameter
-  async updateNoteStatus(newStatus: string, file?: TFile) {
-    const targetFile = file || this.app.workspace.getActiveFile();
-    if (!targetFile) return;
+		// Listen for status changes
+		window.addEventListener('note-status:status-changed', (e: any) => {
+			const status = e.detail?.status || 'unknown';
+			this.statusBar.update(status);
+			this.statusDropdown.update(status);
+		});
 
-    const content = await this.app.vault.read(targetFile);
-    let newContent = content;
+		// Listen for refresh dropdown
+		window.addEventListener('note-status:refresh-dropdown', () => {
+			this.statusDropdown.render();
+		});
 
-    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
-    if (frontmatterMatch) {
-      const frontmatter = frontmatterMatch[1];
-      if (frontmatter.includes('status:')) {
-        newContent = content.replace(/status:\s*\w+/i, `status: ${newStatus}`);
-      } else {
-        newContent = content.replace(/^---\n/, `---\nstatus: ${newStatus}\n`);
-      }
-    } else {
-      newContent = `---\nstatus: ${newStatus}\n---\n${content.trim()}`;
-    }
+		// Listen for UI refresh
+		window.addEventListener('note-status:refresh-ui', () => {
+			this.checkNoteStatus();
+			this.explorerIntegration.updateAllFileExplorerIcons();
+			this.updateStatusPane();
+		});
+	}
 
-    await this.app.vault.modify(targetFile, newContent);
-    if (targetFile === this.app.workspace.getActiveFile()) {
-      this.currentStatus = newStatus;
-      this.updateStatusBar();
-      this.updateStatusDropdown();
-    }
-    this.updateFileExplorerIcons(targetFile);
-    this.updateStatusPane();
-  }
+	private registerCommands() {
+		// Refresh status command
+		this.addCommand({
+			id: 'refresh-status',
+			name: 'Refresh Status',
+			callback: () => {
+				this.checkNoteStatus();
+				new Notice('Note status refreshed!');
+			}
+		});
 
-  async checkNoteStatus() {
-    const activeFile = this.app.workspace.getActiveFile();
-    if (!activeFile) {
-      this.currentStatus = 'unknown';
-      this.updateStatusBar();
-      this.updateStatusDropdown();
-      return;
-    }
+		// Batch update status command
+		this.addCommand({
+			id: 'batch-update-status',
+			name: 'Batch Update Status',
+			callback: () => this.showBatchStatusModal()
+		});
 
-    const cachedMetadata = this.app.metadataCache.getFileCache(activeFile);
-    this.currentStatus = 'unknown';
+		// Insert status metadata command
+		this.addCommand({
+			id: 'insert-status-metadata',
+			name: 'Insert Status Metadata',
+			editorCallback: (editor: Editor, view: MarkdownView) => {
+				this.statusService.insertStatusMetadataInEditor(editor);
+			}
+		});
 
-    if (cachedMetadata?.frontmatter?.status) {
-      const status = cachedMetadata.frontmatter.status.toLowerCase();
-      if (this.settings.customStatuses.some(s => s.name === status)) {
-        this.currentStatus = status;
-      }
-    }
+		// Open status pane command
+		this.addCommand({
+			id: 'open-status-pane',
+			name: 'Open Status Pane',
+			callback: () => this.openStatusPane()
+		});
+	}
 
-    this.updateStatusBar();
-    this.updateStatusDropdown();
-    this.updateFileExplorerIcons(activeFile);
-  }
+	private registerMenuHandlers() {
+		// File explorer context menu
+		this.registerEvent(
+			this.app.workspace.on('file-menu', (menu, file, source) => {
+				if (source === 'file-explorer-context-menu' && file instanceof TFile && file.extension === 'md') {
+					menu.addItem((item) =>
+						item
+							.setTitle('Change Status of Selected Files')
+							.setIcon('tag')
+							.onClick(() => {
+								const selectedFiles = this.explorerIntegration.getSelectedFiles();
+								if (selectedFiles.length > 1) {
+									this.statusContextMenu.showForFiles(selectedFiles);
+								} else {
+									this.statusContextMenu.showForFiles([file]);
+								}
+							})
+					);
+				}
+			})
+		);
 
-  updateStatusBar() {
-    this.statusBarItem.empty();
-    if (!this.settings.showStatusBar) {
-      this.statusBarItem.style.display = 'none';
-      return;
-    }
+		// Multiple files selection menu
+		this.registerEvent(
+			this.app.workspace.on('files-menu', (menu, files) => {
+				const mdFiles = files.filter(file => file instanceof TFile && file.extension === 'md') as TFile[];
+				if (mdFiles.length > 0) {
+					menu.addItem((item) =>
+						item
+							.setTitle('Change Status of Selected Files')
+							.setIcon('tag')
+							.onClick(() => {
+								this.statusContextMenu.showForFiles(mdFiles);
+							})
+					);
+				}
+			})
+		);
 
-    this.statusBarItem.style.display = 'flex';
-    this.statusBarItem.style.justifyContent = this.settings.statusBarPosition === 'left' ? 'flex-start' : 'flex-end';
-    
-    const statusEl = this.statusBarItem.createEl('span', {
-      text: `Status: ${this.currentStatus}`,
-      cls: `note-status-${this.currentStatus}`
-    });
-    statusEl.style.color = this.settings.statusColors[this.currentStatus] || '#808080';
-    this.statusBarItem.createEl('span', {
-      text: this.getStatusIcon(this.currentStatus),
-      cls: 'status-icon'
-    });
+		// Editor context menu
+		this.registerEvent(
+			this.app.workspace.on('editor-menu', (menu, editor, view) => {
+				if (view instanceof MarkdownView) {
+					menu.addItem((item) =>
+						item
+							.setTitle('Change Note Status')
+							.setIcon('tag')
+							.onClick(() => this.statusDropdown.showInContextMenu(editor, view))
+					);
+				}
+			})
+		);
+	}
 
-    if (this.settings.autoHideStatusBar && this.currentStatus === 'unknown') {
-      this.statusBarItem.style.opacity = '0';
-      this.statusBarItem.style.transition = 'opacity 0.5s ease';
-      setTimeout(() => {
-        if (this.currentStatus === 'unknown' && this.settings.showStatusBar) {
-          this.statusBarItem.style.display = 'none';
-        }
-      }, 500);
-    } else {
-      this.statusBarItem.style.opacity = '1';
-      this.statusBarItem.style.display = 'flex';
-    }
-  }
+	private registerEvents() {
+		// File open event
+		this.registerEvent(this.app.workspace.on('file-open', () => {
+			this.checkNoteStatus();
+			this.statusDropdown.update(this.getCurrentStatus());
+		}));
 
-  getStatusIcon(status: string): string {
-    const customStatus = this.settings.customStatuses.find(s => s.name === status);
-    return customStatus ? customStatus.icon : '❓';
-  }
+		// Editor change event
+		this.registerEvent(this.app.workspace.on('editor-change', () => this.checkNoteStatus()));
 
-  toggleStatusModal() {
-    const modal = new Modal(this.app);
-    modal.contentEl.createEl('h2', { text: 'Change Note Status' });
-    this.settings.customStatuses
-      .filter(status => status.name !== 'unknown')
-      .forEach(status => {
-        const button = modal.contentEl.createEl('button', {
-          text: `${status.name} ${status.icon}`,
-          cls: `status-button status-${status.name}`
-        });
-        button.style.backgroundColor = this.settings.statusColors[status.name] || '#808080';
-        button.addEventListener('click', async () => {
-          await this.updateNoteStatus(status.name);
-          modal.close();
-        });
-      });
-    modal.open();
-  }
+		// Active leaf change event
+		this.registerEvent(this.app.workspace.on('active-leaf-change', () => {
+			this.statusDropdown.update(this.getCurrentStatus());
+			this.updateStatusPane();
+		}));
 
+		// File modification events
+		this.registerEvent(this.app.vault.on('modify', (file) => {
+			if (file instanceof TFile) {
+				this.explorerIntegration.updateFileExplorerIcons(file);
+				this.updateStatusPane();
+			}
+		}));
 
-  async updateStatusPane() {
-    if (this.statusPaneLeaf && this.statusPaneLeaf.view instanceof StatusPaneView) {
-      const searchQuery = (this.statusPaneLeaf.view as StatusPaneView).searchInput?.value.toLowerCase() || '';
-      await (this.statusPaneLeaf.view as StatusPaneView).renderGroups(searchQuery);
-    }
-  }
+		// File creation, deletion, and rename events
+		this.registerEvent(this.app.vault.on('create', () => {
+			this.explorerIntegration.updateAllFileExplorerIcons();
+			this.updateStatusPane();
+		}));
 
-  showStatusDropdown(editor: Editor, view: MarkdownView) {
-    const menu = new Menu();
-    this.settings.customStatuses
-      .filter(status => status.name !== 'unknown')
-      .forEach(status => {
-        menu.addItem((item) =>
-          item
-            .setTitle(`${status.name} ${status.icon}`)
-            .setIcon('tag')
-            .onClick(async () => {
-              await this.updateNoteStatus(status.name);
-            })
-        );
-      });
+		this.registerEvent(this.app.vault.on('delete', () => {
+			this.explorerIntegration.updateAllFileExplorerIcons();
+			this.updateStatusPane();
+		}));
 
-    const cursor = editor.getCursor('to');
-    editor.posToOffset(cursor);
-    const editorEl = view.contentEl.querySelector('.cm-content');
-    const rect = editorEl?.getBoundingClientRect();
-    if (rect) {
-        menu.showAtPosition({ x: rect.left, y: rect.bottom });
-    } else {
-        menu.showAtPosition({ x: 0, y: 0 }); // Fallback position
-    }
-  }
+		this.registerEvent(this.app.vault.on('rename', () => {
+			this.explorerIntegration.updateAllFileExplorerIcons();
+			this.updateStatusPane();
+		}));
 
-  updateStatusDropdown() {
-    if (!this.settings.showStatusDropdown) {
-      if (this.statusDropdownContainer) {
-        this.statusDropdownContainer.remove();
-        this.statusDropdownContainer = undefined;
-      }
-      return;
-    }
+		// Metadata change events
+		this.registerEvent(this.app.metadataCache.on('changed', (file) => {
+			this.checkNoteStatus();
+			this.explorerIntegration.updateFileExplorerIcons(file);
+			this.updateStatusPane();
+		}));
 
-    const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-    if (!view) {
-      if (this.statusDropdownContainer) {
-        this.statusDropdownContainer.remove();
-        this.statusDropdownContainer = undefined;
-      }
-      return;
-    }
+		// Metadata resolved event
+		this.registerEvent(this.app.metadataCache.on('resolved', () => {
+			this.explorerIntegration.updateAllFileExplorerIcons();
+		}));
+	}
 
-    const contentEl = view.contentEl;
-    if (!this.statusDropdownContainer) {
-      this.statusDropdownContainer = this.settings.dropdownPosition === 'top'
-        ? contentEl.insertBefore(document.createElement('div'), contentEl.firstChild)
-        : contentEl.appendChild(document.createElement('div'));
-      this.statusDropdownContainer.className = 'note-status-dropdown';
-      this.statusDropdownContainer.style.cssText = `
-        padding: 5px;
-        background: var(--background-secondary);
-        border-${this.settings.dropdownPosition === 'top' ? 'bottom' : 'top'}: 1px solid var(--background-modifier-border);
-        position: sticky;
-        ${this.settings.dropdownPosition}: 0;
-        z-index: 10;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      `;
-    }
+	checkNoteStatus() {
+		const activeFile = this.app.workspace.getActiveFile();
+		if (!activeFile || activeFile.extension !== 'md') {
+			this.statusBar.update('unknown');
+			return;
+		}
 
-    this.statusDropdownContainer.empty();
-    const label = this.statusDropdownContainer.createEl('span', {
-      text: 'Status:',
-      cls: 'status-label'
-    });
-    label.style.fontWeight = 'bold';
+		const status = this.statusService.getFileStatus(activeFile);
+		this.statusBar.update(status);
+	}
 
-    const select = this.statusDropdownContainer.createEl('select', {
-      cls: 'status-select'
-    });
-    select.style.cssText = `
-      padding: 4px 8px;
-      border: 1px solid var(--background-modifier-border);
-      border-radius: 4px;
-      background: var(--background-primary);
-      color: var(--text-normal);
-      cursor: pointer;
-      outline: none;
-      transition: all 0.2s ease;
-    `;
+	getCurrentStatus(): string {
+		const activeFile = this.app.workspace.getActiveFile();
+		if (!activeFile || activeFile.extension !== 'md') {
+			return 'unknown';
+		}
+		return this.statusService.getFileStatus(activeFile);
+	}
 
-    this.settings.customStatuses.forEach(status => {
-      const option = select.createEl('option', {
-        text: `${status.name} ${status.icon}`,
-        value: status.name
-      });
-      option.style.color = this.settings.statusColors[status.name] || '#808080';
-      if (status.name === this.currentStatus) {
-        option.selected = true;
-      }
-    });
+	async openStatusPane() {
+		const existing = this.app.workspace.getLeavesOfType('status-pane')[0];
+		if (existing) {
+			this.app.workspace.setActiveLeaf(existing);
+			await this.updateStatusPane();
+		} else {
+			const leaf = this.app.workspace.getLeftLeaf(false);
+			if (leaf) await leaf.setViewState({ type: 'status-pane', active: true });
+		}
+	}
 
-    select.addEventListener('change', async (e) => {
-      const newStatus = (e.target as HTMLSelectElement).value;
-      if (newStatus !== 'unknown') {
-        await this.updateNoteStatus(newStatus);
-      }
-    });
+	showBatchStatusModal() {
+		new BatchStatusModal(this.app, this.settings, this.statusService).open();
+	}
 
-    select.addEventListener('mouseover', () => {
-      select.style.boxShadow = '0 2px 4px var(--background-modifier-box-shadow)';
-    });
-    select.addEventListener('mouseout', () => {
-      select.style.boxShadow = 'none';
-    });
+	showStatusContextMenu(files: TFile[]) {
+		this.statusContextMenu.showForFiles(files);
+	}
 
-    const hideButton = this.statusDropdownContainer.createEl('button', {
-      text: 'Hide Bar',
-      cls: 'hide-status-bar-button'
-    });
-    hideButton.style.cssText = `
-      padding: 4px 8px;
-      border: 1px solid var(--background-modifier-border);
-      border-radius: 4px;
-      background: var(--background-primary);
-      color: var(--text-normal);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    `;
-    hideButton.addEventListener('click', () => {
-      this.settings.showStatusDropdown = false;
-      this.updateStatusDropdown();
-      this.saveSettings();
-      new Notice('Status dropdown hidden');
-    });
-    hideButton.addEventListener('mouseover', () => {
-      hideButton.style.backgroundColor = 'var(--background-modifier-hover)';
-    });
-    hideButton.addEventListener('mouseout', () => {
-      hideButton.style.backgroundColor = 'var(--background-primary)';
-    });
-  }
+	async updateStatusPane() {
+		if (this.statusPaneLeaf && this.statusPaneLeaf.view instanceof StatusPaneView) {
+			const searchQuery = (this.statusPaneLeaf.view as StatusPaneView).searchInput?.value.toLowerCase() || '';
+			await (this.statusPaneLeaf.view as StatusPaneView).renderGroups(searchQuery);
+		}
+	}
 
-  async updateFileExplorerIcons(file: TFile) {
-    if (!this.settings.showStatusIconsInExplorer) return;
+	async resetDefaultColors() {
+		// Reset colors for default statuses
+		const defaultStatuses = ['active', 'onHold', 'completed', 'dropped', 'unknown'];
 
-    const content = await this.app.vault.read(file);
-    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
-    let status = 'unknown';
+		for (const status of defaultStatuses) {
+			if (this.settings.customStatuses.some(s => s.name === status)) {
+				this.settings.statusColors[status] = DEFAULT_COLORS[status];
+			}
+		}
 
-    if (frontmatterMatch) {
-      const frontmatter = frontmatterMatch[1];
-      const statusMatch = frontmatter.match(/status:\s*(\w+)/i);
-      if (statusMatch) {
-        const foundStatus = statusMatch[1].toLowerCase();
-        if (this.settings.customStatuses.some(s => s.name === foundStatus)) {
-          status = foundStatus;
-        }
-      }
-    }
+		await this.saveSettings();
+	}
 
-    const fileExplorer = this.app.workspace.getLeavesOfType('file-explorer')[0];
-    if (fileExplorer && fileExplorer.view && (fileExplorer.view as any).fileItems) {
-      const fileItem = (fileExplorer.view as any).fileItems[file.path];
-      if (fileItem) {
-        const titleEl = fileItem.titleEl || fileItem.selfEl;
-        if (titleEl) {
-          const existingIcon = titleEl.querySelector('.note-status-icon');
-          if (existingIcon) existingIcon.remove();
+	async loadSettings() {
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		this.initializeDefaultColors();
+	}
 
-          const iconEl = titleEl.createEl('span', {
-            cls: 'note-status-icon',
-            text: this.getStatusIcon(status)
-          });
-          iconEl.style.marginLeft = '5px';
-          iconEl.style.color = this.settings.statusColors[status] || '#808080';
-          iconEl.style.fontSize = '12px';
-        }
-      }
-    }
-  }
+	private initializeDefaultColors() {
+		// Ensure default colors are set for all statuses
+		for (const [status, color] of Object.entries(DEFAULT_COLORS)) {
+			if (!this.settings.statusColors[status]) {
+				this.settings.statusColors[status] = color;
+			}
+		}
+	}
 
-  updateAllFileExplorerIcons() {
-    if (!this.settings.showStatusIconsInExplorer) {
-      const fileExplorer = this.app.workspace.getLeavesOfType('file-explorer')[0];
-      if (fileExplorer && fileExplorer.view && (fileExplorer.view as any).fileItems) {
-        Object.values((fileExplorer.view as any).fileItems).forEach((fileItem: any) => {
-          const titleEl = fileItem.titleEl || fileItem.selfEl;
-          if (titleEl) {
-            const existingIcon = titleEl.querySelector('.note-status-icon');
-            if (existingIcon) existingIcon.remove();
-          }
-        });
-      }
-      return;
-    }
+	async saveSettings() {
+		await this.saveData(this.settings);
 
-    this.app.vault.getMarkdownFiles().forEach(file => {
-      this.updateFileExplorerIcons(file);
-    });
-  }
+		// Update services with new settings
+		this.statusService.updateSettings(this.settings);
+		this.styleService.updateSettings(this.settings);
 
-  onunload() {
-    this.statusBarItem.remove();
-    if (this.statusDropdownContainer) {
-      this.statusDropdownContainer.remove();
-    }
-    const fileExplorer = this.app.workspace.getLeavesOfType('file-explorer')[0];
-    if (fileExplorer && fileExplorer.view && (fileExplorer.view as any).fileItems) {
-      Object.values((fileExplorer.view as any).fileItems).forEach((fileItem: any) => {
-        const titleEl = fileItem.titleEl || fileItem.selfEl;
-        if (titleEl) {
-          const existingIcon = titleEl.querySelector('.note-status-icon');
-          if (existingIcon) existingIcon.remove();
-        }
-      });
-    }
-    const statusPane = this.app.workspace.getLeavesOfType('status-pane')[0];
-    if (statusPane) {
-      statusPane.detach();
-    }
-  }
+		// Update UI components with new settings
+		this.statusBar.updateSettings(this.settings);
+		this.statusDropdown.updateSettings(this.settings);
+		this.explorerIntegration.updateSettings(this.settings);
+		this.statusContextMenu.updateSettings(this.settings);
 
-  async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-  }
+		// Update status pane if open
+		if (this.statusPaneLeaf && this.statusPaneLeaf.view instanceof StatusPaneView) {
+			(this.statusPaneLeaf.view as StatusPaneView).updateSettings(this.settings);
+		}
+	}
 
-  async saveSettings() {
-    await this.saveData(this.settings);
-    this.updateStatusPane();
-  }
-}
+	onunload() {
+		// Clean up UI elements
+		this.statusBar.unload?.();
+		this.statusDropdown.unload?.();
+		this.explorerIntegration.unload?.();
+		this.styleService.unload?.();
 
-class NoteStatusSettingTab extends PluginSettingTab {
-  plugin: NoteStatus;
+		// Close status pane if open
+		const statusPane = this.app.workspace.getLeavesOfType('status-pane')[0];
+		if (statusPane) statusPane.detach();
 
-  constructor(app: App, plugin: NoteStatus) {
-    super(app, plugin);
-    this.plugin = plugin;
-  }
-
-  display(): void {
-    const { containerEl } = this;
-    containerEl.empty();
-
-    containerEl.createEl('h2', { text: 'Note Status Settings' });
-
-    new Setting(containerEl)
-      .setName('Show status dropdown')
-      .setDesc('Display status dropdown in notes (can also toggle by clicking status bar)')
-      .addToggle(toggle => toggle
-        .setValue(this.plugin.settings.showStatusDropdown)
-        .onChange(async (value) => {
-          this.plugin.settings.showStatusDropdown = value;
-          await this.plugin.saveSettings();
-          this.plugin.updateStatusDropdown();
-        }));
-
-    new Setting(containerEl)
-      .setName('Dropdown position')
-      .setDesc('Where to place the status dropdown in the note')
-      .addDropdown(dropdown => dropdown
-        .addOption('top', 'Top')
-        .addOption('bottom', 'Bottom')
-        .setValue(this.plugin.settings.dropdownPosition)
-        .onChange(async (value: 'top' | 'bottom') => {
-          this.plugin.settings.dropdownPosition = value;
-          await this.plugin.saveSettings();
-          this.plugin.updateStatusDropdown();
-        }));
-
-    new Setting(containerEl)
-      .setName('Show status bar')
-      .setDesc('Display the status bar at the bottom of the app')
-      .addToggle(toggle => toggle
-        .setValue(this.plugin.settings.showStatusBar)
-        .onChange(async (value) => {
-          this.plugin.settings.showStatusBar = value;
-          await this.plugin.saveSettings();
-          this.plugin.updateStatusBar();
-        }));
-
-    new Setting(containerEl)
-      .setName('Status bar position')
-      .setDesc('Align the status bar text')
-      .addDropdown(dropdown => dropdown
-        .addOption('left', 'Left')
-        .addOption('right', 'Right')
-        .setValue(this.plugin.settings.statusBarPosition)
-        .onChange(async (value: 'left' | 'right') => {
-          this.plugin.settings.statusBarPosition = value;
-          await this.plugin.saveSettings();
-          this.plugin.updateStatusBar();
-        }));
-
-    new Setting(containerEl)
-      .setName('Auto-hide status bar')
-      .setDesc('Hide the status bar when status is unknown')
-      .addToggle(toggle => toggle
-        .setValue(this.plugin.settings.autoHideStatusBar)
-        .onChange(async (value) => {
-          this.plugin.settings.autoHideStatusBar = value;
-          await this.plugin.saveSettings();
-          this.plugin.updateStatusBar();
-        }));
-
-    new Setting(containerEl)
-      .setName('Show status icons in file explorer')
-      .setDesc('Display status icons next to note names in the file explorer')
-      .addToggle(toggle => toggle
-        .setValue(this.plugin.settings.showStatusIconsInExplorer)
-        .onChange(async (value) => {
-          this.plugin.settings.showStatusIconsInExplorer = value;
-          await this.plugin.saveSettings();
-          this.plugin.updateAllFileExplorerIcons();
-        }));
-
-    containerEl.createEl('h3', { text: 'Custom Statuses' });
-
-    const statusList = containerEl.createDiv({ cls: 'custom-status-list' });
-    const renderStatuses = () => {
-      statusList.empty();
-      this.plugin.settings.customStatuses.forEach((status, index) => {
-        const statusSetting = new Setting(statusList)
-          .setName(status.name)
-          .addText(text => text
-            .setPlaceholder('Status Name')
-            .setValue(status.name)
-            .onChange(async (value) => {
-              if (value && !this.plugin.settings.customStatuses.some(s => s.name === value && s !== status)) {
-                const oldName = status.name;
-                status.name = value;
-                if (this.plugin.settings.statusColors[oldName]) {
-                  this.plugin.settings.statusColors[value] = this.plugin.settings.statusColors[oldName];
-                  delete this.plugin.settings.statusColors[oldName];
-                }
-                await this.plugin.saveSettings();
-                this.plugin.updateStatusDropdown();
-                this.plugin.updateStatusBar();
-                this.plugin.updateAllFileExplorerIcons();
-              }
-            }))
-          .addText(text => text
-            .setPlaceholder('Icon')
-            .setValue(status.icon)
-            .onChange(async (value) => {
-              status.icon = value || '❓';
-              await this.plugin.saveSettings();
-              this.plugin.updateStatusDropdown();
-              this.plugin.updateStatusBar();
-              this.plugin.updateAllFileExplorerIcons();
-            }))
-          .addColorPicker(colorPicker => colorPicker
-            .setValue(this.plugin.settings.statusColors[status.name] || '#808080')
-            .onChange(async (value) => {
-              this.plugin.settings.statusColors[status.name] = value;
-              await this.plugin.saveSettings();
-              this.plugin.updateStatusBar();
-              this.plugin.updateStatusDropdown();
-              this.plugin.updateAllFileExplorerIcons();
-            }))
-          .addButton(button => button
-            .setButtonText('Remove')
-            .setWarning()
-            .onClick(async () => {
-              this.plugin.settings.customStatuses.splice(index, 1);
-              delete this.plugin.settings.statusColors[status.name];
-              await this.plugin.saveSettings();
-              renderStatuses();
-              this.plugin.updateStatusDropdown();
-              this.plugin.updateStatusBar();
-              this.plugin.updateAllFileExplorerIcons();
-            }));
-      });
-    };
-    renderStatuses();
-
-    new Setting(containerEl)
-      .setName('Add new status')
-      .setDesc('Add a custom status with a name, icon, and color')
-      .addButton(button => button
-        .setButtonText('Add Status')
-        .setCta()
-        .onClick(async () => {
-          const newStatus = { name: `status${this.plugin.settings.customStatuses.length + 1}`, icon: '⭐' };
-          this.plugin.settings.customStatuses.push(newStatus);
-          this.plugin.settings.statusColors[newStatus.name] = '#ffffff';
-          await this.plugin.saveSettings();
-          renderStatuses();
-          this.plugin.updateStatusDropdown();
-          this.plugin.updateAllFileExplorerIcons();
-        }));
-  }
+		// Remove event listeners
+		window.removeEventListener('note-status:settings-changed', this.saveSettings);
+		window.removeEventListener('note-status:status-changed', this.checkNoteStatus);
+		window.removeEventListener('note-status:refresh-dropdown', this.statusDropdown.render);
+		window.removeEventListener('note-status:refresh-ui', this.checkNoteStatus);
+	}
 }
