@@ -1,6 +1,6 @@
 # Obsidian Note Status Plugin
 
-![Version](https://img.shields.io/badge/version-1.0.2-blue) ![Obsidian](https://img.shields.io/badge/Obsidian-Compatible-green)
+![Version](https://img.shields.io/badge/version-1.0.6-blue) ![Obsidian](https://img.shields.io/badge/Obsidian-Compatible-green)
 
 The **Note Status** plugin for Obsidian enhances your workflow by allowing you to assign, manage, and visualize statuses for your notes. Whether you're tracking projects, tasks, or personal notes, this plugin provides a seamless way to organize your vault with customizable statuses, a dedicated status pane, and visual indicators.
 ## Features
@@ -13,12 +13,12 @@ The **Note Status** plugin for Obsidian enhances your workflow by allowing you t
 - **Commands**: Includes commands to refresh statuses, insert status metadata, and open the status pane.
 ## Installation
 1. **Download the Plugin**:
-    - Grab the latest release (v1.0.2) from the [GitHub Releases page](https://github.com/devonthesofa/obsidian-note-status/releases).
-    - Extract the zip file to get the plugin folder (obsidian-note-status).
+    - Grab the latest release from the [GitHub Releases page](https://github.com/devonthesofa/obsidian-note-status/releases).
+    - Download the files `main.js`, `styles.css` and `manifest.json`
 2. **Install in Obsidian**:
-    - Open your Obsidian vault and navigate to .obsidian/plugins/.
-    - Copy the obsidian-note-status folder into this directory.
-    - If the plugins folder doesn’t exist, create it.
+    - Open your Obsidian vault and navigate to `.obsidian/plugins/`.
+    - Create a folder named `obsidian-note-status` into this directory.
+    - Copy the downloaded files in the `obsidian-note-status` folder.
 3. **Enable the Plugin**:
     - In Obsidian, go to Settings > Community Plugins.
     - Ensure "Safe Mode" is turned off.
@@ -94,11 +94,26 @@ npm run build
 
 - Fork this repository and submit pull requests with improvements or bug fixes.
 - Report issues or suggest features via the [Issues tab](https://github.com/devonthesofa/obsidian-note-status/issues).
+
+### 🔧 Still in Progress
+
+- **Bug:** When manually editing the status in the frontmatter **after** tags, a weird behavior occurs:
+    ```
+    status: ...
+    ---
+    tags:
+      - calendar/daily
+    ---
+    It creates a new block of tags, leaving the old one outside. Needs refinement.
+    ```
+-  **Improvement:** Performance optimization when changing statuses for a large number of notes — currently a bit slow.
+-  **Improvement:** Codebase needs cleanup — right now it’s barely readable unless you’re an AI 🤖
+
 ## Known Limitations
 - Dropdown positioning uses DOM-based workarounds due to limited API support for editor coordinates.
 - Initial release; some edge cases may still need refinement—please report bugs!
 ## License
-This plugin is released under the . Feel free to use, modify, and distribute it as you see fit.
+This plugin is released under a permissive license by _Dynalist Inc. (2020-2025)_. Feel free to use, modify, and distribute it as you see fit.
 ## Acknowledgments
 - Built with help from [xAI’s Grok](https://xai.com) for code assistance and debugging.
 - Inspired by the amazing Obsidian community and its plugin ecosystem.
