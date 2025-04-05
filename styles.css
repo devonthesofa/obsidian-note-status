@@ -126,31 +126,33 @@
     font-size: var(--font-ui-small);
   }
   
-  /* Status Bar */
-  .note-status-bar {
-    display: flex;
-    justify-content: flex-end; /* Default, will be overridden by settings */
-  }
-  
-  .note-status-bar.left {
-    justify-content: flex-start;
-  }
-  
-  .note-status-bar.hidden {
-    display: none;
-  }
-  
-  .note-status-bar.auto-hide {
-    opacity: 0;
-    transition: opacity 0.5s ease;
-  }
-  
-  .note-status-bar.auto-hide.visible {
-    opacity: 1;
-  }
+/* Status Bar */
+.note-status-bar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.note-status-bar.left {
+  justify-content: flex-start;
+}
+
+.note-status-bar.hidden {
+  display: none;
+}
+
+.note-status-bar.auto-hide {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.note-status-bar.auto-hide.visible {
+  opacity: 1;
+}
+
+/* Los colores de estado se manejan dinámicamente en JS, no aquí */
 
 
-/* Colores de los estados */
+/* Colores de los estados 
 .status-active {
   color: var(--text-success);
 }
@@ -166,6 +168,7 @@
 .status-unknown {
   color: var(--text-muted);
 }
+*/
 
 /* Aplicar colores a los íconos y textos en el status bar y explorador */
 .note-status-bar .note-status-active,
