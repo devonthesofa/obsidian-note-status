@@ -1,7 +1,7 @@
 {
 	"id": "note-status",
 	"name": "Note Status",
-	"version": "1.0.6",
+	"version": "1.0.8",
 	"minAppVersion": "0.15.0",
 	"description": "Enhance your note organization with a status management system. Assign and track statuses (active, on hold, completed, dropped) for your notes with a customizable interface including status pane, dropdown, and file explorer integration.",
 	"author": "Aleix Soler",
