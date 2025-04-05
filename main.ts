@@ -163,8 +163,24 @@ export default class NoteStatus extends Plugin {
 	private statusPaneLeaf: WorkspaceLeaf | null = null;
 	private dynamicStyleEl?: HTMLStyleElement; // Para los estilos dinámicos
 
+	// Colores por defecto en formato hexadecimal (aproximados para temas comunes de Obsidian)
+	private readonly defaultColors: Record<string, string> = {
+		active: '#00ff00',    // Verde para success
+		onHold: '#ffaa00',    // Naranja para warning
+		completed: '#00aaff', // Azul para accent
+		dropped: '#ff0000',   // Rojo para error
+		unknown: '#888888'    // Gris para muted
+	};
+
 	async onload() {
 		await this.loadSettings();
+		// Asegurar que los colores por defecto estén inicializados
+		for (const [status, color] of Object.entries(this.defaultColors)) {
+			if (!this.settings.statusColors[status]) {
+				this.settings.statusColors[status] = color;
+			}
+		}
+		await this.saveSettings();
 
 		// Registrar CSS
 		this.register(() => {
@@ -697,6 +713,21 @@ export default class NoteStatus extends Plugin {
 	async saveSettings() {
 		await this.saveData(this.settings);
 		this.updateStatusPane();
+		this.updateDynamicStyles();
+		this.updateStatusPane();
+		// this.updateStatusBar();
+		this.updateStatusDropdown();
+		this.updateAllFileExplorerIcons();
+	}
+
+	async resetDefaultColors() {
+		const defaultStatuses = ['active', 'onHold', 'completed', 'dropped', 'unknown'];
+		for (const status of defaultStatuses) {
+			if (this.settings.customStatuses.some(s => s.name === status)) {
+				this.settings.statusColors[status] = this.defaultColors[status];
+			}
+		}
+		await this.saveSettings();
 	}
 }
 
@@ -802,6 +833,7 @@ class NoteStatusSettingTab extends PluginSettingTab {
 									delete this.plugin.settings.statusColors[oldName];
 								}
 								await this.plugin.saveSettings();
+								renderStatuses(); // Refrescar la lista inmediatamente
 							}
 						}))
 					.addText(text => text
@@ -842,6 +874,17 @@ class NoteStatusSettingTab extends PluginSettingTab {
 					this.plugin.settings.statusColors[newStatus.name] = '#ffffff'; // Valor inicial blanco
 					await this.plugin.saveSettings();
 					renderStatuses();
+				}));
+		new Setting(containerEl)
+			.setName('Reset default status colors')
+			.setDesc('Restore the default colors for predefined statuses (active, onHold, completed, dropped, unknown)')
+			.addButton(button => button
+				.setButtonText('Reset Colors')
+				.setWarning()
+				.onClick(async () => {
+					await this.plugin.resetDefaultColors();
+					renderStatuses();
+					new Notice('Default status colors restored');
 				}));
 	}
 }
