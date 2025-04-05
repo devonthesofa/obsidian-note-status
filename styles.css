@@ -148,3 +148,43 @@
   .note-status-bar.auto-hide.visible {
     opacity: 1;
   }
+
+
+/* Colores de los estados */
+.status-active {
+  color: var(--text-success);
+}
+.status-onHold {
+  color: var(--text-warning);
+}
+.status-completed {
+  color: var(--text-accent);
+}
+.status-dropped {
+  color: var(--text-error);
+}
+.status-unknown {
+  color: var(--text-muted);
+}
+
+/* Aplicar colores a los íconos y textos en el status bar y explorador */
+.note-status-bar .note-status-active,
+.nav-file-title .note-status-active {
+  color: var(--text-success);
+}
+.note-status-bar .note-status-onHold,
+.nav-file-title .note-status-onHold {
+  color: var(--text-warning);
+}
+.note-status-bar .note-status-completed,
+.nav-file-title .note-status-completed {
+  color: var(--text-accent);
+}
+.note-status-bar .note-status-dropped,
+.nav-file-title .note-status-dropped {
+  color: var(--text-error);
+}
+.note-status-bar .note-status-unknown,
+.nav-file-title .note-status-unknown {
+  color: var(--text-muted);
+}
