@@ -42,7 +42,15 @@ interface NoteStatusSettings {
 	customStatuses: Status[];
 	showStatusIconsInExplorer: boolean;
 	collapsedStatuses: Record<string, boolean>;
-	compactView?: boolean;
+	compactView: boolean;
+}
+interface FileExplorerView extends View {
+	fileItems: Record<string, {
+		el?: HTMLElement;
+		file?: TFile;
+		titleEl?: HTMLElement;
+		selfEl?: HTMLElement;
+	}>;
 }
 
 const DEFAULT_SETTINGS: NoteStatusSettings = {
@@ -211,7 +219,7 @@ class StatusPaneView extends View {
 		// Render each status group
 		Object.entries(statusGroups).forEach(([status, files]) => {
 			if (files.length > 0) {
-				this.renderStatusGroup(groupsContainer, status, files);
+				this.renderStatusGroup(groupsContainer as HTMLElement, status, files);
 			}
 		});
 	}
@@ -594,15 +602,19 @@ export default class NoteStatus extends Plugin {
 
 	getSelectedFiles(): TFile[] {
 		const fileExplorer = this.app.workspace.getLeavesOfType('file-explorer')[0];
-		if (!fileExplorer || !fileExplorer.view || !('fileItems' in fileExplorer.view)) {
+		if (!fileExplorer || !fileExplorer.view) {
 			console.log('File explorer not found or no file items');
 			return [];
 		}
 
-		const fileItems = fileExplorer.view.fileItems as Record<string, { el: HTMLElement; file: TFile }>;
-		const selectedFiles: TFile[] = [];
+		const fileExplorerView = fileExplorer.view as FileExplorerView;
+		if (!fileExplorerView.fileItems) {
+			console.log('No file items found');
+			return [];
+		}
 
-		Object.entries(fileItems).forEach(([_, item]) => {
+		const selectedFiles: TFile[] = [];
+		Object.entries(fileExplorerView.fileItems).forEach(([_, item]) => {
 			if (item.el?.classList.contains('is-selected') && item.file instanceof TFile && item.file.extension === 'md') {
 				selectedFiles.push(item.file);
 			}
@@ -1002,22 +1014,26 @@ export default class NoteStatus extends Plugin {
 		const status = this.getFileStatus(file);
 		const fileExplorer = this.app.workspace.getLeavesOfType('file-explorer')[0];
 
-		if (fileExplorer && fileExplorer.view && 'fileItems' in fileExplorer.view) {
-			const fileItems = fileExplorer.view.fileItems as Record<string, { titleEl?: HTMLElement; selfEl?: HTMLElement }>;
-			const fileItem = fileItems[file.path];
+		if (fileExplorer && fileExplorer.view) {
+			// Cast fileExplorer.view to FileExplorerView
+			const fileExplorerView = fileExplorer.view as FileExplorerView;
 
-			if (fileItem) {
-				const titleEl = fileItem.titleEl || fileItem.selfEl;
-				if (titleEl) {
-					// Remove existing icon if present
-					const existingIcon = titleEl.querySelector('.note-status-icon');
-					if (existingIcon) existingIcon.remove();
+			if (fileExplorerView.fileItems) {
+				const fileItem = fileExplorerView.fileItems[file.path];
 
-					// Add new icon
-					titleEl.createEl('span', {
-						cls: `note-status-icon nav-file-tag status-${status}`,
-						text: this.getStatusIcon(status)
-					});
+				if (fileItem) {
+					const titleEl = fileItem.titleEl || fileItem.selfEl;
+					if (titleEl) {
+						// Remove existing icon if present
+						const existingIcon = titleEl.querySelector('.note-status-icon');
+						if (existingIcon) existingIcon.remove();
+
+						// Add new icon
+						titleEl.createEl('span', {
+							cls: `note-status-icon nav-file-tag status-${status}`,
+							text: this.getStatusIcon(status)
+						});
+					}
 				}
 			}
 		}
@@ -1037,16 +1053,19 @@ export default class NoteStatus extends Plugin {
 
 	private removeAllFileExplorerIcons() {
 		const fileExplorer = this.app.workspace.getLeavesOfType('file-explorer')[0];
-		if (fileExplorer && fileExplorer.view && 'fileItems' in fileExplorer.view) {
-			const fileItems = fileExplorer.view.fileItems as Record<string, { titleEl?: HTMLElement; selfEl?: HTMLElement }>;
+		if (fileExplorer && fileExplorer.view) {
+			// Cast fileExplorer.view to FileExplorerView
+			const fileExplorerView = fileExplorer.view as FileExplorerView;
 
-			Object.values(fileItems).forEach((fileItem) => {
-				const titleEl = fileItem.titleEl || fileItem.selfEl;
-				if (titleEl) {
-					const existingIcon = titleEl.querySelector('.note-status-icon');
-					if (existingIcon) existingIcon.remove();
-				}
-			});
+			if (fileExplorerView.fileItems) {
+				Object.values(fileExplorerView.fileItems).forEach((fileItem) => {
+					const titleEl = fileItem.titleEl || fileItem.selfEl;
+					if (titleEl) {
+						const existingIcon = titleEl.querySelector('.note-status-icon');
+						if (existingIcon) existingIcon.remove();
+					}
+				});
+			}
 		}
 	}
 
