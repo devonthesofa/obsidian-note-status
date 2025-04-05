@@ -762,13 +762,15 @@ export default class NoteStatus extends Plugin {
 		const statusSelect = statusSelectContainer.createEl('select', { cls: 'note-status-status-select' });
 
 		// Add status options
-		this.settings.customStatuses.forEach(status => {
-			const option = statusSelect.createEl('option', {
-				text: `${status.name} ${status.icon}`,
-				value: status.name
+		this.settings.customStatuses
+			.filter(status => status.name !== 'unknown')
+			.forEach(status => {
+				const option = statusSelect.createEl('option', {
+					text: `${status.name} ${status.icon}`,
+					value: status.name
+				});
+				option.classList.add(`status-${status.name}`);
 			});
-			option.classList.add(`status-${status.name}`);
-		});
 
 		// Add action buttons
 		const buttonContainer = modal.contentEl.createDiv({ cls: 'note-status-modal-buttons' });
@@ -963,12 +965,13 @@ export default class NoteStatus extends Plugin {
 
 		// Add status options (excluding 'unknown')
 		this.settings.customStatuses
-			.filter(status => status.name !== 'unknown') // Exclude 'unknown' status
 			.forEach(status => {
 				const option = select.createEl('option', {
 					text: `${status.name} ${status.icon}`,
 					value: status.name
 				});
+				if (status.name === 'unknown') option.disabled = true;
+
 
 				if (status.name === this.currentStatus) option.selected = true;
 			});
