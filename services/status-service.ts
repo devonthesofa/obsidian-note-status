@@ -1,5 +1,6 @@
 import { App, TFile, Editor, Notice } from 'obsidian';
-import { NoteStatusSettings } from '../models/types';
+import { NoteStatusSettings, Status } from '../models/types';
+import { PREDEFINED_TEMPLATES } from '../constants/status-templates';
 
 /**
  * Service for handling note status operations
@@ -7,17 +8,76 @@ import { NoteStatusSettings } from '../models/types';
 export class StatusService {
 	private app: App;
 	private settings: NoteStatusSettings;
+	private allStatuses: Status[] = [];
 
 	constructor(app: App, settings: NoteStatusSettings) {
 		this.app = app;
 		this.settings = settings;
+		this.updateAllStatuses();
 	}
 
 	/**
-	 * Updates the settings reference
+	 * Updates the settings reference and recalculates all statuses
 	 */
 	public updateSettings(settings: NoteStatusSettings): void {
 		this.settings = settings;
+		this.updateAllStatuses();
+	}
+
+	/**
+	 * Updates the combined list of all statuses (from templates and custom)
+	 */
+	private updateAllStatuses(): void {
+		// Start with custom statuses if not using templates exclusively
+		this.allStatuses = [...this.settings.customStatuses];
+
+		// Add statuses from enabled templates
+		if (!this.settings.useCustomStatusesOnly) {
+			const templateStatuses = this.getTemplateStatuses();
+			
+			// Add template statuses that don't have the same name as existing statuses
+			for (const status of templateStatuses) {
+				if (!this.allStatuses.some(s => s.name.toLowerCase() === status.name.toLowerCase())) {
+					this.allStatuses.push(status);
+				} else {
+					// Update status colors if they come from a template and have colors
+					const existingStatusIndex = this.allStatuses.findIndex(
+						s => s.name.toLowerCase() === status.name.toLowerCase()
+					);
+					
+					if (existingStatusIndex !== -1 && status.color) {
+						// Update color in settings if it doesn't exist
+						if (!this.settings.statusColors[status.name]) {
+							this.settings.statusColors[status.name] = status.color;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Gets all statuses from enabled templates
+	 */
+	private getTemplateStatuses(): Status[] {
+		const statuses: Status[] = [];
+		
+		// Find templates that are enabled
+		for (const templateId of this.settings.enabledTemplates) {
+			const template = PREDEFINED_TEMPLATES.find(t => t.id === templateId);
+			if (template) {
+				statuses.push(...template.statuses);
+			}
+		}
+		
+		return statuses;
+	}
+
+	/**
+	 * Get all available statuses (combined from templates and custom)
+	 */
+	public getAllStatuses(): Status[] {
+		return this.allStatuses;
 	}
 
 	/**
@@ -29,7 +89,7 @@ export class StatusService {
 
 		if (cachedMetadata?.frontmatter?.status) {
 			const frontmatterStatus = cachedMetadata.frontmatter.status.toLowerCase();
-			const matchingStatus = this.settings.customStatuses.find(s =>
+			const matchingStatus = this.allStatuses.find(s =>
 				s.name.toLowerCase() === frontmatterStatus);
 
 			if (matchingStatus) status = matchingStatus.name;
@@ -42,7 +102,7 @@ export class StatusService {
 	 * Get the icon for a given status
 	 */
 	public getStatusIcon(status: string): string {
-		const customStatus = this.settings.customStatuses.find(
+		const customStatus = this.allStatuses.find(
 			s => s.name.toLowerCase() === status.toLowerCase()
 		);
 		return customStatus ? customStatus.icon : '❓';
@@ -151,10 +211,15 @@ export class StatusService {
 	public groupFilesByStatus(searchQuery = ''): Record<string, TFile[]> {
 		const statusGroups: Record<string, TFile[]> = {};
 
-		// Initialize groups for each status
-		this.settings.customStatuses.forEach(status => {
+		// Initialize groups for all statuses
+		this.allStatuses.forEach(status => {
 			statusGroups[status.name] = [];
 		});
+
+		// Ensure 'unknown' status is included
+		if (!statusGroups['unknown']) {
+			statusGroups['unknown'] = [];
+		}
 
 		// Get all markdown files and filter by search query
 		const files = this.getMarkdownFiles(searchQuery);

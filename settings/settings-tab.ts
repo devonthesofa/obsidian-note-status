@@ -1,5 +1,6 @@
 import { App, PluginSettingTab, Setting, Notice } from 'obsidian';
 import { Status } from '../models/types';
+import { PREDEFINED_TEMPLATES } from '../constants/status-templates';
 
 /**
  * Settings tab for the Note Status plugin
@@ -18,6 +19,9 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 
 		// Header
 		containerEl.createEl('h2', { text: 'Note Status Settings' });
+
+		// Status Template section
+		this.displayTemplateSettings(containerEl.createDiv());
 
 		// UI section
 		containerEl.createEl('h3', { text: 'UI Settings' });
@@ -102,6 +106,23 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 
 		// Status management section
 		containerEl.createEl('h3', { text: 'Custom Statuses' });
+		
+		// Option to use only custom statuses
+		new Setting(containerEl)
+			.setName('Use only custom statuses')
+			.setDesc('Ignore template statuses and use only the custom statuses defined below')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.useCustomStatusesOnly || false)
+				.onChange(async (value) => {
+					this.plugin.settings.useCustomStatusesOnly = value;
+					await this.plugin.saveSettings();
+					
+					// Refresh the UI to show/hide template statuses
+					window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+					this.display();
+				}));
+		
+		// Custom statuses list
 		const statusList = containerEl.createDiv({ cls: 'custom-status-list' });
 
 		const renderStatuses = () => {
@@ -235,5 +256,113 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 					renderStatuses();
 					new Notice('Default status colors restored');
 				}));
+	}
+	
+	/**
+	 * Display template settings section
+	 */
+	private displayTemplateSettings(containerEl: HTMLElement): void {
+		containerEl.createEl('h3', { text: 'Status Templates' });
+		containerEl.createEl('p', { 
+			text: 'Enable predefined templates to quickly add common status workflows',
+			cls: 'setting-item-description'
+		});
+		
+		// Create templates container
+		const templatesContainer = containerEl.createDiv({ cls: 'templates-container' });
+		
+		// List each template with checkbox and preview
+		PREDEFINED_TEMPLATES.forEach(template => {
+			const templateEl = templatesContainer.createDiv({ cls: 'template-item' });
+			
+			// Template header with checkbox and name
+			const headerEl = templateEl.createDiv({ cls: 'template-header' });
+			
+			// Checkbox for enabling/disabling template
+			const isEnabled = this.plugin.settings.enabledTemplates.includes(template.id);
+			const checkbox = headerEl.createEl('input', {
+				type: 'checkbox',
+				cls: 'template-checkbox'
+			});
+			checkbox.checked = isEnabled;
+			
+			checkbox.addEventListener('change', async () => {
+				if (checkbox.checked) {
+					// Enable template
+					if (!this.plugin.settings.enabledTemplates.includes(template.id)) {
+						this.plugin.settings.enabledTemplates.push(template.id);
+					}
+				} else {
+					// Disable template
+					this.plugin.settings.enabledTemplates = this.plugin.settings.enabledTemplates.filter(
+						id => id !== template.id
+					);
+				}
+				
+				await this.plugin.saveSettings();
+				
+				// Refresh UI
+				window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+			});
+			
+			// Template name
+			headerEl.createEl('span', { 
+				text: template.name,
+				cls: 'template-name'
+			});
+			
+			// Template description
+			templateEl.createEl('div', {
+				text: template.description,
+				cls: 'template-description'
+			});
+			
+			// Preview statuses
+			const statusesEl = templateEl.createDiv({ cls: 'template-statuses' });
+			
+			template.statuses.forEach(status => {
+				const statusEl = statusesEl.createEl('div', { cls: 'template-status-chip' });
+				
+				// Create colored dot for the status
+				const colorDot = statusEl.createEl('span', { cls: 'status-color-dot' });
+				colorDot.style.display = 'inline-block';
+				colorDot.style.width = '8px';
+				colorDot.style.height = '8px';
+				colorDot.style.borderRadius = '50%';
+				colorDot.style.backgroundColor = status.color || '#ffffff';
+				colorDot.style.marginRight = '4px';
+				
+				// Status icon and name
+				statusEl.createSpan({ text: `${status.icon} ${status.name}` });
+			});
+		});
+		
+		// Import/Export buttons for templates
+		const buttonsContainer = containerEl.createDiv({ cls: 'template-buttons' });
+		buttonsContainer.style.marginTop = '15px';
+		buttonsContainer.style.display = 'flex';
+		buttonsContainer.style.gap = '10px';
+		
+		// Import button
+		const importButton = buttonsContainer.createEl('button', {
+			text: 'Import Template',
+			cls: 'mod-cta'
+		});
+		
+		importButton.addEventListener('click', () => {
+			// Show notification about upcoming feature
+			new Notice('Template import functionality coming soon!');
+		});
+		
+		// Export button
+		const exportButton = buttonsContainer.createEl('button', {
+			text: 'Export Templates',
+			cls: ''
+		});
+		
+		exportButton.addEventListener('click', () => {
+			// Show notification about upcoming feature
+			new Notice('Template export functionality coming soon!');
+		});
 	}
 }

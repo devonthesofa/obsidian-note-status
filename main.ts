@@ -3,6 +3,7 @@ import { Editor, MarkdownView, Notice, Plugin, TFile, addIcon, WorkspaceLeaf } f
 // Import constants
 import { ICONS } from './constants/icons';
 import { DEFAULT_SETTINGS, DEFAULT_COLORS } from './constants/defaults';
+import { PREDEFINED_TEMPLATES } from './constants/status-templates';
 
 // Import interfaces and types
 import { NoteStatusSettings } from './models/types';
@@ -311,6 +312,20 @@ export default class NoteStatus extends Plugin {
 			}
 		}
 
+		// Also reset template status colors
+		if (!this.settings.useCustomStatusesOnly) {
+			for (const templateId of this.settings.enabledTemplates) {
+				const template = PREDEFINED_TEMPLATES.find(t => t.id === templateId);
+				if (template) {
+					for (const status of template.statuses) {
+						if (status.color) {
+							this.settings.statusColors[status.name] = status.color;
+						}
+					}
+				}
+			}
+		}
+
 		await this.saveSettings();
 	}
 
@@ -324,6 +339,20 @@ export default class NoteStatus extends Plugin {
 		for (const [status, color] of Object.entries(DEFAULT_COLORS)) {
 			if (!this.settings.statusColors[status]) {
 				this.settings.statusColors[status] = color;
+			}
+		}
+
+		// Also initialize colors from enabled templates if not present
+		if (!this.settings.useCustomStatusesOnly) {
+			for (const templateId of this.settings.enabledTemplates) {
+				const template = PREDEFINED_TEMPLATES.find(t => t.id === templateId);
+				if (template) {
+					for (const status of template.statuses) {
+						if (status.color && !this.settings.statusColors[status.name]) {
+							this.settings.statusColors[status.name] = status.color;
+						}
+					}
+				}
 			}
 		}
 	}

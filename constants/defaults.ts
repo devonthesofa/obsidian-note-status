@@ -1,4 +1,5 @@
 import { NoteStatusSettings } from '../models/types';
+import { DEFAULT_ENABLED_TEMPLATES } from '../constants/status-templates';
 
 /**
  * Default plugin settings
@@ -25,7 +26,9 @@ export const DEFAULT_SETTINGS: NoteStatusSettings = {
 	],
 	showStatusIconsInExplorer: true,
 	collapsedStatuses: {},
-	compactView: false
+	compactView: false,
+	enabledTemplates: DEFAULT_ENABLED_TEMPLATES,
+	useCustomStatusesOnly: false
 };
 
 /**

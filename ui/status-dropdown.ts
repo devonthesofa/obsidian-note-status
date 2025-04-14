@@ -81,18 +81,19 @@ export class StatusDropdown {
 		// Add select element
 		const select = this.dropdownContainer.createEl('select', { cls: 'note-status-select dropdown' });
 
-		// Add status options (excluding 'unknown')
-		this.settings.customStatuses
-			.forEach(status => {
-				const option = select.createEl('option', {
-					text: `${status.name} ${status.icon}`,
-					value: status.name
-				});
-				if (status.name === 'unknown') option.disabled = true;
+		// Get all available statuses (from custom statuses and enabled templates)
+		const allStatuses = this.statusService.getAllStatuses();
 
-
-				if (status.name === this.currentStatus) option.selected = true;
+		// Add status options
+		allStatuses.forEach(status => {
+			const option = select.createEl('option', {
+				text: `${status.name} ${status.icon}`,
+				value: status.name
 			});
+			if (status.name === 'unknown') option.disabled = true;
+
+			if (status.name === this.currentStatus) option.selected = true;
+		});
 
 		// Add change event listener
 		select.addEventListener('change', async (e) => {
@@ -130,8 +131,11 @@ export class StatusDropdown {
 	public showInContextMenu(editor: Editor, view: MarkdownView): void {
 		const menu = new Menu();
 
-		// Add status options to menu
-		this.settings.customStatuses
+		// Get all available statuses (from custom statuses and enabled templates)
+		const allStatuses = this.statusService.getAllStatuses();
+
+		// Add status options to menu (excluding 'unknown')
+		allStatuses
 			.filter(status => status.name !== 'unknown')
 			.forEach(status => {
 				menu.addItem((item) =>

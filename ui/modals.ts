@@ -65,8 +65,11 @@ export class BatchStatusModal extends Modal {
         const statusSelectContainer = contentEl.createDiv({ cls: 'note-status-status-select-container' });
         const statusSelect = statusSelectContainer.createEl('select', { cls: 'note-status-status-select' });
 
-        // Add status options
-        this.settings.customStatuses
+        // Get all available statuses
+        const allStatuses = this.statusService.getAllStatuses();
+
+        // Add status options (excluding 'unknown')
+        allStatuses
             .filter(status => status.name !== 'unknown')
             .forEach(status => {
                 const option = statusSelect.createEl('option', {

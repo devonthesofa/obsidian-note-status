@@ -29,8 +29,11 @@ export class StatusContextMenu {
 	public showForFiles(files: TFile[], position?: { x: number; y: number }): void {
 		const menu = new Menu();
 
+		// Get all available statuses (from custom statuses and enabled templates)
+		const allStatuses = this.statusService.getAllStatuses();
+
 		// Add status options to menu
-		this.settings.customStatuses
+		allStatuses
 			.filter(status => status.name !== 'unknown')
 			.forEach(status => {
 				menu.addItem((item) =>
