@@ -25,6 +25,8 @@ export interface NoteStatusSettings {
     compactView: boolean;
     enabledTemplates: string[];  // IDs of enabled templates
     useCustomStatusesOnly: boolean; // Whether to use only custom statuses or include templates
+    useMultipleStatuses: boolean; // Whether to allow multiple statuses per note
+    tagPrefix: string; // Prefix for the status tag (default: 'status')
 }
 
 /**

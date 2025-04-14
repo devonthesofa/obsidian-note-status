@@ -28,7 +28,9 @@ export const DEFAULT_SETTINGS: NoteStatusSettings = {
 	collapsedStatuses: {},
 	compactView: false,
 	enabledTemplates: DEFAULT_ENABLED_TEMPLATES,
-	useCustomStatusesOnly: false
+	useCustomStatusesOnly: false,
+	useMultipleStatuses: true,
+	tagPrefix: 'obsidian-note-status'
 };
 
 /**

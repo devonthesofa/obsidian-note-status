@@ -36,7 +36,7 @@ export class ExplorerIntegration {
 	public updateFileExplorerIcons(file: TFile): void {
 		if (!this.settings.showStatusIconsInExplorer || file.extension !== 'md') return;
 
-		const status = this.statusService.getFileStatus(file);
+		const statuses = this.statusService.getFileStatuses(file);
 		const fileExplorer = this.app.workspace.getLeavesOfType('file-explorer')[0];
 
 		if (fileExplorer && fileExplorer.view) {
@@ -49,15 +49,32 @@ export class ExplorerIntegration {
 				if (fileItem) {
 					const titleEl = fileItem.titleEl || fileItem.selfEl;
 					if (titleEl) {
-						// Remove existing icon if present
-						const existingIcon = titleEl.querySelector('.note-status-icon');
-						if (existingIcon) existingIcon.remove();
+						// Remove existing icons if present
+						const existingIcons = titleEl.querySelectorAll('.note-status-icon, .note-status-icon-container');
+						existingIcons.forEach(icon => icon.remove());
 
-						// Add new icon
-						titleEl.createEl('span', {
-							cls: `note-status-icon nav-file-tag status-${status}`,
-							text: this.statusService.getStatusIcon(status)
+						// Create container for multiple icons
+						const iconContainer = titleEl.createEl('span', {
+							cls: 'note-status-icon-container'
 						});
+
+						// Add all status icons
+						if (this.settings.useMultipleStatuses && statuses.length > 0 && statuses[0] !== 'unknown') {
+							// Add all icons if using multiple statuses
+							statuses.forEach(status => {
+								iconContainer.createEl('span', {
+									cls: `note-status-icon nav-file-tag status-${status}`,
+									text: this.statusService.getStatusIcon(status)
+								});
+							});
+						} else {
+							// Just show primary status
+							const primaryStatus = statuses[0] || 'unknown';
+							iconContainer.createEl('span', {
+								cls: `note-status-icon nav-file-tag status-${primaryStatus}`,
+								text: this.statusService.getStatusIcon(primaryStatus)
+							});
+						}
 					}
 				}
 			}

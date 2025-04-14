@@ -215,31 +215,52 @@ export class StatusPaneView extends View {
 	private createFileListItem(container: HTMLElement, file: TFile, status: string): void {
 		const fileEl = container.createDiv({ cls: 'nav-file' });
 		const fileTitleEl = fileEl.createDiv({ cls: 'nav-file-title' });
-
+	
 		// Add file icon if in standard view
 		if (!this.settings.compactView) {
 			const fileIcon = fileTitleEl.createDiv({ cls: 'nav-file-icon' });
 			fileIcon.innerHTML = ICONS.file;
 		}
-
+	
 		// Add file name
 		fileTitleEl.createSpan({
 			text: file.basename,
 			cls: 'nav-file-title-content'
 		});
-
-		// Add status indicator
+	
+		// Get all statuses for this file
+		const allStatuses = this.statusService.getFileStatuses(file);
+		
+			// Show primary status icon by default
 		fileTitleEl.createSpan({
 			cls: `note-status-icon nav-file-tag status-${status}`,
 			text: this.statusService.getStatusIcon(status)
 		});
-
+		
+		// If using multiple statuses and has multiple, show additional badges
+		if (this.settings.useMultipleStatuses && allStatuses.length > 1 && allStatuses[0] !== 'unknown') {
+			const additionalStatuses = allStatuses.filter(s => s !== status);
+			
+			if (additionalStatuses.length > 0) {
+				const badgesContainer = fileTitleEl.createSpan({
+					cls: 'note-status-additional-badges'
+				});
+				
+				additionalStatuses.forEach(additionalStatus => {
+					badgesContainer.createSpan({
+						cls: `note-status-mini-badge status-${additionalStatus}`,
+						text: this.statusService.getStatusIcon(additionalStatus)
+					});
+				});
+			}
+		}
+	
 		// Add click handler to open the file
 		fileEl.addEventListener('click', (e) => {
 			e.preventDefault();
 			this.app.workspace.openLinkText(file.path, file.path, true);
 		});
-
+	
 		// Add context menu
 		fileEl.addEventListener('contextmenu', (e) => {
 			e.preventDefault();

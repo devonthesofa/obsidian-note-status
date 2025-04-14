@@ -81,21 +81,50 @@ export class StatusService {
 	}
 
 	/**
-	 * Get the status of a file from its metadata
+	 * Get the statuses of a file from its metadata
+	 * Returns an array of status names
 	 */
-	public getFileStatus(file: TFile): string {
+	public getFileStatuses(file: TFile): string[] {
 		const cachedMetadata = this.app.metadataCache.getFileCache(file);
-		let status = 'unknown';
+		const statuses: string[] = [];
 
-		if (cachedMetadata?.frontmatter?.status) {
-			const frontmatterStatus = cachedMetadata.frontmatter.status.toLowerCase();
-			const matchingStatus = this.allStatuses.find(s =>
-				s.name.toLowerCase() === frontmatterStatus);
+		if (cachedMetadata?.frontmatter) {
+			// Check for status using the configured tag prefix
+			const frontmatterStatus = cachedMetadata.frontmatter[this.settings.tagPrefix];
+			
+			if (frontmatterStatus !== undefined) {
+				if (Array.isArray(frontmatterStatus)) {
+					// Handle array format
+					for (const statusName of frontmatterStatus) {
+						const normalizedStatus = statusName.toString().toLowerCase();
+						const matchingStatus = this.allStatuses.find(s => 
+							s.name.toLowerCase() === normalizedStatus);
+						
+						if (matchingStatus) {
+							statuses.push(matchingStatus.name);
+						}
+					}
+				} else {
+					// Handle single value format
+					const normalizedStatus = frontmatterStatus.toString().toLowerCase();
+					const matchingStatus = this.allStatuses.find(s =>
+						s.name.toLowerCase() === normalizedStatus);
 
-			if (matchingStatus) status = matchingStatus.name;
+					if (matchingStatus) statuses.push(matchingStatus.name);
+				}
+			}
 		}
 
-		return status;
+		// Return 'unknown' if no statuses found
+		return statuses.length > 0 ? statuses : ['unknown'];
+	}
+
+	/**
+	 * Get the primary status of a file (first one, or 'unknown')
+	 */
+	public getFilePrimaryStatus(file: TFile): string {
+		const statuses = this.getFileStatuses(file);
+		return statuses[0] || 'unknown';
 	}
 
 	/**
@@ -109,9 +138,11 @@ export class StatusService {
 	}
 
 	/**
-	 * Update the status of a note
+	 * Update the statuses of a note
+	 * @param newStatuses Array of status names to set
+	 * @param file Optional file to update, otherwise uses active file
 	 */
-	public async updateNoteStatus(newStatus: string, file?: TFile): Promise<void> {
+	public async updateNoteStatuses(newStatuses: string[], file?: TFile): Promise<void> {
 		const targetFile = file || this.app.workspace.getActiveFile();
 		if (!targetFile || targetFile.extension !== 'md') return;
 
@@ -122,19 +153,35 @@ export class StatusService {
 		const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n?/);
 		if (frontmatterMatch) {
 			const frontmatter = frontmatterMatch[1];
-			if (frontmatter.includes('status:')) {
+			
+			// Escape special regex characters in the tag prefix
+			const escapedTagPrefix = this.settings.tagPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			
+			// Regex to match the status tag line
+			const statusTagRegex = new RegExp(`${escapedTagPrefix}:.*(?:\n|$)`, 'm');
+			
+			if (frontmatter.match(statusTagRegex)) {
+				// Format array for YAML (with proper indentation)
+				const formattedArray = JSON.stringify(newStatuses);
 				newContent = content.replace(
-					/^---\n([\s\S]*?)status:\s*[^\n]+([\s\S]*?)\n---\n?/,
-					`---\n$1status: ${newStatus}$2\n---\n`
+					frontmatterMatch[0],
+					`---\n${frontmatter.replace(
+						statusTagRegex,
+						`${this.settings.tagPrefix}: ${formattedArray}\n`
+					)}---\n`
 				);
 			} else {
+				// Add new status tag to existing frontmatter
+				const formattedArray = JSON.stringify(newStatuses);
 				newContent = content.replace(
 					/^---\n([\s\S]*?)\n---\n?/,
-					`---\n$1\nstatus: ${newStatus}\n---\n`
+					`---\n$1\n${this.settings.tagPrefix}: ${formattedArray}\n---\n`
 				);
 			}
 		} else {
-			newContent = `---\nstatus: ${newStatus}\n---\n${content.trim()}`;
+			// Create new frontmatter with status tag
+			const formattedArray = JSON.stringify(newStatuses);
+			newContent = `---\n${this.settings.tagPrefix}: ${formattedArray}\n---\n\n${content.trim()}`;
 		}
 
 		// Clean up excess newlines
@@ -144,20 +191,106 @@ export class StatusService {
 		await this.app.vault.modify(targetFile, newContent);
 	}
 
+
 	/**
-	 * Batch update multiple files' statuses
+	 * Legacy method to update a single status for backward compatibility
 	 */
-	public async batchUpdateStatus(files: TFile[], newStatus: string): Promise<void> {
+	public async updateNoteStatus(newStatus: string, file?: TFile): Promise<void> {
+		await this.updateNoteStatuses([newStatus], file);
+	}
+
+	/**
+	 * Add a status to a note's existing statuses
+	 */
+	public async addNoteStatus(statusToAdd: string, file?: TFile): Promise<void> {
+		const targetFile = file || this.app.workspace.getActiveFile();
+		if (!targetFile || targetFile.extension !== 'md') return;
+		
+		const currentStatuses = this.getFileStatuses(targetFile);
+		
+		// Don't add if already exists
+		if (currentStatuses.includes(statusToAdd)) return;
+		
+		// Filter out 'unknown' status when adding valid statuses
+		const filteredStatuses = currentStatuses.filter(s => s !== 'unknown');
+		const newStatuses = [...filteredStatuses, statusToAdd];
+		
+		await this.updateNoteStatuses(newStatuses, targetFile);
+	}
+
+	/**
+	 * Remove a status from a note's existing statuses
+	 */
+	public async removeNoteStatus(statusToRemove: string, file?: TFile): Promise<void> {
+		const targetFile = file || this.app.workspace.getActiveFile();
+		if (!targetFile || targetFile.extension !== 'md') return;
+		
+		const currentStatuses = this.getFileStatuses(targetFile);
+		const newStatuses = currentStatuses.filter(status => status !== statusToRemove);
+		
+		// If all statuses were removed, set to 'unknown'
+		if (newStatuses.length === 0) {
+			newStatuses.push('unknown');
+		}
+		
+		await this.updateNoteStatuses(newStatuses, targetFile);
+	}
+
+	/**
+	 * Toggle a status on/off for a note
+	 */
+	public async toggleNoteStatus(statusToToggle: string, file?: TFile): Promise<void> {
+		const targetFile = file || this.app.workspace.getActiveFile();
+		if (!targetFile || targetFile.extension !== 'md') return;
+		
+		const currentStatuses = this.getFileStatuses(targetFile);
+		
+		if (currentStatuses.includes(statusToToggle)) {
+			await this.removeNoteStatus(statusToToggle, targetFile);
+		} else {
+			await this.addNoteStatus(statusToToggle, targetFile);
+		}
+	}
+
+	/**
+	* Batch update multiple files' statuses
+	* @param files Array of files to update
+	* @param statusesToSet Array of statuses to set
+	* @param mode 'replace' to replace all statuses, 'add' to add to existing
+	*/
+	public async batchUpdateStatuses(
+		files: TFile[], 
+		statusesToSet: string[], 
+		mode: 'replace' | 'add' = 'replace'
+	): Promise<void> {
 		if (files.length === 0) {
 			new Notice('No files selected');
 			return;
 		}
 
 		for (const file of files) {
-			await this.updateNoteStatus(newStatus, file);
+			if (mode === 'replace') {
+				await this.updateNoteStatuses(statusesToSet, file);
+			} else {
+				// Add each status
+				for (const status of statusesToSet) {
+					await this.addNoteStatus(status, file);
+				}
+			}
 		}
 
-		new Notice(`Updated status of ${files.length} file${files.length === 1 ? '' : 's'} to ${newStatus}`);
+		const statusText = statusesToSet.length === 1 
+			? statusesToSet[0] 
+			: `${statusesToSet.length} statuses`;
+			
+		new Notice(`Updated ${files.length} file${files.length === 1 ? '' : 's'} with ${statusText}`);
+	}
+
+	/**
+	 * Legacy batch update for a single status
+	 */
+	public async batchUpdateStatus(files: TFile[], newStatus: string): Promise<void> {
+		await this.batchUpdateStatuses(files, [newStatus], 'replace');
 	}
 
 	/**
@@ -165,7 +298,8 @@ export class StatusService {
 	 */
 	public insertStatusMetadataInEditor(editor: Editor): void {
 		const content = editor.getValue();
-		const statusMetadata = 'status: unknown';
+		const defaultStatuses = ['unknown'];
+		const statusMetadata = `${this.settings.tagPrefix}: ${JSON.stringify(defaultStatuses)}`;
 
 		// Check if frontmatter exists
 		const frontMatterMatch = content.match(/^---\n([\s\S]+?)\n---/);
@@ -174,9 +308,11 @@ export class StatusService {
 			const frontMatter = frontMatterMatch[1];
 			let updatedFrontMatter = frontMatter;
 
-			// Check if status already exists in frontmatter
-			if (/^status:/.test(frontMatter)) {
-				updatedFrontMatter = frontMatter.replace(/^status: .*/m, statusMetadata);
+			// Check if status tag already exists in frontmatter
+			const statusTagRegex = new RegExp(`${this.settings.tagPrefix}:\\s*\\[?[^\\]]*\\]?`, 'm');
+			
+			if (frontMatter.match(statusTagRegex)) {
+				updatedFrontMatter = frontMatter.replace(statusTagRegex, statusMetadata);
 			} else {
 				updatedFrontMatter = `${frontMatter}\n${statusMetadata}`;
 			}
@@ -225,8 +361,14 @@ export class StatusService {
 		const files = this.getMarkdownFiles(searchQuery);
 
 		for (const file of files) {
-			const status = this.getFileStatus(file);
-			statusGroups[status].push(file);
+			const statuses = this.getFileStatuses(file);
+			
+			// Add file to each of its status groups
+			for (const status of statuses) {
+				if (statusGroups[status]) {
+					statusGroups[status].push(file);
+				}
+			}
 		}
 
 		return statusGroups;

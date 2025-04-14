@@ -45,12 +45,18 @@ export class BatchStatusModal extends Modal {
                 .filter(file => !filter || file.path.toLowerCase().includes(filter.toLowerCase()))
                 .sort((a, b) => a.path.localeCompare(b.path))
                 .forEach(file => {
-                    const status = this.statusService.getFileStatus(file);
+                    const statuses = this.statusService.getFileStatuses(file);
+                    const statusIcons = statuses.map(s => this.statusService.getStatusIcon(s)).join(' ');
+                    
                     const option = fileSelect.createEl('option', {
-                        text: `${file.path} ${this.statusService.getStatusIcon(status)}`,
+                        text: `${file.path} ${statusIcons}`,
                         value: file.path
                     });
-                    option.classList.add(`status-${status}`);
+                    
+                    // Use first status for class styling
+                    if (statuses.length > 0) {
+                        option.classList.add(`status-${statuses[0]}`);
+                    }
                 });
         };
 
@@ -61,59 +67,166 @@ export class BatchStatusModal extends Modal {
             populateFiles(searchInput.value);
         });
 
-        // Status selection
+        // Status selection section
         const statusSelectContainer = contentEl.createDiv({ cls: 'note-status-status-select-container' });
-        const statusSelect = statusSelectContainer.createEl('select', { cls: 'note-status-status-select' });
-
-        // Get all available statuses
-        const allStatuses = this.statusService.getAllStatuses();
-
-        // Add status options (excluding 'unknown')
-        allStatuses
-            .filter(status => status.name !== 'unknown')
-            .forEach(status => {
-                const option = statusSelect.createEl('option', {
-                    text: `${status.name} ${status.icon}`,
-                    value: status.name
-                });
-                option.classList.add(`status-${status.name}`);
+        
+        // Create status selection based on whether multiple statuses are allowed
+        if (this.settings.useMultipleStatuses) {
+            // Add mode selection radio buttons
+            const modeContainer = contentEl.createDiv({ cls: 'note-status-mode-container' });
+            
+            // Create radio buttons for replace/add mode
+            const replaceRadio = modeContainer.createEl('input', {
+                type: 'radio',
+                attr: { 
+                    name: 'status-update-mode',
+                    id: 'mode-replace',
+                    checked: 'checked'
+                }
+            });
+            
+            modeContainer.createEl('label', {
+                text: 'Replace existing statuses',
+                attr: { for: 'mode-replace' }
+            });
+            
+            modeContainer.createEl('br');
+            
+             modeContainer.createEl('input', {
+                type: 'radio',
+                attr: { 
+                    name: 'status-update-mode',
+                    id: 'mode-add'
+                }
+            });
+            
+            modeContainer.createEl('label', {
+                text: 'Add to existing statuses',
+                attr: { for: 'mode-add' }
+            });
+            
+            // Create multi-select status dropdown
+            const statusSelect = statusSelectContainer.createEl('select', { 
+                cls: 'note-status-status-select',
+                attr: { 
+                    multiple: 'true',
+                    size: '5'
+                }
             });
 
-        // Add action buttons
-        const buttonContainer = contentEl.createDiv({ cls: 'note-status-modal-buttons' });
+            // Get all available statuses
+            const allStatuses = this.statusService.getAllStatuses();
 
-        // Select all button
-        const selectAllButton = buttonContainer.createEl('button', {
-            text: 'Select All',
-            cls: 'note-status-select-all'
-        });
+            // Add status options (excluding 'unknown')
+            allStatuses
+                .filter(status => status.name !== 'unknown')
+                .forEach(status => {
+                    const option = statusSelect.createEl('option', {
+                        text: `${status.name} ${status.icon}`,
+                        value: status.name
+                    });
+                    option.classList.add(`status-${status.name}`);
+                });
+                
+            // Add action buttons
+            const buttonContainer = contentEl.createDiv({ cls: 'note-status-modal-buttons' });
 
-        selectAllButton.addEventListener('click', () => {
-            for (const option of Array.from(fileSelect.options)) {
-                option.selected = true;
-            }
-        });
+            // Select all files button
+            const selectAllButton = buttonContainer.createEl('button', {
+                text: 'Select All Files',
+                cls: 'note-status-select-all'
+            });
 
-        // Apply button
-        const applyButton = buttonContainer.createEl('button', {
-            text: 'Apply Status',
-            cls: 'mod-cta'
-        });
+            selectAllButton.addEventListener('click', () => {
+                for (const option of Array.from(fileSelect.options)) {
+                    option.selected = true;
+                }
+            });
 
-        applyButton.addEventListener('click', async () => {
-            const selectedFiles = Array.from(fileSelect.selectedOptions)
-                .map(opt => mdFiles.find(f => f.path === opt.value))
-                .filter(Boolean) as TFile[];
+            // Apply button
+            const applyButton = buttonContainer.createEl('button', {
+                text: 'Apply Statuses',
+                cls: 'mod-cta'
+            });
 
-            if (selectedFiles.length === 0) {
-                new Notice('No files selected');
-                return;
-            }
+            applyButton.addEventListener('click', async () => {
+                const selectedFiles = Array.from(fileSelect.selectedOptions)
+                    .map(opt => mdFiles.find(f => f.path === opt.value))
+                    .filter(Boolean) as TFile[];
 
-            const newStatus = statusSelect.value;
-            await this.statusService.batchUpdateStatus(selectedFiles, newStatus);
-            this.close();
-        });
+                if (selectedFiles.length === 0) {
+                    new Notice('No files selected');
+                    return;
+                }
+
+                const selectedStatuses = Array.from(statusSelect.selectedOptions)
+                    .map(opt => opt.value);
+                    
+                if (selectedStatuses.length === 0) {
+                    new Notice('No statuses selected');
+                    return;
+                }
+
+                // Get update mode
+                const mode = replaceRadio.checked ? 'replace' : 'add';
+                
+                await this.statusService.batchUpdateStatuses(selectedFiles, selectedStatuses, mode);
+                this.close();
+            });
+        } else {
+            // Legacy single-status dropdown
+            const statusSelect = statusSelectContainer.createEl('select', { cls: 'note-status-status-select' });
+
+            // Get all available statuses
+            const allStatuses = this.statusService.getAllStatuses();
+
+            // Add status options (excluding 'unknown')
+            allStatuses
+                .filter(status => status.name !== 'unknown')
+                .forEach(status => {
+                    const option = statusSelect.createEl('option', {
+                        text: `${status.name} ${status.icon}`,
+                        value: status.name
+                    });
+                    option.classList.add(`status-${status.name}`);
+                });
+
+            // Add action buttons
+            const buttonContainer = contentEl.createDiv({ cls: 'note-status-modal-buttons' });
+
+            // Select all button
+            const selectAllButton = buttonContainer.createEl('button', {
+                text: 'Select All',
+                cls: 'note-status-select-all'
+            });
+
+            selectAllButton.addEventListener('click', () => {
+                for (const option of Array.from(fileSelect.options)) {
+                    option.selected = true;
+                }
+            });
+
+            // Apply button
+            const applyButton = buttonContainer.createEl('button', {
+                text: 'Apply Status',
+                cls: 'mod-cta'
+            });
+
+            applyButton.addEventListener('click', async () => {
+                const selectedFiles = Array.from(fileSelect.selectedOptions)
+                    .map(opt => mdFiles.find(f => f.path === opt.value))
+                    .filter(Boolean) as TFile[];
+
+                if (selectedFiles.length === 0) {
+                    new Notice('No files selected');
+                    return;
+                }
+
+                const newStatus = statusSelect.value;
+                await this.statusService.batchUpdateStatus(selectedFiles, newStatus);
+                this.close();
+            });
+        }
     }
 
     onClose() {

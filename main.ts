@@ -78,7 +78,7 @@ export default class NoteStatus extends Plugin {
 			// Small delay to ensure everything is loaded
 			await new Promise(resolve => setTimeout(resolve, 500));
 			this.checkNoteStatus();
-			this.statusDropdown.update(this.getCurrentStatus());
+			this.statusDropdown.update(this.getCurrentStatuses());
 			this.explorerIntegration.updateAllFileExplorerIcons();
 		});
 
@@ -89,6 +89,9 @@ export default class NoteStatus extends Plugin {
 		this.setupCustomEvents();
 	}
 
+	/**
+	 * Set up custom events for status changes and UI updates
+	 */
 	private setupCustomEvents() {
 		// Listen for settings changes
 		window.addEventListener('note-status:settings-changed', async () => {
@@ -97,14 +100,17 @@ export default class NoteStatus extends Plugin {
 
 		// Listen for status changes
 		window.addEventListener('note-status:status-changed', (e: any) => {
-			const status = e.detail?.status || 'unknown';
-			this.statusBar.update(status);
-			this.statusDropdown.update(status);
+			const statuses = e.detail?.statuses || ['unknown'];
+			this.statusBar.update(statuses);
+			
+			// Pass the array to update method (which now accepts string | string[])
+			this.statusDropdown.update(statuses);
 		});
 
 		// Listen for refresh dropdown
 		window.addEventListener('note-status:refresh-dropdown', () => {
-			this.statusDropdown.render();
+			const currentStatuses = this.getCurrentStatuses();
+			this.statusDropdown.update(currentStatuses);
 		});
 
 		// Listen for UI refresh
@@ -208,7 +214,7 @@ export default class NoteStatus extends Plugin {
 		// File open event
 		this.registerEvent(this.app.workspace.on('file-open', () => {
 			this.checkNoteStatus();
-			this.statusDropdown.update(this.getCurrentStatus());
+			this.statusDropdown.update(this.getCurrentStatuses());
 		}));
 
 		// Editor change event
@@ -216,7 +222,7 @@ export default class NoteStatus extends Plugin {
 
 		// Active leaf change event
 		this.registerEvent(this.app.workspace.on('active-leaf-change', () => {
-			this.statusDropdown.update(this.getCurrentStatus());
+			this.statusDropdown.update(this.getCurrentStatuses());
 			this.updateStatusPane();
 		}));
 
@@ -257,23 +263,26 @@ export default class NoteStatus extends Plugin {
 		}));
 	}
 
+	/**
+	 * Check and update the status display for the active file
+	 */
 	checkNoteStatus() {
 		const activeFile = this.app.workspace.getActiveFile();
 		if (!activeFile || activeFile.extension !== 'md') {
-			this.statusBar.update('unknown');
+			this.statusBar.update(['unknown']);
 			return;
 		}
 
-		const status = this.statusService.getFileStatus(activeFile);
-		this.statusBar.update(status);
+		const statuses = this.statusService.getFileStatuses(activeFile);
+		this.statusBar.update(statuses);
 	}
 
-	getCurrentStatus(): string {
+	getCurrentStatuses(): string[] {
 		const activeFile = this.app.workspace.getActiveFile();
 		if (!activeFile || activeFile.extension !== 'md') {
-			return 'unknown';
+			return ['unknown'];
 		}
-		return this.statusService.getFileStatus(activeFile);
+		return this.statusService.getFileStatuses(activeFile);
 	}
 
 	async openStatusPane() {

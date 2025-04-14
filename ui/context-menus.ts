@@ -28,32 +28,91 @@ export class StatusContextMenu {
 	 */
 	public showForFiles(files: TFile[], position?: { x: number; y: number }): void {
 		const menu = new Menu();
-
-		// Get all available statuses (from custom statuses and enabled templates)
+	
+		// Get all available statuses
 		const allStatuses = this.statusService.getAllStatuses();
-
-		// Add status options to menu
-		allStatuses
-			.filter(status => status.name !== 'unknown')
-			.forEach(status => {
-				menu.addItem((item) =>
-					item
-						.setTitle(`${status.name} ${status.icon}`)
-						.setIcon('tag')
-						.onClick(async () => {
-							await this.statusService.batchUpdateStatus(files, status.name);
-
-							// Dispatch event for UI update
-							window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
-						})
-				);
-			});
-
+	
+		if (this.settings.useMultipleStatuses) {
+			// Add a replace section
+			menu.addItem((item) => 
+				item
+					.setTitle('Replace with...')
+					.setIcon('note')
+					.onClick(() => {
+						const replaceMenu = new Menu();
+						
+						allStatuses
+							.filter(status => status.name !== 'unknown')
+							.forEach(status => {
+								replaceMenu.addItem((subItem) =>
+									subItem
+										.setTitle(`${status.name} ${status.icon}`)
+										.setIcon('tag')
+										.onClick(async () => {
+											await this.statusService.batchUpdateStatuses(files, [status.name], 'replace');
+											window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+										})
+								);
+							});
+						
+						if (position) {
+							replaceMenu.showAtPosition(position);
+						} else {
+							replaceMenu.showAtMouseEvent(new MouseEvent('contextmenu'));
+						}
+					})
+			);
+	
+			// Add "Add status" option
+			menu.addItem((item) => 
+				item
+					.setTitle('Add status...')
+					.setIcon('plus')
+					.onClick(() => {
+						const addMenu = new Menu();
+						
+						allStatuses
+							.filter(status => status.name !== 'unknown')
+							.forEach(status => {
+								addMenu.addItem((subItem) =>
+									subItem
+										.setTitle(`${status.name} ${status.icon}`)
+										.setIcon('plus')
+										.onClick(async () => {
+											await this.statusService.batchUpdateStatuses(files, [status.name], 'add');
+											window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+										})
+								);
+							});
+						
+						if (position) {
+							addMenu.showAtPosition(position);
+						} else {
+							addMenu.showAtMouseEvent(new MouseEvent('contextmenu'));
+						}
+					})
+			);
+		} else {
+			// Legacy single status mode
+			allStatuses
+				.filter(status => status.name !== 'unknown')
+				.forEach(status => {
+					menu.addItem((item) =>
+						item
+							.setTitle(`${status.name} ${status.icon}`)
+							.setIcon('tag')
+							.onClick(async () => {
+								await this.statusService.batchUpdateStatus(files, status.name);
+								window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+							})
+					);
+				});
+		}
+	
 		// Show the menu
 		if (position) {
 			menu.showAtPosition(position);
 		} else {
-			// Use a default position at mouse event
 			menu.showAtMouseEvent(new MouseEvent('contextmenu'));
 		}
 	}

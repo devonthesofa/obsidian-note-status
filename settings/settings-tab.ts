@@ -104,6 +104,38 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 
+		containerEl.createEl('h3', { text: 'Status Tag Settings' });
+		// Option to use multiple statuses
+		new Setting(containerEl)
+			.setName('Enable multiple statuses')
+			.setDesc('Allow notes to have multiple statuses at the same time')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.useMultipleStatuses)
+				.onChange(async (value) => {
+					this.plugin.settings.useMultipleStatuses = value;
+					await this.plugin.saveSettings();
+					
+					// Refresh UI to show multi-select or single-select options
+					window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+				}));
+
+		// Status tag prefix
+		new Setting(containerEl)
+			.setName('Status tag prefix')
+			.setDesc('The YAML frontmatter tag name used for status (default: obsidian-note-status)')
+			.addText(text => text
+				.setValue(this.plugin.settings.tagPrefix)
+				.onChange(async (value) => {
+					// Don't allow empty tag prefix
+					if (!value.trim()) {
+						return;
+					}
+					
+					this.plugin.settings.tagPrefix = value.trim();
+					await this.plugin.saveSettings();
+				}));
+
+
 		// Status management section
 		containerEl.createEl('h3', { text: 'Custom Statuses' });
 		
@@ -295,7 +327,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 				} else {
 					// Disable template
 					this.plugin.settings.enabledTemplates = this.plugin.settings.enabledTemplates.filter(
-						id => id !== template.id
+						(id: string) => id !== template.id
 					);
 				}
 				
