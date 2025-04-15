@@ -32,7 +32,7 @@ export class StatusDropdown {
 			this.currentStatuses = [...currentStatuses]; // Create a copy to ensure it's updated
 		}
 		
-		// Clear and render fresh dropdown
+		// Clear and render fresh dropdown - force a complete UI rebuild
 		this.render();
 	}
 
@@ -154,6 +154,11 @@ export class StatusDropdown {
 	 */
 	private createStatusChips(): void {
 		if (!this.dropdownContainer) return;
+    
+		// Make sure previous container is removed
+		if (this.statusChipsContainer) {
+			this.statusChipsContainer.remove();
+		}
 		
 		// Create container for status chips
 		this.statusChipsContainer = this.dropdownContainer.createDiv({ cls: 'note-status-chips-container' });
@@ -171,7 +176,7 @@ export class StatusDropdown {
 		}
 		
 		// Add chip for each status
-		if (this.statusChipsContainer) {
+		if (this.statusChipsContainer !== undefined) {
 			this.currentStatuses.forEach(status => {
 				if (status === 'unknown') return; // Skip unknown status
 				

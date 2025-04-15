@@ -216,6 +216,11 @@ export class StatusService {
 		const newStatuses = [...filteredStatuses, statusToAdd];
 		
 		await this.updateNoteStatuses(newStatuses, targetFile);
+		
+		// Add this line to trigger UI updates
+		window.dispatchEvent(new CustomEvent('note-status:status-changed', {
+			detail: { statuses: newStatuses }
+		}));
 	}
 
 	/**
@@ -234,6 +239,11 @@ export class StatusService {
 		}
 		
 		await this.updateNoteStatuses(newStatuses, targetFile);
+		
+		// Add this line to trigger UI updates
+		window.dispatchEvent(new CustomEvent('note-status:status-changed', {
+			detail: { statuses: newStatuses }
+		}));
 	}
 
 	/**
@@ -244,12 +254,26 @@ export class StatusService {
 		if (!targetFile || targetFile.extension !== 'md') return;
 		
 		const currentStatuses = this.getFileStatuses(targetFile);
+		let newStatuses: string[];
 		
 		if (currentStatuses.includes(statusToToggle)) {
-			await this.removeNoteStatus(statusToToggle, targetFile);
+			newStatuses = currentStatuses.filter(status => status !== statusToToggle);
+			// If all statuses were removed, set to 'unknown'
+			if (newStatuses.length === 0) {
+				newStatuses.push('unknown');
+			}
 		} else {
-			await this.addNoteStatus(statusToToggle, targetFile);
+			// Filter out 'unknown' status when adding valid statuses
+			const filteredStatuses = currentStatuses.filter(s => s !== 'unknown');
+			newStatuses = [...filteredStatuses, statusToToggle];
 		}
+		
+		await this.updateNoteStatuses(newStatuses, targetFile);
+		
+		// Add this line to ensure UI updates
+		window.dispatchEvent(new CustomEvent('note-status:status-changed', {
+			detail: { statuses: newStatuses }
+		}));
 	}
 
 	/**

@@ -102,9 +102,11 @@ export default class NoteStatus extends Plugin {
 		window.addEventListener('note-status:status-changed', (e: any) => {
 			const statuses = e.detail?.statuses || ['unknown'];
 			this.statusBar.update(statuses);
-			
-			// Pass the array to update method (which now accepts string | string[])
 			this.statusDropdown.update(statuses);
+			// Make sure the dropdown is completely re-rendered
+			setTimeout(() => {
+				this.statusDropdown.render();
+			}, 50); // Small delay to ensure all data is updated first
 		});
 
 		// Listen for refresh dropdown
@@ -255,6 +257,7 @@ export default class NoteStatus extends Plugin {
 			this.checkNoteStatus();
 			this.explorerIntegration.updateFileExplorerIcons(file);
 			this.updateStatusPane();
+			this.statusDropdown.update(this.getCurrentStatuses());
 		}));
 
 		// Metadata resolved event
