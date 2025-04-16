@@ -21,6 +21,7 @@ export interface NoteStatusSettings {
     autoHideStatusBar: boolean;
     customStatuses: Status[];
     showStatusIconsInExplorer: boolean;
+    hideUnknownStatusInExplorer: boolean;
     collapsedStatuses: Record<string, boolean>;
     compactView: boolean;
     enabledTemplates: string[];  // IDs of enabled templates

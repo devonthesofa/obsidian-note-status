@@ -92,6 +92,20 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 					this.plugin.settings.showStatusIconsInExplorer = value;
 					await this.plugin.saveSettings();
 				}));
+				
+		// NEW SETTING: Hide unknown status in explorer
+		new Setting(containerEl)
+			.setName('Hide unknown status in file explorer')
+			.setDesc('Hide status icons for files with unknown status in the file explorer')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.hideUnknownStatusInExplorer || false)
+				.onChange(async (value) => {
+					this.plugin.settings.hideUnknownStatusInExplorer = value;
+					await this.plugin.saveSettings();
+					
+					// Refresh explorer icons when this setting changes
+					this.plugin.explorerIntegration.updateAllFileExplorerIcons();
+				}));
 
 		// Compact view setting
 		new Setting(containerEl)

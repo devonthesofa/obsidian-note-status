@@ -25,6 +25,7 @@ export const DEFAULT_SETTINGS: NoteStatusSettings = {
 		{ name: 'unknown', icon: '❓' }
 	],
 	showStatusIconsInExplorer: true,
+	hideUnknownStatusInExplorer: false, // Default to show unknown status
 	collapsedStatuses: {},
 	compactView: false,
 	enabledTemplates: DEFAULT_ENABLED_TEMPLATES,

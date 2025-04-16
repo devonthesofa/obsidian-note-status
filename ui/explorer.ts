@@ -121,6 +121,13 @@ export class ExplorerIntegration {
 		const existingIcons = titleEl.querySelectorAll('.note-status-icon, .note-status-icon-container');
 		existingIcons.forEach(icon => icon.remove());
 
+		// Hide unknown status if setting is enabled
+		if (this.settings.hideUnknownStatusInExplorer && 
+			statuses.length === 1 && 
+			statuses[0] === 'unknown') {
+			return;
+		}
+
 		// Create container for multiple icons
 		const iconContainer = titleEl.createEl('span', {
 			cls: 'note-status-icon-container'
