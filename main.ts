@@ -147,6 +147,11 @@ export default class NoteStatus extends Plugin {
 		this.statusDropdown = new StatusDropdown(this.app, this.settings, this.statusService);
 		this.explorerIntegration = new ExplorerIntegration(this.app, this.settings, this.statusService);
 		this.statusContextMenu = new StatusContextMenu(this.app, this.settings, this.statusService);
+
+		// Register event to update toolbar button when plugin is loaded
+		this.app.workspace.onLayoutReady(() => {
+			this.statusDropdown.update(this.getCurrentStatuses());
+		});
 	}
 
 	/**
@@ -369,6 +374,7 @@ export default class NoteStatus extends Plugin {
 			} else {
 				this.lastActiveFile = null;
 				this.statusBar.update(['unknown']);
+				this.statusDropdown.update(['unknown']);  // Add this line to update toolbar when no file is open
 			}
 		}));
 
@@ -460,11 +466,13 @@ export default class NoteStatus extends Plugin {
 			const activeFile = this.app.workspace.getActiveFile();
 			if (!activeFile || activeFile.extension !== 'md') {
 				this.statusBar.update(['unknown']);
+				this.statusDropdown.update(['unknown']); // Add this line to update toolbar
 				return;
 			}
-
+	
 			const statuses = this.statusService.getFileStatuses(activeFile);
 			this.statusBar.update(statuses);
+			this.statusDropdown.update(statuses); // Add this line to update toolbar
 		} catch (error) {
 			console.error('Error checking note status:', error);
 			if (!this.hasShownErrorNotification) {
