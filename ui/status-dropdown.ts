@@ -3,7 +3,7 @@ import { NoteStatusSettings, Status } from '../models/types';
 import { StatusService } from '../services/status-service';
 
 /**
- * Handles the status dropdown functionality with improved UI/UX
+ * Enhanced status dropdown with improved UI/UX and touch support
  */
 export class StatusDropdown {
 	private app: any;
@@ -14,11 +14,18 @@ export class StatusDropdown {
 	private currentStatuses: string[] = ['unknown'];
 	private statusPopover?: HTMLElement;
 	private isPopoverOpen = false;
+	private clickOutsideHandler: any;
+	
+	// Animation timings
+	private readonly ANIMATION_DURATION = 220;
 
 	constructor(app: any, settings: NoteStatusSettings, statusService: StatusService) {
 		this.app = app;
 		this.settings = settings;
 		this.statusService = statusService;
+		
+		// Bind methods to preserve this context
+		this.handleClickOutside = this.handleClickOutside.bind(this);
 	}
 
 	/**
@@ -67,6 +74,9 @@ export class StatusDropdown {
 		const dropdownEl = document.createElement('div');
 		dropdownEl.addClass('note-status-dropdown', this.settings.dropdownPosition);
 		
+		// Add animation class
+		dropdownEl.addClass('note-status-animate-in');
+		
 		// Insert at correct position
 		if (this.settings.dropdownPosition === 'top') {
 			contentEl.insertBefore(dropdownEl, contentEl.firstChild);
@@ -85,6 +95,11 @@ export class StatusDropdown {
 		
 		// Add "Add Status" button that shows popover
 		this.createAddStatusButton();
+		
+		// Remove animation class after animation completes
+		setTimeout(() => {
+			dropdownEl.removeClass('note-status-animate-in');
+		}, this.ANIMATION_DURATION);
 	}
 
 	/**
@@ -116,15 +131,21 @@ export class StatusDropdown {
 		
 		toggleModeButton.addEventListener('click', async (e) => {
 			e.stopPropagation();
+			
+			// Add animation
+			toggleModeButton.addClass('note-status-button-active');
+			
+			// Update setting
 			this.settings.useMultipleStatuses = !this.settings.useMultipleStatuses;
 			
 			// Trigger settings save
 			window.dispatchEvent(new CustomEvent('note-status:settings-changed'));
 			
 			// Re-render the dropdown
-			this.render();
-			
-			new Notice(`Switched to ${this.settings.useMultipleStatuses ? 'multiple' : 'single'} status mode`);
+			setTimeout(() => {
+				this.render();
+				new Notice(`Switched to ${this.settings.useMultipleStatuses ? 'multiple' : 'single'} status mode`);
+			}, 150);
 		});
 		
 		// Close button
@@ -139,13 +160,19 @@ export class StatusDropdown {
 		
 		closeButton.addEventListener('click', (e) => {
 			e.stopPropagation();
-			this.settings.showStatusDropdown = false;
-			this.render();
-
-			// Trigger settings save
-			window.dispatchEvent(new CustomEvent('note-status:settings-changed'));
-
-			new Notice('Status dropdown hidden');
+			
+			// Add animation
+			this.dropdownContainer?.addClass('note-status-animate-out');
+			
+			setTimeout(() => {
+				this.settings.showStatusDropdown = false;
+				this.render();
+				
+				// Trigger settings save
+				window.dispatchEvent(new CustomEvent('note-status:settings-changed'));
+				
+				new Notice('Status dropdown hidden');
+			}, this.ANIMATION_DURATION);
 		});
 	}
 
@@ -161,7 +188,9 @@ export class StatusDropdown {
 		}
 		
 		// Create container for status chips
-		this.statusChipsContainer = this.dropdownContainer.createDiv({ cls: 'note-status-chips-container' });
+		this.statusChipsContainer = this.dropdownContainer.createDiv({
+			cls: 'note-status-chips-container'
+		});
 		
 		// Show 'No status' indicator if no statuses or only unknown status
 		if (this.currentStatuses.length === 0 || 
@@ -176,12 +205,13 @@ export class StatusDropdown {
 		}
 		
 		// Add chip for each status
-		if (this.statusChipsContainer !== undefined) {
+		if (this.statusChipsContainer) {
 			this.currentStatuses.forEach(status => {
 				if (status === 'unknown') return; // Skip unknown status
 				
 				const statusObj = this.statusService.getAllStatuses().find(s => s.name === status);
 				if (!statusObj) return;
+				if (!this.statusChipsContainer) return;
 				
 				const chipEl = this.statusChipsContainer.createDiv({ 
 					cls: `note-status-chip status-${status}`
@@ -213,23 +243,29 @@ export class StatusDropdown {
 					removeBtn.addEventListener('click', async (e) => {
 						e.stopPropagation();
 						
-						// Remove this status
-						await this.statusService.removeNoteStatus(status);
+						// Add remove animation
+						chipEl.addClass('note-status-chip-removing');
 						
-						// Get updated statuses
-						const updatedStatuses = this.statusService.getFileStatuses(this.app.workspace.getActiveFile());
-						
-						// Dispatch event for UI update
-						window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-							detail: { statuses: updatedStatuses }
-						}));
+						// Wait for animation to complete before actually removing
+						setTimeout(async () => {
+							// Remove this status
+							await this.statusService.removeNoteStatus(status);
+							
+							// Get updated statuses
+							const updatedStatuses = this.statusService.getFileStatuses(this.app.workspace.getActiveFile());
+							
+							// Dispatch event for UI update
+							window.dispatchEvent(new CustomEvent('note-status:status-changed', {
+								detail: { statuses: updatedStatuses }
+							}));
+						}, 150);
 					});
 				}
 				
 				// Make the whole chip clickable if in single status mode
 				if (!this.settings.useMultipleStatuses) {
 					chipEl.addClass('clickable');
-					chipEl.addEventListener('click', async (e) => {
+					chipEl.addEventListener('click', (e) => {
 						this.openStatusPopover(chipEl);
 					});
 				}
@@ -304,47 +340,60 @@ export class StatusDropdown {
 		const populateOptions = (filter = '') => {
 			statusOptionsContainer.empty();
 			
-			allStatuses
-				.filter(status => !filter || 
-					status.name.toLowerCase().includes(filter.toLowerCase()) ||
-					status.icon.includes(filter))
-				.forEach(status => {
-					const isSelected = this.currentStatuses.includes(status.name);
+			const filteredStatuses = allStatuses.filter(status => !filter || 
+				status.name.toLowerCase().includes(filter.toLowerCase()) ||
+				status.icon.includes(filter));
+				
+			if (filteredStatuses.length === 0) {
+				// Show empty state
+				statusOptionsContainer.createDiv({
+					cls: 'note-status-empty-options',
+					text: filter ? `No statuses match "${filter}"` : 'No statuses found'
+				});
+				return;
+			}
+			
+			filteredStatuses.forEach(status => {
+				const isSelected = this.currentStatuses.includes(status.name);
+				
+				const optionEl = statusOptionsContainer.createDiv({ 
+					cls: `note-status-option ${isSelected ? 'is-selected' : ''} status-${status.name}`
+				});
+				
+				// Status icon
+				optionEl.createSpan({ 
+					text: status.icon,
+					cls: 'note-status-option-icon'
+				});
+				
+				// Status name
+				optionEl.createSpan({ 
+					text: status.name,
+					cls: 'note-status-option-text' 
+				});
+				
+				// Check icon for selected status
+				if (isSelected) {
+					const checkIcon = optionEl.createDiv({ cls: 'note-status-option-check' });
+					setIcon(checkIcon, 'check');
+				}
+				
+				// Add click handler
+				optionEl.addEventListener('click', async () => {
+					const activeFile = this.app.workspace.getActiveFile();
+					if (!activeFile) return;
 					
-					const optionEl = statusOptionsContainer.createDiv({ 
-						cls: `note-status-option ${isSelected ? 'is-selected' : ''} status-${status.name}`
-					});
-					
-					// Status icon
-					optionEl.createSpan({ 
-						text: status.icon,
-						cls: 'note-status-option-icon'
-					});
-					
-					// Status name
-					optionEl.createSpan({ 
-						text: status.name,
-						cls: 'note-status-option-text' 
-					});
-					
-					// Check icon for selected status
-					if (isSelected) {
-						const checkIcon = optionEl.createDiv({ cls: 'note-status-option-check' });
-						setIcon(checkIcon, 'check');
-					}
-					
-					// Add click handler
-					optionEl.addEventListener('click', async () => {
-						const activeFile = this.app.workspace.getActiveFile();
-						if (!activeFile) return;
+					try {
+						// Add selection animation
+						optionEl.addClass('note-status-option-selecting');
 						
-						try {
-							// First close the popover if in single status mode to improve perceived performance
-							if (!this.settings.useMultipleStatuses) {
-								this.closeStatusPopover();
-							}
-							
-							// Apply status changes
+						// First close the popover if in single status mode to improve perceived performance
+						if (!this.settings.useMultipleStatuses) {
+							this.closeStatusPopover();
+						}
+						
+						// Apply status changes after brief delay for animation
+						setTimeout(async () => {
 							if (this.settings.useMultipleStatuses) {
 								await this.statusService.toggleNoteStatus(status.name);
 							} else {
@@ -374,12 +423,13 @@ export class StatusDropdown {
 									this.openStatusPopover(targetEl);
 								}, 10);
 							}
-						} catch (error) {
-							console.error('Error updating status:', error);
-							new Notice('Failed to update status');
-						}
-					});
+						}, 150);
+					} catch (error) {
+						console.error('Error updating status:', error);
+						new Notice('Failed to update status');
+					}
 				});
+			});
 		};
 		
 		// Initial population
@@ -393,12 +443,21 @@ export class StatusDropdown {
 		// Position the popover relative to the target element
 		this.positionPopover(targetEl);
 		
+		// Add animation class
+		this.statusPopover.addClass('note-status-popover-animate-in');
+		
 		// Focus search input
-		searchInput.focus();
+		setTimeout(() => {
+			searchInput.focus();
+		}, 50);
 		
 		// Add click outside listener to close popover
 		setTimeout(() => {
-			document.addEventListener('click', this.handleClickOutside);
+			this.clickOutsideHandler = this.handleClickOutside;
+			document.addEventListener('click', this.clickOutsideHandler);
+			
+			// Also add escape key listener
+			document.addEventListener('keydown', this.handleEscapeKey);
 		}, 10);
 	}
 	
@@ -469,64 +528,112 @@ export class StatusDropdown {
 	}
 	
 	/**
-	 * Handle click outside the popover
+	 * Handle escape key to close popover
 	 */
-	private handleClickOutside = (e: MouseEvent) => {
-		if (this.statusPopover && !this.statusPopover.contains(e.target as Node)) {
+	private handleEscapeKey = (e: KeyboardEvent) => {
+		if (e.key === 'Escape' && this.isPopoverOpen) {
 			this.closeStatusPopover();
 		}
 	};
 	
 	/**
-	 * Close the status selection popover
+	 * Handle click outside the popover
 	 */
-	private closeStatusPopover(): void {
-		if (this.statusPopover) {
-			this.statusPopover.remove();
-			this.statusPopover = undefined;
-			this.isPopoverOpen = false;
-			document.removeEventListener('click', this.handleClickOutside);
+	private handleClickOutside(e: MouseEvent) {
+		if (this.statusPopover && !this.statusPopover.contains(e.target as Node)) {
+			this.closeStatusPopover();
 		}
 	}
 	
 	/**
-	 * Update checkmark in option
+	 * Close the status selection popover
 	 */
-	private updateOptionCheckmark(optionEl: HTMLElement, isSelected: boolean): void {
-		// Remove existing checkmark
-		const existingCheck = optionEl.querySelector('.note-status-option-check');
-		if (existingCheck) existingCheck.remove();
+	private closeStatusPopover(): void {
+		if (!this.statusPopover) return;
 		
-		// Add checkmark if selected
-		if (isSelected) {
-			const checkIcon = optionEl.createDiv({ cls: 'note-status-option-check' });
-			setIcon(checkIcon, 'check');
-		}
+		// Add exit animation
+		this.statusPopover.addClass('note-status-popover-animate-out');
+		
+		// Clean up event listeners immediately
+		document.removeEventListener('click', this.clickOutsideHandler);
+		document.removeEventListener('keydown', this.handleEscapeKey);
+		
+		// Remove after animation completes
+		setTimeout(() => {
+			if (this.statusPopover) {
+				this.statusPopover.remove();
+				this.statusPopover = undefined;
+				this.isPopoverOpen = false;
+			}
+		}, this.ANIMATION_DURATION);
 	}
-
+	
 	/**
 	 * Show status dropdown in context menu
 	 */
 	public showInContextMenu(editor: Editor, view: MarkdownView): void {
 		const menu = new Menu();
-		const activeFile = this.app.workspace.getActiveFile();
+		const customClass = 'note-status-context-menu';
+		// Apply class manually since Menu doesn't have addClass method
+		(menu as any).dom?.addClass?.(customClass);
 		
+		const activeFile = this.app.workspace.getActiveFile();
 		if (!activeFile) return;
 		
 		const currentStatuses = this.statusService.getFileStatuses(activeFile);
+		
+		// Add a header item
+		menu.addItem((item) => {
+			item.setTitle('Change Note Status')
+				.setDisabled(true);
+			// Apply class manually since MenuItem doesn't have setClass method
+			(item as any).dom?.addClass?.('note-status-menu-header');
+			return item;
+		});
 
-		// Get all available statuses (from custom statuses and enabled templates)
+		// Get all available statuses grouped by template
 		const allStatuses = this.statusService.getAllStatuses();
-
-		// Add status options to menu (excluding 'unknown')
-		allStatuses
-			.filter(status => status.name !== 'unknown')
-			.forEach(status => {
+		
+		// Group statuses by template name if they have one
+		const statusesByTemplate: Record<string, Status[]> = { 'Custom': [] };
+		
+		allStatuses.forEach(status => {
+			if (status.name !== 'unknown') {
+				// For now, just put all in custom group
+				// In a future version, we could implement proper template grouping
+				statusesByTemplate['Custom'].push(status);
+			}
+		});
+		
+		// Add status options by template
+		Object.entries(statusesByTemplate).forEach(([templateName, statuses]) => {
+			if (statuses.length === 0) return;
+			
+			// Add template section
+			if (Object.keys(statusesByTemplate).length > 1) {
+				menu.addSeparator();
+				
+				menu.addItem((item) => {
+					item.setTitle(templateName)
+						.setDisabled(true);
+					// Apply class manually since MenuItem doesn't have setClass method
+					(item as any).dom?.addClass?.('note-status-menu-section');
+					return item;
+				});
+			}
+			
+			// Add statuses from this template
+			statuses.forEach(status => {
 				const isActive = currentStatuses.includes(status.name);
 				
 				menu.addItem((item) => {
-					item.setTitle(`${status.name} ${status.icon}`)
-						.setIcon(isActive ? 'checkmark' : 'tag');
+					item.setTitle(`${status.icon} ${status.name}`)
+						.setIcon(isActive ? 'check-circle' : 'circle');
+					
+					// Apply class manually if active
+					if (isActive) {
+						(item as any).dom?.addClass?.('is-active');
+					}
 					
 					if (this.settings.useMultipleStatuses) {
 						// Toggle mode - add checkmark for active statuses
@@ -558,6 +665,21 @@ export class StatusDropdown {
 					return item;
 				});
 			});
+		});
+		
+		// Add separator and additional actions
+		menu.addSeparator();
+		
+		// Add "batch update" option
+		menu.addItem((item) => {
+			item.setTitle('Batch Update Status...')
+				.setIcon('folders')
+				.onClick(() => {
+					// Dispatch event to open batch modal
+					window.dispatchEvent(new CustomEvent('note-status:open-batch-modal'));
+				});
+			return item;
+		});
 
 		// Position menu near cursor
 		const cursor = editor.getCursor('to');
@@ -566,7 +688,7 @@ export class StatusDropdown {
 
 		if (editorEl) {
 			const rect = editorEl.getBoundingClientRect();
-			menu.showAtPosition({ x: rect.left, y: rect.bottom });
+			menu.showAtPosition({ x: rect.left + 20, y: rect.top + 40 });
 		} else {
 			menu.showAtPosition({ x: 0, y: 0 });
 		}

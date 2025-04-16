@@ -1,9 +1,15 @@
 /* Base styles and variables */
 :root {
-  --status-transition-time: 0.2s;
+  --status-transition-time: 0.22s;
   --status-border-radius: var(--radius-s, 4px);
   --status-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   --status-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --status-icon-size: 16px;
+  
+  /* Animation curves */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
 }
 
 /* Status Pane */
@@ -38,22 +44,27 @@
   position: relative;
 }
 
-.search-input-wrapper {
+.search-input-wrapper,
+.note-status-search-wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.search-input-icon {
+.search-input-icon,
+.note-status-search-icon {
   position: absolute;
   left: var(--size-4-1, 4px);
   color: var(--text-muted);
   display: flex;
   align-items: center;
   pointer-events: none;
+  padding: 4px;
 }
 
-.note-status-search-input {
+.note-status-search-input,
+.note-status-modal-search-input,
+.note-status-popover-search-input {
   width: 100%;
   padding: var(--input-padding, 6px 8px);
   padding-left: calc(var(--size-4-1, 4px) * 3 + 18px);
@@ -62,15 +73,18 @@
   background: var(--background-primary);
   color: var(--text-normal);
   outline: none;
-  transition: all var(--status-transition-time) ease;
+  transition: all var(--status-transition-time) var(--ease-out);
 }
 
-.note-status-search-input:focus {
+.note-status-search-input:focus,
+.note-status-modal-search-input:focus,
+.note-status-popover-search-input:focus {
   border-color: var(--interactive-accent);
   box-shadow: 0 0 0 2px hsla(var(--interactive-accent-hsl), 0.2);
 }
 
-.search-input-clear-button {
+.search-input-clear-button,
+.note-status-search-clear-button {
   opacity: 0;
   position: absolute;
   right: var(--size-4-1, 4px);
@@ -78,15 +92,20 @@
   color: var(--text-muted);
   display: flex;
   align-items: center;
-  transition: opacity var(--status-transition-time) ease;
+  transition: opacity var(--status-transition-time) var(--ease-out);
+  padding: 4px;
+  border-radius: 50%;
 }
 
-.search-input-clear-button.is-visible {
+.search-input-clear-button.is-visible,
+.note-status-search-clear-button.is-visible {
   opacity: 1;
 }
 
-.search-input-clear-button:hover {
+.search-input-clear-button:hover,
+.note-status-search-clear-button:hover {
   color: var(--text-normal);
+  background-color: var(--background-modifier-hover);
 }
 
 /* Actions toolbar */
@@ -105,7 +124,7 @@
   background: var(--background-primary);
   color: var(--text-normal);
   cursor: pointer;
-  transition: all var(--status-transition-time) ease;
+  transition: all var(--status-transition-time) var(--ease-out);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -115,6 +134,12 @@
 .note-status-actions-refresh:hover {
   background: var(--background-modifier-hover);
   box-shadow: var(--shadow-s);
+}
+
+.note-status-view-toggle:active,
+.note-status-actions-refresh:active {
+  transform: translateY(1px);
+  box-shadow: none;
 }
 
 /* Status Groups Container */
@@ -131,12 +156,13 @@
   background: var(--background-primary-alt);
   box-shadow: var(--shadow-xs);
   overflow: hidden;
+  animation: fadeInSlideDown 0.3s var(--ease-out);
 }
 
 .status-group .nav-folder-title {
   padding: var(--size-4-1, 4px) var(--size-4-2, 8px);
   background: var(--background-secondary-alt);
-  transition: background var(--status-transition-time) ease;
+  transition: background var(--status-transition-time) var(--ease-out);
 }
 
 .status-group .nav-folder-title:hover {
@@ -156,7 +182,7 @@
   display: flex;
   align-items: center;
   color: var(--text-muted);
-  transition: transform var(--status-transition-time) ease;
+  transition: transform var(--status-transition-time) var(--ease-in-out);
   opacity: 1;
 }
 
@@ -168,6 +194,7 @@
 .status-group .nav-folder-children {
   padding: var(--size-4-1, 4px);
   background: var(--background-primary);
+  transition: height var(--status-transition-time) var(--ease-out);
 }
 .status-group.nav-folder.is-collapsed .nav-folder-children {
   display: none;
@@ -175,7 +202,7 @@
 
 .nav-file {
   border-radius: var(--status-border-radius);
-  transition: background var(--status-transition-time) ease;
+  transition: background var(--status-transition-time) var(--ease-out);
   margin-bottom: 2px;
   position: relative;
 }
@@ -242,6 +269,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: var(--status-icon-size);
+  height: var(--status-icon-size);
 }
 
 /* Hover effect for icon container */
@@ -263,10 +292,21 @@
   box-shadow: var(--shadow-s);
   border-radius: var(--radius-m, 8px);
   margin: var(--size-4-2, 8px);
-  animation: fadeIn 0.2s ease;
   max-width: 720px;
   margin: 8px auto;
   border: 1px solid var(--background-modifier-border);
+  transition: opacity var(--status-transition-time) var(--ease-out),
+              transform var(--status-transition-time) var(--ease-out);
+}
+
+.note-status-dropdown.note-status-animate-in {
+  animation: slideInFade 0.25s var(--ease-out);
+}
+
+.note-status-dropdown.note-status-animate-out {
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
 }
 
 .note-status-dropdown.top {
@@ -327,6 +367,13 @@
   color: var(--text-normal);
 }
 
+.note-status-action-button:active,
+.note-status-action-button.note-status-button-active {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+  transform: scale(0.95);
+}
+
 /* Status chips container */
 .note-status-chips-container {
   display: flex;
@@ -351,6 +398,7 @@
   background: var(--background-secondary-alt);
   border-radius: var(--radius-s, 4px);
   font-size: 0.9em;
+  user-select: none;
 }
 
 /* Status chips styling */
@@ -362,9 +410,10 @@
   border-radius: 16px;
   box-shadow: var(--shadow-xs);
   font-size: 0.9em;
-  transition: all 0.15s ease;
+  transition: all 0.15s var(--ease-out);
   border: 1px solid var(--background-modifier-border);
   max-width: 180px;
+  animation: scaleIn 0.2s var(--ease-out);
 }
 
 .note-status-chip.clickable {
@@ -375,6 +424,12 @@
   background: var(--background-modifier-hover);
   transform: translateY(-1px);
   box-shadow: var(--status-hover-shadow);
+}
+
+.note-status-chip-removing {
+  transform: scale(0.8);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .note-status-chip-icon {
@@ -398,12 +453,13 @@
   background: var(--background-modifier-border);
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.15s var(--ease-out);
 }
 
 .note-status-chip-remove:hover {
   background: var(--text-accent);
   color: var(--text-on-accent);
+  transform: scale(1.1);
 }
 
 /* Add status button */
@@ -415,13 +471,19 @@
   border-radius: var(--radius-m, 8px);
   margin-top: 4px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.15s var(--ease-out);
   border: 1px dashed var(--background-modifier-border);
 }
 
 .note-status-add-button:hover {
   background: var(--background-modifier-hover);
   box-shadow: var(--shadow-xs);
+  transform: translateY(-1px);
+}
+
+.note-status-add-button:active {
+  transform: translateY(0px);
+  box-shadow: none;
 }
 
 .note-status-add-icon {
@@ -444,7 +506,6 @@
   border-radius: var(--radius-m, 8px);
   box-shadow: var(--status-box-shadow);
   z-index: calc(var(--layer-popover, 40) + 10);
-  animation: fadeInScale 0.15s ease;
   max-height: 300px;
   display: flex;
   flex-direction: column;
@@ -452,6 +513,21 @@
   min-width: 200px;
   overflow: hidden;
   width: auto !important;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity var(--status-transition-time) var(--ease-out),
+              transform var(--status-transition-time) var(--ease-out);
+}
+
+.note-status-popover.note-status-popover-animate-in {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.note-status-popover.note-status-popover-animate-out {
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
 }
 
 .note-status-popover.popover-top {
@@ -472,21 +548,6 @@
   top: 0;
   background: var(--background-primary);
   z-index: 1;
-}
-
-.note-status-popover-search-input {
-  width: 100%;
-  padding: 6px 10px;
-  border-radius: var(--radius-s, 4px);
-  border: 1px solid var(--background-modifier-border);
-  background: var(--background-primary);
-  color: var(--text-normal);
-}
-
-.note-status-popover-search-input:focus {
-  border-color: var(--interactive-accent);
-  box-shadow: 0 0 0 2px hsla(var(--interactive-accent-hsl), 0.2);
-  outline: none;
 }
 
 /* Status options container */
@@ -512,6 +573,15 @@
   background-color: transparent;
 }
 
+/* Empty status options */
+.note-status-empty-options {
+  padding: 16px 12px;
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.9em;
+}
+
 /* Status option items */
 .note-status-option {
   display: flex;
@@ -519,7 +589,7 @@
   padding: 8px 12px;
   border-radius: var(--radius-s, 4px);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.15s var(--ease-out);
   margin-bottom: 2px;
   position: relative;
 }
@@ -530,6 +600,12 @@
 
 .note-status-option.is-selected {
   background: var(--background-secondary-alt);
+}
+
+.note-status-option-selecting {
+  background: var(--interactive-accent) !important;
+  color: var(--text-on-accent);
+  transform: scale(0.98);
 }
 
 .note-status-option-icon {
@@ -557,24 +633,183 @@
   margin-left: 4px;
 }
 
-/* Additional styling for multiple status badges */
-.note-status-additional-badges {
+/* Batch modal styling */
+.note-status-batch-modal {
+  max-width: 550px;
   display: flex;
-  align-items: center;
-  gap: 2px;
-  margin-left: 4px;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.note-status-mini-badge {
-  font-size: 0.75em;
-  display: inline-flex;
+.note-status-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.note-status-modal-icon {
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
+  color: var(--text-accent);
+  font-size: 1.2em;
+}
+
+.note-status-modal-title {
+  margin: 0;
+  font-size: 1.3em;
+  line-height: 1.3;
+}
+
+.note-status-modal-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.note-status-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.note-status-section-title {
+  margin: 0;
+  font-size: 1em;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.note-status-file-count,
+.note-status-status-count {
+  font-size: 0.85em;
+  color: var(--text-muted);
+  transition: all 0.2s var(--ease-out);
+}
+
+.note-status-file-count.has-selection,
+.note-status-status-count.has-selection {
+  color: var(--text-accent);
+  font-weight: 600;
+}
+
+.note-status-file-select-container,
+.note-status-status-select-container {
+  position: relative;
+}
+
+.note-status-file-select,
+.note-status-status-select {
+  width: 100%;
+  padding: 8px;
+  border-radius: var(--radius-s, 4px);
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  color: var(--text-normal);
+  font-size: 0.9em;
+  outline: none;
+  transition: all 0.2s var(--ease-out);
+  max-height: 200px;
+}
+
+.note-status-file-select option,
+.note-status-status-select option {
+  padding: 6px 8px;
+}
+
+.note-status-file-select:focus,
+.note-status-status-select:focus {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px hsla(var(--interactive-accent-hsl), 0.2);
+}
+
+.note-status-empty-option {
+  font-style: italic;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 12px !important;
+}
+
+/* Mode selection in batch modal */
+.note-status-mode-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  background: var(--background-primary-alt);
+  border-radius: var(--radius-s, 4px);
+  margin-bottom: 8px;
+}
+
+.note-status-mode-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-s, 4px);
+  cursor: pointer;
+  transition: all 0.15s var(--ease-out);
+}
+
+.note-status-mode-option:hover {
+  background: var(--background-modifier-hover);
+}
+
+.note-status-mode-option.is-active {
+  background: var(--background-modifier-hover);
+}
+
+.note-status-mode-radio {
+  margin: 0;
+}
+
+.note-status-mode-label {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Action buttons in modal */
+.note-status-modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.note-status-select-all,
+.note-status-apply-button {
+  padding: 8px 16px;
+  border-radius: var(--radius-s, 4px);
   background: var(--background-secondary);
-  box-shadow: var(--shadow-xs);
+  border: 1px solid var(--background-modifier-border);
+  color: var(--text-normal);
+  cursor: pointer;
+  transition: all 0.15s var(--ease-out);
+  font-size: 0.9em;
+}
+
+.note-status-select-all:hover,
+.note-status-apply-button:hover {
+  background: var(--background-modifier-hover);
+  box-shadow: var(--shadow-s);
+}
+
+.note-status-select-all:active,
+.note-status-apply-button:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.note-status-apply-button {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-color: var(--interactive-accent);
+}
+
+.note-status-apply-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* Status bar refinements */
@@ -584,7 +819,7 @@
   gap: 6px;
   padding: 4px 8px;
   border-radius: var(--radius-s, 4px);
-  transition: all 0.2s ease;
+  transition: all 0.2s var(--ease-out);
   cursor: pointer;
 }
 
@@ -619,16 +854,61 @@
   text-overflow: ellipsis;
 }
 
+/* Additional styling for multiple status badges */
+.note-status-additional-badges {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 4px;
+}
+
+.note-status-mini-badge {
+  font-size: 0.75em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--background-secondary);
+  box-shadow: var(--shadow-xs);
+}
+
+/* Context menu enhancements */
+.note-status-context-menu .menu-item {
+  display: flex;
+  align-items: center;
+}
+
+.note-status-context-menu .menu-item.is-active {
+  color: var(--text-accent);
+}
+
+.note-status-menu-header {
+  font-weight: 600;
+  border-bottom: 1px solid var(--background-modifier-border);
+  margin-bottom: 2px;
+  pointer-events: none !important;
+}
+
+.note-status-menu-section {
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  pointer-events: none !important;
+}
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-@keyframes fadeInScale {
+@keyframes scaleIn {
   from { 
     opacity: 0; 
-    transform: scale(0.95);
+    transform: scale(0.9);
   }
   to { 
     opacity: 1;
@@ -636,9 +916,26 @@
   }
 }
 
-@keyframes slideIn {
-  from { transform: translateY(-10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+@keyframes slideInFade {
+  from { 
+    opacity: 0; 
+    transform: translateY(-10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInSlideDown {
+  from { 
+    opacity: 0; 
+    transform: translateY(-6px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Responsive adjustments */
@@ -651,6 +948,10 @@
   .note-status-chip {
     max-width: 150px;
   }
+  
+  .note-status-batch-modal {
+    max-width: 95%;
+  }
 }
 
 /* High contrast improvements */
@@ -658,5 +959,30 @@
   .note-status-chip,
   .note-status-option.is-selected {
     border: 1px solid currentColor;
+  }
+  
+  .note-status-action-button:focus-visible,
+  .note-status-chip:focus-visible,
+  .note-status-option:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+/* Dark mode adjustments */
+.theme-dark .note-status-popover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.theme-dark .note-status-option-selecting {
+  box-shadow: 0 0 0 1px var(--interactive-accent);
+}
+
+/* Print styles - hide interactive elements when printing */
+@media print {
+  .note-status-dropdown,
+  .note-status-bar,
+  .note-status-pane {
+    display: none !important;
   }
 }

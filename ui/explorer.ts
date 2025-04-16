@@ -1,14 +1,23 @@
-import { App, TFile } from 'obsidian';
+import { App, TFile, debounce } from 'obsidian';
 import { FileExplorerView, NoteStatusSettings } from '../models/types';
 import { StatusService } from '../services/status-service';
 
 /**
- * Handles file explorer integration for displaying status icons
+ * Enhanced file explorer integration for displaying status icons with performance optimizations
  */
 export class ExplorerIntegration {
 	private app: App;
 	private settings: NoteStatusSettings;
 	private statusService: StatusService;
+	private iconUpdateQueue: Set<string> = new Set();
+	private isProcessingQueue = false;
+	
+	// Debounced update function for better performance
+	private debouncedUpdateAll = debounce(
+		() => this.processUpdateQueue(),
+		100,
+		true
+	);
 
 	constructor(app: App, settings: NoteStatusSettings, statusService: StatusService) {
 		this.app = app;
@@ -17,68 +26,147 @@ export class ExplorerIntegration {
 	}
 
 	/**
-	 * Update settings reference
+	 * Update settings reference and refresh icons
 	 */
 	public updateSettings(settings: NoteStatusSettings): void {
+		const previousShowIcons = this.settings.showStatusIconsInExplorer;
 		this.settings = settings;
 
 		// Update icons based on new settings
-		if (settings.showStatusIconsInExplorer) {
+		if (previousShowIcons !== settings.showStatusIconsInExplorer) {
+			if (settings.showStatusIconsInExplorer) {
+				this.updateAllFileExplorerIcons();
+			} else {
+				this.removeAllFileExplorerIcons();
+			}
+		} else if (settings.showStatusIconsInExplorer) {
+			// If setting hasn't changed but is enabled, refresh the icons
+			// This handles cases where custom statuses or colors changed
 			this.updateAllFileExplorerIcons();
-		} else {
-			this.removeAllFileExplorerIcons();
+		}
+	}
+
+	/**
+	 * Add a file to the update queue
+	 */
+	public queueFileUpdate(file: TFile): void {
+		if (!this.settings.showStatusIconsInExplorer || file.extension !== 'md') return;
+		
+		this.iconUpdateQueue.add(file.path);
+		this.debouncedUpdateAll();
+	}
+
+	/**
+	 * Process the queue of files that need icon updates
+	 */
+	private async processUpdateQueue(): Promise<void> {
+		if (this.isProcessingQueue || this.iconUpdateQueue.size === 0) return;
+		
+		this.isProcessingQueue = true;
+		
+		try {
+			const fileExplorer = this.app.workspace.getLeavesOfType('file-explorer')[0];
+			if (!fileExplorer || !fileExplorer.view) return;
+			
+			const fileExplorerView = fileExplorer.view as FileExplorerView;
+			if (!fileExplorerView.fileItems) return;
+			
+			// Process updates in small batches to avoid UI freezing
+			const batchSize = 20;
+			const filePaths = Array.from(this.iconUpdateQueue);
+			
+			for (let i = 0; i < filePaths.length; i += batchSize) {
+				const batch = filePaths.slice(i, i + batchSize);
+				
+				// Process each file in the batch
+				for (const filePath of batch) {
+					const file = this.app.vault.getFileByPath(filePath);
+					if (file && file instanceof TFile) {
+						this.updateSingleFileIcon(file, fileExplorerView);
+					}
+					this.iconUpdateQueue.delete(filePath);
+				}
+				
+				// Allow UI to breathe between batches
+				if (i + batchSize < filePaths.length) {
+					await new Promise(resolve => setTimeout(resolve, 10));
+				}
+			}
+		} finally {
+			this.isProcessingQueue = false;
+			
+			// If more files were added while processing, process them too
+			if (this.iconUpdateQueue.size > 0) {
+				this.debouncedUpdateAll();
+			}
 		}
 	}
 
 	/**
 	 * Update a single file's icon in the file explorer
 	 */
-	public updateFileExplorerIcons(file: TFile): void {
+	private updateSingleFileIcon(file: TFile, fileExplorerView: FileExplorerView): void {
 		if (!this.settings.showStatusIconsInExplorer || file.extension !== 'md') return;
 
+		const fileItem = fileExplorerView.fileItems[file.path];
+		if (!fileItem) return;
+		
+		const titleEl = fileItem.titleEl || fileItem.selfEl;
+		if (!titleEl) return;
+		
+		// Get statuses for this file
 		const statuses = this.statusService.getFileStatuses(file);
-		const fileExplorer = this.app.workspace.getLeavesOfType('file-explorer')[0];
+		
+		// Remove existing icons if present
+		const existingIcons = titleEl.querySelectorAll('.note-status-icon, .note-status-icon-container');
+		existingIcons.forEach(icon => icon.remove());
 
-		if (fileExplorer && fileExplorer.view) {
-			// Cast fileExplorer.view to FileExplorerView
-			const fileExplorerView = fileExplorer.view as FileExplorerView;
+		// Create container for multiple icons
+		const iconContainer = titleEl.createEl('span', {
+			cls: 'note-status-icon-container'
+		});
 
-			if (fileExplorerView.fileItems) {
-				const fileItem = fileExplorerView.fileItems[file.path];
-
-				if (fileItem) {
-					const titleEl = fileItem.titleEl || fileItem.selfEl;
-					if (titleEl) {
-						// Remove existing icons if present
-						const existingIcons = titleEl.querySelectorAll('.note-status-icon, .note-status-icon-container');
-						existingIcons.forEach(icon => icon.remove());
-
-						// Create container for multiple icons
-						const iconContainer = titleEl.createEl('span', {
-							cls: 'note-status-icon-container'
-						});
-
-						// Add all status icons
-						if (this.settings.useMultipleStatuses && statuses.length > 0 && statuses[0] !== 'unknown') {
-							// Add all icons if using multiple statuses
-							statuses.forEach(status => {
-								iconContainer.createEl('span', {
-									cls: `note-status-icon nav-file-tag status-${status}`,
-									text: this.statusService.getStatusIcon(status)
-								});
-							});
-						} else {
-							// Just show primary status
-							const primaryStatus = statuses[0] || 'unknown';
-							iconContainer.createEl('span', {
-								cls: `note-status-icon nav-file-tag status-${primaryStatus}`,
-								text: this.statusService.getStatusIcon(primaryStatus)
-							});
-						}
-					}
-				}
+		// Add all status icons
+		if (this.settings.useMultipleStatuses && statuses.length > 0 && statuses[0] !== 'unknown') {
+			// Add all icons if using multiple statuses
+			statuses.forEach(status => {
+				const icon = this.statusService.getStatusIcon(status);
+				const iconEl = iconContainer.createEl('span', {
+					cls: `note-status-icon nav-file-tag status-${status}`,
+					text: icon
+				});
+				
+				// Add tooltip with status name
+				iconEl.setAttribute('aria-label', status);
+				iconEl.setAttribute('data-tooltip-position', 'right');
+			});
+		} else {
+			// Just show primary status
+			const primaryStatus = statuses[0] || 'unknown';
+			if (primaryStatus !== 'unknown' || !this.settings.autoHideStatusBar) {
+				const icon = this.statusService.getStatusIcon(primaryStatus);
+				const iconEl = iconContainer.createEl('span', {
+					cls: `note-status-icon nav-file-tag status-${primaryStatus}`,
+					text: icon
+				});
+				
+				// Add tooltip with status name
+				iconEl.setAttribute('aria-label', primaryStatus);
+				iconEl.setAttribute('data-tooltip-position', 'right');
 			}
 		}
+		
+		// Remove container if empty (no icons added)
+		if (iconContainer.childElementCount === 0) {
+			iconContainer.remove();
+		}
+	}
+
+	/**
+	 * Update a single file's icon in the file explorer (public method)
+	 */
+	public updateFileExplorerIcons(file: TFile): void {
+		this.queueFileUpdate(file);
 	}
 
 	/**
@@ -91,9 +179,9 @@ export class ExplorerIntegration {
 			return;
 		}
 
-		// Update icons for all markdown files
+		// Queue all markdown files for update
 		const files = this.app.vault.getMarkdownFiles();
-		files.forEach(file => this.updateFileExplorerIcons(file));
+		files.forEach(file => this.queueFileUpdate(file));
 	}
 
 	/**
@@ -101,20 +189,21 @@ export class ExplorerIntegration {
 	 */
 	public removeAllFileExplorerIcons(): void {
 		const fileExplorer = this.app.workspace.getLeavesOfType('file-explorer')[0];
-		if (fileExplorer && fileExplorer.view) {
-			// Cast fileExplorer.view to FileExplorerView
-			const fileExplorerView = fileExplorer.view as FileExplorerView;
-
-			if (fileExplorerView.fileItems) {
-				Object.values(fileExplorerView.fileItems).forEach((fileItem) => {
-					const titleEl = fileItem.titleEl || fileItem.selfEl;
-					if (titleEl) {
-						const existingIcon = titleEl.querySelector('.note-status-icon');
-						if (existingIcon) existingIcon.remove();
-					}
-				});
-			}
-		}
+		if (!fileExplorer || !fileExplorer.view) return;
+		
+		const fileExplorerView = fileExplorer.view as FileExplorerView;
+		if (!fileExplorerView.fileItems) return;
+		
+		Object.values(fileExplorerView.fileItems).forEach((fileItem) => {
+			const titleEl = fileItem.titleEl || fileItem.selfEl;
+			if (!titleEl) return;
+			
+			const existingIcons = titleEl.querySelectorAll('.note-status-icon, .note-status-icon-container');
+			existingIcons.forEach(icon => icon.remove());
+		});
+		
+		// Clear the update queue
+		this.iconUpdateQueue.clear();
 	}
 
 	/**
@@ -122,20 +211,17 @@ export class ExplorerIntegration {
 	 */
 	public getSelectedFiles(): TFile[] {
 		const fileExplorer = this.app.workspace.getLeavesOfType('file-explorer')[0];
-		if (!fileExplorer || !fileExplorer.view) {
-			console.log('File explorer not found or no file items');
-			return [];
-		}
+		if (!fileExplorer || !fileExplorer.view) return [];
 
 		const fileExplorerView = fileExplorer.view as FileExplorerView;
-		if (!fileExplorerView.fileItems) {
-			console.log('No file items found');
-			return [];
-		}
+		if (!fileExplorerView.fileItems) return [];
 
 		const selectedFiles: TFile[] = [];
+		
 		Object.entries(fileExplorerView.fileItems).forEach(([_, item]) => {
-			if (item.el?.classList.contains('is-selected') && item.file instanceof TFile && item.file.extension === 'md') {
+			if (item.el?.classList.contains('is-selected') && 
+				item.file instanceof TFile && 
+				item.file.extension === 'md') {
 				selectedFiles.push(item.file);
 			}
 		});
@@ -148,5 +234,6 @@ export class ExplorerIntegration {
 	 */
 	public unload(): void {
 		this.removeAllFileExplorerIcons();
+		this.debouncedUpdateAll.cancel();
 	}
 }
