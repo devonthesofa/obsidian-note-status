@@ -93,7 +93,7 @@ export class StatusContextMenu {
 					})
 			);
 		} else {
-			// Legacy single status mode
+			// Single status mode - but still using arrays internally
 			allStatuses
 				.filter(status => status.name !== 'unknown')
 				.forEach(status => {
@@ -102,7 +102,8 @@ export class StatusContextMenu {
 							.setTitle(`${status.name} ${status.icon}`)
 							.setIcon('tag')
 							.onClick(async () => {
-								await this.statusService.batchUpdateStatus(files, status.name);
+								// Always use arrays, even in single status mode
+								await this.statusService.batchUpdateStatuses(files, [status.name], 'replace');
 								window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
 							})
 					);

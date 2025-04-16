@@ -105,7 +105,7 @@ export class StatusService {
 						}
 					}
 				} else {
-					// Handle single value format
+					// Handle single value format (string) - convert to array format internally
 					const normalizedStatus = frontmatterStatus.toString().toLowerCase();
 					const matchingStatus = this.allStatuses.find(s =>
 						s.name.toLowerCase() === normalizedStatus);
@@ -161,7 +161,7 @@ export class StatusService {
 			const statusTagRegex = new RegExp(`${escapedTagPrefix}:.*(?:\n|$)`, 'm');
 			
 			if (frontmatter.match(statusTagRegex)) {
-				// Format array for YAML (with proper indentation)
+				// Always format as array for YAML
 				const formattedArray = JSON.stringify(newStatuses);
 				newContent = content.replace(
 					frontmatterMatch[0],
@@ -191,11 +191,11 @@ export class StatusService {
 		await this.app.vault.modify(targetFile, newContent);
 	}
 
-
 	/**
 	 * Legacy method to update a single status for backward compatibility
 	 */
 	public async updateNoteStatus(newStatus: string, file?: TFile): Promise<void> {
+		// Always store as an array even in single status mode
 		await this.updateNoteStatuses([newStatus], file);
 	}
 
@@ -314,6 +314,7 @@ export class StatusService {
 	 * Legacy batch update for a single status
 	 */
 	public async batchUpdateStatus(files: TFile[], newStatus: string): Promise<void> {
+		// Always store as array even in single status mode
 		await this.batchUpdateStatuses(files, [newStatus], 'replace');
 	}
 

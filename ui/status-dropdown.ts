@@ -515,7 +515,7 @@ export class StatusDropdown {
 			(item as any).dom?.addClass?.('note-status-menu-header');
 			return item;
 		});
-
+	
 		// Get all available statuses grouped by template
 		const allStatuses = this.statusService.getAllStatuses();
 		
@@ -552,7 +552,8 @@ export class StatusDropdown {
 				const isActive = currentStatuses.includes(status.name);
 				
 				menu.addItem((item) => {
-					item.setTitle(`${status.icon} ${status.name}`)
+					item
+						.setTitle(`${status.icon} ${status.name}`)
 						.setIcon(isActive ? 'check-circle' : 'circle');
 					
 					// Apply class manually if active
@@ -579,9 +580,9 @@ export class StatusDropdown {
 							window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
 						});
 					} else {
-						// Single select mode
+						// Single select mode - but still using arrays internally
 						item.onClick(async () => {
-							await this.statusService.updateNoteStatus(status.name);
+							await this.statusService.updateNoteStatuses([status.name]);
 							
 							// Update current statuses and toolbar button
 							this.currentStatuses = [status.name];
@@ -613,12 +614,12 @@ export class StatusDropdown {
 				});
 			return item;
 		});
-
+	
 		// Position menu near cursor
 		const cursor = editor.getCursor('to');
 		editor.posToOffset(cursor);
 		const editorEl = view.contentEl.querySelector('.cm-content');
-
+	
 		if (editorEl) {
 			const rect = editorEl.getBoundingClientRect();
 			menu.showAtPosition({ x: rect.left + 20, y: rect.top + 40 });

@@ -466,13 +466,13 @@ export default class NoteStatus extends Plugin {
 			const activeFile = this.app.workspace.getActiveFile();
 			if (!activeFile || activeFile.extension !== 'md') {
 				this.statusBar.update(['unknown']);
-				this.statusDropdown.update(['unknown']); // Add this line to update toolbar
+				this.statusDropdown.update(['unknown']);
 				return;
 			}
-	
+		
 			const statuses = this.statusService.getFileStatuses(activeFile);
 			this.statusBar.update(statuses);
-			this.statusDropdown.update(statuses); // Add this line to update toolbar
+			this.statusDropdown.update(statuses);
 		} catch (error) {
 			console.error('Error checking note status:', error);
 			if (!this.hasShownErrorNotification) {
@@ -485,17 +485,18 @@ export default class NoteStatus extends Plugin {
 
 	/**
 	 * Get the current statuses for the active file
+	 * Always returns an array of status names
 	 */
 	getCurrentStatuses(): string[] {
 		try {
-			const activeFile = this.app.workspace.getActiveFile();
-			if (!activeFile || activeFile.extension !== 'md') {
-				return ['unknown'];
-			}
-			return this.statusService.getFileStatuses(activeFile);
-		} catch (error) {
-			console.error('Error getting current statuses:', error);
+		const activeFile = this.app.workspace.getActiveFile();
+		if (!activeFile || activeFile.extension !== 'md') {
 			return ['unknown'];
+		}
+		return this.statusService.getFileStatuses(activeFile);
+		} catch (error) {
+		console.error('Error getting current statuses:', error);
+		return ['unknown'];
 		}
 	}
 
@@ -520,16 +521,16 @@ export default class NoteStatus extends Plugin {
 			new Notice('Error opening status pane. Check console for details.');
 		}
 	}
-
+	
 	/**
 	 * Show the batch status modal
 	 */
 	showBatchStatusModal() {
 		try {
-			new BatchStatusModal(this.app, this.settings, this.statusService).open();
+		new BatchStatusModal(this.app, this.settings, this.statusService).open();
 		} catch (error) {
-			console.error('Error showing batch status modal:', error);
-			new Notice('Error showing batch status modal. Check console for details.');
+		console.error('Error showing batch status modal:', error);
+		new Notice('Error showing batch status modal. Check console for details.');
 		}
 	}
 
