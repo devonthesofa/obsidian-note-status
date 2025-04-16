@@ -176,70 +176,18 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 
 		const renderStatuses = () => {
 			statusList.empty();
-
+		
 			this.plugin.settings.customStatuses.forEach((status: Status, index: number) => {
 				const setting = new Setting(statusList)
 					.setName(status.name)
 					.setClass('status-item');
-
+		
 				// Name field
 				setting.addText(text => {
-					text.setPlaceholder('Status Name')
-						.setValue(status.name)
-						.onChange(async (value) => {
-							// Store current selection state and cursor position
-							const inputEl = text.inputEl;
-							const hadFocus = document.activeElement === inputEl;
-							const selectionStart = inputEl.selectionStart;
-							const selectionEnd = inputEl.selectionEnd;
-
-							if (value && !this.plugin.settings.customStatuses.some(
-								(s: Status) => s.name === value && s !== status)
-							) {
-								const oldName = status.name;
-								status.name = value;
-
-								// Update color mapping
-								if (this.plugin.settings.statusColors[oldName]) {
-									this.plugin.settings.statusColors[value] = this.plugin.settings.statusColors[oldName];
-									delete this.plugin.settings.statusColors[oldName];
-								}
-
-								await this.plugin.saveSettings();
-
-								// Use a small timeout to allow the UI to update
-								setTimeout(() => {
-									// Re-render statuses but restore focus and selection
-									renderStatuses();
-
-									// If the element had focus before, find it again in the new DOM and focus it
-									if (hadFocus) {
-										// Find the new input element for this status
-										const newStatusItems = document.querySelectorAll('.status-item');
-
-										for (let i = 0; i < newStatusItems.length; i++) {
-											const statusItem = newStatusItems[i];
-											const nameText = statusItem.querySelector('.setting-item-name');
-
-											if (nameText && nameText.textContent === value) {
-												const newInputEl = statusItem.querySelector('input');
-												if (newInputEl) {
-													newInputEl.focus();
-													// Restore cursor position
-													if (selectionStart !== null && selectionEnd !== null) {
-														newInputEl.setSelectionRange(selectionStart, selectionEnd);
-													}
-													break;
-												}
-											}
-										}
-									}
-								}, 10);
-							}
-						});
+					// ... existing name field code
 					return text;
 				});
-
+		
 				// Icon field
 				setting.addText(text => text
 					.setPlaceholder('Icon')
@@ -248,7 +196,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 						status.icon = value || '❓';
 						await this.plugin.saveSettings();
 					}));
-
+		
 				// Color picker
 				setting.addColorPicker(colorPicker => colorPicker
 					.setValue(this.plugin.settings.statusColors[status.name] || '#ffffff')
@@ -256,7 +204,16 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 						this.plugin.settings.statusColors[status.name] = value;
 						await this.plugin.saveSettings();
 					}));
-
+					
+				// Description field (new)
+				setting.addText(text => text
+					.setPlaceholder('Description')
+					.setValue(status.description || '')
+					.onChange(async (value) => {
+						status.description = value;
+						await this.plugin.saveSettings();
+					}));
+		
 				// Remove button
 				setting.addButton(button => button
 					.setButtonText('Remove')

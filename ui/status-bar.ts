@@ -15,13 +15,19 @@ export class StatusBar {
 		this.statusBarEl = statusBarEl;
 		this.settings = settings;
 		this.statusService = statusService;
-
+	
 		// Add initial class
 		this.statusBarEl.addClass('note-status-bar');
-
+	
 		// Add click handler
 		this.statusBarEl.addEventListener('click', this.handleClick.bind(this));
-
+		
+		// Add right-click handler for force refresh
+		this.statusBarEl.addEventListener('contextmenu', (e) => {
+			e.preventDefault();
+			window.dispatchEvent(new CustomEvent('note-status:force-refresh'));
+		});
+	
 		// Initial render
 		this.update(['unknown']);
 	}

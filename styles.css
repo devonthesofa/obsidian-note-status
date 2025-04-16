@@ -272,6 +272,65 @@
   width: var(--status-icon-size);
   height: var(--status-icon-size);
 }
+/* Tooltip styling for status description */
+.note-status-icon {
+  position: relative;
+}
+
+.note-status-icon::after {
+  content: attr(data-description);
+  display: none; /* Hide by default */
+  position: absolute;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  padding: 6px 10px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000; /* Very high z-index to ensure it's above other elements */
+  box-shadow: var(--shadow-s);
+  pointer-events: none; /* Prevents the tooltip from blocking hover */
+  opacity: 0;
+  transition: opacity 150ms ease-in-out;
+}
+
+/* Only show tooltip when data-description is not empty */
+.note-status-icon[data-description]:hover::after {
+  display: block;
+  opacity: 1;
+}
+
+/* Handle long descriptions */
+.note-status-icon::after {
+  max-width: 200px;
+  white-space: normal;
+  text-align: center;
+}
+
+/* Ensure tooltip is above all other elements */
+.note-status-icon {
+  z-index: 500; /* Higher than most elements */
+}
+
+/* Additional tooltip positioning for different contexts */
+.nav-file-title .note-status-icon::after {
+  bottom: 150%; /* Position above in file explorer */
+}
+
+.status-bar .note-status-icon::after {
+  bottom: auto;
+  top: -30px;
+}
+
+/* Ensure tooltips in popovers and dropdowns are visible */
+.note-status-popover .note-status-option-icon::after,
+.note-status-dropdown .note-status-chip-icon::after {
+  z-index: 1001; /* Even higher for nested elements */
+}
 
 /* Hover effect for icon container */
 .note-status-icon-container:hover {

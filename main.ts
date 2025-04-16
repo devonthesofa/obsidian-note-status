@@ -49,7 +49,7 @@ export default class NoteStatus extends Plugin {
 	
 	private debouncedUpdateExplorer = debounce(
 		() => this.explorerIntegration?.updateAllFileExplorerIcons(),
-		300
+		150
 	);
 	
 	private debouncedUpdateStatusPane = debounce(
@@ -163,6 +163,15 @@ export default class NoteStatus extends Plugin {
 			await this.saveSettings();
 		});
 
+		// Listen for force refresh
+		window.addEventListener('note-status:force-refresh', () => {
+			try {
+				this.forceRefreshUI();
+			} catch (error) {
+				console.error('Error handling force refresh event:', error);
+			}
+		});
+
 		// Listen for status changes
 		window.addEventListener('note-status:status-changed', (e: any) => {
 			try {
@@ -228,6 +237,12 @@ export default class NoteStatus extends Plugin {
 				this.checkNoteStatus();
 				new Notice('Note status refreshed!');
 			}
+		});
+
+		this.addCommand({
+			id: 'force-refresh-ui',
+			name: 'Force Refresh UI',
+			callback: () => this.forceRefreshUI()
 		});
 
 		// Batch update status command
@@ -662,6 +677,25 @@ export default class NoteStatus extends Plugin {
 		} catch (error) {
 			console.error('Error saving settings:', error);
 			new Notice('Error saving settings. Check console for details.');
+		}
+	}
+
+	public forceRefreshUI(): void {
+		try {
+			// Cancel any pending updates
+			this.debouncedCheckNoteStatus.cancel();
+			this.debouncedUpdateExplorer.cancel();
+			this.debouncedUpdateStatusPane.cancel();
+			
+			// Immediate updates
+			this.checkNoteStatus();
+			this.explorerIntegration.updateAllFileExplorerIcons();
+			this.updateStatusPane();
+			
+			new Notice('UI forcefully refreshed');
+		} catch (error) {
+			console.error('Error force refreshing UI:', error);
+			new Notice('Error refreshing UI. Check console for details.');
 		}
 	}
 

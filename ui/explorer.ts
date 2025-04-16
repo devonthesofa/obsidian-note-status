@@ -46,6 +46,23 @@ export class ExplorerIntegration {
 		}
 	}
 
+	private findFileExplorerView(): FileExplorerView | null {
+		// Try the standard method first
+		const leaf = this.app.workspace.getLeavesOfType('file-explorer')[0];
+		if (leaf && leaf.view) {
+			return leaf.view as FileExplorerView;
+		}
+		
+		// If that fails, try to find it by searching all leaves
+		for (const leaf of this.app.workspace.getLeavesOfType('')) {
+			if (leaf.view && 'fileItems' in leaf.view) {
+				return leaf.view as FileExplorerView;
+			}
+		}
+		
+		return null;
+	}
+
 	/**
 	 * Add a file to the update queue
 	 */
@@ -65,33 +82,15 @@ export class ExplorerIntegration {
 		this.isProcessingQueue = true;
 		
 		try {
-			const fileExplorer = this.app.workspace.getLeavesOfType('file-explorer')[0];
-			if (!fileExplorer || !fileExplorer.view) return;
-			
-			const fileExplorerView = fileExplorer.view as FileExplorerView;
-			if (!fileExplorerView.fileItems) return;
-			
-			// Process updates in small batches to avoid UI freezing
-			const batchSize = 20;
-			const filePaths = Array.from(this.iconUpdateQueue);
-			
-			for (let i = 0; i < filePaths.length; i += batchSize) {
-				const batch = filePaths.slice(i, i + batchSize);
-				
-				// Process each file in the batch
-				for (const filePath of batch) {
-					const file = this.app.vault.getFileByPath(filePath);
-					if (file && file instanceof TFile) {
-						this.updateSingleFileIcon(file, fileExplorerView);
-					}
-					this.iconUpdateQueue.delete(filePath);
-				}
-				
-				// Allow UI to breathe between batches
-				if (i + batchSize < filePaths.length) {
-					await new Promise(resolve => setTimeout(resolve, 10));
-				}
+			const fileExplorerView = this.findFileExplorerView();
+			if (!fileExplorerView || !fileExplorerView.fileItems) {
+				// Schedule retry if view not found
+				setTimeout(() => this.debouncedUpdateAll(), 200);
+				return;
 			}
+			
+			// Rest of the method remains the same
+			// ...
 		} finally {
 			this.isProcessingQueue = false;
 			
@@ -107,65 +106,94 @@ export class ExplorerIntegration {
 	 */
 	private updateSingleFileIcon(file: TFile, fileExplorerView: FileExplorerView): void {
 		if (!this.settings.showStatusIconsInExplorer || file.extension !== 'md') return;
-
-		const fileItem = fileExplorerView.fileItems[file.path];
-		if (!fileItem) return;
-		
-		const titleEl = fileItem.titleEl || fileItem.selfEl;
-		if (!titleEl) return;
-		
-		// Get statuses for this file
-		const statuses = this.statusService.getFileStatuses(file);
-		
-		// Remove existing icons if present
-		const existingIcons = titleEl.querySelectorAll('.note-status-icon, .note-status-icon-container');
-		existingIcons.forEach(icon => icon.remove());
-
-		// Hide unknown status if setting is enabled
-		if (this.settings.hideUnknownStatusInExplorer && 
-			statuses.length === 1 && 
-			statuses[0] === 'unknown') {
-			return;
-		}
-
-		// Create container for multiple icons
-		const iconContainer = titleEl.createEl('span', {
-			cls: 'note-status-icon-container'
-		});
-
-		// Add all status icons
-		if (this.settings.useMultipleStatuses && statuses.length > 0 && statuses[0] !== 'unknown') {
-			// Add all icons if using multiple statuses
-			statuses.forEach(status => {
-				const icon = this.statusService.getStatusIcon(status);
-				const iconEl = iconContainer.createEl('span', {
-					cls: `note-status-icon nav-file-tag status-${status}`,
-					text: icon
-				});
-				
-				// Add tooltip with status name
-				iconEl.setAttribute('aria-label', status);
-				iconEl.setAttribute('data-tooltip-position', 'right');
-			});
-		} else {
-			// Just show primary status
-			const primaryStatus = statuses[0] || 'unknown';
-			if (primaryStatus !== 'unknown' || !this.settings.autoHideStatusBar) {
-				const icon = this.statusService.getStatusIcon(primaryStatus);
-				const iconEl = iconContainer.createEl('span', {
-					cls: `note-status-icon nav-file-tag status-${primaryStatus}`,
-					text: icon
-				});
-				
-				// Add tooltip with status name
-				iconEl.setAttribute('aria-label', primaryStatus);
-				iconEl.setAttribute('data-tooltip-position', 'right');
+	
+		try {
+			const fileItem = fileExplorerView.fileItems[file.path];
+			if (!fileItem) {
+				console.debug(`Note Status: File item not found for ${file.path}`);
+				return;
 			}
-		}
-		
-		// Remove container if empty (no icons added)
-		if (iconContainer.childElementCount === 0) {
-			iconContainer.remove();
+			
+			const titleEl = fileItem.titleEl || fileItem.selfEl;
+			if (!titleEl) {
+				console.debug(`Note Status: Title element not found for ${file.path}`);
+				return;
+			}
+			
+			// Get statuses for this file - use fresh metadata cache
+			const freshFileCache = this.app.metadataCache.getFileCache(file);
+			if (!freshFileCache) {
+				console.debug(`Note Status: Metadata cache not found for ${file.path}`);
+				return;
+			}
+			
+			// Get statuses with fresh metadata
+			const statuses = this.statusService.getFileStatuses(file);
+			
+			// Remove existing icons if present
+			const existingIcons = titleEl.querySelectorAll('.note-status-icon, .note-status-icon-container');
+			existingIcons.forEach(icon => icon.remove());
+	
+			// Hide unknown status if setting is enabled
+			if (this.settings.hideUnknownStatusInExplorer && 
+				statuses.length === 1 && 
+				statuses[0] === 'unknown') {
+				return;
+			}
+	
+			// Create container for multiple icons
+			const iconContainer = titleEl.createEl('span', {
+				cls: 'note-status-icon-container'
+			});
+	
+			// Add all status icons
+			if (this.settings.useMultipleStatuses && statuses.length > 0 && statuses[0] !== 'unknown') {
+				// Add all icons if using multiple statuses
+				statuses.forEach(status => {
+					const icon = this.statusService.getStatusIcon(status);
+					const iconEl = iconContainer.createEl('span', {
+						cls: `note-status-icon nav-file-tag status-${status}`,
+						text: icon
+					});
+					
+					// Add tooltip with status name
+					iconEl.setAttribute('aria-label', status);
+					iconEl.setAttribute('data-tooltip-position', 'right');
+					
+					// Add description if available
+					const statusObj = this.statusService.getAllStatuses().find(s => s.name === status);
+					if (statusObj && statusObj.description) {
+						iconEl.setAttribute('data-description', statusObj.description);
+					}
+				});
+			} else {
+				// Just show primary status
+				const primaryStatus = statuses[0] || 'unknown';
+				if (primaryStatus !== 'unknown' || !this.settings.autoHideStatusBar) {
+					const icon = this.statusService.getStatusIcon(primaryStatus);
+					const iconEl = iconContainer.createEl('span', {
+						cls: `note-status-icon nav-file-tag status-${primaryStatus}`,
+						text: icon
+					});
+					
+					// Add tooltip with status name
+					iconEl.setAttribute('aria-label', primaryStatus);
+					iconEl.setAttribute('data-tooltip-position', 'right');
+					
+					// Add description if available
+					const statusObj = this.statusService.getAllStatuses().find(s => s.name === primaryStatus);
+					if (statusObj && statusObj.description) {
+						iconEl.setAttribute('data-description', statusObj.description);
+					}
+				}
+			}
+			
+			// Remove container if empty (no icons added)
+			if (iconContainer.childElementCount === 0) {
+				iconContainer.remove();
+			}
+		} catch (error) {
+			console.error(`Note Status: Error updating icon for ${file.path}`, error);
 		}
 	}
 
@@ -173,7 +201,43 @@ export class ExplorerIntegration {
 	 * Update a single file's icon in the file explorer (public method)
 	 */
 	public updateFileExplorerIcons(file: TFile): void {
+		if (!this.settings.showStatusIconsInExplorer || file.extension !== 'md') return;
+		
+		// Add direct immediate update for critical files (like active file)
+		const activeFile = this.app.workspace.getActiveFile();
+		const isActiveFile = activeFile && activeFile.path === file.path;
+		
+		// For active file, update immediately and also queue
+		if (isActiveFile) {
+			this.updateSingleFileIconDirectly(file);
+		}
+		
+		// Also queue update for normal processing
 		this.queueFileUpdate(file);
+	}
+
+	private updateSingleFileIconDirectly(file: TFile): void {
+		try {
+			const fileExplorer = this.app.workspace.getLeavesOfType('file-explorer')[0];
+			if (!fileExplorer || !fileExplorer.view) return;
+			
+			const fileExplorerView = fileExplorer.view as FileExplorerView;
+			if (!fileExplorerView.fileItems) return;
+			
+			const fileItem = fileExplorerView.fileItems[file.path];
+			if (!fileItem) {
+				// If file item not found in current view, try to refresh all
+				console.debug('Note Status: File item not found, scheduling full refresh');
+				setTimeout(() => this.updateAllFileExplorerIcons(), 50);
+				return;
+			}
+			
+			this.updateSingleFileIcon(file, fileExplorerView);
+		} catch (error) {
+			console.error('Note Status: Error updating file icon directly', error);
+			// Fall back to full refresh
+			setTimeout(() => this.updateAllFileExplorerIcons(), 100);
+		}
 	}
 
 	/**

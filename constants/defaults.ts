@@ -17,13 +17,13 @@ export const DEFAULT_SETTINGS: NoteStatusSettings = {
 	dropdownPosition: 'top',
 	statusBarPosition: 'right',
 	autoHideStatusBar: false,
-	customStatuses: [
-		{ name: 'active', icon: '▶️' },
-		{ name: 'onHold', icon: '⏸️' },
-		{ name: 'completed', icon: '✅' },
-		{ name: 'dropped', icon: '❌' },
-		{ name: 'unknown', icon: '❓' }
-	],
+    customStatuses: [
+        { name: 'active', icon: '▶️', description: 'Currently working on this note' },
+        { name: 'onHold', icon: '⏸️', description: 'Temporarily paused work' },
+        { name: 'completed', icon: '✅', description: 'Finished work on this note' },
+        { name: 'dropped', icon: '❌', description: 'No longer working on this' },
+        { name: 'unknown', icon: '❓', description: 'Status not set' }
+    ],
 	showStatusIconsInExplorer: true,
 	hideUnknownStatusInExplorer: false, // Default to show unknown status
 	collapsedStatuses: {},

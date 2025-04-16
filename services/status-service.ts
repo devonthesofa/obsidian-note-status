@@ -87,7 +87,7 @@ export class StatusService {
 	public getFileStatuses(file: TFile): string[] {
 		const cachedMetadata = this.app.metadataCache.getFileCache(file);
 		const statuses: string[] = [];
-
+	
 		if (cachedMetadata?.frontmatter) {
 			// Check for status using the configured tag prefix
 			const frontmatterStatus = cachedMetadata.frontmatter[this.settings.tagPrefix];
@@ -145,15 +145,18 @@ export class StatusService {
 	public async updateNoteStatuses(newStatuses: string[], file?: TFile): Promise<void> {
 		const targetFile = file || this.app.workspace.getActiveFile();
 		if (!targetFile || targetFile.extension !== 'md') return;
-
+	
 		const content = await this.app.vault.read(targetFile);
 		
 		// Create a new content with updated frontmatter
 		const newContent = this.updateFrontmatterWithStatus(content, newStatuses);
-
+	
 		// Update the file only if content changed
 		if (newContent !== content) {
 			await this.app.vault.modify(targetFile, newContent);
+			
+			// Force metadata cache refresh for this file (add this line)
+			this.app.metadataCache.trigger('changed', targetFile);
 		}
 	}
 

@@ -7,6 +7,7 @@ export interface Status {
     name: string;
     icon: string;
     color?: string; // Optional color property
+    description?: string; // Optional description property
 }
 
 /**
