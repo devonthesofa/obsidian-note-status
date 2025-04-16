@@ -147,6 +147,9 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 					
 					this.plugin.settings.tagPrefix = value.trim();
 					await this.plugin.saveSettings();
+					
+					// Add this line to trigger a full UI refresh
+					window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
 				}));
 
 
