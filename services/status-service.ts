@@ -147,48 +147,67 @@ export class StatusService {
 		if (!targetFile || targetFile.extension !== 'md') return;
 
 		const content = await this.app.vault.read(targetFile);
-		let newContent = content;
+		
+		// Create a new content with updated frontmatter
+		const newContent = this.updateFrontmatterWithStatus(content, newStatuses);
 
-		// Handle frontmatter update
-		const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n?/);
+		// Update the file only if content changed
+		if (newContent !== content) {
+			await this.app.vault.modify(targetFile, newContent);
+		}
+	}
+
+	/**
+	 * Update frontmatter content with new statuses
+	 * This function properly handles different frontmatter formats
+	 */
+	private updateFrontmatterWithStatus(content: string, newStatuses: string[]): string {
+		// Check if frontmatter exists
+		const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---(?:\n|$)/);
+		
 		if (frontmatterMatch) {
-			const frontmatter = frontmatterMatch[1];
+			// Extract frontmatter
+			const fullFrontmatter = frontmatterMatch[0];
+			const frontmatterContent = frontmatterMatch[1];
 			
-			// Escape special regex characters in the tag prefix
-			const escapedTagPrefix = this.settings.tagPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			// Format the new statuses as JSON array
+			const formattedArray = JSON.stringify(newStatuses);
 			
-			// Regex to match the status tag line
-			const statusTagRegex = new RegExp(`${escapedTagPrefix}:.*(?:\n|$)`, 'm');
+			// Create the new status line
+			const statusLine = `${this.settings.tagPrefix}: ${formattedArray}`;
 			
-			if (frontmatter.match(statusTagRegex)) {
-				// Always format as array for YAML
-				const formattedArray = JSON.stringify(newStatuses);
-				newContent = content.replace(
-					frontmatterMatch[0],
-					`---\n${frontmatter.replace(
-						statusTagRegex,
-						`${this.settings.tagPrefix}: ${formattedArray}\n`
-					)}---\n`
+			// Create a regex to match the existing status tag and any following indented lines
+			const escapedPrefix = this.settings.tagPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			const statusLineRegex = new RegExp(
+				`(^|\\n)${escapedPrefix}:.*?(\\n(?![ \\t]+[-])|$)`, 
+				's'
+			);
+			
+			// Check if the status tag already exists
+			if (frontmatterContent.match(statusLineRegex)) {
+				// Replace existing status tag
+				const updatedFrontmatter = frontmatterContent.replace(
+					statusLineRegex,
+					`$1${statusLine}$2`
+				);
+				
+				// Replace the entire frontmatter section
+				return content.replace(
+					fullFrontmatter,
+					`---\n${updatedFrontmatter}\n---\n`
 				);
 			} else {
 				// Add new status tag to existing frontmatter
-				const formattedArray = JSON.stringify(newStatuses);
-				newContent = content.replace(
-					/^---\n([\s\S]*?)\n---\n?/,
-					`---\n$1\n${this.settings.tagPrefix}: ${formattedArray}\n---\n`
+				return content.replace(
+					fullFrontmatter,
+					`---\n${frontmatterContent}\n${statusLine}\n---\n`
 				);
 			}
 		} else {
-			// Create new frontmatter with status tag
+			// Create new frontmatter if none exists
 			const formattedArray = JSON.stringify(newStatuses);
-			newContent = `---\n${this.settings.tagPrefix}: ${formattedArray}\n---\n\n${content.trim()}`;
+			return `---\n${this.settings.tagPrefix}: ${formattedArray}\n---\n\n${content.trim()}`;
 		}
-
-		// Clean up excess newlines
-		newContent = newContent.replace(/\n{3,}/g, '\n\n');
-
-		// Update the file
-		await this.app.vault.modify(targetFile, newContent);
 	}
 
 	/**
@@ -233,11 +252,6 @@ export class StatusService {
 		const currentStatuses = this.getFileStatuses(targetFile);
 		const newStatuses = currentStatuses.filter(status => status !== statusToRemove);
 		
-		// If all statuses were removed, set to 'unknown'
-		if (newStatuses.length === 0) {
-			newStatuses.push('unknown');
-		}
-		
 		await this.updateNoteStatuses(newStatuses, targetFile);
 		
 		// Add this line to trigger UI updates
@@ -258,10 +272,6 @@ export class StatusService {
 		
 		if (currentStatuses.includes(statusToToggle)) {
 			newStatuses = currentStatuses.filter(status => status !== statusToToggle);
-			// If all statuses were removed, set to 'unknown'
-			if (newStatuses.length === 0) {
-				newStatuses.push('unknown');
-			}
 		} else {
 			// Filter out 'unknown' status when adding valid statuses
 			const filteredStatuses = currentStatuses.filter(s => s !== 'unknown');

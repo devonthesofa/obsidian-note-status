@@ -521,16 +521,16 @@ export default class NoteStatus extends Plugin {
 			new Notice('Error opening status pane. Check console for details.');
 		}
 	}
-	
+
 	/**
 	 * Show the batch status modal
 	 */
 	showBatchStatusModal() {
 		try {
-		new BatchStatusModal(this.app, this.settings, this.statusService).open();
+			new BatchStatusModal(this.app, this.settings, this.statusService).open();
 		} catch (error) {
-		console.error('Error showing batch status modal:', error);
-		new Notice('Error showing batch status modal. Check console for details.');
+			console.error('Error showing batch status modal:', error);
+			new Notice('Error showing batch status modal. Check console for details.');
 		}
 	}
 
