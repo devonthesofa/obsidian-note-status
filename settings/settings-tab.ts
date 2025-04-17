@@ -26,19 +26,6 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 		// UI section
 		containerEl.createEl('h3', { text: 'UI Settings' });
 
-		// Status dropdown settings
-		new Setting(containerEl)
-			.setName('Dropdown position')
-			.setDesc('Where to place the status dropdown')
-			.addDropdown(dropdown => dropdown
-				.addOption('top', 'Top')
-				.addOption('bottom', 'Bottom')
-				.setValue(this.plugin.settings.dropdownPosition)
-				.onChange(async (value: 'top' | 'bottom') => {
-					this.plugin.settings.dropdownPosition = value;
-					await this.plugin.saveSettings();
-				}));
-
 		// Status bar settings
 		new Setting(containerEl)
 			.setName('Show status bar')

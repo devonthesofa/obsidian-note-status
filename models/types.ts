@@ -16,7 +16,6 @@ export interface Status {
 export interface NoteStatusSettings {
     statusColors: Record<string, string>;
     showStatusBar: boolean;
-    dropdownPosition: 'top' | 'bottom';
     statusBarPosition: 'left' | 'right';
     autoHideStatusBar: boolean;
     customStatuses: Status[];

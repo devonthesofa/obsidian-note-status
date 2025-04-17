@@ -13,7 +13,6 @@ export const DEFAULT_SETTINGS: NoteStatusSettings = {
 		unknown: 'var(--text-muted)'
 	},
 	showStatusBar: true,
-	dropdownPosition: 'top',
 	statusBarPosition: 'right',
 	autoHideStatusBar: false,
     customStatuses: [
