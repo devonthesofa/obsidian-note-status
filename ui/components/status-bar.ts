@@ -1,6 +1,6 @@
 import { Notice } from 'obsidian';
-import { NoteStatusSettings } from '../models/types';
-import { StatusService } from '../services/status-service';
+import { NoteStatusSettings } from '../../models/types';
+import { StatusService } from '../../services/status-service';
 
 /**
  * Handles the status bar functionality

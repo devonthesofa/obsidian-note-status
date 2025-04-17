@@ -1,7 +1,7 @@
 import { TFile, WorkspaceLeaf, View, Menu, Notice } from 'obsidian';
-import { NoteStatusSettings } from '../models/types';
-import { StatusService } from '../services/status-service';
-import { ICONS } from '../constants/icons';
+import { NoteStatusSettings } from '../../models/types';
+import { StatusService } from '../../services/status-service';
+import { ICONS } from '../../constants/icons';
 
 /**
  * Status Pane View for managing note statuses
@@ -256,7 +256,7 @@ export class StatusPaneView extends View {
 			.setIcon('tag')
 			.onClick(() => {
 			// Use the position from the event
-			const position = { x: e.clientX, y: e.clientY };
+			// const position = { x: e.clientX, y: e.clientY };
 			this.plugin.statusContextMenu.showForFile(file, e);
 			})
 		);
