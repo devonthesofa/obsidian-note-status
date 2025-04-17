@@ -39,6 +39,16 @@ export class StatusDropdown {
 	 * Initialize the toolbar button in the Obsidian ribbon
  	*/
 	private initToolbarButton(): void {
+		// Clear timeout to prevent multiple initializations
+		if (this.toolbarButton) {
+			this.toolbarButton.remove();
+			this.toolbarButton = undefined;
+		}
+		if (this.toolbarButtonContainer) {
+			this.toolbarButtonContainer.remove();
+			this.toolbarButtonContainer = undefined;
+		}
+	
 		// Wait for next tick to ensure the UI is fully rendered
 		setTimeout(() => {
 			// Try different selectors to find the toolbar
@@ -72,25 +82,37 @@ export class StatusDropdown {
 			// Add the button to the container
 			this.toolbarButtonContainer.appendChild(this.toolbarButton);
 			
-			// Insert at specific position - before the last element (which is usually the more options button)
-			// If there's no children or insertion fails, just append it
+			// Add some debug styling to check visibility
+			this.toolbarButtonContainer.style.border = '2px solid red';
+			this.toolbarButton.style.border = '1px solid blue';
+			
+			// Force display properties
+			this.toolbarButtonContainer.style.display = 'flex';
+			this.toolbarButtonContainer.style.visibility = 'visible';
+			this.toolbarButtonContainer.style.opacity = '1';
+			
+			// Insert at a more reliable position - just prepend to the container
 			try {
-				if (toolbarContainer.children.length > 0) {
-					// Insert before the last element (more options button)
-					toolbarContainer.insertBefore(
-						this.toolbarButtonContainer, 
-						toolbarContainer.children[toolbarContainer.children.length - 1]
-					);
-				} else {
-					toolbarContainer.appendChild(this.toolbarButtonContainer);
-				}
-				
-				console.log('Note Status: Toolbar button added successfully');
+				toolbarContainer.prepend(this.toolbarButtonContainer);
+				console.log('Note Status: Toolbar button added successfully at position:', 
+					Array.from(toolbarContainer.children).indexOf(this.toolbarButtonContainer));
 			} catch (error) {
 				console.error('Note Status: Error inserting toolbar button', error);
 				// Fallback - just append it
 				toolbarContainer.appendChild(this.toolbarButtonContainer);
 			}
+			
+			// Force a redraw
+			setTimeout(() => {
+				if (this.toolbarButtonContainer) {
+					this.toolbarButtonContainer.style.display = 'none';
+					setTimeout(() => {
+						if (this.toolbarButtonContainer) {
+							this.toolbarButtonContainer.style.display = 'flex';
+						}
+					}, 10);
+				}
+			}, 100);
 		}, 500); // Waiting 500ms to ensure the UI is ready
 	}
 	
