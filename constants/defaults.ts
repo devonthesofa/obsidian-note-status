@@ -13,7 +13,6 @@ export const DEFAULT_SETTINGS: NoteStatusSettings = {
 		unknown: 'var(--text-muted)'
 	},
 	showStatusBar: true,
-	statusBarPosition: 'right',
 	autoHideStatusBar: false,
     customStatuses: [
         { name: 'active', icon: '▶️', description: 'Currently working on this note' },

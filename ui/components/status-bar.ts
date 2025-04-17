@@ -50,11 +50,6 @@ export class StatusBar {
 			return;
 		}
 
-		// Add left class if needed
-		if (this.settings.statusBarPosition === 'left') {
-			this.statusBarEl.addClass('left');
-		}
-		
 		// Handle single vs. multiple status display
 		if (this.currentStatuses.length === 1 || !this.settings.useMultipleStatuses) {
 			// Display single status

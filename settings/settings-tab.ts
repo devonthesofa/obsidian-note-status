@@ -38,18 +38,6 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 				}));
 
 		new Setting(containerEl)
-			.setName('Status bar position')
-			.setDesc('Align the status bar text')
-			.addDropdown(dropdown => dropdown
-				.addOption('left', 'Left')
-				.addOption('right', 'Right')
-				.setValue(this.plugin.settings.statusBarPosition)
-				.onChange(async (value: 'left' | 'right') => {
-					this.plugin.settings.statusBarPosition = value;
-					await this.plugin.saveSettings();
-				}));
-
-		new Setting(containerEl)
 			.setName('Auto-hide status bar')
 			.setDesc('Hide the status bar when status is unknown')
 			.addToggle(toggle => toggle
