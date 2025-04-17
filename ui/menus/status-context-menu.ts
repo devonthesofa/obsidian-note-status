@@ -1,7 +1,6 @@
 import { App, Menu, TFile } from 'obsidian';
 import { NoteStatusSettings } from '../../models/types';
 import { StatusService } from '../../services/status-service';
-import { StatusDropdownComponent } from '../components/status-dropdown-component';
 import { StatusDropdown } from 'ui/components/status-dropdown';
 
 /**
@@ -25,7 +24,6 @@ export class StatusContextMenu {
    */
   public updateSettings(settings: NoteStatusSettings): void {
     this.settings = settings;
-    //this.dropdownComponent.updateSettings(settings);
   }
 
   /**

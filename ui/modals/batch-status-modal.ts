@@ -401,7 +401,7 @@ export class BatchStatusModal extends Modal {
         ? this.selectedStatuses[0] 
         : `${this.selectedStatuses.length} statuses`;
       
-      new Notice(`Updated ${this.selectedFiles.length} file${this.selectedFiles.length === 1 ? '' : 's'} with ${statusText}`);
+      new Notice(`Updated2 ${this.selectedFiles.length} file${this.selectedFiles.length === 1 ? '' : 's'} with ${statusText}`);
     } catch (error) {
       console.error('Error applying status changes:', error);
       new Notice('Error applying changes');

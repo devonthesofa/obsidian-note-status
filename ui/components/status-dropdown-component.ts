@@ -13,10 +13,11 @@ export class StatusDropdownComponent {
   private dropdownElement: HTMLElement | null = null;
   private currentStatuses: string[] = ['unknown'];
   private onStatusChange: (statuses: string[]) => void;
-  private isOpen = false;
   private animationDuration = 220;
   private clickOutsideHandler: (e: MouseEvent) => void;
   private targetFile: TFile | null = null;
+  public isOpen = false;
+
   
   constructor(app: any, statusService: StatusService, settings: NoteStatusSettings) {
     this.app = app;
@@ -86,6 +87,14 @@ export class StatusDropdownComponent {
   public toggle(targetEl: HTMLElement, position?: { x: number, y: number }): void {
     if (this.isOpen) {
       this.close();
+      // Add small delay to ensure dropdown is fully closed before potentially reopening
+      // This prevents state conflicts when clicking in rapid succession
+      setTimeout(() => {
+        // Check if we're still in the closing state to prevent reopening if user clicked elsewhere
+        if (!this.isOpen && !this.dropdownElement) {
+          this.open(targetEl, position);
+        }
+      }, 50);
     } else {
       this.open(targetEl, position);
     }
@@ -95,10 +104,20 @@ export class StatusDropdownComponent {
    * Open the dropdown
    */
   public open(targetEl: HTMLElement, position?: { x: number, y: number }): void {
-    if (this.isOpen) {
+    // Make sure any existing dropdown is fully closed
+    if (this.isOpen || this.dropdownElement) {
       this.close();
+      // Add small delay before opening new dropdown to ensure proper cleanup
+      setTimeout(() => {
+        this.actuallyOpen(targetEl, position);
+      }, 10);
+      return;
     }
     
+    this.actuallyOpen(targetEl, position);
+  }
+
+  private actuallyOpen(targetEl: HTMLElement, position?: { x: number, y: number }): void {
     this.isOpen = true;
     
     // Create dropdown element
@@ -137,8 +156,7 @@ export class StatusDropdownComponent {
    * Close the dropdown
    */
   public close(): void {
-    if (!this.dropdownElement || !this.isOpen) return;
-    
+    if (!this.dropdownElement) return;
     // Add exit animation
     this.dropdownElement.addClass('note-status-popover-animate-out');
     
@@ -146,14 +164,14 @@ export class StatusDropdownComponent {
     document.removeEventListener('click', this.clickOutsideHandler);
     document.removeEventListener('keydown', this.handleEscapeKey);
     
+    // Set isOpen to false immediately to prevent multiple open/close conflicts
+    this.isOpen = false;
+    
     // Remove after animation completes
-    setTimeout(() => {
-      if (this.dropdownElement) {
-        this.dropdownElement.remove();
-        this.dropdownElement = null;
-        this.isOpen = false;
-      }
-    }, this.animationDuration);
+    if (this.dropdownElement) {
+      this.dropdownElement.remove();
+      this.dropdownElement = null;
+    }
   }
   
   /**

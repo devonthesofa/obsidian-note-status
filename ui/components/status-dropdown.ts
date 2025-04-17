@@ -296,135 +296,158 @@ export class StatusDropdown {
 	 * @param options Configuration options for opening the dropdown
 	 */
 	public openStatusDropdown(options: {
-	target?: HTMLElement;            // Target element to position relative to
-	position?: { x: number, y: number }; // Explicit position override
-	files?: TFile[];                 // Files to edit (single file or multiple)
-	editor?: Editor;                 // Editor instance if opened from editor
-	view?: MarkdownView;             // View if opened from editor
-	mode?: 'replace' | 'add';        // Mode for multiple files
-	onStatusChange?: (statuses: string[]) => void; // Custom callback
+		target?: HTMLElement;
+		position?: { x: number, y: number };
+		files?: TFile[];
+		editor?: Editor;
+		view?: MarkdownView;
+		mode?: 'replace' | 'add';
+		onStatusChange?: (statuses: string[]) => void;
 	}): void {
-	// If no files provided, use active file
-	const files = options.files || [this.app.workspace.getActiveFile()].filter(Boolean);
-	if (!files.length) {
-	new Notice('No files selected');
-	return;
+		// IMPORTANT: Force reset the dropdown component's state
+		// Add this at the beginning of the method
+		if (this.dropdownComponent.isOpen) {
+			this.dropdownComponent.close();
+			// Give it a moment to clean up before proceeding
+			setTimeout(() => {
+				this._openStatusDropdown(options);
+			}, 50);
+			return;
+		}
+
+		this._openStatusDropdown(options);
 	}
-	console.log("els seleccionats", files, options)
+  
+	private _openStatusDropdown(options: {
+		target?: HTMLElement;
+		position?: { x: number, y: number };
+		files?: TFile[];
+		editor?: Editor;
+		view?: MarkdownView;
+		mode?: 'replace' | 'add';
+		onStatusChange?: (statuses: string[]) => void;
+	}): void {
+		// If no files provided, use active file
+		const files = options.files || [this.app.workspace.getActiveFile()].filter(Boolean);
+		if (!files.length) {
+			new Notice('No files selected');
+			return;
+		}
+		console.log("filesfilesfiles", files)
 
-	// Determine if we're handling single or multiple files
-	const isSingleFile = files.length === 1;
-	const targetFile = isSingleFile ? files[0] : null;
+		// Determine if we're handling single or multiple files
+		const isSingleFile = files.length === 1;
+		const targetFile = isSingleFile ? files[0] : null;
 
-	// Set target file (if single) or null (if multiple)
-	this.dropdownComponent.setTargetFile(targetFile);
+		// Set target file (if single) or null (if multiple)
+		this.dropdownComponent.setTargetFile(targetFile);
 
-	// Get current statuses if single file, or reset to unknown for multiple
-	const currentStatuses = targetFile ? 
-	this.statusService.getFileStatuses(targetFile) : 
-	['unknown'];
+		// Get current statuses if single file, or reset to unknown for multiple
+		const currentStatuses = targetFile ? 
+			this.statusService.getFileStatuses(targetFile) : 
+			['unknown'];
 
-	// Update dropdown with current statuses
-	this.dropdownComponent.updateStatuses(currentStatuses);
+		// Update dropdown with current statuses
+		this.dropdownComponent.updateStatuses(currentStatuses);
 
-	// Set custom callback for status changes if provided
-	if (options.onStatusChange) {
-	const originalCallback = this.dropdownComponent.getOnStatusChange();
-	this.dropdownComponent.setOnStatusChange(options.onStatusChange);
+		// Set custom callback for status changes if provided
+		if (options.onStatusChange) {
+			const originalCallback = this.dropdownComponent.getOnStatusChange();
+			this.dropdownComponent.setOnStatusChange(options.onStatusChange);
 
-	// Restore original callback after operation
-	setTimeout(() => {
-	this.dropdownComponent.setOnStatusChange(originalCallback);
-	}, 300);
-	} else if (!isSingleFile && options.mode) {
-	// Set batch operation callback for multiple files
-	this.dropdownComponent.setOnStatusChange(async (statuses) => {
-	if (statuses.length > 0) {
-	await this.statusService.batchUpdateStatuses(files, statuses, options.mode || 'replace');
+			// Restore original callback after operation
+			setTimeout(() => {
+				this.dropdownComponent.setOnStatusChange(originalCallback);
+			}, 300);
+		} else if (!isSingleFile && options.mode) {
+			// Set batch operation callback for multiple files
+			this.dropdownComponent.setOnStatusChange(async (statuses) => {
+				if (statuses.length > 0) {
+					await this.statusService.batchUpdateStatuses(files, statuses, options.mode || 'replace');
 
-	// Dispatch events for UI update
-	window.dispatchEvent(new CustomEvent('note-status:batch-update-complete', {
-	detail: { 
-	statuses,
-	fileCount: files.length,
-	mode: options.mode
-	}
-	}));
-	window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
-	}
-	});
-	}
+					// Dispatch events for UI update
+					window.dispatchEvent(new CustomEvent('note-status:batch-update-complete', {
+					detail: { 
+					statuses,
+					fileCount: files.length,
+					mode: options.mode
+					}
+					}));
+					window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+				}
+			});
+		}
 
-	// For dropdown from editor
-	if (options.editor && options.view) {
-	const position = this.getCursorPosition(options.editor, options.view);
-	const dummyTarget = this.createDummyTarget(position);
-	this.dropdownComponent.open(dummyTarget, position);
+		// For dropdown from editor
+		if (options.editor && options.view) {
+			const position = this.getCursorPosition(options.editor, options.view);
+			const dummyTarget = this.createDummyTarget(position);
+			this.dropdownComponent.open(dummyTarget, position);
 
-	// Clean up dummy target
-	setTimeout(() => {
-	if (dummyTarget.parentNode) {
-	dummyTarget.parentNode.removeChild(dummyTarget);
-	}
-	}, 100);
-	return;
-	}
+			// Clean up dummy target
+			setTimeout(() => {
+				if (dummyTarget.parentNode) {
+					dummyTarget.parentNode.removeChild(dummyTarget);
+				}
+			}, 100);
+			return;
+		}
 
-	// For dropdown from toolbar button
-	if (options.target) {
-	if (options.position) {
-	this.dropdownComponent.open(options.target, options.position);
-	} else {
-	const rect = options.target.getBoundingClientRect();
-	const position = { 
-	x: rect.left, 
-	y: rect.bottom + 5 
-	};
-	this.dropdownComponent.open(options.target, position);
-	}
-	return;
-	}
+		// For dropdown from toolbar button
+		if (options.target) {
+			if (options.position) {
+				this.dropdownComponent.open(options.target, options.position);
+			} else {
+				const rect = options.target.getBoundingClientRect();
+				const position = { 
+					x: rect.left, 
+					y: rect.bottom + 5 
+				};
+				this.dropdownComponent.open(options.target, position);
+			}
+			return;
+		}
 
-	// For direct position (context menus)
-	if (options.position) {
-	const dummyTarget = document.createElement('div');
-	dummyTarget.style.position = 'fixed';
-	dummyTarget.style.left = `${options.position.x}px`;
-	dummyTarget.style.top = `${options.position.y}px`;
-	dummyTarget.style.width = '0';
-	dummyTarget.style.height = '0';
-	document.body.appendChild(dummyTarget);
+		// For direct position (context menus)
+		if (options.position) {
+			const dummyTarget = document.createElement('div');
+			dummyTarget.style.position = 'fixed';
+			dummyTarget.style.left = `${options.position.x}px`;
+			dummyTarget.style.top = `${options.position.y}px`;
+			dummyTarget.style.width = '0';
+			dummyTarget.style.height = '0';
+			document.body.appendChild(dummyTarget);
 
-	this.dropdownComponent.open(dummyTarget, options.position);
+			this.dropdownComponent.open(dummyTarget, options.position);
 
-	// Clean up dummy target
-	setTimeout(() => {
-	if (dummyTarget.parentNode) {
-	dummyTarget.parentNode.removeChild(dummyTarget);
-	}
-	}, 100);
-	return;
-	}
+			// Clean up dummy target
+			setTimeout(() => {
+				if (dummyTarget.parentNode) {
+					dummyTarget.parentNode.removeChild(dummyTarget);
+				}
+			}, 100);
+			return;
+		}
 
-	// Fallback to center position
-	const center = {
-	x: window.innerWidth / 2,
-	y: window.innerHeight / 3
-	};
-	const fallbackTarget = document.createElement('div');
-	fallbackTarget.style.position = 'fixed';
-	fallbackTarget.style.left = `${center.x}px`;
-	fallbackTarget.style.top = `${center.y}px`;
-	document.body.appendChild(fallbackTarget);
+		// Fallback to center position
+		const center = {
+			x: window.innerWidth / 2,
+			y: window.innerHeight / 3
+		};
+		const fallbackTarget = document.createElement('div');
+		fallbackTarget.style.position = 'fixed';
+		fallbackTarget.style.left = `${center.x}px`;
+		fallbackTarget.style.top = `${center.y}px`;
+		document.body.appendChild(fallbackTarget);
 
-	this.dropdownComponent.open(fallbackTarget, center);
+		this.dropdownComponent.open(fallbackTarget, center);
 
-	// Clean up fallback target
-	setTimeout(() => {
-	if (fallbackTarget.parentNode) {
-	fallbackTarget.parentNode.removeChild(fallbackTarget);
-	}
-	}, 100);
+		// Clean up fallback target
+		setTimeout(() => {
+			if (fallbackTarget.parentNode) {
+				fallbackTarget.parentNode.removeChild(fallbackTarget);
+			}
+		}, 100);
 	}
 
 }
