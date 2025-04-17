@@ -101,16 +101,6 @@ export class StatusContextMenu {
       );
     }
     
-    // Add option to open the batch modal for more advanced options
-    menu.addItem((item) => 
-      item
-        .setTitle('Open batch update modal...')
-        .setIcon('lucide-edit')
-        .onClick(() => {
-          window.dispatchEvent(new CustomEvent('note-status:open-batch-modal'));
-        })
-    );
-
     // Show the menu
     if (position) {
       menu.showAtPosition(position);

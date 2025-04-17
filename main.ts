@@ -16,7 +16,6 @@ import { StatusBar } from './ui/components/status-bar';
 import { StatusDropdown } from './ui/components/status-dropdown';
 import { StatusPaneView } from './ui/components/status-pane-view';
 import { ExplorerIntegration } from './ui/integrations/explorer-integration';
-import { BatchStatusModal } from './ui/modals/batch-status-modal';
 import { StatusContextMenu } from './ui/menus/status-context-menu';
 
 // Settings
@@ -225,14 +224,6 @@ export default class NoteStatus extends Plugin {
       }
     });
     
-    // Listen for batch modal opening
-    window.addEventListener('note-status:open-batch-modal', () => {
-      try {
-        this.showBatchStatusModal();
-      } catch (error) {
-        console.error('Error opening batch modal:', error);
-      }
-    });
   }
 
   /**
@@ -255,12 +246,6 @@ export default class NoteStatus extends Plugin {
       callback: () => this.forceRefreshUI()
     });
 
-    // Batch update status command
-    this.addCommand({
-      id: 'batch-update-status',
-      name: 'Batch Update Status',
-      callback: () => this.showBatchStatusModal()
-    });
 
     // Insert status metadata command
     this.addCommand({
@@ -539,18 +524,6 @@ export default class NoteStatus extends Plugin {
   }
 
   /**
-   * Show the batch status modal
-   */
-  showBatchStatusModal(): void {
-    try {
-      new BatchStatusModal(this.app, this.settings, this.statusService).open();
-    } catch (error) {
-      console.error('Error showing batch status modal:', error);
-      new Notice('Error showing batch status modal. Check console for details.');
-    }
-  }
-
-  /**
    * Show status context menu
    */
   showStatusContextMenu(files: TFile[]): void {
@@ -750,6 +723,5 @@ export default class NoteStatus extends Plugin {
     window.removeEventListener('note-status:status-changed', this.checkNoteStatus);
     window.removeEventListener('note-status:refresh-dropdown', this.statusDropdown.render);
     window.removeEventListener('note-status:refresh-ui', this.checkNoteStatus);
-    window.removeEventListener('note-status:open-batch-modal', this.showBatchStatusModal);
   }
 }

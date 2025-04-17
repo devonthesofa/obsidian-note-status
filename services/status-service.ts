@@ -367,13 +367,6 @@ export class StatusService {
       : `${statusesToSet.length} statuses`;
   }
 
-  /**
-   * Legacy batch update for a single status
-   */
-  public async batchUpdateStatus(files: TFile[], newStatus: string): Promise<void> {
-    // Always store as array even in single status mode
-    await this.batchUpdateStatuses(files, [newStatus], 'replace');
-  }
 
   /**
    * Insert status metadata in the editor
