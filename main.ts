@@ -164,7 +164,7 @@ export default class NoteStatus extends Plugin {
     this.statusBar = new StatusBar(this.addStatusBarItem(), this.settings, this.statusService);
     this.statusDropdown = new StatusDropdown(this.app, this.settings, this.statusService);
     this.explorerIntegration = new ExplorerIntegration(this.app, this.settings, this.statusService);
-    this.statusContextMenu = new StatusContextMenu(this.app, this.settings, this.statusService);
+    this.statusContextMenu = new StatusContextMenu(this.app, this.settings, this.statusService, this.statusDropdown);
   }
 
   /**
