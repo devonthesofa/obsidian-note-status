@@ -243,16 +243,20 @@ export class StatusDropdown {
    */
   private getCursorPosition(editor: Editor, view: MarkdownView): {x: number, y: number} {
     try {
-      // Try to get cursor position
+      // Get cursor position in the document
       const cursor = editor.getCursor('head');
-      const editorPosition = editor.posToCoords(cursor);
       
-      if (editorPosition) {
+      // Try to find the DOM representation of the cursor position
+      const lineElement = view.contentEl.querySelector(`.cm-line:nth-child(${cursor.line + 1})`);
+      
+      if (lineElement) {
+        const rect = lineElement.getBoundingClientRect();
+        // Position near the current line with some offset
         return {
-          x: editorPosition.left,
-          y: editorPosition.top + 20 // Add small offset below cursor
+          x: rect.left + 20,
+          y: rect.bottom + 5
         };
-      } 
+      }
       
       // Fallback to editor element position
       const editorEl = view.contentEl.querySelector('.cm-editor');
