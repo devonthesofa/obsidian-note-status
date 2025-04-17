@@ -11,7 +11,6 @@ export class StatusDropdown {
   private settings: NoteStatusSettings;
   private statusService: StatusService;
   private currentStatuses: string[] = ['unknown'];
-  private toolbarButtonContainer?: HTMLElement;
   private toolbarButton?: HTMLElement;
   private dropdownComponent: StatusDropdownComponent;
   
@@ -58,10 +57,6 @@ export class StatusDropdown {
       this.toolbarButton.remove();
       this.toolbarButton = undefined;
     }
-    if (this.toolbarButtonContainer) {
-      this.toolbarButtonContainer.remove();
-      this.toolbarButtonContainer = undefined;
-    }
   
     // Wait for next tick to ensure the UI is fully rendered
     setTimeout(() => {
@@ -86,13 +81,9 @@ export class StatusDropdown {
    * Create the toolbar button element
    */
   private createToolbarButton(toolbarContainer: HTMLElement): void {
-    // Create button container for proper positioning
-    this.toolbarButtonContainer = toolbarContainer.createEl('div');
-    this.toolbarButtonContainer.addClass('note-status-toolbar-button-container');
-    
     // Create the button element
     this.toolbarButton = document.createElement('button');
-    this.toolbarButton.addClass('note-status-toolbar-button', 'clickable-icon');
+    this.toolbarButton.addClass('note-status-toolbar-button', 'clickable-icon', 'view-action');
     this.toolbarButton.setAttribute('aria-label', 'Note Status');
     
     // Update initial button state
@@ -105,16 +96,13 @@ export class StatusDropdown {
       this.toggleStatusPopover();
     });
     
-    // Add the button to the container
-	this.toolbarButtonContainer.appendChild(this.toolbarButton);
-	
 	// Insert at a more reliable position - just prepend to the container
 	try {
-		toolbarContainer.prepend(this.toolbarButtonContainer);
+		toolbarContainer.prepend(this.toolbarButton);
 	} catch (error) {
 		console.error('Note Status: Error inserting toolbar button', error);
 		// Fallback - just append it
-		toolbarContainer.appendChild(this.toolbarButtonContainer);
+		toolbarContainer.appendChild(this.toolbarButton);
 	}
   }
   
@@ -331,9 +319,9 @@ export class StatusDropdown {
     this.dropdownComponent.dispose();
     
     // Remove toolbar button
-    if (this.toolbarButtonContainer) {
-      this.toolbarButtonContainer.remove();
-      this.toolbarButtonContainer = undefined;
+    if (this.toolbarButton) {
+      this.toolbarButton.remove();
+      this.toolbarButton = undefined;
     }
   }
 }

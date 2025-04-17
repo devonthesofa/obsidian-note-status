@@ -1023,36 +1023,6 @@
 
 
 /* Toolbar button styling */
-.note-status-toolbar-button-container {
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: relative !important;
-  margin-right: 8px !important;
-  z-index: 100 !important;
-  height: 24px !important;
-  width: auto !important;
-}
-
-.note-status-toolbar-button {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 4px !important;
-  background-color: var(--interactive-accent-hover) !important;
-  border-radius: 4px !important;
-  cursor: pointer !important;
-  width: 24px !important;
-  height: 24px !important;
-  min-width: 24px !important;
-  min-height: 24px !important;
-}
-
-.note-status-toolbar-button:hover {
-  background-color: var(--background-modifier-hover);
-  color: var(--text-accent);
-}
-
 .note-status-toolbar-badge-container {
   display: flex;
   align-items: center;
@@ -1061,18 +1031,10 @@
 }
 
 .note-status-toolbar-icon {
-  font-size: 16px !important;
   color: var(--text-normal) !important;
 }
 
 /* Target all possible toolbar locations */
-.view-header .view-actions .note-status-toolbar-button-container,
-.view-header-actions .note-status-toolbar-button-container,
-.workspace-ribbon.mod-right .note-status-toolbar-button-container,
-.workspace-tab-header-container .note-status-toolbar-button-container {
-  display: flex !important;
-}
-
 .note-status-count-badge {
   position: absolute;
   top: -5px;
@@ -1144,54 +1106,11 @@
   background: transparent;
 }
 
-/* Ensure the button container has proper z-index and positioning */
-.note-status-toolbar-button-container {
-  display: flex !important;
-  align-items: center !important;
-  margin-right: 4px !important;
-  position: relative !important;
-  z-index: 10 !important;
-}
-
-/* Ensure button is visible with proper sizing */
-.note-status-toolbar-button {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background: transparent !important;
-  border: none !important;
-  border-radius: var(--radius-s, 4px) !important;
-  color: var(--text-normal) !important;
-  padding: 6px !important;
-  cursor: pointer !important;
-  transition: all 0.15s var(--ease-out) !important;
-  position: relative !important;
-  width: 28px !important;
-  height: 28px !important;
-  min-width: 28px !important;
-  min-height: 28px !important;
-}
-
 /* Make icons more visible */
 .note-status-toolbar-icon {
-  font-size: 16px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-}
-
-/* Alternative selectors for toolbar button placement */
-.view-header .view-actions .note-status-toolbar-button-container,
-.view-header-actions .note-status-toolbar-button-container,
-.workspace-ribbon.mod-right .note-status-toolbar-button-container {
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-/* Debug outline to help identify the button (you can remove this after debugging) */
-.note-status-toolbar-button-container {
-  outline: 1px solid rgba(255, 0, 0, 0.3) !important;
 }
 
 /* Make the unified dropdown look consistent in all contexts */
@@ -1398,29 +1317,6 @@
   color: var(--text-accent);
 }
 
-/* Fix toolbar button */
-.note-status-toolbar-button-container {
-  display: flex !important;
-  align-items: center !important;
-  margin-right: 8px !important;
-}
-
-.note-status-toolbar-button {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 32px !important;
-  height: 32px !important;
-  border-radius: var(--radius-s, 4px) !important;
-  background: transparent !important;
-  color: var(--text-normal) !important;
-  cursor: pointer !important;
-  transition: background 0.2s ease !important;
-}
-
-.note-status-toolbar-button:hover {
-  background: var(--background-modifier-hover) !important;
-}
 
 /* Prevent event propagation issues */
 .note-status-unified-dropdown * {
