@@ -28,16 +28,6 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 
 		// Status dropdown settings
 		new Setting(containerEl)
-			.setName('Show status dropdown')
-			.setDesc('Display status dropdown in notes')
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.showStatusDropdown)
-				.onChange(async (value) => {
-					this.plugin.settings.showStatusDropdown = value;
-					await this.plugin.saveSettings();
-				}));
-
-		new Setting(containerEl)
 			.setName('Dropdown position')
 			.setDesc('Where to place the status dropdown')
 			.addDropdown(dropdown => dropdown

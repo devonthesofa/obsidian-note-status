@@ -279,23 +279,6 @@ export default class NoteStatus extends Plugin {
       callback: () => this.openStatusPane()
     });
     
-    // Toggle status dropdown command
-    this.addCommand({
-      id: 'toggle-status-dropdown',
-      name: 'Toggle Status Dropdown',
-      callback: () => {
-        this.settings.showStatusDropdown = !this.settings.showStatusDropdown;
-        this.saveSettings();
-        
-        if (this.settings.showStatusDropdown) {
-          this.statusDropdown.update(this.getCurrentStatuses());
-          new Notice('Status dropdown shown');
-        } else {
-          new Notice('Status dropdown hidden');
-        }
-      }
-    });
-    
     // Add status to note command
     this.addCommand({
       id: 'add-status-to-note',

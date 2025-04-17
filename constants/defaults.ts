@@ -12,7 +12,6 @@ export const DEFAULT_SETTINGS: NoteStatusSettings = {
 		dropped: 'var(--text-error)',
 		unknown: 'var(--text-muted)'
 	},
-	showStatusDropdown: true,
 	showStatusBar: true,
 	dropdownPosition: 'top',
 	statusBarPosition: 'right',

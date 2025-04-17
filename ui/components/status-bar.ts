@@ -19,9 +19,6 @@ export class StatusBar {
 		// Add initial class
 		this.statusBarEl.addClass('note-status-bar');
 	
-		// Add click handler
-		this.statusBarEl.addEventListener('click', this.handleClick.bind(this));
-		
 		// Add right-click handler for force refresh
 		this.statusBarEl.addEventListener('contextmenu', (e) => {
 			e.preventDefault();
@@ -30,18 +27,6 @@ export class StatusBar {
 	
 		// Initial render
 		this.update(['unknown']);
-	}
-
-	/**
-	 * Handle click on status bar
-	 */
-	private handleClick(): void {
-		this.settings.showStatusDropdown = !this.settings.showStatusDropdown;
-
-		// Notify UI listeners through an event
-		window.dispatchEvent(new CustomEvent('note-status:refresh-dropdown'));
-
-		new Notice(`Status dropdown ${this.settings.showStatusDropdown ? 'shown' : 'hidden'}`);
 	}
 
 	/**
