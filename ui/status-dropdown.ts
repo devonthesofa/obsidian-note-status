@@ -1,6 +1,7 @@
-import { MarkdownView, Notice, Editor, Menu, setIcon } from 'obsidian';
-import { NoteStatusSettings, Status } from '../models/types';
+import { MarkdownView, Editor, setIcon } from 'obsidian';
+import { NoteStatusSettings } from '../models/types';
 import { StatusService } from '../services/status-service';
+import { StatusDropdownComponent } from './status-dropdown-component';
 
 /**
  * Enhanced status dropdown with toolbar integration
@@ -9,25 +10,31 @@ export class StatusDropdown {
 	private app: any;
 	private settings: NoteStatusSettings;
 	private statusService: StatusService;
-	private dropdownContainer?: HTMLElement;
-	private statusChipsContainer?: HTMLElement;
 	private currentStatuses: string[] = ['unknown'];
-	private statusPopover?: HTMLElement;
-	private isPopoverOpen = false;
-	private clickOutsideHandler: any;
 	private toolbarButtonContainer?: HTMLElement;
 	private toolbarButton?: HTMLElement;
+	private dropdownComponent: StatusDropdownComponent;
 	
-	// Animation timings
-	private readonly ANIMATION_DURATION = 220;
-
 	constructor(app: any, settings: NoteStatusSettings, statusService: StatusService) {
 		this.app = app;
 		this.settings = settings;
 		this.statusService = statusService;
 		
-		// Bind methods to preserve this context
-		this.handleClickOutside = this.handleClickOutside.bind(this);
+		// Initialize the dropdown component
+		this.dropdownComponent = new StatusDropdownComponent(app, statusService, settings);
+		
+		// Configure dropdown component callbacks
+		this.dropdownComponent.setOnStatusChange((statuses) => {
+			// Update current statuses and toolbar button
+			this.currentStatuses = [...statuses]; // Make sure to copy the array
+			this.updateToolbarButton();
+			
+			// Dispatch events for UI update
+			window.dispatchEvent(new CustomEvent('note-status:status-changed', {
+				detail: { statuses }
+			}));
+			window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+		});
 		
 		// Initialize toolbar button after layout is ready
 		this.app.workspace.onLayoutReady(() => {
@@ -39,7 +46,7 @@ export class StatusDropdown {
 	 * Initialize the toolbar button in the Obsidian ribbon
  	*/
 	private initToolbarButton(): void {
-		// Clear timeout to prevent multiple initializations
+		// Clear any existing button
 		if (this.toolbarButton) {
 			this.toolbarButton.remove();
 			this.toolbarButton = undefined;
@@ -76,43 +83,21 @@ export class StatusDropdown {
 			// Add click handler
 			this.toolbarButton.addEventListener('click', (e) => {
 				e.stopPropagation();
-				this.toggleStatusPopover(this.toolbarButton);
+				e.preventDefault();
+				this.toggleStatusPopover();
 			});
 			
 			// Add the button to the container
 			this.toolbarButtonContainer.appendChild(this.toolbarButton);
 			
-			// Add some debug styling to check visibility
-			this.toolbarButtonContainer.style.border = '2px solid red';
-			this.toolbarButton.style.border = '1px solid blue';
-			
-			// Force display properties
-			this.toolbarButtonContainer.style.display = 'flex';
-			this.toolbarButtonContainer.style.visibility = 'visible';
-			this.toolbarButtonContainer.style.opacity = '1';
-			
 			// Insert at a more reliable position - just prepend to the container
 			try {
 				toolbarContainer.prepend(this.toolbarButtonContainer);
-				console.log('Note Status: Toolbar button added successfully at position:', 
-					Array.from(toolbarContainer.children).indexOf(this.toolbarButtonContainer));
 			} catch (error) {
 				console.error('Note Status: Error inserting toolbar button', error);
 				// Fallback - just append it
 				toolbarContainer.appendChild(this.toolbarButtonContainer);
 			}
-			
-			// Force a redraw
-			setTimeout(() => {
-				if (this.toolbarButtonContainer) {
-					this.toolbarButtonContainer.style.display = 'none';
-					setTimeout(() => {
-						if (this.toolbarButtonContainer) {
-							this.toolbarButtonContainer.style.display = 'flex';
-						}
-					}, 10);
-				}
-			}, 100);
 		}, 500); // Waiting 500ms to ensure the UI is ready
 	}
 	
@@ -178,10 +163,8 @@ export class StatusDropdown {
 		// Update toolbar button
 		this.updateToolbarButton();
 		
-		// Clear and render fresh dropdown if it exists
-		if (this.dropdownContainer) {
-			this.render();
-		}
+		// Update dropdown component
+		this.dropdownComponent.updateStatuses(this.currentStatuses);
 	}
 
 	/**
@@ -190,472 +173,124 @@ export class StatusDropdown {
 	public updateSettings(settings: NoteStatusSettings): void {
 		this.settings = settings;
 		this.updateToolbarButton();
-		if (this.dropdownContainer) {
-			this.render();
-		}
-	}
-
-	/**
-	 * Render or remove the dropdown based on settings
-	 */
-	public render(): void {
-		// Remove existing popover if open
-		if (this.isPopoverOpen) {
-			this.closeStatusPopover();
-		}
+		this.dropdownComponent.updateSettings(settings);
 	}
 
 	/**
 	 * Toggle the status popover
 	 */
-	private toggleStatusPopover(targetEl?: HTMLElement): void {
-		if (this.isPopoverOpen) {
-			this.closeStatusPopover();
-		} else {
-			this.openStatusPopover(targetEl);
+	private toggleStatusPopover(): void {
+		// Get the active file first
+		const activeFile = this.app.workspace.getActiveFile();
+		if (!activeFile) return;
+		
+		// Set the target file for the dropdown component
+		this.dropdownComponent.setTargetFile(activeFile);
+		
+		// Get current statuses
+		const currentStatuses = this.statusService.getFileStatuses(activeFile);
+		this.dropdownComponent.updateStatuses(currentStatuses);
+		
+		// Create a position below the toolbar button
+		if (this.toolbarButton) {
+			const rect = this.toolbarButton.getBoundingClientRect();
+			const position = { 
+			x: rect.left, 
+			y: rect.bottom + 5 
+			};
+			
+			// Force open the dropdown with explicit position
+			this.dropdownComponent.open(this.toolbarButton, position);
 		}
 	}
 
 	/**
-	 * Open the status selection popover
-	 * @param targetEl - The element that triggered the popover (for positioning)
-	 */
-	private openStatusPopover(targetEl?: HTMLElement): void {
-		if (this.isPopoverOpen) {
-			this.closeStatusPopover();
-			return;
-		}
-		
-		this.isPopoverOpen = true;
-		
-		// Create popover element
-		this.statusPopover = document.createElement('div');
-		this.statusPopover.addClass('note-status-popover', 'note-status-toolbar-popover');
-		document.body.appendChild(this.statusPopover);
-		
-		// Create header
-		const headerEl = this.statusPopover.createDiv({ cls: 'note-status-popover-header' });
-		
-		// Title with icon
-		const titleEl = headerEl.createDiv({ cls: 'note-status-popover-title' });
-		const iconContainer = titleEl.createDiv({ cls: 'note-status-popover-icon' });
-		setIcon(iconContainer, 'tag');
-		titleEl.createSpan({ text: 'Note Status', cls: 'note-status-popover-label' });
-		
-		// Current status chips
-		const chipsContainer = this.statusPopover.createDiv({ cls: 'note-status-popover-chips' });
-		
-		// Show 'No status' indicator if no statuses or only unknown status
-		if (this.currentStatuses.length === 0 || 
-			(this.currentStatuses.length === 1 && this.currentStatuses[0] === 'unknown')) {
-			chipsContainer.createDiv({ 
-				cls: 'note-status-empty-indicator',
-				text: 'No status assigned'
-			});
-		} else {
-			// Add chip for each status
-			this.currentStatuses.forEach(status => {
-				if (status === 'unknown') return; // Skip unknown status
-				
-				const statusObj = this.statusService.getAllStatuses().find(s => s.name === status);
-				if (!statusObj) return;
-				
-				const chipEl = chipsContainer.createDiv({ 
-					cls: `note-status-chip status-${status}`
-				});
-				
-				// Status icon
-				chipEl.createSpan({ 
-					text: statusObj.icon,
-					cls: 'note-status-chip-icon'
-				});
-				
-				// Status name
-				chipEl.createSpan({ 
-					text: statusObj.name,
-					cls: 'note-status-chip-text' 
-				});
-				
-				// Remove button (only show if multiple statuses allowed)
-				if (this.settings.useMultipleStatuses && this.currentStatuses.length > 1) {
-					const removeBtn = chipEl.createDiv({ 
-						cls: 'note-status-chip-remove',
-						attr: {
-							'aria-label': `Remove ${status} status`,
-							'title': `Remove ${status} status`
-						}
-					});
-					setIcon(removeBtn, 'x');
-					
-					removeBtn.addEventListener('click', async (e) => {
-						e.stopPropagation();
-						
-						// Add remove animation
-						chipEl.addClass('note-status-chip-removing');
-						
-						// Wait for animation to complete before actually removing
-						setTimeout(async () => {
-							// Remove this status
-							await this.statusService.removeNoteStatus(status);
-							
-							// Get updated statuses
-							const updatedStatuses = this.statusService.getFileStatuses(this.app.workspace.getActiveFile());
-							
-							// Update current statuses
-							this.currentStatuses = updatedStatuses;
-							
-							// Update toolbar button
-							this.updateToolbarButton();
-							
-							// Refresh chips
-							this.openStatusPopover(targetEl);
-							
-							// Dispatch event for UI update
-							window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-								detail: { statuses: updatedStatuses }
-							}));
-						}, 150);
-					});
-				}
-			});
-		}
-		
-		// Create search filter
-		const searchContainer = this.statusPopover.createDiv({ cls: 'note-status-popover-search' });
-		const searchInput = searchContainer.createEl('input', {
-			type: 'text',
-			placeholder: 'Filter statuses...',
-			cls: 'note-status-popover-search-input'
-		});
-		
-		// Create status options container
-		const statusOptionsContainer = this.statusPopover.createDiv({ cls: 'note-status-options-container' });
-		
-		// Get all available statuses
-		const allStatuses = this.statusService.getAllStatuses()
-			.filter(status => status.name !== 'unknown');
-		
-		// Populate status options
-		const populateOptions = (filter = '') => {
-			statusOptionsContainer.empty();
-			
-			const filteredStatuses = allStatuses.filter(status => !filter || 
-				status.name.toLowerCase().includes(filter.toLowerCase()) ||
-				status.icon.includes(filter));
-				
-			if (filteredStatuses.length === 0) {
-				// Show empty state
-				statusOptionsContainer.createDiv({
-					cls: 'note-status-empty-options',
-					text: filter ? `No statuses match "${filter}"` : 'No statuses found'
-				});
-				return;
-			}
-			
-			filteredStatuses.forEach(status => {
-				const isSelected = this.currentStatuses.includes(status.name);
-				
-				const optionEl = statusOptionsContainer.createDiv({ 
-					cls: `note-status-option ${isSelected ? 'is-selected' : ''} status-${status.name}`
-				});
-				
-				// Status icon
-				optionEl.createSpan({ 
-					text: status.icon,
-					cls: 'note-status-option-icon'
-				});
-				
-				// Status name
-				optionEl.createSpan({ 
-					text: status.name,
-					cls: 'note-status-option-text' 
-				});
-				
-				// Check icon for selected status
-				if (isSelected) {
-					const checkIcon = optionEl.createDiv({ cls: 'note-status-option-check' });
-					setIcon(checkIcon, 'check');
-				}
-				
-				// Add click handler
-				optionEl.addEventListener('click', async () => {
-					const activeFile = this.app.workspace.getActiveFile();
-					if (!activeFile) return;
-					
-					try {
-						// Add selection animation
-						optionEl.addClass('note-status-option-selecting');
-						
-						// Apply status changes after brief delay for animation
-						setTimeout(async () => {
-							if (this.settings.useMultipleStatuses) {
-								await this.statusService.toggleNoteStatus(status.name);
-							} else {
-								await this.statusService.updateNoteStatuses([status.name]);
-								// Close popover in single status mode
-								this.closeStatusPopover();
-							}
-							
-							// Get fresh status from file
-							const freshStatuses = this.statusService.getFileStatuses(activeFile);
-							
-							// Update current statuses and toolbar button
-							this.currentStatuses = [...freshStatuses];
-							this.updateToolbarButton();
-							
-							// Refresh status options if popover still open
-							if (this.isPopoverOpen && this.settings.useMultipleStatuses) {
-								populateOptions(searchInput.value);
-							}
-							
-							// Dispatch events for UI update
-							window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-								detail: { statuses: freshStatuses }
-							}));
-							window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
-						}, 150);
-					} catch (error) {
-						console.error('Error updating status:', error);
-						new Notice('Failed to update status');
-					}
-				});
-			});
-		};
-		
-		// Initial population
-		populateOptions();
-		
-		// Add search functionality
-		searchInput.addEventListener('input', () => {
-			populateOptions(searchInput.value);
-		});
-		
-		// Position the popover relative to the toolbar button
-		this.positionToolbarPopover(targetEl);
-		
-		// Add animation class
-		this.statusPopover.addClass('note-status-popover-animate-in');
-		
-		// Focus search input
-		setTimeout(() => {
-			searchInput.focus();
-		}, 50);
-		
-		// Add click outside listener to close popover
-		setTimeout(() => {
-			this.clickOutsideHandler = this.handleClickOutside;
-			document.addEventListener('click', this.clickOutsideHandler);
-			
-			// Also add escape key listener
-			document.addEventListener('keydown', this.handleEscapeKey);
-		}, 10);
-	}
-	
-	/**
-	 * Position the popover relative to the toolbar button
-	 */
-	private positionToolbarPopover(targetEl?: HTMLElement): void {
-		if (!this.statusPopover || !targetEl) return;
-		
-		// Reset positioning
-		this.statusPopover.style.position = 'fixed';
-		this.statusPopover.style.zIndex = '999';
-		
-		// Get target element's position
-		const targetRect = targetEl.getBoundingClientRect();
-		
-		// Position below the button
-		this.statusPopover.style.top = `${targetRect.bottom + 5}px`;
-		this.statusPopover.style.right = `${window.innerWidth - targetRect.right}px`;
-		
-		// Set max height based on viewport
-		const maxHeight = window.innerHeight - targetRect.bottom - 40;
-		this.statusPopover.style.maxHeight = `${maxHeight}px`;
-	}
-	
-	/**
-	 * Handle escape key to close popover
-	 */
-	private handleEscapeKey = (e: KeyboardEvent) => {
-		if (e.key === 'Escape' && this.isPopoverOpen) {
-			this.closeStatusPopover();
-		}
-	};
-	
-	/**
-	 * Handle click outside the popover
-	 */
-	private handleClickOutside(e: MouseEvent) {
-		if (this.statusPopover && !this.statusPopover.contains(e.target as Node) && 
-			this.toolbarButton && !this.toolbarButton.contains(e.target as Node)) {
-			this.closeStatusPopover();
-		}
-	}
-	
-	/**
-	 * Close the status selection popover
-	 */
-	private closeStatusPopover(): void {
-		if (!this.statusPopover) return;
-		
-		// Add exit animation
-		this.statusPopover.addClass('note-status-popover-animate-out');
-		
-		// Clean up event listeners immediately
-		document.removeEventListener('click', this.clickOutsideHandler);
-		document.removeEventListener('keydown', this.handleEscapeKey);
-		
-		// Remove after animation completes
-		setTimeout(() => {
-			if (this.statusPopover) {
-				this.statusPopover.remove();
-				this.statusPopover = undefined;
-				this.isPopoverOpen = false;
-			}
-		}, this.ANIMATION_DURATION);
-	}
-	
-	/**
 	 * Show status dropdown in context menu
 	 */
 	public showInContextMenu(editor: Editor, view: MarkdownView): void {
-		const menu = new Menu();
-		const customClass = 'note-status-context-menu';
-		// Apply class manually since Menu doesn't have addClass method
-		(menu as any).dom?.addClass?.(customClass);
-		
 		const activeFile = this.app.workspace.getActiveFile();
 		if (!activeFile) return;
 		
+		// For editor context menu, use cursor position if possible
+		let position: {x: number, y: number};
+		
+		try {
+			// Try to get cursor position
+			const cursor = editor.getCursor('head');
+			const editorPosition = editor.posToCoords(cursor);
+			
+			if (editorPosition) {
+				position = {
+					x: editorPosition.left,
+					y: editorPosition.top + 20 // Add small offset below cursor
+				};
+			} else {
+				// If can't get cursor position, use editor element position
+				const editorEl = view.contentEl.querySelector('.cm-editor');
+				if (editorEl) {
+					const rect = editorEl.getBoundingClientRect();
+					position = {
+						x: rect.left + 100, // Offset from left
+						y: rect.top + 100   // Offset from top
+					};
+				} else {
+					// Last resort - use middle of viewport
+					position = {
+						x: window.innerWidth / 2,
+						y: window.innerHeight / 3
+					};
+				}
+			}
+		} catch (error) {
+			console.error('Error getting position for dropdown:', error);
+			// Fallback to center of screen
+			position = {
+				x: window.innerWidth / 2,
+				y: window.innerHeight / 3
+			};
+		}
+		
+		// Create a dummy target element for positioning
+		const dummyTarget = document.createElement('div');
+		dummyTarget.style.position = 'fixed';
+		dummyTarget.style.left = `${position.x}px`;
+		dummyTarget.style.top = `${position.y}px`;
+		dummyTarget.style.zIndex = '1000';
+		document.body.appendChild(dummyTarget);
+		
+		// Set the active file as the target for the dropdown
+		this.dropdownComponent.setTargetFile(activeFile);
+		
+		// Get current statuses for this file
 		const currentStatuses = this.statusService.getFileStatuses(activeFile);
 		
-		// Add a header item
-		menu.addItem((item) => {
-			item.setTitle('Change Note Status')
-				.setDisabled(true);
-			// Apply class manually since MenuItem doesn't have setClass method
-			(item as any).dom?.addClass?.('note-status-menu-header');
-			return item;
-		});
-	
-		// Get all available statuses grouped by template
-		const allStatuses = this.statusService.getAllStatuses();
+		// Update dropdown with current statuses
+		this.dropdownComponent.updateStatuses(currentStatuses);
 		
-		// Group statuses by template name if they have one
-		const statusesByTemplate: Record<string, Status[]> = { 'Custom': [] };
+		// Show dropdown at the calculated position
+		this.dropdownComponent.open(dummyTarget, position);
 		
-		allStatuses.forEach(status => {
-			if (status.name !== 'unknown') {
-				// For now, just put all in custom group
-				// In a future version, we could implement proper template grouping
-				statusesByTemplate['Custom'].push(status);
+		// Clean up dummy target after dropdown is shown
+		setTimeout(() => {
+			if (dummyTarget.parentNode) {
+				dummyTarget.parentNode.removeChild(dummyTarget);
 			}
-		});
-		
-		// Add status options by template
-		Object.entries(statusesByTemplate).forEach(([templateName, statuses]) => {
-			if (statuses.length === 0) return;
-			
-			// Add template section
-			if (Object.keys(statusesByTemplate).length > 1) {
-				menu.addSeparator();
-				
-				menu.addItem((item) => {
-					item.setTitle(templateName)
-						.setDisabled(true);
-					// Apply class manually since MenuItem doesn't have setClass method
-					(item as any).dom?.addClass?.('note-status-menu-section');
-					return item;
-				});
-			}
-			
-			// Add statuses from this template
-			statuses.forEach(status => {
-				const isActive = currentStatuses.includes(status.name);
-				
-				menu.addItem((item) => {
-					item
-						.setTitle(`${status.icon} ${status.name}`)
-						.setIcon(isActive ? 'check-circle' : 'circle');
-					
-					// Apply class manually if active
-					if (isActive) {
-						(item as any).dom?.addClass?.('is-active');
-					}
-					
-					if (this.settings.useMultipleStatuses) {
-						// Toggle mode - add checkmark for active statuses
-						item.onClick(async () => {
-							await this.statusService.toggleNoteStatus(status.name);
-							
-							// Get updated statuses
-							const updatedStatuses = this.statusService.getFileStatuses(activeFile);
-							
-							// Update current statuses and toolbar button
-							this.currentStatuses = updatedStatuses;
-							this.updateToolbarButton();
-							
-							// Dispatch events for UI update
-							window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-								detail: { statuses: updatedStatuses }
-							}));
-							window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
-						});
-					} else {
-						// Single select mode - but still using arrays internally
-						item.onClick(async () => {
-							await this.statusService.updateNoteStatuses([status.name]);
-							
-							// Update current statuses and toolbar button
-							this.currentStatuses = [status.name];
-							this.updateToolbarButton();
-							
-							// Dispatch events for UI update
-							window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-								detail: { statuses: [status.name] }
-							}));
-							window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
-						});
-					}
-					
-					return item;
-				});
-			});
-		});
-		
-		// Add separator and additional actions
-		menu.addSeparator();
-		
-		// Add "batch update" option
-		menu.addItem((item) => {
-			item.setTitle('Batch Update Status...')
-				.setIcon('folders')
-				.onClick(() => {
-					// Dispatch event to open batch modal
-					window.dispatchEvent(new CustomEvent('note-status:open-batch-modal'));
-				});
-			return item;
-		});
-	
-		// Position menu near cursor
-		const cursor = editor.getCursor('to');
-		editor.posToOffset(cursor);
-		const editorEl = view.contentEl.querySelector('.cm-content');
-	
-		if (editorEl) {
-			const rect = editorEl.getBoundingClientRect();
-			menu.showAtPosition({ x: rect.left + 20, y: rect.top + 40 });
-		} else {
-			menu.showAtPosition({ x: 0, y: 0 });
-		}
+		}, 100);
+	}
+
+	/**
+	 * Render method (kept for compatibility)
+	 */
+	public render(): void {
+		// This is now a no-op, as the dropdown component handles everything internally
 	}
 
 	/**
 	 * Remove dropdown when plugin is unloaded
 	 */
 	public unload(): void {
-		// Close any open popover
-		this.closeStatusPopover();
+		// Clean up dropdown component
+		this.dropdownComponent.dispose();
 		
 		// Remove toolbar button
 		if (this.toolbarButtonContainer) {

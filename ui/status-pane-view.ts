@@ -249,25 +249,27 @@ export class StatusPaneView extends View {
 
 	private showFileContextMenu(e: MouseEvent, file: TFile): void {
 		const menu = new Menu();
-
+	
 		// Add status change options
 		menu.addItem((item) =>
-			item.setTitle('Change Status')
-				.setIcon('tag')
-				.onClick(() => {
-					this.plugin.showStatusContextMenu([file]);
-				})
+		item.setTitle('Change Status')
+			.setIcon('tag')
+			.onClick(() => {
+			// Use the position from the event
+			const position = { x: e.clientX, y: e.clientY };
+			this.plugin.statusContextMenu.showForFile(file, e);
+			})
 		);
-
+	
 		// Add open options
 		menu.addItem((item) =>
-			item.setTitle('Open in New Tab')
-				.setIcon('lucide-external-link')
-				.onClick(() => {
-					this.app.workspace.openLinkText(file.path, file.path, 'tab');
-				})
+		item.setTitle('Open in New Tab')
+			.setIcon('lucide-external-link')
+			.onClick(() => {
+			this.app.workspace.openLinkText(file.path, file.path, 'tab');
+			})
 		);
-
+	
 		menu.showAtMouseEvent(e);
 	}
 

@@ -1193,3 +1193,243 @@
 .note-status-toolbar-button-container {
   outline: 1px solid rgba(255, 0, 0, 0.3) !important;
 }
+
+/* Make the unified dropdown look consistent in all contexts */
+.note-status-unified-dropdown {
+  width: 280px;
+  max-width: 90vw;
+  border-radius: var(--radius-m, 8px);
+  overflow: hidden;
+  box-shadow: var(--shadow-m), 0 0 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  z-index: 9999 !important; /* Ensure it's above everything */
+  pointer-events: all !important; /* Ensure dropdown receives clicks */
+}
+
+/* Better animation for unified dropdown */
+.note-status-popover-animate-in {
+  animation: statusDropdownFadeIn 0.22s var(--ease-out) forwards;
+}
+
+.note-status-popover-animate-out {
+  animation: statusDropdownFadeOut 0.22s var(--ease-out) forwards;
+}
+
+@keyframes statusDropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes statusDropdownFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+/* Fix for positioning when transitioning */
+.note-status-popover {
+  transform-origin: top left;
+  pointer-events: all !important;
+}
+
+/* Make sure clickable elements in dropdown work properly */
+.note-status-option,
+.note-status-option-icon,
+.note-status-option-text,
+.note-status-chip,
+.note-status-chip-remove,
+.note-status-popover-search-input {
+  pointer-events: all !important;
+}
+
+/* Fix option clicking */
+.note-status-option {
+  cursor: pointer !important;
+  transition: background-color 0.15s ease;
+}
+
+.note-status-option:hover {
+  background-color: var(--background-modifier-hover) !important;
+}
+
+.note-status-option.is-selected {
+  background-color: var(--interactive-accent-hover) !important;
+  color: var(--text-on-accent) !important;
+}
+
+/* Make options more visible when selecting */
+.note-status-option-selecting {
+  background-color: var(--interactive-accent) !important;
+  color: var(--text-on-accent) !important;
+  animation: pulse 0.3s var(--ease-out);
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.98); }
+  100% { transform: scale(1); }
+}
+
+/* Ensure dropdown shows above modal if needed */
+.modal-container .note-status-unified-dropdown {
+  z-index: 10001 !important;
+}
+
+/* Make sure scrollable containers in dropdown work properly */
+.note-status-options-container {
+  max-height: 250px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+/* Fix dropdown header styling */
+.note-status-popover-header {
+  padding: 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary-alt);
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* Improve status badges styling */
+.note-status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  margin: 2px;
+  border-radius: 12px;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  color: var(--text-normal);
+  font-size: 0.9em;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-status-chip-icon {
+  margin-right: 4px;
+}
+
+/* Remove button on badges */
+.note-status-chip-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--background-modifier-border);
+  color: var(--text-muted);
+  cursor: pointer !important;
+  transition: all 0.15s var(--ease-out);
+}
+
+.note-status-chip-remove:hover {
+  background: var(--text-accent);
+  color: var(--text-on-accent);
+  transform: scale(1.1);
+}
+
+/* Improve search input */
+.note-status-popover-search {
+  padding: 8px;
+  position: sticky;
+  top: 0;
+  background: var(--background-primary);
+  z-index: 3;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.note-status-popover-search-input {
+  width: 100%;
+  padding: 8px;
+  border-radius: var(--input-radius, 4px);
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-normal);
+}
+
+.note-status-popover-search-input:focus {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px rgba(var(--interactive-accent-rgb), 0.2);
+  outline: none;
+}
+
+/* Better options styling */
+.note-status-option {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  margin: 2px 4px;
+  border-radius: var(--radius-s, 4px);
+  background: var(--background-primary);
+  color: var(--text-normal);
+}
+
+.note-status-option.is-selected {
+  font-weight: 500;
+}
+
+.note-status-option-icon {
+  margin-right: 8px;
+  font-size: 1.1em;
+}
+
+.note-status-option-check {
+  margin-left: auto;
+  color: var(--text-accent);
+}
+
+/* Fix toolbar button */
+.note-status-toolbar-button-container {
+  display: flex !important;
+  align-items: center !important;
+  margin-right: 8px !important;
+}
+
+.note-status-toolbar-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: var(--radius-s, 4px) !important;
+  background: transparent !important;
+  color: var(--text-normal) !important;
+  cursor: pointer !important;
+  transition: background 0.2s ease !important;
+}
+
+.note-status-toolbar-button:hover {
+  background: var(--background-modifier-hover) !important;
+}
+
+/* Prevent event propagation issues */
+.note-status-unified-dropdown * {
+  pointer-events: all !important;
+}
+
+/* Animation for badge removal */
+.note-status-chip-removing {
+  transform: scale(0.8);
+  opacity: 0;
+  transition: all 0.15s ease-out;
+}

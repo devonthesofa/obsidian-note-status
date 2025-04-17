@@ -15,6 +15,7 @@ import { StyleService } from './services/style-service';
 // Import UI components
 import { StatusBar } from './ui/status-bar';
 import { StatusDropdown } from './ui/status-dropdown';
+import { StatusDropdownComponent } from './ui/status-dropdown-component';
 import { StatusPaneView } from './ui/status-pane-view';
 import { ExplorerIntegration } from './ui/explorer';
 import { BatchStatusModal } from './ui/modals';
