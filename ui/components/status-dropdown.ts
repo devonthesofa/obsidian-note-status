@@ -212,13 +212,30 @@ export class StatusDropdown {
    */
   public showInContextMenu(editor: Editor, view: MarkdownView): void {
     const activeFile = this.app.workspace.getActiveFile();
-	if (!activeFile) return;
-	
-	this.openStatusDropdown({
-		editor: editor,
-		view: view,
-		files: [activeFile]
-	});
+    if (!activeFile) return;
+    
+    // Pass context to indicate this is from editor context menu
+    this.openStatusDropdown({
+      editor: editor,
+      view: view,
+      files: [activeFile],
+      onStatusChange: async (statuses) => {
+        if (statuses.length > 0) {
+          // Use a direct file operation, not batch update
+          if (this.settings.useMultipleStatuses) {
+            await this.statusService.toggleNoteStatus(statuses[0], activeFile);
+          } else {
+            await this.statusService.updateNoteStatuses(statuses, activeFile);
+          }
+          
+          // Trigger UI updates
+          window.dispatchEvent(new CustomEvent('note-status:status-changed', {
+            detail: { statuses, file: activeFile.path }
+          }));
+          window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+        }
+      }
+    });
   }
   
   /**
@@ -318,7 +335,7 @@ export class StatusDropdown {
 		this._openStatusDropdown(options);
 	}
   
-	private _openStatusDropdown(options: {
+  private _openStatusDropdown(options: {
 		target?: HTMLElement;
 		position?: { x: number, y: number };
 		files?: TFile[];
@@ -333,7 +350,6 @@ export class StatusDropdown {
 			new Notice('No files selected');
 			return;
 		}
-		console.log("filesfilesfiles", files)
 
 		// Determine if we're handling single or multiple files
 		const isSingleFile = files.length === 1;

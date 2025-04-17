@@ -328,18 +328,22 @@ export class StatusService {
   }
 
   /**
-  * Batch update multiple files' statuses
-  * @param files Array of files to update
-  * @param statusesToSet Array of statuses to set
-  * @param mode 'replace' to replace all statuses, 'add' to add to existing
-  */
+   * Batch update multiple files' statuses
+   * @param files Array of files to update
+   * @param statusesToSet Array of statuses to set
+   * @param mode 'replace' to replace all statuses, 'add' to add to existing
+   * @param showNotice Whether to show a notification (default: true)
+   */
   public async batchUpdateStatuses(
     files: TFile[], 
     statusesToSet: string[], 
-    mode: 'replace' | 'add' = 'replace'
+    mode: 'replace' | 'add' = 'replace',
+    showNotice = true
   ): Promise<void> {
     if (files.length === 0) {
-      new Notice('No files selected');
+      if (showNotice) {
+        new Notice('No files selected');
+      }
       return;
     }
 
@@ -354,8 +358,11 @@ export class StatusService {
       }
     }
 
-    const statusText = this.formatStatusText(statusesToSet);
-    new Notice(`Updated ${files.length} file${files.length === 1 ? '' : 's'} with ${statusText}`);
+    // Only show notice if explicitly requested and we're dealing with multiple files
+    if (showNotice && files.length > 1) {
+      const statusText = this.formatStatusText(statusesToSet);
+      new Notice(`Updated ${files.length} files with ${statusText}`);
+    }
   }
   
   /**

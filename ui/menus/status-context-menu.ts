@@ -143,7 +143,7 @@ export class StatusContextMenu {
         await this.statusService.addNoteStatus(statuses[0], file);
       }
     } else {
-      // Replace with the single status
+      // Replace with the single status - use the direct method, not batch
       await this.statusService.updateNoteStatuses([statuses[0]], file);
     }
     
