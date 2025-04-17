@@ -73,6 +73,7 @@ export class ExplorerIntegration {
 		this.debouncedUpdateAll();
 	}
 
+	
 	/**
 	 * Process the queue of files that need icon updates
 	 */
@@ -89,8 +90,16 @@ export class ExplorerIntegration {
 				return;
 			}
 			
-			// Rest of the method remains the same
-			// ...
+			// Process files in the queue
+			for (const filePath of this.iconUpdateQueue) {
+				const file = this.app.vault.getFileByPath(filePath);
+				if (file && file instanceof TFile) {
+					this.updateSingleFileIcon(file, fileExplorerView);
+				}
+				this.iconUpdateQueue.delete(filePath);
+			}
+		} catch (error) {
+			console.error('Note Status: Error processing file update queue', error);
 		} finally {
 			this.isProcessingQueue = false;
 			
@@ -157,14 +166,10 @@ export class ExplorerIntegration {
 					});
 					
 					// Add tooltip with status name
-					iconEl.setAttribute('aria-label', status);
-					iconEl.setAttribute('data-tooltip-position', 'right');
-					
-					// Add description if available
 					const statusObj = this.statusService.getAllStatuses().find(s => s.name === status);
-					if (statusObj && statusObj.description) {
-						iconEl.setAttribute('data-description', statusObj.description);
-					}
+					const tooltipValue = statusObj?.description ? `${status} - ${statusObj.description}`: status;
+					iconEl.setAttribute('aria-label', tooltipValue);
+					iconEl.setAttribute('data-tooltip-position', 'right');
 				});
 			} else {
 				// Just show primary status
@@ -177,14 +182,10 @@ export class ExplorerIntegration {
 					});
 					
 					// Add tooltip with status name
-					iconEl.setAttribute('aria-label', primaryStatus);
-					iconEl.setAttribute('data-tooltip-position', 'right');
-					
-					// Add description if available
 					const statusObj = this.statusService.getAllStatuses().find(s => s.name === primaryStatus);
-					if (statusObj && statusObj.description) {
-						iconEl.setAttribute('data-description', statusObj.description);
-					}
+					const tooltipValue = statusObj?.description ? `${primaryStatus} - ${statusObj.description}`: primaryStatus;
+					iconEl.setAttribute('aria-label', tooltipValue);
+					iconEl.setAttribute('data-tooltip-position', 'right');
 				}
 			}
 			

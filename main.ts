@@ -102,7 +102,14 @@ export default class NoteStatus extends Plugin {
 				await new Promise(resolve => setTimeout(resolve, 200));
 				this.checkNoteStatus();
 				this.statusDropdown.update(this.getCurrentStatuses());
+				
 				this.explorerIntegration.updateAllFileExplorerIcons();
+				
+				// Add additional retry with delay to ensure icons are updated
+				setTimeout(() => {
+					console.log('Note Status: Retry updating file explorer icons');
+					this.explorerIntegration.updateAllFileExplorerIcons();
+				}, 2000);
 			});
 
 			// Add settings tab
@@ -110,8 +117,6 @@ export default class NoteStatus extends Plugin {
 
 			// Set up custom events
 			this.setupCustomEvents();
-			
-			console.log(`Note Status plugin v${PLUGIN_VERSION} loaded successfully`);
 		} catch (error) {
 			console.error('Error loading Note Status plugin:', error);
 			new Notice('Error loading Note Status plugin. Check console for details.');
@@ -463,9 +468,13 @@ export default class NoteStatus extends Plugin {
 		}));
 
 		// Metadata resolved event - when all files are indexed
-		this.registerEvent(this.app.metadataCache.on('resolved', () => {
-			this.debouncedUpdateExplorer();
-		}));
+		this.registerEvent(
+			this.app.metadataCache.on('resolved', () => {
+				// When metadata cache is fully resolved, update all icons
+				console.log('Note Status: Metadata cache resolved, updating all icons');
+				setTimeout(() => this.explorerIntegration.updateAllFileExplorerIcons(), 500);
+			})
+		);
 		
 		// Layout change event - ensure status pane is properly rendered
 		this.registerEvent(this.app.workspace.on('layout-change', () => {
