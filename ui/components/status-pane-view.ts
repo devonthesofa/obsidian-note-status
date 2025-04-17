@@ -145,7 +145,6 @@ export class StatusPaneView extends View {
 
 		// Group files by status
 		const statusGroups = this.statusService.groupFilesByStatus(searchQuery);
-
 		// Render each status group
 		Object.entries(statusGroups).forEach(([status, files]) => {
 			if (files.length > 0) {

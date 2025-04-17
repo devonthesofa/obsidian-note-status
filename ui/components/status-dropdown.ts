@@ -71,7 +71,6 @@ export class StatusDropdown {
         console.error('Note Status: Could not find toolbar container');
         return;
       }
-      
       this.createToolbarButton(toolbarContainer);
     }, 500); // Waiting 500ms to ensure the UI is ready
   }
@@ -80,9 +79,7 @@ export class StatusDropdown {
    * Find the toolbar container element
    */
   private findToolbarContainer(): HTMLElement | null {
-    return document.querySelector('.view-header-actions') || 
-           document.querySelector('.view-actions') || 
-           document.querySelector('.workspace-ribbon.mod-right');
+    return document.querySelector('.workspace-leaf .view-header .view-actions')
   }
   
   /**
@@ -90,7 +87,7 @@ export class StatusDropdown {
    */
   private createToolbarButton(toolbarContainer: HTMLElement): void {
     // Create button container for proper positioning
-    this.toolbarButtonContainer = document.createElement('div');
+    this.toolbarButtonContainer = toolbarContainer.createEl('div');
     this.toolbarButtonContainer.addClass('note-status-toolbar-button-container');
     
     // Create the button element
@@ -109,16 +106,16 @@ export class StatusDropdown {
     });
     
     // Add the button to the container
-    this.toolbarButtonContainer.appendChild(this.toolbarButton);
-    
-    // Insert at a more reliable position - just prepend to the container
-    try {
-      toolbarContainer.prepend(this.toolbarButtonContainer);
-    } catch (error) {
-      console.error('Note Status: Error inserting toolbar button', error);
-      // Fallback - just append it
-      toolbarContainer.appendChild(this.toolbarButtonContainer);
-    }
+	this.toolbarButtonContainer.appendChild(this.toolbarButton);
+	
+	// Insert at a more reliable position - just prepend to the container
+	try {
+		toolbarContainer.prepend(this.toolbarButtonContainer);
+	} catch (error) {
+		console.error('Note Status: Error inserting toolbar button', error);
+		// Fallback - just append it
+		toolbarContainer.appendChild(this.toolbarButtonContainer);
+	}
   }
   
   /**
