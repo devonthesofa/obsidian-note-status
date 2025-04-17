@@ -99,7 +99,7 @@ export class StatusService {
       // Check for status using the configured tag prefix
       const frontmatterStatus = cachedMetadata.frontmatter[this.settings.tagPrefix];
       
-      if (frontmatterStatus !== undefined) {
+      if (frontmatterStatus) {
         if (Array.isArray(frontmatterStatus)) {
           // Handle array format
           this.processStatusArray(frontmatterStatus, statuses);
