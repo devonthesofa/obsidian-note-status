@@ -251,6 +251,308 @@
   overflow: hidden;
   box-shadow: var(--shadow-m);
   border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+}
+
+/* Print styles - hide interactive elements when printing */
+@media print {
+  .note-status-dropdown,
+  .note-status-bar,
+  .note-status-pane {
+    display: none !important;
+  }
+}
+
+/* Dark mode adjustments */
+.theme-dark .note-status-popover {
+  box-shadow: var(--shadow-l);
+}
+
+.theme-dark .note-status-option-selecting {
+  box-shadow: 0 0 0 1px var(--interactive-accent);
+}
+
+/* High contrast improvements */
+@media (forced-colors: active) {
+  .note-status-chip,
+  .note-status-option.is-selected {
+    border: 1px solid currentColor;
+  }
+  
+  .note-status-action-button:focus-visible,
+  .note-status-chip:focus-visible,
+  .note-status-option:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+/* Component styles */
+/*
+ * Status Pane Styles
+ */
+
+/* Main container */
+.note-status-pane {
+  padding: var(--size-4-2, 8px);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-family: var(--font-interface);
+  overflow-y: auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header elements */
+.note-status-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--background-secondary);
+  padding-bottom: var(--size-4-2, 8px);
+  border-bottom: 1px solid var(--background-modifier-border);
+  margin-bottom: var(--size-4-2, 8px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-2, 8px);
+}
+
+/* Search input styles */
+.note-status-search {
+  width: 100%;
+  position: relative;
+}
+
+.search-input-wrapper,
+.note-status-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-icon,
+.note-status-search-icon {
+  position: absolute;
+  left: var(--size-4-1, 4px);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  padding: 4px;
+}
+
+.note-status-search-input,
+.note-status-modal-search-input,
+.note-status-popover-search-input {
+  width: 100%;
+  padding: var(--input-padding);
+  padding-left: calc(var(--size-4-1, 4px) * 3 + 18px);
+  border: var(--input-border-width) solid var(--background-modifier-border);
+  border-radius: var(--input-radius);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  outline: none;
+  transition: all var(--status-transition-time) var(--ease-out);
+}
+
+.note-status-search-input:focus,
+.note-status-modal-search-input:focus,
+.note-status-popover-search-input:focus {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px var(--interactive-accent-hover);
+}
+
+.search-input-clear-button,
+.note-status-search-clear-button {
+  opacity: 0;
+  position: absolute;
+  right: var(--size-4-1, 4px);
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  transition: opacity var(--status-transition-time) var(--ease-out);
+  padding: 4px;
+  border-radius: 50%;
+}
+
+.search-input-clear-button.is-visible,
+.note-status-search-clear-button.is-visible {
+  opacity: 1;
+}
+
+.search-input-clear-button:hover,
+.note-status-search-clear-button:hover {
+  color: var(--text-normal);
+  background-color: var(--background-modifier-hover);
+}
+
+/* Actions toolbar */
+.status-pane-actions-container {
+  display: flex;
+  gap: var(--size-4-2, 8px);
+  justify-content: flex-end;
+  margin-top: var(--size-4-1, 4px);
+}
+
+.note-status-view-toggle,
+.note-status-actions-refresh {
+  padding: var(--size-4-1, 4px) var(--size-4-2, 8px);
+  border: var(--input-border-width) solid var(--background-modifier-border);
+  border-radius: var(--button-radius);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  cursor: pointer;
+  transition: all var(--status-transition-time) var(--ease-out);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.note-status-view-toggle:hover,
+.note-status-actions-refresh:hover {
+  background: var(--background-modifier-hover);
+  box-shadow: var(--shadow-s);
+}
+
+.note-status-view-toggle:active,
+.note-status-actions-refresh:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* Status Groups Container */
+.note-status-groups-container {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 2px; /* Prevents scrollbar from hugging the edge */
+}
+
+/* Status Group Styling */
+.status-group {
+  margin-bottom: var(--size-4-3, 12px);
+  border-radius: var(--radius-s);
+  background: var(--background-primary-alt);
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+  animation: fadeInSlideDown 0.3s var(--ease-out);
+}
+
+.status-group .nav-folder-title {
+  padding: var(--size-4-1, 4px) var(--size-4-2, 8px);
+  background: var(--background-secondary-alt);
+  transition: background var(--status-transition-time) var(--ease-out);
+}
+
+.status-group .nav-folder-title:hover {
+  background: var(--background-modifier-hover);
+}
+
+.status-group .nav-folder-title-content {
+  font-weight: var(--font-semibold);
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-1, 4px);
+}
+
+/* Collapse indicators */
+.collapse-indicator {
+  margin-right: var(--size-4-2, 8px);
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  transition: transform var(--status-transition-time) var(--ease-in-out);
+  opacity: 1;
+}
+
+.is-collapsed .collapse-indicator {
+  transform: rotate(-90deg);
+}
+
+/* File items */
+.status-group .nav-folder-children {
+  padding: var(--size-4-1, 4px);
+  background: var(--background-primary);
+  transition: height var(--status-transition-time) var(--ease-out);
+}
+
+.status-group.nav-folder.is-collapsed .nav-folder-children {
+  display: none;
+}
+
+.nav-file {
+  border-radius: var(--radius-s);
+  transition: background var(--status-transition-time) var(--ease-out);
+  margin-bottom: 2px;
+  position: relative;
+}
+
+.nav-file:hover {
+  background: var(--background-modifier-hover);
+}
+
+.nav-file-title {
+  display: flex;
+  align-items: center;
+  padding: var(--size-4-1, 4px) var(--size-4-2, 8px);
+  flex-wrap: nowrap;
+}
+
+.nav-file-icon {
+  color: var(--text-muted);
+  margin-right: var(--size-4-2, 8px);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.nav-file-title-content {
+  flex: 1;
+  min-width: 0; /* Allows text to shrink properly */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Compact view */
+.compact-view .nav-file-title {
+  padding: 2px var(--size-4-2, 8px);
+  font-size: var(--font-smaller);
+}
+
+.compact-view .nav-folder-children {
+  padding: 0;
+}
+
+.compact-view .nav-file {
+  margin-bottom: 0;
+  border-radius: 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.compact-view .nav-file:last-child {
+  border-bottom: none;
+}
+
+/*
+ * Status Dropdown and Popover Styles
+ */
+
+/* Status Dropdown */
+.note-status-dropdown {
+  padding: var(--size-4-2, 8px);
+  background: var(--background-primary);
+  position: sticky;
+  z-index: var(--layer-popover);
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-2, 8px);
+  box-shadow: var(--shadow-s);
+  border-radius: var(--radius-m);
+  margin: 8px auto;
+  max-width: 720px;
+  border: 1px solid var(--background-modifier-border);
   transition: opacity var(--status-transition-time) var(--ease-out),
               transform var(--status-transition-time) var(--ease-out);
 }
@@ -610,306 +912,164 @@
   max-height: 120px;
   overflow-y: auto;
   border-bottom: 1px solid var(--background-modifier-border);
-});
-  background: var(--background-primary);
 }
 
-/* Print styles - hide interactive elements when printing */
-@media print {
-  .note-status-dropdown,
-  .note-status-bar,
-  .note-status-pane {
-    display: none !important;
-  }
-}
-
-/* Dark mode adjustments */
-.theme-dark .note-status-popover {
-  box-shadow: var(--shadow-l);
-}
-
-.theme-dark .note-status-option-selecting {
-  box-shadow: 0 0 0 1px var(--interactive-accent);
-}
-
-/* High contrast improvements */
-@media (forced-colors: active) {
-  .note-status-chip,
-  .note-status-option.is-selected {
-    border: 1px solid currentColor;
-  }
-  
-  .note-status-action-button:focus-visible,
-  .note-status-chip:focus-visible,
-  .note-status-option:focus-visible {
-    outline: 2px solid currentColor;
-    outline-offset: 2px;
-  }
-}
-
-/* Component styles */
 /*
- * Status Pane Styles
+ * Explorer integration styles
  */
 
-/* Main container */
-.note-status-pane {
-  padding: var(--size-4-2, 8px);
-  background: var(--background-secondary);
-  color: var(--text-normal);
-  font-family: var(--font-interface);
-  overflow-y: auto;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Header elements */
-.note-status-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: var(--background-secondary);
-  padding-bottom: var(--size-4-2, 8px);
-  border-bottom: 1px solid var(--background-modifier-border);
-  margin-bottom: var(--size-4-2, 8px);
-  display: flex;
-  flex-direction: column;
-  gap: var(--size-4-2, 8px);
-}
-
-/* Search input styles */
-.note-status-search {
-  width: 100%;
-  position: relative;
-}
-
-.search-input-wrapper,
-.note-status-search-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.search-input-icon,
-.note-status-search-icon {
-  position: absolute;
-  left: var(--size-4-1, 4px);
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  pointer-events: none;
-  padding: 4px;
-}
-
-.note-status-search-input,
-.note-status-modal-search-input,
-.note-status-popover-search-input {
-  width: 100%;
-  padding: var(--input-padding);
-  padding-left: calc(var(--size-4-1, 4px) * 3 + 18px);
-  border: var(--input-border-width) solid var(--background-modifier-border);
-  border-radius: var(--input-radius);
-  background: var(--background-primary);
-  color: var(--text-normal);
-  outline: none;
-  transition: all var(--status-transition-time) var(--ease-out);
-}
-
-.note-status-search-input:focus,
-.note-status-modal-search-input:focus,
-.note-status-popover-search-input:focus {
-  border-color: var(--interactive-accent);
-  box-shadow: 0 0 0 2px var(--interactive-accent-hover);
-}
-
-.search-input-clear-button,
-.note-status-search-clear-button {
-  opacity: 0;
-  position: absolute;
-  right: var(--size-4-1, 4px);
-  cursor: pointer;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  transition: opacity var(--status-transition-time) var(--ease-out);
-  padding: 4px;
-  border-radius: 50%;
-}
-
-.search-input-clear-button.is-visible,
-.note-status-search-clear-button.is-visible {
-  opacity: 1;
-}
-
-.search-input-clear-button:hover,
-.note-status-search-clear-button:hover {
-  color: var(--text-normal);
-  background-color: var(--background-modifier-hover);
-}
-
-/* Actions toolbar */
-.status-pane-actions-container {
-  display: flex;
-  gap: var(--size-4-2, 8px);
-  justify-content: flex-end;
-  margin-top: var(--size-4-1, 4px);
-}
-
-.note-status-view-toggle,
-.note-status-actions-refresh {
-  padding: var(--size-4-1, 4px) var(--size-4-2, 8px);
-  border: var(--input-border-width) solid var(--background-modifier-border);
-  border-radius: var(--button-radius);
-  background: var(--background-primary);
-  color: var(--text-normal);
-  cursor: pointer;
-  transition: all var(--status-transition-time) var(--ease-out);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.note-status-view-toggle:hover,
-.note-status-actions-refresh:hover {
-  background: var(--background-modifier-hover);
-  box-shadow: var(--shadow-s);
-}
-
-.note-status-view-toggle:active,
-.note-status-actions-refresh:active {
-  transform: translateY(1px);
-  box-shadow: none;
-}
-
-/* Status Groups Container */
-.note-status-groups-container {
-  flex: 1;
-  overflow-y: auto;
-  padding-right: 2px; /* Prevents scrollbar from hugging the edge */
-}
-
-/* Status Group Styling */
-.status-group {
-  margin-bottom: var(--size-4-3, 12px);
-  border-radius: var(--radius-s);
-  background: var(--background-primary-alt);
-  box-shadow: var(--shadow-xs);
-  overflow: hidden;
-  animation: fadeInSlideDown 0.3s var(--ease-out);
-}
-
-.status-group .nav-folder-title {
-  padding: var(--size-4-1, 4px) var(--size-4-2, 8px);
-  background: var(--background-secondary-alt);
-  transition: background var(--status-transition-time) var(--ease-out);
-}
-
-.status-group .nav-folder-title:hover {
-  background: var(--background-modifier-hover);
-}
-
-.status-group .nav-folder-title-content {
-  font-weight: var(--font-semibold);
-  display: flex;
-  align-items: center;
-  gap: var(--size-4-1, 4px);
-}
-
-/* Collapse indicators */
-.collapse-indicator {
-  margin-right: var(--size-4-2, 8px);
-  display: flex;
-  align-items: center;
-  color: var(--text-muted);
-  transition: transform var(--status-transition-time) var(--ease-in-out);
-  opacity: 1;
-}
-
-.is-collapsed .collapse-indicator {
-  transform: rotate(-90deg);
-}
-
-/* File items */
-.status-group .nav-folder-children {
-  padding: var(--size-4-1, 4px);
-  background: var(--background-primary);
-  transition: height var(--status-transition-time) var(--ease-out);
-}
-
-.status-group.nav-folder.is-collapsed .nav-folder-children {
-  display: none;
-}
-
-.nav-file {
-  border-radius: var(--radius-s);
-  transition: background var(--status-transition-time) var(--ease-out);
-  margin-bottom: 2px;
-  position: relative;
-}
-
-.nav-file:hover {
-  background: var(--background-modifier-hover);
-}
-
-.nav-file-title {
-  display: flex;
-  align-items: center;
-  padding: var(--size-4-1, 4px) var(--size-4-2, 8px);
-  flex-wrap: nowrap;
-}
-
-.nav-file-icon {
-  color: var(--text-muted);
-  margin-right: var(--size-4-2, 8px);
-  display: flex;
+/* Explorer icons container */
+.note-status-icon-container {
+  display: inline-flex;
+  margin-left: var(--size-4-1, 4px);
+  gap: 2px;
   align-items: center;
   flex-shrink: 0;
 }
 
-.nav-file-title-content {
-  flex: 1;
-  min-width: 0; /* Allows text to shrink properly */
+/* Individual status icons in explorer */
+.note-status-icon {
+  font-size: var(--font-ui-smaller);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--status-icon-size);
+  height: var(--status-icon-size);
+  position: relative;
+  z-index: 500; /* Higher than most elements */
+}
+
+.nav-file-title .note-status-icon::after {
+  bottom: 150%; /* Position above in file explorer */
+}
+
+/*
+ * Status bar styles
+ */
+
+/* Status bar refinements */
+.note-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: var(--radius-s);
+  transition: all 0.2s var(--ease-out);
+  cursor: pointer;
+}
+
+.note-status-bar:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.note-status-badges {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.note-status-badge {
+  display: flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: var(--background-secondary-alt);
+  font-size: var(--font-ui-smaller);
+  max-width: 100px;
+  margin-right: 2px;
+}
+
+.note-status-badge-icon {
+  margin-right: 2px;
+}
+
+.note-status-badge-text {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Compact view */
-.compact-view .nav-file-title {
-  padding: 2px var(--size-4-2, 8px);
-  font-size: var(--font-smaller);
+/* Status bar positioning and visibility */
+.status-bar .note-status-icon::after {
+  bottom: auto;
+  top: -30px;
 }
 
-.compact-view .nav-folder-children {
-  padding: 0;
+/* Auto-hide behavior */
+.note-status-bar.hidden {
+  display: none;
 }
 
-.compact-view .nav-file {
-  margin-bottom: 0;
-  border-radius: 0;
-  border-bottom: 1px solid var(--background-modifier-border);
+.note-status-bar.auto-hide {
+  opacity: 0.5;
+  transition: opacity 0.2s var(--ease-out);
 }
 
-.compact-view .nav-file:last-child {
-  border-bottom: none;
+.note-status-bar.visible {
+  opacity: 1;
+}
+
+/* Additional styling for multiple status badges */
+.note-status-additional-badges {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 4px;
+}
+
+.note-status-mini-badge {
+  font-size: var(--font-ui-smallest);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--background-secondary);
+  box-shadow: var(--shadow-xs);
 }
 
 /*
- * Status Dropdown and Popover Styles
+ * Context menu and toolbar styles
  */
 
-/* Status Dropdown */
-.note-status-dropdown {
-  padding: var(--size-4-2, 8px);
-  background: var(--background-primary);
-  position: sticky;
-  z-index: var(--layer-popover);
+/* Context menu enhancements */
+.note-status-context-menu .menu-item {
+  display: flex;
+  align-items: center;
+}
+
+.note-status-menu-header {
+  font-weight: var(--font-semibold);
+  border-bottom: 1px solid var(--background-modifier-border);
+  margin-bottom: 2px;
+  pointer-events: none !important;
+}
+
+.note-status-menu-section {
+  font-size: var(--font-ui-smaller);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  pointer-events: none !important;
+}
+
+/* Batch modal styling */
+.note-status-batch-modal {
+  max-width: 550px;
   display: flex;
   flex-direction: column;
-  gap: var(--size-4-2, 8px);
-  box-shadow: var(--shadow-s);
-  border-radius: var(--radius-m);
-  margin: 8px auto;
-  max-width: 720px;
-  border: 1px solid var(--background-modifier-border
+  gap: 16px;
+}
+
+.note-status-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+/* Status batch modal specific styles */
+.note-status-batch-menu {
+  z-index: 1000;
+}
