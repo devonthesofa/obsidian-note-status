@@ -1,3 +1,10 @@
+/*
+ * Note Status Plugin for Obsidian
+ * Main CSS file importing all components
+ *
+ * Author: Aleix Soler
+*/
+
 /* Base styles and variables */
 :root {
   --status-transition-time: 0.22s;
@@ -12,7 +19,129 @@
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
 }
 
-/* Status Pane */
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { 
+    opacity: 0; 
+    transform: scale(0.9);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInFade {
+  from { 
+    opacity: 0; 
+    transform: translateY(-10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInSlideDown {
+  from { 
+    opacity: 0; 
+    transform: translateY(-6px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes statusDropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes statusDropdownFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.98); }
+  100% { transform: scale(1); }
+}
+
+/* Common utility classes */
+.note-status-empty-indicator {
+  color: var(--text-muted);
+  font-style: italic;
+  padding: var(--size-4-1, 4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 36px;
+  background: var(--background-secondary-alt);
+  border-radius: var(--radius-s, 4px);
+  font-size: 0.9em;
+  user-select: none;
+}
+
+/* Print styles - hide interactive elements when printing */
+@media print {
+  .note-status-dropdown,
+  .note-status-bar,
+  .note-status-pane {
+    display: none !important;
+  }
+}
+
+/* Dark mode adjustments */
+.theme-dark .note-status-popover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.theme-dark .note-status-option-selecting {
+  box-shadow: 0 0 0 1px var(--interactive-accent);
+}
+
+/* High contrast improvements */
+@media (forced-colors: active) {
+  .note-status-chip,
+  .note-status-option.is-selected {
+    border: 1px solid currentColor;
+  }
+  
+  .note-status-action-button:focus-visible,
+  .note-status-chip:focus-visible,
+  .note-status-option:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+/* Component styles */
+/*
+ * Status Pane Styles
+ */
+
+/* Main container */
 .note-status-pane {
   padding: var(--size-4-2, 8px);
   background: var(--background-secondary);
@@ -38,7 +167,7 @@
   gap: var(--size-4-2, 8px);
 }
 
-/* Search input improvements */
+/* Search input styles */
 .note-status-search {
   width: 100%;
   position: relative;
@@ -196,6 +325,7 @@
   background: var(--background-primary);
   transition: height var(--status-transition-time) var(--ease-out);
 }
+
 .status-group.nav-folder.is-collapsed .nav-folder-children {
   display: none;
 }
@@ -253,65 +383,9 @@
 .compact-view .nav-file:last-child {
   border-bottom: none;
 }
-
-/* Explorer icons container */
-.note-status-icon-container {
-  display: inline-flex;
-  margin-left: var(--size-4-1, 4px);
-  gap: 2px;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-/* Individual status icons in explorer */
-.note-status-icon {
-  font-size: var(--font-ui-smaller, 0.85em);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--status-icon-size);
-  height: var(--status-icon-size);
-}
-/* Tooltip styling for status description */
-.note-status-icon {
-  position: relative;
-}
-
-
-/* Handle long descriptions */
-.note-status-icon::after {
-  max-width: 200px;
-  white-space: normal;
-  text-align: center;
-}
-
-/* Ensure tooltip is above all other elements */
-.note-status-icon {
-  z-index: 500; /* Higher than most elements */
-}
-
-/* Additional tooltip positioning for different contexts */
-.nav-file-title .note-status-icon::after {
-  bottom: 150%; /* Position above in file explorer */
-}
-
-.status-bar .note-status-icon::after {
-  bottom: auto;
-  top: -30px;
-}
-
-/* Ensure tooltips in popovers and dropdowns are visible */
-.note-status-popover .note-status-option-icon::after,
-.note-status-dropdown .note-status-chip-icon::after {
-  z-index: 1001; /* Even higher for nested elements */
-}
-
-/* Hover effect for icon container */
-.note-status-icon-container:hover {
-  background-color: var(--background-modifier-hover);
-  border-radius: var(--radius-s, 4px);
-  padding: 1px 2px;
-}
+/*
+ * Status Dropdown and Popover Styles
+ */
 
 /* Status Dropdown */
 .note-status-dropdown {
@@ -324,9 +398,8 @@
   gap: var(--size-4-2, 8px);
   box-shadow: var(--shadow-s);
   border-radius: var(--radius-m, 8px);
-  margin: var(--size-4-2, 8px);
-  max-width: 720px;
   margin: 8px auto;
+  max-width: 720px;
   border: 1px solid var(--background-modifier-border);
   transition: opacity var(--status-transition-time) var(--ease-out),
               transform var(--status-transition-time) var(--ease-out);
@@ -418,22 +491,6 @@
   border-radius: var(--status-border-radius);
 }
 
-.note-status-empty-indicator {
-  color: var(--text-muted);
-  font-style: italic;
-  padding: var(--size-4-1, 4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  min-height: 36px;
-  background: var(--background-secondary-alt);
-  border-radius: var(--radius-s, 4px);
-  font-size: 0.9em;
-  user-select: none;
-}
-
 /* Status chips styling */
 .note-status-chip {
   display: inline-flex;
@@ -463,6 +520,7 @@
   transform: scale(0.8);
   opacity: 0;
   pointer-events: none;
+  transition: all 0.15s ease-out;
 }
 
 .note-status-chip-icon {
@@ -550,6 +608,8 @@
   transform: scale(0.95);
   transition: opacity var(--status-transition-time) var(--ease-out),
               transform var(--status-transition-time) var(--ease-out);
+  transform-origin: top left;
+  pointer-events: all !important;
 }
 
 .note-status-popover.note-status-popover-animate-in {
@@ -575,12 +635,27 @@
 
 /* Search container */
 .note-status-popover-search {
-  padding: var(--size-4-2, 8px);
-  border-bottom: 1px solid var(--background-modifier-border);
+  padding: 8px;
   position: sticky;
   top: 0;
   background: var(--background-primary);
-  z-index: 1;
+  z-index: 3;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.note-status-popover-search-input {
+  width: 100%;
+  padding: 8px;
+  border-radius: var(--input-radius, 4px);
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-normal);
+}
+
+.note-status-popover-search-input:focus {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px rgba(var(--interactive-accent-rgb), 0.2);
+  outline: none;
 }
 
 /* Status options container */
@@ -620,11 +695,12 @@
   display: flex;
   align-items: center;
   padding: 8px 12px;
+  margin: 2px 4px;
   border-radius: var(--radius-s, 4px);
-  cursor: pointer;
-  transition: all 0.15s var(--ease-out);
-  margin-bottom: 2px;
-  position: relative;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  cursor: pointer !important;
+  transition: background-color 0.15s ease;
 }
 
 .note-status-option:hover {
@@ -633,21 +709,23 @@
 
 .note-status-option.is-selected {
   background: var(--background-secondary-alt);
+  font-weight: 500;
+}
+
+.note-status-option.is-selected {
+  background-color: var(--interactive-accent-hover) !important;
+  color: var(--text-on-accent) !important;
 }
 
 .note-status-option-selecting {
-  background: var(--interactive-accent) !important;
-  color: var(--text-on-accent);
-  transform: scale(0.98);
+  background-color: var(--interactive-accent) !important;
+  color: var(--text-on-accent) !important;
+  animation: pulse 0.3s var(--ease-out);
 }
 
 .note-status-option-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   margin-right: 8px;
-  font-size: 1em;
-  min-width: 16px;
+  font-size: 1.1em;
 }
 
 .note-status-option-text {
@@ -659,11 +737,230 @@
 }
 
 .note-status-option-check {
+  margin-left: auto;
+  color: var(--text-accent);
+}
+
+/* Unified dropdown */
+.note-status-unified-dropdown {
+  width: 280px;
+  max-width: 90vw;
+  border-radius: var(--radius-m, 8px);
+  overflow: hidden;
+  box-shadow: var(--shadow-m), 0 0 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  z-index: 9999 !important; /* Ensure it's above everything */
+  pointer-events: all !important; /* Ensure dropdown receives clicks */
+}
+
+/* Animation for unified dropdown */
+.note-status-popover-animate-in {
+  animation: statusDropdownFadeIn 0.22s var(--ease-out) forwards;
+}
+
+.note-status-popover-animate-out {
+  animation: statusDropdownFadeOut 0.22s var(--ease-out) forwards;
+}
+
+/* Popover header */
+.note-status-popover-header {
+  padding: 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary-alt);
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.note-status-popover-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.note-status-popover-icon {
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-accent);
+}
+
+.note-status-popover-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px;
+  background: var(--background-primary-alt);
+  max-height: 120px;
+  overflow-y: auto;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+/*
+ * Explorer integration styles
+ */
+
+/* Explorer icons container */
+.note-status-icon-container {
+  display: inline-flex;
+  margin-left: var(--size-4-1, 4px);
+  gap: 2px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Individual status icons in explorer */
+.note-status-icon {
+  font-size: var(--font-ui-smaller, 0.85em);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--status-icon-size);
+  height: var(--status-icon-size);
+  position: relative;
+  z-index: 500; /* Higher than most elements */
+}
+
+/* Tooltip styling for status description */
+.note-status-icon::after {
+  max-width: 200px;
+  white-space: normal;
+  text-align: center;
+}
+
+/* Additional tooltip positioning for different contexts */
+.nav-file-title .note-status-icon::after {
+  bottom: 150%; /* Position above in file explorer */
+}
+
+/* Hover effect for icon container */
+.note-status-icon-container:hover {
+  background-color: var(--background-modifier-hover);
+  border-radius: var(--radius-s, 4px);
+  padding: 1px 2px;
+}
+
+/* Ensure tooltips in popovers and dropdowns are visible */
+.note-status-popover .note-status-option-icon::after,
+.note-status-dropdown .note-status-chip-icon::after {
+  z-index: 1001; /* Even higher for nested elements */
+}
+/*
+ * Status bar styles
+ */
+
+/* Status bar refinements */
+.note-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: var(--radius-s, 4px);
+  transition: all 0.2s var(--ease-out);
+  cursor: pointer;
+}
+
+.note-status-bar:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.note-status-badges {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.note-status-badge {
+  display: flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: var(--background-secondary-alt);
+  font-size: 0.8em;
+  max-width: 100px;
+  margin-right: 2px;
+}
+
+.note-status-badge-icon {
+  margin-right: 2px;
+}
+
+.note-status-badge-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Additional styling for multiple status badges */
+.note-status-additional-badges {
+  display: flex;
+  align-items: center;
+  gap: 2px;
   margin-left: 4px;
+}
+
+.note-status-mini-badge {
+  font-size: 0.75em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--background-secondary);
+  box-shadow: var(--shadow-xs);
+}
+
+/* Status bar positioning and visibility */
+.status-bar .note-status-icon::after {
+  bottom: auto;
+  top: -30px;
+}
+
+/* Auto-hide behavior */
+.note-status-bar.hidden {
+  display: none;
+}
+
+.note-status-bar.auto-hide {
+  opacity: 0.5;
+  transition: opacity 0.2s var(--ease-out);
+}
+
+.note-status-bar.visible {
+  opacity: 1;
+}
+/*
+ * Context menu and toolbar styles
+ */
+
+/* Context menu enhancements */
+.note-status-context-menu .menu-item {
+  display: flex;
+  align-items: center;
+}
+
+.note-status-context-menu .menu-item.is-active {
+  color: var(--text-accent);
+}
+
+.note-status-menu-header {
+  font-weight: 600;
+  border-bottom: 1px solid var(--background-modifier-border);
+  margin-bottom: 2px;
+  pointer-events: none !important;
+}
+
+.note-status-menu-section {
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  pointer-events: none !important;
 }
 
 /* Batch modal styling */
@@ -764,44 +1061,6 @@
   padding: 12px !important;
 }
 
-/* Mode selection in batch modal */
-.note-status-mode-container {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 8px;
-  background: var(--background-primary-alt);
-  border-radius: var(--radius-s, 4px);
-  margin-bottom: 8px;
-}
-
-.note-status-mode-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: var(--radius-s, 4px);
-  cursor: pointer;
-  transition: all 0.15s var(--ease-out);
-}
-
-.note-status-mode-option:hover {
-  background: var(--background-modifier-hover);
-}
-
-.note-status-mode-option.is-active {
-  background: var(--background-modifier-hover);
-}
-
-.note-status-mode-radio {
-  margin: 0;
-}
-
-.note-status-mode-label {
-  cursor: pointer;
-  user-select: none;
-}
-
 /* Action buttons in modal */
 .note-status-modal-buttons {
   display: flex;
@@ -845,183 +1104,6 @@
   pointer-events: none;
 }
 
-/* Status bar refinements */
-.note-status-bar {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
-  border-radius: var(--radius-s, 4px);
-  transition: all 0.2s var(--ease-out);
-  cursor: pointer;
-}
-
-.note-status-bar:hover {
-  background-color: var(--background-modifier-hover);
-}
-
-.note-status-badges {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.note-status-badge {
-  display: flex;
-  align-items: center;
-  padding: 2px 6px;
-  border-radius: 10px;
-  background: var(--background-secondary-alt);
-  font-size: 0.8em;
-  max-width: 100px;
-  margin-right: 2px;
-}
-
-.note-status-badge-icon {
-  margin-right: 2px;
-}
-
-.note-status-badge-text {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Additional styling for multiple status badges */
-.note-status-additional-badges {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  margin-left: 4px;
-}
-
-.note-status-mini-badge {
-  font-size: 0.75em;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--background-secondary);
-  box-shadow: var(--shadow-xs);
-}
-
-/* Context menu enhancements */
-.note-status-context-menu .menu-item {
-  display: flex;
-  align-items: center;
-}
-
-.note-status-context-menu .menu-item.is-active {
-  color: var(--text-accent);
-}
-
-.note-status-menu-header {
-  font-weight: 600;
-  border-bottom: 1px solid var(--background-modifier-border);
-  margin-bottom: 2px;
-  pointer-events: none !important;
-}
-
-.note-status-menu-section {
-  font-size: 0.8em;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
-  pointer-events: none !important;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes scaleIn {
-  from { 
-    opacity: 0; 
-    transform: scale(0.9);
-  }
-  to { 
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes slideInFade {
-  from { 
-    opacity: 0; 
-    transform: translateY(-10px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeInSlideDown {
-  from { 
-    opacity: 0; 
-    transform: translateY(-6px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .note-status-dropdown {
-    margin: 4px;
-    padding: 6px;
-  }
-  
-  .note-status-chip {
-    max-width: 150px;
-  }
-  
-  .note-status-batch-modal {
-    max-width: 95%;
-  }
-}
-
-/* High contrast improvements */
-@media (forced-colors: active) {
-  .note-status-chip,
-  .note-status-option.is-selected {
-    border: 1px solid currentColor;
-  }
-  
-  .note-status-action-button:focus-visible,
-  .note-status-chip:focus-visible,
-  .note-status-option:focus-visible {
-    outline: 2px solid currentColor;
-    outline-offset: 2px;
-  }
-}
-
-/* Dark mode adjustments */
-.theme-dark .note-status-popover {
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-}
-
-.theme-dark .note-status-option-selecting {
-  box-shadow: 0 0 0 1px var(--interactive-accent);
-}
-
-/* Print styles - hide interactive elements when printing */
-@media print {
-  .note-status-dropdown,
-  .note-status-bar,
-  .note-status-pane {
-    display: none !important;
-  }
-}
-
-
-
 /* Toolbar button styling */
 .note-status-toolbar-badge-container {
   display: flex;
@@ -1032,6 +1114,9 @@
 
 .note-status-toolbar-icon {
   color: var(--text-normal) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 /* Target all possible toolbar locations */
@@ -1062,270 +1147,172 @@
   border: 1px solid var(--background-modifier-border);
   background: var(--background-primary);
 }
+/*
+ * Settings tab styles
+ */
 
-.note-status-popover-header {
-  padding: 12px;
-  border-bottom: 1px solid var(--background-modifier-border);
-  background: var(--background-secondary-alt);
-  display: flex;
-  align-items: center;
+/* Template selection styling */
+.template-item {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--status-border-radius);
+  margin-bottom: 10px;
+  padding: 10px;
+  background: var(--background-primary-alt);
 }
 
-.note-status-popover-title {
+.template-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  color: var(--text-normal);
+  margin-bottom: 5px;
 }
 
-.note-status-popover-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-accent);
+.template-checkbox {
+  margin-right: 10px;
 }
 
-.note-status-popover-chips {
+.template-name {
+  font-weight: bold;
+}
+
+.template-description {
+  font-size: 0.9em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.template-statuses {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding: 12px;
-  background: var(--background-primary-alt);
-  max-height: 120px;
-  overflow-y: auto;
-  border-bottom: 1px solid var(--background-modifier-border);
+  gap: 5px;
 }
 
-/* Empty indicator for popover */
-.note-status-popover-chips .note-status-empty-indicator {
-  width: 100%;
-  min-height: auto;
-  padding: 8px 0;
-  justify-content: flex-start;
-  background: transparent;
-}
-
-/* Make icons more visible */
-.note-status-toolbar-icon {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-/* Make the unified dropdown look consistent in all contexts */
-.note-status-unified-dropdown {
-  width: 280px;
-  max-width: 90vw;
-  border-radius: var(--radius-m, 8px);
-  overflow: hidden;
-  box-shadow: var(--shadow-m), 0 0 15px rgba(0, 0, 0, 0.1);
-  border: 1px solid var(--background-modifier-border);
-  background: var(--background-primary);
-  z-index: 9999 !important; /* Ensure it's above everything */
-  pointer-events: all !important; /* Ensure dropdown receives clicks */
-}
-
-/* Better animation for unified dropdown */
-.note-status-popover-animate-in {
-  animation: statusDropdownFadeIn 0.22s var(--ease-out) forwards;
-}
-
-.note-status-popover-animate-out {
-  animation: statusDropdownFadeOut 0.22s var(--ease-out) forwards;
-}
-
-@keyframes statusDropdownFadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes statusDropdownFadeOut {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-}
-
-/* Fix for positioning when transitioning */
-.note-status-popover {
-  transform-origin: top left;
-  pointer-events: all !important;
-}
-
-/* Make sure clickable elements in dropdown work properly */
-.note-status-option,
-.note-status-option-icon,
-.note-status-option-text,
-.note-status-chip,
-.note-status-chip-remove,
-.note-status-popover-search-input {
-  pointer-events: all !important;
-}
-
-/* Fix option clicking */
-.note-status-option {
-  cursor: pointer !important;
-  transition: background-color 0.15s ease;
-}
-
-.note-status-option:hover {
-  background-color: var(--background-modifier-hover) !important;
-}
-
-.note-status-option.is-selected {
-  background-color: var(--interactive-accent-hover) !important;
-  color: var(--text-on-accent) !important;
-}
-
-/* Make options more visible when selecting */
-.note-status-option-selecting {
-  background-color: var(--interactive-accent) !important;
-  color: var(--text-on-accent) !important;
-  animation: pulse 0.3s var(--ease-out);
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(0.98); }
-  100% { transform: scale(1); }
-}
-
-/* Ensure dropdown shows above modal if needed */
-.modal-container .note-status-unified-dropdown {
-  z-index: 10001 !important;
-}
-
-/* Make sure scrollable containers in dropdown work properly */
-.note-status-options-container {
-  max-height: 250px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-}
-
-/* Fix dropdown header styling */
-.note-status-popover-header {
-  padding: 12px;
-  border-bottom: 1px solid var(--background-modifier-border);
-  background: var(--background-secondary-alt);
-  display: flex;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-}
-
-/* Improve status badges styling */
-.note-status-chip {
+.template-status-chip {
   display: inline-flex;
   align-items: center;
-  padding: 4px 8px;
-  margin: 2px;
+  padding: 2px 8px;
   border-radius: 12px;
   background: var(--background-secondary);
-  border: 1px solid var(--background-modifier-border);
-  color: var(--text-normal);
-  font-size: 0.9em;
-  max-width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 0.85em;
 }
 
-.note-status-chip-icon {
+.status-color-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
   margin-right: 4px;
 }
 
-/* Remove button on badges */
-.note-status-chip-remove {
+/* Custom status list */
+.custom-status-list {
+  margin-bottom: 1rem;
+}
+
+.status-item {
   display: flex;
   align-items: center;
-  justify-content: center;
+  padding: 8px;
+  border-radius: var(--radius-s);
+  margin-bottom: 4px;
+  background: var(--background-primary-alt);
+}
+
+.status-remove-button {
   margin-left: 4px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--background-modifier-border);
-  color: var(--text-muted);
-  cursor: pointer !important;
-  transition: all 0.15s var(--ease-out);
 }
 
-.note-status-chip-remove:hover {
-  background: var(--text-accent);
-  color: var(--text-on-accent);
-  transform: scale(1.1);
-}
-
-/* Improve search input */
-.note-status-popover-search {
-  padding: 8px;
-  position: sticky;
-  top: 0;
-  background: var(--background-primary);
-  z-index: 3;
-  border-bottom: 1px solid var(--background-modifier-border);
-}
-
-.note-status-popover-search-input {
-  width: 100%;
-  padding: 8px;
-  border-radius: var(--input-radius, 4px);
-  border: 1px solid var(--background-modifier-border);
-  background: var(--background-primary);
-  color: var(--text-normal);
-}
-
-.note-status-popover-search-input:focus {
-  border-color: var(--interactive-accent);
-  box-shadow: 0 0 0 2px rgba(var(--interactive-accent-rgb), 0.2);
-  outline: none;
-}
-
-/* Better options styling */
-.note-status-option {
+/* Template buttons container */
+.template-buttons {
+  margin-top: 15px;
   display: flex;
-  align-items: center;
-  padding: 8px 12px;
-  margin: 2px 4px;
-  border-radius: var(--radius-s, 4px);
-  background: var(--background-primary);
-  color: var(--text-normal);
+  gap: 10px;
 }
 
-.note-status-option.is-selected {
-  font-weight: 500;
+/* Override obsidian settings spacing */
+.status-item .setting-item-info {
+  display: none;
 }
 
-.note-status-option-icon {
-  margin-right: 8px;
-  font-size: 1.1em;
+.status-item .setting-item-control {
+  justify-content: flex-start;
+  gap: 8px;
 }
 
-.note-status-option-check {
-  margin-left: auto;
-  color: var(--text-accent);
+/* Responsive adjustments */
+/*
+ * Responsive adjustments
+ */
+
+/* Medium screens */
+@media (max-width: 768px) {
+  .note-status-dropdown {
+    margin: 4px;
+    padding: 6px;
+  }
+  
+  .note-status-chip {
+    max-width: 150px;
+  }
+  
+  .note-status-batch-modal {
+    max-width: 95%;
+  }
+
+  .note-status-popover-chips {
+    max-height: 80px;
+  }
+
+  .note-status-options-container {
+    max-height: 200px;
+  }
 }
 
+/* Small screens */
+@media (max-width: 480px) {
+  .note-status-popover {
+    width: 95vw !important;
+    max-width: 95vw;
+  }
 
-/* Prevent event propagation issues */
-.note-status-unified-dropdown * {
-  pointer-events: all !important;
+  .note-status-unified-dropdown {
+    width: 95vw;
+  }
+
+  .note-status-chip {
+    max-width: 120px;
+    font-size: 0.85em;
+  }
+
+  .note-status-option {
+    padding: 6px 8px;
+  }
+
+  .note-status-toolbar-popover {
+    width: 95vw;
+  }
+
+  .note-status-modal-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .note-status-apply-button {
+    width: 100%;
+  }
 }
 
-/* Animation for badge removal */
-.note-status-chip-removing {
-  transform: scale(0.8);
-  opacity: 0;
-  transition: all 0.15s ease-out;
+/* Ensure modal dialogs work properly on small screens */
+@media (max-height: 600px) {
+  .note-status-options-container {
+    max-height: 150px;
+  }
+
+  .note-status-popover-chips {
+    max-height: 60px;
+  }
+
+  .note-status-batch-modal {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
 }
