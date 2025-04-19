@@ -58,8 +58,6 @@ export default class NoteStatus extends Plugin {
   private hasShownErrorNotification = false;
 
   async onload() {
-    console.log(`Loading Note Status plugin v${PLUGIN_VERSION}`);
-    
     try {
       // Load settings first before initializing other components
       await this.loadSettings();
@@ -116,7 +114,6 @@ export default class NoteStatus extends Plugin {
     
     // Add additional retry with delay to ensure icons are updated
     setTimeout(() => {
-      console.log('Note Status: Retry updating file explorer icons');
       this.explorerIntegration.updateAllFileExplorerIcons();
     }, 2000);
   }
@@ -455,7 +452,6 @@ export default class NoteStatus extends Plugin {
     this.registerEvent(
       this.app.metadataCache.on('resolved', () => {
         // When metadata cache is fully resolved, update all icons
-        console.log('Note Status: Metadata cache resolved, updating all icons');
         setTimeout(() => this.explorerIntegration.updateAllFileExplorerIcons(), 500);
       })
     );
@@ -700,8 +696,6 @@ export default class NoteStatus extends Plugin {
    * Clean up when the plugin is unloaded
    */
   onunload(): void {
-    console.log('Unloading Note Status plugin');
-    
     // Cancel debounced functions
     this.debouncedCheckNoteStatus.cancel();
     this.debouncedUpdateExplorer.cancel();
@@ -719,8 +713,6 @@ export default class NoteStatus extends Plugin {
 
     // Remove event listeners for custom events
     this.removeCustomEventListeners();
-    
-    console.log('Note Status plugin unloaded');
   }
   
   /**
