@@ -1,4 +1,3 @@
-import { Notice } from 'obsidian';
 import { NoteStatusSettings } from '../../models/types';
 import { StatusService } from '../../services/status-service';
 
@@ -15,16 +14,16 @@ export class StatusBar {
 		this.statusBarEl = statusBarEl;
 		this.settings = settings;
 		this.statusService = statusService;
-	
+
 		// Add initial class
 		this.statusBarEl.addClass('note-status-bar');
-	
+
 		// Add right-click handler for force refresh
 		this.statusBarEl.addEventListener('contextmenu', (e) => {
 			e.preventDefault();
 			window.dispatchEvent(new CustomEvent('note-status:force-refresh'));
 		});
-	
+
 		// Initial render
 		this.update(['unknown']);
 	}
@@ -41,74 +40,93 @@ export class StatusBar {
 	 * Render the status bar based on current settings and statuses
 	 */
 	public render(): void {
-		this.statusBarEl.empty();
-		this.statusBarEl.removeClass('left', 'hidden', 'auto-hide', 'visible');
-		this.statusBarEl.addClass('note-status-bar');
-
-		if (!this.settings.showStatusBar) {
-			this.statusBarEl.addClass('hidden');
-			return;
-		}
-
-		// Handle single vs. multiple status display
-		if (this.currentStatuses.length === 1 || !this.settings.useMultipleStatuses) {
-			// Display single status
-			const primaryStatus = this.currentStatuses[0];
-			
-			// Create status text
-			this.statusBarEl.createEl('span', {
-				text: `Status: ${primaryStatus}`,
-				cls: `note-status-${primaryStatus}`
-			});
-
-			// Create status icon
-			this.statusBarEl.createEl('span', {
-				text: this.statusService.getStatusIcon(primaryStatus),
-				cls: `note-status-icon status-${primaryStatus}`
-			});
-		} else {
-			// Display multiple statuses
-			// Create status text
-			this.statusBarEl.createEl('span', {
-				text: `Statuses: `,
-				cls: 'note-status-label'
-			});
-			
-			// Create container for status badges
-			const badgesContainer = this.statusBarEl.createEl('span', {
-				cls: 'note-status-badges'
-			});
-			
-			// Add status badges
-			this.currentStatuses.forEach(status => {
-				const badge = badgesContainer.createEl('span', {
-					cls: `note-status-badge status-${status}`
-				});
-				
-				badge.createEl('span', {
-					text: this.statusService.getStatusIcon(status),
-					cls: 'note-status-badge-icon'
-				});
-				
-				badge.createEl('span', {
-					text: status,
-					cls: 'note-status-badge-text'
-				});
-			});
-		}
-
-		// Handle auto-hide behavior
-		const onlyUnknown = this.currentStatuses.length === 1 && this.currentStatuses[0] === 'unknown';
-		if (this.settings.autoHideStatusBar && onlyUnknown) {
-			this.statusBarEl.addClass('auto-hide');
-			setTimeout(() => {
-				if (onlyUnknown && this.settings.showStatusBar) {
-					this.statusBarEl.addClass('hidden');
-				}
-			}, 500);
-		} else {
-			this.statusBarEl.addClass('visible');
-		}
+	  this.statusBarEl.empty();
+	  this.statusBarEl.removeClass('left', 'hidden', 'auto-hide', 'visible');
+	  this.statusBarEl.addClass('note-status-bar');
+	
+	  if (!this.settings.showStatusBar) {
+	    this.statusBarEl.addClass('hidden');
+	    return;
+	  }
+	
+	  // Handle single vs. multiple status display
+	  if (this.currentStatuses.length === 1 || !this.settings.useMultipleStatuses) {
+	    // Display single status
+	    const primaryStatus = this.currentStatuses[0];
+	    
+	    // Get status object to get description
+	    const statusObj = this.statusService.getAllStatuses().find(s => s.name === primaryStatus);
+	    const tooltipValue = statusObj?.description ? `${primaryStatus} - ${statusObj.description}` : primaryStatus;
+	    
+	    // Create status text
+	    const statusText = this.statusBarEl.createEl('span', {
+	      text: `Status: ${primaryStatus}`,
+	      cls: `note-status-${primaryStatus}`
+	    });
+	    
+	    // Add tooltip
+	    statusText.setAttribute('aria-label', tooltipValue);
+	    statusText.setAttribute('data-tooltip-position', 'top');
+	
+	    // Create status icon
+	    const statusIcon = this.statusBarEl.createEl('span', {
+	      text: this.statusService.getStatusIcon(primaryStatus),
+	      cls: `note-status-icon status-${primaryStatus}`
+	    });
+	    
+	    // Add tooltip to icon too
+	    statusIcon.setAttribute('aria-label', tooltipValue);
+	    statusIcon.setAttribute('data-tooltip-position', 'top');
+	  } else {
+	    // Display multiple statuses
+	    // Create status text
+	    this.statusBarEl.createEl('span', {
+	      text: `Statuses: `,
+	      cls: 'note-status-label'
+	    });
+	    
+	    // Create container for status badges
+	    const badgesContainer = this.statusBarEl.createEl('span', {
+	      cls: 'note-status-badges'
+	    });
+	    
+	    // Add status badges
+	    this.currentStatuses.forEach(status => {
+	      const statusObj = this.statusService.getAllStatuses().find(s => s.name === status);
+	      const tooltipValue = statusObj?.description ? `${status} - ${statusObj.description}` : status;
+	      
+	      const badge = badgesContainer.createEl('span', {
+	        cls: `note-status-badge status-${status}`
+	      });
+	      
+	      // Add tooltip
+	      badge.setAttribute('aria-label', tooltipValue);
+	      badge.setAttribute('data-tooltip-position', 'top');
+	      
+	      badge.createEl('span', {
+	        text: this.statusService.getStatusIcon(status),
+	        cls: 'note-status-badge-icon'
+	      });
+	      
+	      badge.createEl('span', {
+	        text: status,
+	        cls: 'note-status-badge-text'
+	      });
+	    });
+	  }
+	
+	  // Handle auto-hide behavior
+	  const onlyUnknown = this.currentStatuses.length === 1 && this.currentStatuses[0] === 'unknown';
+	  if (this.settings.autoHideStatusBar && onlyUnknown) {
+	    this.statusBarEl.addClass('auto-hide');
+	    setTimeout(() => {
+	      if (onlyUnknown && this.settings.showStatusBar) {
+	        this.statusBarEl.addClass('hidden');
+	      }
+	    }, 500);
+	  } else {
+	    this.statusBarEl.addClass('visible');
+	  }
 	}
 
 	/**
