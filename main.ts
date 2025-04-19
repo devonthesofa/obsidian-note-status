@@ -28,6 +28,11 @@ const PLUGIN_VERSION = '1.5.0';
  * Main plugin class for Note Status functionality
  */
 export default class NoteStatus extends Plugin {
+  private boundSaveSettings: () => Promise<void>;
+  private boundCheckNoteStatus: () => void;
+  private boundRefreshDropdown: () => void;
+  private boundRefreshUI: () => void;
+
   settings: NoteStatusSettings;
   statusService: StatusService;
   styleService: StyleService;
@@ -61,7 +66,12 @@ export default class NoteStatus extends Plugin {
     try {
       // Load settings first before initializing other components
       await this.loadSettings();
-            
+      
+      this.boundSaveSettings = this.saveSettings.bind(this);
+      this.boundCheckNoteStatus = this.checkNoteStatus.bind(this);
+      this.boundRefreshDropdown = () => this.statusDropdown?.render();
+      this.boundRefreshUI = () => this.checkNoteStatus();
+      
       // Then initialize the rest of the plugin
       await this.initialize();
     } catch (error) {
@@ -170,9 +180,8 @@ export default class NoteStatus extends Plugin {
    */
   private setupCustomEvents(): void {
     // Listen for settings changes
-    window.addEventListener('note-status:settings-changed', async () => {
-      await this.saveSettings();
-});
+    window.addEventListener('note-status:settings-changed', this.boundSaveSettings);
+
 
     // Listen for force refresh
     window.addEventListener('note-status:force-refresh', () => {
@@ -203,26 +212,10 @@ export default class NoteStatus extends Plugin {
     });
 
     // Listen for refresh dropdown
-    window.addEventListener('note-status:refresh-dropdown', () => {
-      try {
-        const currentStatuses = this.getCurrentStatuses();
-        this.statusDropdown.update(currentStatuses);
-      } catch (error) {
-        console.error('Error refreshing dropdown:', error);
-      }
-    });
+    window.addEventListener('note-status:refresh-dropdown', this.boundRefreshDropdown);
 
     // Listen for UI refresh
-    window.addEventListener('note-status:refresh-ui', () => {
-      try {
-        this.debouncedCheckNoteStatus();
-        this.debouncedUpdateExplorer();
-        this.debouncedUpdateStatusPane();
-      } catch (error) {
-        console.error('Error refreshing UI:', error);
-      }
-    });
-    
+    window.addEventListener('note-status:refresh-ui', this.boundRefreshUI);
   }
 
   /**
@@ -719,9 +712,9 @@ export default class NoteStatus extends Plugin {
    * Remove custom event listeners
    */
   private removeCustomEventListeners(): void {
-    window.removeEventListener('note-status:settings-changed', this.saveSettings);
-    window.removeEventListener('note-status:status-changed', this.checkNoteStatus);
-    window.removeEventListener('note-status:refresh-dropdown', this.statusDropdown.render);
-    window.removeEventListener('note-status:refresh-ui', this.checkNoteStatus);
+    window.removeEventListener('note-status:settings-changed', this.boundSaveSettings);
+    window.removeEventListener('note-status:status-changed', this.boundCheckNoteStatus);
+    window.removeEventListener('note-status:refresh-dropdown', this.boundRefreshDropdown);
+    window.removeEventListener('note-status:refresh-ui', this.boundRefreshUI);
   }
 }
