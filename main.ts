@@ -61,7 +61,7 @@ export default class NoteStatus extends Plugin {
     try {
       // Load settings first before initializing other components
       await this.loadSettings();
-      
+            
       // Then initialize the rest of the plugin
       await this.initialize();
     } catch (error) {
@@ -172,7 +172,7 @@ export default class NoteStatus extends Plugin {
     // Listen for settings changes
     window.addEventListener('note-status:settings-changed', async () => {
       await this.saveSettings();
-    });
+});
 
     // Listen for force refresh
     window.addEventListener('note-status:force-refresh', () => {

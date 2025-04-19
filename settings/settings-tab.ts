@@ -1,12 +1,13 @@
 import { App, PluginSettingTab, Setting, Notice } from 'obsidian';
 import { Status } from '../models/types';
 import { PREDEFINED_TEMPLATES } from '../constants/status-templates';
+import NoteStatus from 'main';
 
 /**
  * Settings tab for the Note Status plugin
  */
 export class NoteStatusSettingTab extends PluginSettingTab {
-	plugin: any;
+	plugin: NoteStatus;
 
 	constructor(app: App, plugin: any) {
 		super(app, plugin);

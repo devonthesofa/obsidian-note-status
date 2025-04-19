@@ -1,4 +1,4 @@
-import { setIcon, TFile } from 'obsidian';
+import { App, setIcon, TFile } from 'obsidian';
 import { NoteStatusSettings, Status } from '../../models/types';
 import { StatusService } from '../../services/status-service';
 
@@ -7,7 +7,7 @@ import { StatusService } from '../../services/status-service';
  * This component handles the UI for selecting statuses across multiple contexts
  */
 export class StatusDropdownComponent {
-  private app: any;
+  private app: App;
   private statusService: StatusService;
   private settings: NoteStatusSettings;
   private dropdownElement: HTMLElement | null = null;
@@ -19,7 +19,7 @@ export class StatusDropdownComponent {
   public isOpen = false;
 
   
-  constructor(app: any, statusService: StatusService, settings: NoteStatusSettings) {
+  constructor(app: App, statusService: StatusService, settings: NoteStatusSettings) {
     this.app = app;
     this.statusService = statusService;
     this.settings = settings;

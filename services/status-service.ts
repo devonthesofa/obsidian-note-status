@@ -167,18 +167,15 @@ export class StatusService {
     const targetFile = file || this.app.workspace.getActiveFile();
     if (!targetFile || targetFile.extension !== 'md') return;
   
-    const content = await this.app.vault.read(targetFile);
+    // Use processFrontMatter instead of manual read/modify
+    await this.app.fileManager.processFrontMatter(targetFile, (frontmatter) => {
+      frontmatter[this.settings.tagPrefix] = newStatuses;
+    });
     
-    // Create a new content with updated frontmatter
-    const newContent = this.updateFrontmatterWithStatus(content, newStatuses);
-  
-    // Update the file only if content changed
-    if (newContent !== content) {
-      await this.app.vault.modify(targetFile, newContent);
-      
-      // Force metadata cache refresh for this file
-      this.app.metadataCache.trigger('changed', targetFile);
-    }
+    // Dispatch events for UI update
+    window.dispatchEvent(new CustomEvent('note-status:status-changed', {
+      detail: { statuses: newStatuses, file: targetFile.path }
+    }));
   }
 
   /**

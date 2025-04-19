@@ -274,7 +274,6 @@ export class ExplorerIntegration {
       const fileItem = fileExplorerView.fileItems[file.path];
       if (!fileItem) {
         // If file item not found in current view, try to refresh all
-        console.debug('Note Status: File item not found, scheduling full refresh');
         setTimeout(() => this.updateAllFileExplorerIcons(), 50);
         return;
       }
