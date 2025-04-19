@@ -2,6 +2,7 @@ import { App, Menu, TFile } from 'obsidian';
 import { NoteStatusSettings } from '../../models/types';
 import { StatusService } from '../../services/status-service';
 import { StatusDropdown } from 'ui/components/status-dropdown';
+import { ExplorerIntegration } from 'ui/integrations/explorer-integration';
 
 /**
  * Handles context menu interactions for status changes
@@ -10,13 +11,15 @@ export class StatusContextMenu {
 	private statusDropdown: StatusDropdown;
   private settings: NoteStatusSettings;
   private statusService: StatusService;
+  private explorerIntegration: ExplorerIntegration;
   public app: App;
 
-  constructor(app: App, settings: NoteStatusSettings, statusService: StatusService, statusDropdown: StatusDropdown) {
+  constructor(app: App, settings: NoteStatusSettings, statusService: StatusService, statusDropdown: StatusDropdown, explorerIntegration:ExplorerIntegration) {
     this.app = app;
     this.settings = settings;
     this.statusService = statusService;
 		this.statusDropdown = statusDropdown;
+    this.explorerIntegration = explorerIntegration;
   }
 
   /**
@@ -162,9 +165,8 @@ export class StatusContextMenu {
    */
   private updateExplorerIcon(file: TFile): void {
     setTimeout(() => {
-      const explorerIntegration = (this.app as any).plugins.plugins['note-status']?.explorerIntegration;
-      if (explorerIntegration) {
-        explorerIntegration.updateFileExplorerIcons(file);
+      if (this.explorerIntegration) {
+        this.explorerIntegration.updateFileExplorerIcons(file);
       }
     }, 50);
   }

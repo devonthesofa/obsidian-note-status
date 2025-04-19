@@ -156,7 +156,8 @@ export class StatusDropdownComponent {
    * Close the dropdown
    */
   public close(): void {
-    if (!this.dropdownElement) return;
+    if (!this.dropdownElement || !this.isOpen) return;
+    
     // Add exit animation
     this.dropdownElement.addClass('note-status-popover-animate-out');
     
@@ -168,10 +169,12 @@ export class StatusDropdownComponent {
     this.isOpen = false;
     
     // Remove after animation completes
-    if (this.dropdownElement) {
-      this.dropdownElement.remove();
-      this.dropdownElement = null;
-    }
+    setTimeout(() => {
+      if (this.dropdownElement) {
+        this.dropdownElement.remove();
+        this.dropdownElement = null;
+      }
+    }, this.animationDuration);
   }
   
   /**
@@ -304,16 +307,22 @@ export class StatusDropdownComponent {
       cls: 'note-status-chip-text' 
     });
     
-    // Add remove button if multiple statuses allowed
-    if (this.settings.useMultipleStatuses && this.currentStatuses.length > 1) {
-      this.addRemoveButton(chipEl, status);
-    }
+    // Add remove button regardless of the number of statuses
+    // This allows removal even when there's only one status
+    this.addRemoveButton(chipEl, status);
   }
   
   /**
    * Add a remove button to a status chip
    */
   private addRemoveButton(chipEl: HTMLElement, status: string): void {
+    const statusObj = this.statusService.getAllStatuses().find(s => s.name === status);
+    const tooltipValue = statusObj?.description ? `${status} - ${statusObj.description}`: status;
+    
+    // Add tooltip to the chip element
+    chipEl.setAttribute('aria-label', tooltipValue);
+    chipEl.setAttribute('data-tooltip-position', 'top');
+    
     const removeBtn = chipEl.createDiv({ 
       cls: 'note-status-chip-remove',
       attr: {
@@ -444,6 +453,12 @@ export class StatusDropdownComponent {
       text: status.name,
       cls: 'note-status-option-text' 
     });
+    
+    // Add tooltip with description if available
+    if (status.description) {
+      optionEl.setAttribute('aria-label', `${status.name} - ${status.description}`);
+      optionEl.setAttribute('data-tooltip-position', 'right');
+    }
     
     // Check icon for selected status
     if (isSelected) {
