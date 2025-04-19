@@ -148,11 +148,23 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 					.setName(status.name)
 					.setClass('status-item');
 		
-				// Name field
-				setting.addText(text => {
-					// ... existing name field code
-					return text;
-				});
+				// Name field - now properly implemented
+				setting.addText(text => text
+					.setPlaceholder('Name')
+					.setValue(status.name)
+					.onChange(async (value) => {
+						const oldName = status.name;
+						status.name = value || 'unnamed';
+						
+						// Update color mapping when name changes
+						if (oldName !== status.name) {
+							this.plugin.settings.statusColors[status.name] = 
+								this.plugin.settings.statusColors[oldName];
+							delete this.plugin.settings.statusColors[oldName];
+						}
+						
+						await this.plugin.saveSettings();
+					}));
 		
 				// Icon field
 				setting.addText(text => text
@@ -171,7 +183,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					}));
 					
-				// Description field (new)
+				// Description field
 				setting.addText(text => text
 					.setPlaceholder('Description')
 					.setValue(status.description || '')
@@ -214,19 +226,6 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 
 					await this.plugin.saveSettings();
 					renderStatuses();
-				}));
-
-		// Reset colors
-		new Setting(containerEl)
-			.setName('Reset default status colors')
-			.setDesc('Restore the default colors for predefined statuses')
-			.addButton(button => button
-				.setButtonText('Reset Colors')
-				.setWarning()
-				.onClick(async () => {
-					await this.plugin.resetDefaultColors();
-					renderStatuses();
-					new Notice('Default status colors restored');
 				}));
 	}
 	

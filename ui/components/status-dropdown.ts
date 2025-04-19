@@ -163,7 +163,9 @@ export class StatusDropdown {
   private addDefaultStatusIcon(container: HTMLElement): void {
     const iconSpan = document.createElement('span');
     iconSpan.addClass('note-status-toolbar-icon', 'status-unknown');
-    iconSpan.textContent = '📌'; // Default tag icon
+    
+    // Use the statusService to get the proper icon for 'unknown' status
+    iconSpan.textContent = this.statusService.getStatusIcon('unknown');
     container.appendChild(iconSpan);
   }
 

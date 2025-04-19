@@ -541,45 +541,6 @@ export default class NoteStatus extends Plugin {
   }
 
   /**
-   * Reset default colors
-   */
-  async resetDefaultColors(): Promise<void> {
-    try {
-      // Reset colors for default statuses
-      const defaultStatuses = ['active', 'onHold', 'completed', 'dropped', 'unknown'];
-
-      for (const status of defaultStatuses) {
-        if (this.settings.customStatuses.some(s => s.name === status)) {
-          this.settings.statusColors[status] = DEFAULT_COLORS[status];
-        }
-      }
-      
-      // Handle template status colors
-      this.resetTemplateColors();
-
-      await this.saveSettings();
-      new Notice('Default colors have been restored');
-    } catch (error) {
-      console.error('Error resetting default colors:', error);
-      new Notice('Error resetting default colors. Check console for details.');
-    }
-  }
-  
-  /**
-   * Reset colors for template statuses
-   */
-  private resetTemplateColors(): void {
-    if (!this.settings.useCustomStatusesOnly) {
-      const templateStatuses = this.statusService.getTemplateStatuses();
-      for (const status of templateStatuses) {
-        if (status.color) {
-          this.settings.statusColors[status.name] = status.color;
-        }
-      }
-    }
-  }
-
-  /**
    * Load settings with error handling
    */
   async loadSettings(): Promise<void> {
