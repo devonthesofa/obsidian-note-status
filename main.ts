@@ -61,6 +61,10 @@ export default class NoteStatus extends Plugin {
     console.log(`Loading Note Status plugin v${PLUGIN_VERSION}`);
     
     try {
+      // Load settings first before initializing other components
+      await this.loadSettings();
+      
+      // Then initialize the rest of the plugin
       await this.initialize();
     } catch (error) {
       console.error('Error loading Note Status plugin:', error);
@@ -74,9 +78,6 @@ export default class NoteStatus extends Plugin {
   private async initialize(): Promise<void> {
     // Register custom icons
     this.registerIcons();
-
-    // Load settings
-    await this.loadSettings();
 
     // Initialize services
     this.initializeServices();
@@ -152,6 +153,7 @@ export default class NoteStatus extends Plugin {
    * Initialize plugin services
    */
   private initializeServices(): void {
+    // These services depend on settings being loaded first
     this.statusService = new StatusService(this.app, this.settings);
     this.styleService = new StyleService(this.settings);
   }
@@ -623,7 +625,13 @@ export default class NoteStatus extends Plugin {
    * Initialize colors from templates
    */
   private initializeTemplateColors(): void {
-    if (!this.settings.useCustomStatusesOnly) {
+    // Make sure settings are properly initialized
+    if (!this.settings) {
+      console.error('Settings not initialized properly');
+      return;
+    }
+    
+    if (!this.settings.useCustomStatusesOnly && this.statusService) {
       const templateStatuses = this.statusService.getTemplateStatuses();
       for (const status of templateStatuses) {
         if (status.color && !this.settings.statusColors[status.name]) {
