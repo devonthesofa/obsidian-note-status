@@ -1,9 +1,11 @@
 # Note Status for Obsidian
 
-[![GitHub release](https://img.shields.io/github/v/release/devonthesofa/obsidian-note-status)](https://github.com/devonthesofa/obsidian-note-status/releases) [![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22note-status%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json)](https://obsidian.md/plugins?id=note-status) [![GitHub License](https://img.shields.io/github/license/devonthesofa/obsidian-note-status)](https://github.com/devonthesofa/obsidian-note-status/blob/main/LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/devonthesofa/obsidian-note-status)](https://github.com/devonthesofa/obsidian-note-status/releases) [![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22note-status%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json)](https://obsidian.md/plugins?id=note-status) [![GitHub License](https://img.shields.io/github/license/devonthesofa/obsidian-note-status)](https://github.com/devonthesofa/obsidian-note-status/blob/master/LICENSE)
 
 Enhance your Obsidian workflow with a powerful status tracking system for your notes. Keep track of whether your notes are active, on hold, completed, or dropped - or create your own custom statuses.
-![[images/hello-world.png]]
+
+![Hello World Screenshot](images/hello-world.png)
+
 ## Features
 - **Status Assignment**: Mark notes with statuses (active, on hold, completed, dropped)
 - **Multiple Statuses**: Apply more than one status to a single note
@@ -15,44 +17,54 @@ Enhance your Obsidian workflow with a powerful status tracking system for your n
 - **Custom Statuses**: Create your own statuses with icons and colors
 - **Status Templates**: Choose from predefined templates or create your own
 - **Highly Customizable**: Configure where and how statuses appear
+
 ## Installation
 > Coming soon to the Obsidian Community Plugins marketplace!
+
 ### Marketplace Installation (Recommended)
 Once available in the marketplace:
 1. Open Obsidian → Settings → Community plugins
 2. Disable Safe mode
 3. Click "Browse" and search for "Note Status"
 4. Click Install and Enable
+
 ### Manual Installation
 1. **Download the Plugin**:
-    - Grab the latest release from the [GitHub Releases page](https://github.com/devonthesofa/obsidian-note-status/releases).
-    - Download the files `main.js`, `styles.css` and `manifest.json`
+    - Grab the latest release from the [GitHub Releases page](https://github.com/devonthesofa/obsidian-note-status/releases).
+    - Download the files `main.js`, `styles.css` and `manifest.json`
 2. **Install in Obsidian**:
-    - Open your Obsidian vault and navigate to `.obsidian/plugins/`.
-    - Create a folder named `obsidian-note-status` into this directory.
-    - Copy the downloaded files in the `obsidian-note-status` folder.
+    - Open your Obsidian vault and navigate to `.obsidian/plugins/`.
+    - Create a folder named `obsidian-note-status` into this directory.
+    - Copy the downloaded files in the `obsidian-note-status` folder.
 3. **Enable the Plugin**:
     - In Obsidian, go to Settings > Community Plugins.
     - Ensure "Safe Mode" is turned off.
     - Find "Note Status" in the list and toggle it on.
+
 ## User Guide
 ### Basic Usage
 #### 1. Assign Status from the Toolbar
 The simplest way to set a note's status is using the toolbar button:
 
-![[images/status-from-toolbar.png]]
+![Status From Toolbar](images/status-from-toolbar.png)
+
 1. Open any note
 2. Click the status icon in the toolbar (looks like a "?" by default)
 3. Select a status from the dropdown
 4. The status will be applied and visible in both toolbar and status bar
+
 #### 2. Status Bar
 The status bar at the bottom of your editor shows the current status of your note:
-![[images/status-bar.png]]
+
+![Status Bar](images/status-bar.png)
+
 - When multiple statuses are enabled, all applied statuses will be displayed here
+
 #### 3. Status Pane
 The Status Pane provides an overview of all your notes grouped by status:
 
-![[images/status-pane.png]]
+![Status Pane](images/status-pane.png)
+
 To open the Status Pane:
 - Click the status pane icon in the left sidebar
 - Use the command palette: "Note Status: Open Status Pane"
@@ -62,28 +74,39 @@ In the Status Pane you can:
 - Search for specific notes
 - Toggle between compact and standard views
 - Right-click on notes for more options
+
 #### 4. File Explorer Integration
 Status icons appear directly in your file explorer:
-![[images/file-explorer.png]]
+
+![File Explorer](images/file-explorer.png)
+
 - Right-click on any file to change its status
 - Select multiple files to batch update their statuses
+
 ### Advanced Usage
 #### Multiple Statuses
 When enabled in settings, you can assign multiple statuses to a single note:
-![[images/multiple-statuses-selector.png]]
-![[images/multiple-statuses-file-explorer.png]]
-![[images/multiple-statuses-status-bar.png]]
+
+![Multiple Statuses Selector](images/multiple-statuses-selector.png)
+
+![Multiple Statuses File Explorer](images/multiple-statuses-file-explorer.png)
+
+![Multiple Statuses Status Bar](images/multiple-statuses-status-bar.png)
+
 To add additional statuses:
 1. Open the status dropdown
 2. Click on another status to add it
 3. Click on an active status to remove it
+
 #### Batch Updates
 To update multiple files at once:
 1. Select multiple files in the file explorer (using Ctrl/Cmd or Shift)
 2. Right-click and choose "Change Status"
 3. Select whether to replace or add the status
 4. Choose the status to apply
-![[images/batch-updates.png]]
+
+![Batch Updates](images/batch-updates.png)
+
 ## Configuration
 ### Status Management
 Access plugin settings via Settings → Note Status
@@ -95,7 +118,9 @@ Choose from predefined status templates:
 - **Minimal Workflow**: A simplified set of essential workflow statuses
 - **Academic Research**: Status workflow for academic research and writing
 - **Project Management**: Status workflow for project management and tracking
-![[images/status-templates.png]]
+
+![Status Templates](images/status-templates.png)
+
 #### Custom Statuses
 
 Create your own statuses by:
@@ -103,7 +128,9 @@ Create your own statuses by:
 1. Clicking "Add Status" in settings
 2. Setting a name, icon, color, and optional description
 3. Saving your settings
-![[images/custom-statuses.png]]
+
+![Custom Statuses](images/custom-statuses.png)
+
 ### Display Options
 Configure how statuses are displayed:
 - Show/hide status bar
@@ -113,6 +140,7 @@ Configure how statuses are displayed:
 - Toggle compact view in status pane
 - Enable/disable multiple statuses mode
 - Customize frontmatter tag name
+
 ## Commands
 The plugin provides several commands accessible via the Command Palette:
 - `Note Status: Open Status Pane` - Opens the status view
@@ -120,6 +148,7 @@ The plugin provides several commands accessible via the Command Palette:
 - `Note Status: Add Status to Current Note` - Shows status menu
 - `Note Status: Insert Status Metadata` - Adds status frontmatter
 - `Note Status: Force Refresh UI` - Complete UI refresh
+
 ## Technical Details
 ### Frontmatter Format
 Status information is stored in your note's frontmatter using the following format:
@@ -135,6 +164,7 @@ obsidian-note-status: ["active", "inProgress"]
 ---
 ```
 The frontmatter tag name can be customized in settings.
+
 ## Development
 ### Project Structure
 The plugin has been recently restructured with a modern, modular architecture:
@@ -168,9 +198,11 @@ note-status/
 │       └── settings-tab.ts              # Settings tab definition
 └── styles.css                           # CSS styles
 ```
+
 ### Prerequisites
 - Node.js and npm installed.
 - Obsidian API knowledge (TypeScript-based).
+
 ### Building the Plugin
 1. Clone this repository:
 ```bash
@@ -190,6 +222,7 @@ npm run build
 npm run dev
 ```
 5. The compiled plugin will be in the root directory, ready to copy into `.obsidian/plugins/`.
+
 ## Contributing
 Contributions welcome! Please feel free to submit a Pull Request.
 1. Fork the repository
@@ -199,8 +232,10 @@ Contributions welcome! Please feel free to submit a Pull Request.
 5. Submit a pull request
    
 - Report issues or suggest features via the Issues tab.
+
 ## Roadmap
 The following features and improvements are planned for upcoming releases:
+
 ### Short-term
 - **Bug Fix**: Resolve selection context issue when changing status of a single file while multiple files are selected in the explorer view
 - **Batch Modification Enhancement**: Implement a modal dialog with file preview and status selection for more intuitive batch operations
@@ -209,10 +244,11 @@ The following features and improvements are planned for upcoming releases:
     - Use proper event lifecycle management
     - Implement debounced operations for file operations
     - Improve plugin teardown process to prevent memory leaks
+
 ### Medium-term
 - **Export/import configurations**: Share your status setups with others
+
 ### Long-term
 - **Canvas integration**: Show status on canvas cards
 - **Graph view integration**: Visualize notes by status in graph view
 - **Mobile optimization**: Improved experience on mobile devices
-
