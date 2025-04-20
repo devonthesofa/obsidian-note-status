@@ -1,18 +1,19 @@
-import { TFile, WorkspaceLeaf, View, Menu, Notice } from 'obsidian';
-import { NoteStatusSettings } from '../models/types';
-import { StatusService } from '../services/status-service';
-import { ICONS } from '../constants/icons';
+import { TFile, WorkspaceLeaf, View, Menu, Notice, setIcon } from 'obsidian';
+import { NoteStatusSettings } from '../../models/types';
+import { StatusService } from '../../services/status-service';
+import { ICONS } from '../../constants/icons';
+import NoteStatus from 'main';
 
 /**
  * Status Pane View for managing note statuses
  */
 export class StatusPaneView extends View {
-	plugin: any;
+	plugin: NoteStatus;
 	searchInput: HTMLInputElement | null = null;
 	private settings: NoteStatusSettings;
 	private statusService: StatusService;
 
-	constructor(leaf: WorkspaceLeaf, plugin: any) {
+	constructor(leaf: WorkspaceLeaf, plugin: NoteStatus) {
 		super(leaf);
 		this.plugin = plugin;
 		this.settings = plugin.settings;
@@ -99,40 +100,43 @@ export class StatusPaneView extends View {
 
 	private createActionToolbar(container: HTMLElement): void {
 		const actionsContainer = container.createDiv({ cls: 'status-pane-actions-container' });
-
+	  
 		// Toggle compact view button
 		const viewToggleButton = actionsContainer.createEl('button', {
-			type: 'button',
-			title: this.settings.compactView ? 'Switch to Standard View' : 'Switch to Compact View',
-			cls: 'note-status-view-toggle clickable-icon'
+		  type: 'button',
+		  title: this.settings.compactView ? 'Switch to Standard View' : 'Switch to Compact View',
+		  cls: 'note-status-view-toggle clickable-icon'
 		});
-
-		viewToggleButton.innerHTML = this.settings.compactView ? ICONS.standardView : ICONS.compactView;
-
+	  
+		// Use setIcon instead of innerHTML
+		setIcon(viewToggleButton, this.settings.compactView ? 'layout' : 'table');
+	  
 		viewToggleButton.addEventListener('click', async () => {
-			this.settings.compactView = !this.settings.compactView;
-			viewToggleButton.title = this.settings.compactView ? 'Switch to Standard View' : 'Switch to Compact View';
-			viewToggleButton.innerHTML = this.settings.compactView ? ICONS.standardView : ICONS.compactView;
-
-			// Trigger settings update
-			window.dispatchEvent(new CustomEvent('note-status:settings-changed'));
-
-			this.containerEl.toggleClass('compact-view', this.settings.compactView);
-			await this.renderGroups(this.searchInput?.value.toLowerCase() || '');
+		  this.settings.compactView = !this.settings.compactView;
+		  viewToggleButton.title = this.settings.compactView ? 'Switch to Standard View' : 'Switch to Compact View';
+		  viewToggleButton.empty();
+		  setIcon(viewToggleButton, this.settings.compactView ? 'layout' : 'table');
+	  
+		  // Trigger settings update
+		  window.dispatchEvent(new CustomEvent('note-status:settings-changed'));
+	  
+		  this.containerEl.toggleClass('compact-view', this.settings.compactView);
+		  await this.renderGroups(this.searchInput?.value.toLowerCase() || '');
 		});
-
+	  
 		// Refresh button
 		const refreshButton = actionsContainer.createEl('button', {
-			type: 'button',
-			title: 'Refresh Statuses',
-			cls: 'note-status-actions-refresh clickable-icon'
+		  type: 'button',
+		  title: 'Refresh Statuses',
+		  cls: 'note-status-actions-refresh clickable-icon'
 		});
-
-		refreshButton.innerHTML = ICONS.refresh;
-
+	  
+		// Use setIcon instead of innerHTML
+		setIcon(refreshButton, 'refresh-cw');
+	  
 		refreshButton.addEventListener('click', async () => {
-			await this.renderGroups(this.searchInput?.value.toLowerCase() || '');
-			new Notice('Status pane refreshed');
+		  await this.renderGroups(this.searchInput?.value.toLowerCase() || '');
+		  new Notice('Status pane refreshed');
 		});
 	}
 
@@ -145,7 +149,6 @@ export class StatusPaneView extends View {
 
 		// Group files by status
 		const statusGroups = this.statusService.groupFilesByStatus(searchQuery);
-
 		// Render each status group
 		Object.entries(statusGroups).forEach(([status, files]) => {
 			if (files.length > 0) {
@@ -157,117 +160,123 @@ export class StatusPaneView extends View {
 	private renderStatusGroup(container: HTMLElement, status: string, files: TFile[]): void {
 		const groupEl = container.createDiv({ cls: 'status-group nav-folder' });
 		const titleEl = groupEl.createDiv({ cls: 'nav-folder-title' });
-
+	
 		// Create a container for the collapse button and title
 		const collapseContainer = titleEl.createDiv({ cls: 'collapse-indicator' });
-		collapseContainer.innerHTML = ICONS.collapseDown;
-
+		// Use setIcon instead of innerHTML
+		setIcon(collapseContainer, 'chevron-down');
+	
 		// Create a container for the title content
 		const titleContentContainer = titleEl.createDiv({ cls: 'nav-folder-title-content' });
-
+	
 		const statusIcon = this.statusService.getStatusIcon(status);
 		titleContentContainer.createSpan({
-			text: `${status} ${statusIcon} (${files.length})`,
-			cls: `status-${status}`
+		  text: `${status} ${statusIcon} (${files.length})`,
+		  cls: `status-${status}`
 		});
-
+	
 		// Handle collapsing/expanding behavior
 		titleEl.style.cursor = 'pointer';
 		const isCollapsed = this.settings.collapsedStatuses[status] ?? false;
-
+	
 		if (isCollapsed) {
-			groupEl.addClass('is-collapsed');
-			collapseContainer.innerHTML = ICONS.collapseRight;
+		  groupEl.addClass('is-collapsed');
+		  collapseContainer.empty();
+		  setIcon(collapseContainer, 'chevron-right');
 		}
-
+	
 		titleEl.addEventListener('click', (e) => {
-			e.preventDefault();
-			const isCurrentlyCollapsed = groupEl.hasClass('is-collapsed');
-
-			// Toggle the collapsed state
-			if (isCurrentlyCollapsed) {
-				groupEl.removeClass('is-collapsed');
-				collapseContainer.innerHTML = ICONS.collapseDown;
-			} else {
-				groupEl.addClass('is-collapsed');
-				collapseContainer.innerHTML = ICONS.collapseRight;
-			}
-
-			// Update the settings
-			this.settings.collapsedStatuses[status] = !isCurrentlyCollapsed;
-
-			// Trigger settings save
-			window.dispatchEvent(new CustomEvent('note-status:settings-changed'));
+		  e.preventDefault();
+		  const isCurrentlyCollapsed = groupEl.hasClass('is-collapsed');
+	
+		  // Toggle the collapsed state
+		  if (isCurrentlyCollapsed) {
+			groupEl.removeClass('is-collapsed');
+			collapseContainer.empty();
+			setIcon(collapseContainer, 'chevron-down');
+		  } else {
+			groupEl.addClass('is-collapsed');
+			collapseContainer.empty();
+			setIcon(collapseContainer, 'chevron-right');
+		  }
+	
+		  // Update the settings
+		  this.settings.collapsedStatuses[status] = !isCurrentlyCollapsed;
+	
+		  // Trigger settings save
+		  window.dispatchEvent(new CustomEvent('note-status:settings-changed'));
 		});
-
+	
 		// Create and populate child elements
 		const childrenEl = groupEl.createDiv({ cls: 'nav-folder-children' });
-
+	
 		// Sort files by name
 		files.sort((a, b) => a.basename.localeCompare(b.basename));
-
+	
 		// Create file list items
 		files.forEach(file => {
-			this.createFileListItem(childrenEl, file, status);
+		  this.createFileListItem(childrenEl, file, status);
 		});
 	}
 
 	private createFileListItem(container: HTMLElement, file: TFile, status: string): void {
 		const fileEl = container.createDiv({ cls: 'nav-file' });
 		const fileTitleEl = fileEl.createDiv({ cls: 'nav-file-title' });
-
+	
 		// Add file icon if in standard view
 		if (!this.settings.compactView) {
-			const fileIcon = fileTitleEl.createDiv({ cls: 'nav-file-icon' });
-			fileIcon.innerHTML = ICONS.file;
+		  const fileIcon = fileTitleEl.createDiv({ cls: 'nav-file-icon' });
+		  setIcon(fileIcon, 'file');
 		}
-
+	
 		// Add file name
 		fileTitleEl.createSpan({
-			text: file.basename,
-			cls: 'nav-file-title-content'
+		  text: file.basename,
+		  cls: 'nav-file-title-content'
 		});
-
+	
 		// Add status indicator
 		fileTitleEl.createSpan({
-			cls: `note-status-icon nav-file-tag status-${status}`,
-			text: this.statusService.getStatusIcon(status)
+		  cls: `note-status-icon nav-file-tag status-${status}`,
+		  text: this.statusService.getStatusIcon(status)
 		});
-
+	
 		// Add click handler to open the file
 		fileEl.addEventListener('click', (e) => {
-			e.preventDefault();
-			this.app.workspace.openLinkText(file.path, file.path, true);
+		  e.preventDefault();
+		  this.app.workspace.openLinkText(file.path, file.path, true);
 		});
-
+	
 		// Add context menu
 		fileEl.addEventListener('contextmenu', (e) => {
-			e.preventDefault();
-			this.showFileContextMenu(e, file);
+		  e.preventDefault();
+		  this.showFileContextMenu(e, file);
 		});
 	}
 
 	private showFileContextMenu(e: MouseEvent, file: TFile): void {
 		const menu = new Menu();
-
+	
 		// Add status change options
 		menu.addItem((item) =>
-			item.setTitle('Change Status')
-				.setIcon('tag')
-				.onClick(() => {
-					this.plugin.showStatusContextMenu([file]);
-				})
+		item.setTitle('Change Status')
+			.setIcon('tag')
+			.onClick(() => {
+			// Use the position from the event
+			// const position = { x: e.clientX, y: e.clientY };
+			this.plugin.statusContextMenu.showForFile(file, e);
+			})
 		);
-
+	
 		// Add open options
 		menu.addItem((item) =>
-			item.setTitle('Open in New Tab')
-				.setIcon('lucide-external-link')
-				.onClick(() => {
-					this.app.workspace.openLinkText(file.path, file.path, 'tab');
-				})
+		item.setTitle('Open in New Tab')
+			.setIcon('lucide-external-link')
+			.onClick(() => {
+			this.app.workspace.openLinkText(file.path, file.path, 'tab');
+			})
 		);
-
+	
 		menu.showAtMouseEvent(e);
 	}
 

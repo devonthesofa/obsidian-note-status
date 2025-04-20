@@ -1,4 +1,5 @@
 import { NoteStatusSettings } from '../models/types';
+import { DEFAULT_ENABLED_TEMPLATES } from '../constants/status-templates';
 
 /**
  * Default plugin settings
@@ -11,21 +12,17 @@ export const DEFAULT_SETTINGS: NoteStatusSettings = {
 		dropped: 'var(--text-error)',
 		unknown: 'var(--text-muted)'
 	},
-	showStatusDropdown: true,
 	showStatusBar: true,
-	dropdownPosition: 'top',
-	statusBarPosition: 'right',
 	autoHideStatusBar: false,
-	customStatuses: [
-		{ name: 'active', icon: '▶️' },
-		{ name: 'onHold', icon: '⏸️' },
-		{ name: 'completed', icon: '✅' },
-		{ name: 'dropped', icon: '❌' },
-		{ name: 'unknown', icon: '❓' }
-	],
+    customStatuses: [],
 	showStatusIconsInExplorer: true,
+	hideUnknownStatusInExplorer: false, // Default to show unknown status
 	collapsedStatuses: {},
-	compactView: false
+	compactView: false,
+	enabledTemplates: DEFAULT_ENABLED_TEMPLATES,
+	useCustomStatusesOnly: false,
+	useMultipleStatuses: true,
+	tagPrefix: 'obsidian-note-status'
 };
 
 /**
