@@ -18,9 +18,6 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		// Header
-		containerEl.createEl('h2', { text: 'Note Status Settings' });
-
 		// Status Template section
 		this.displayTemplateSettings(containerEl.createDiv());
 
