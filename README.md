@@ -192,7 +192,6 @@ note-status/
 │   │   ├── status-service.ts            # Status management logic
 │   │   └── style-service.ts             # Dynamic styling service
 │   ├── utils/                           # Utility functions
-│   │   ├── dom-utils.ts                 # DOM helpers
 │   │   └── file-utils.ts                # File-related helpers
 │   └── settings/                        # Settings UI
 │       └── settings-tab.ts              # Settings tab definition
