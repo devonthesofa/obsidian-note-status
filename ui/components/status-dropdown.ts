@@ -283,10 +283,9 @@ export class StatusDropdown {
 	 */
 	private createDummyTarget(position: { x: number, y: number }): HTMLElement {
 		const dummyTarget = document.createElement('div');
-		dummyTarget.style.position = 'fixed';
-		dummyTarget.style.left = `${position.x}px`;
-		dummyTarget.style.top = `${position.y}px`;
-		dummyTarget.style.zIndex = '1000';
+		dummyTarget.addClass('note-status-dummy-target');
+		dummyTarget.style.setProperty('--pos-x-px', `${position.x}px`);
+		dummyTarget.style.setProperty('--pos-y-px', `${position.y}px`);
 		document.body.appendChild(dummyTarget);
 		return dummyTarget;
 	}
@@ -354,27 +353,27 @@ export class StatusDropdown {
 			new Notice('No files selected');
 			return;
 		}
-
+	
 		// Determine if we're handling single or multiple files
 		const isSingleFile = files.length === 1;
 		const targetFile = isSingleFile ? files[0] : null;
-
+	
 		// Set target file (if single) or null (if multiple)
 		this.dropdownComponent.setTargetFile(targetFile);
-
+	
 		// Get current statuses if single file, or reset to unknown for multiple
 		const currentStatuses = targetFile ?
 			this.statusService.getFileStatuses(targetFile) :
 			['unknown'];
-
+	
 		// Update dropdown with current statuses
 		this.dropdownComponent.updateStatuses(currentStatuses);
-
+	
 		// Set custom callback for status changes if provided
 		if (options.onStatusChange) {
 			const originalCallback = this.dropdownComponent.getOnStatusChange();
 			this.dropdownComponent.setOnStatusChange(options.onStatusChange);
-
+	
 			// Restore original callback after operation
 			setTimeout(() => {
 				this.dropdownComponent.setOnStatusChange(originalCallback);
@@ -384,7 +383,7 @@ export class StatusDropdown {
 			this.dropdownComponent.setOnStatusChange(async (statuses) => {
 				if (statuses.length > 0) {
 					await this.statusService.batchUpdateStatuses(files, statuses, options.mode || 'replace');
-
+	
 					// Dispatch events for UI update
 					window.dispatchEvent(new CustomEvent('note-status:batch-update-complete', {
 						detail: {
@@ -397,13 +396,13 @@ export class StatusDropdown {
 				}
 			});
 		}
-
+	
 		// For dropdown from editor
 		if (options.editor && options.view) {
 			const position = this.getCursorPosition(options.editor, options.view);
 			const dummyTarget = this.createDummyTarget(position);
 			this.dropdownComponent.open(dummyTarget, position);
-
+	
 			// Clean up dummy target
 			setTimeout(() => {
 				if (dummyTarget.parentNode) {
@@ -412,7 +411,7 @@ export class StatusDropdown {
 			}, 100);
 			return;
 		}
-
+	
 		// For dropdown from toolbar button
 		if (options.target) {
 			if (options.position) {
@@ -427,19 +426,17 @@ export class StatusDropdown {
 			}
 			return;
 		}
-
+	
 		// For direct position (context menus)
 		if (options.position) {
 			const dummyTarget = document.createElement('div');
-			dummyTarget.style.position = 'fixed';
-			dummyTarget.style.left = `${options.position.x}px`;
-			dummyTarget.style.top = `${options.position.y}px`;
-			dummyTarget.style.width = '0';
-			dummyTarget.style.height = '0';
+			dummyTarget.addClass('note-status-dummy-target');
+			dummyTarget.style.setProperty('--pos-x-px', `${options.position.x}px`);
+			dummyTarget.style.setProperty('--pos-y-px', `${options.position.y}px`);
 			document.body.appendChild(dummyTarget);
-
+	
 			this.dropdownComponent.open(dummyTarget, options.position);
-
+	
 			// Clean up dummy target
 			setTimeout(() => {
 				if (dummyTarget.parentNode) {
@@ -448,20 +445,20 @@ export class StatusDropdown {
 			}, 100);
 			return;
 		}
-
+	
 		// Fallback to center position
 		const center = {
 			x: window.innerWidth / 2,
 			y: window.innerHeight / 3
 		};
 		const fallbackTarget = document.createElement('div');
-		fallbackTarget.style.position = 'fixed';
-		fallbackTarget.style.left = `${center.x}px`;
-		fallbackTarget.style.top = `${center.y}px`;
+		fallbackTarget.addClass('note-status-dummy-target');
+		fallbackTarget.style.setProperty('--pos-x-px', `${center.x}px`);
+		fallbackTarget.style.setProperty('--pos-y-px', `${center.y}px`);
 		document.body.appendChild(fallbackTarget);
-
+	
 		this.dropdownComponent.open(fallbackTarget, center);
-
+	
 		// Clean up fallback target
 		setTimeout(() => {
 			if (fallbackTarget.parentNode) {

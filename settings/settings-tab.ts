@@ -291,14 +291,8 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 			template.statuses.forEach(status => {
 				const statusEl = statusesEl.createEl('div', { cls: 'template-status-chip' });
 				
-				// Create colored dot for the status
 				const colorDot = statusEl.createEl('span', { cls: 'status-color-dot' });
-				colorDot.style.display = 'inline-block';
-				colorDot.style.width = '8px';
-				colorDot.style.height = '8px';
-				colorDot.style.borderRadius = '50%';
-				colorDot.style.backgroundColor = status.color || '#ffffff';
-				colorDot.style.marginRight = '4px';
+				colorDot.style.setProperty('--dot-color', status.color || '#ffffff')
 				
 				// Status icon and name
 				statusEl.createSpan({ text: `${status.icon} ${status.name}` });
@@ -307,9 +301,6 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 		
 		// Import/Export buttons for templates
 		const buttonsContainer = containerEl.createDiv({ cls: 'template-buttons' });
-		buttonsContainer.style.marginTop = '15px';
-		buttonsContainer.style.display = 'flex';
-		buttonsContainer.style.gap = '10px';
 		
 		// Import button
 		const importButton = buttonsContainer.createEl('button', {

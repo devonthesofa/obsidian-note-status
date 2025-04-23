@@ -527,10 +527,9 @@ export class StatusDropdownComponent {
   private positionAt(x: number, y: number): void {
     if (!this.dropdownElement) return;
     
-    this.dropdownElement.style.position = 'fixed';
-    this.dropdownElement.style.zIndex = '999';
-    this.dropdownElement.style.left = `${x}px`;
-    this.dropdownElement.style.top = `${y}px`;
+    this.dropdownElement.addClass('note-status-popover-fixed');
+    this.dropdownElement.style.setProperty('--pos-x-px', `${x}px`);
+    this.dropdownElement.style.setProperty('--pos-y-px', `${y}px`);
     
     // Ensure dropdown doesn't go off-screen
     setTimeout(() => this.adjustPositionToViewport(), 0);
@@ -545,16 +544,22 @@ export class StatusDropdownComponent {
     const rect = this.dropdownElement.getBoundingClientRect();
     
     if (rect.right > window.innerWidth) {
-      this.dropdownElement.style.left = `${window.innerWidth - rect.width - 10}px`;
+      this.dropdownElement.addClass('note-status-popover-right');
+      this.dropdownElement.style.setProperty('--right-offset-px', '10px');
+    } else {
+      this.dropdownElement.removeClass('note-status-popover-right');
     }
     
     if (rect.bottom > window.innerHeight) {
-      this.dropdownElement.style.top = `${window.innerHeight - rect.height - 10}px`;
+      this.dropdownElement.addClass('note-status-popover-bottom');
+      this.dropdownElement.style.setProperty('--bottom-offset-px', '10px');
+    } else {
+      this.dropdownElement.removeClass('note-status-popover-bottom');
     }
     
     // Set max height based on viewport
     const maxHeight = window.innerHeight - rect.top - 20;
-    this.dropdownElement.style.maxHeight = `${maxHeight}px`;
+    this.dropdownElement.style.setProperty('--max-height-px', `${maxHeight}px`);
   }
   
   /**
@@ -563,18 +568,17 @@ export class StatusDropdownComponent {
   private positionRelativeTo(targetEl: HTMLElement): void {
     if (!this.dropdownElement) return;
     
-    // Reset positioning
-    this.dropdownElement.style.position = 'fixed';
-    this.dropdownElement.style.zIndex = '999';
+    // Apply positioning class
+    this.dropdownElement.addClass('note-status-popover-fixed');
     
     // Get target element's position
     const targetRect = targetEl.getBoundingClientRect();
     
-    // Position below the element
-    this.dropdownElement.style.top = `${targetRect.bottom + 5}px`;
+    // Position below the element - using CSS custom properties
+    this.dropdownElement.style.setProperty('--pos-y-px', `${targetRect.bottom + 5}px`);
     
     // Align to left edge of target by default
-    this.dropdownElement.style.left = `${targetRect.left}px`;
+    this.dropdownElement.style.setProperty('--pos-x-px', `${targetRect.left}px`);
     
     // Check if dropdown would go off-screen
     setTimeout(() => this.adjustRelativePosition(targetRect), 0);
@@ -590,19 +594,23 @@ export class StatusDropdownComponent {
     
     if (rect.right > window.innerWidth) {
       // Align to right edge instead
-      this.dropdownElement.style.left = 'auto';
-      this.dropdownElement.style.right = `${window.innerWidth - targetRect.right}px`;
+      this.dropdownElement.addClass('note-status-popover-right');
+      this.dropdownElement.style.setProperty('--right-offset-px', `${window.innerWidth - targetRect.right}px`);
+    } else {
+      this.dropdownElement.removeClass('note-status-popover-right');
     }
     
     if (rect.bottom > window.innerHeight) {
       // Position above the element instead
-      this.dropdownElement.style.top = 'auto';
-      this.dropdownElement.style.bottom = `${window.innerHeight - targetRect.top + 5}px`;
+      this.dropdownElement.addClass('note-status-popover-bottom');
+      this.dropdownElement.style.setProperty('--bottom-offset-px', `${window.innerHeight - targetRect.top + 5}px`);
+    } else {
+      this.dropdownElement.removeClass('note-status-popover-bottom');
     }
     
     // Set max height based on viewport
     const maxHeight = window.innerHeight - rect.top - 20;
-    this.dropdownElement.style.maxHeight = `${maxHeight}px`;
+    this.dropdownElement.style.setProperty('--max-height-px', `${maxHeight}px`);
   }
   
   /**

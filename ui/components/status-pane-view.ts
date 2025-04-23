@@ -173,7 +173,6 @@ export class StatusPaneView extends View {
 		});
 
 		// Handle collapsing/expanding behavior
-		titleEl.style.cursor = 'pointer';
 		const isCollapsed = this.settings.collapsedStatuses[status] ?? false;
 
 		if (isCollapsed) {

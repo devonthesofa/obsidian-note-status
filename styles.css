@@ -440,6 +440,7 @@
 }
 
 .status-group .nav-folder-title {
+  cursor: pointer;
   padding: var(--size-4-1, 4px) var(--size-4-2, 8px);
   background: var(--background-secondary-alt);
   transition: background var(--status-transition-time) var(--ease-out);
@@ -1089,6 +1090,8 @@
   z-index: 1000;
   width: 0;
   height: 0;
+  left: var(--pos-x-px, 0);
+  top: var(--pos-y-px, 0);
   pointer-events: none;
 }
 
@@ -1105,17 +1108,6 @@
   left: calc(1px * attr(data-pos-x number, 0));
   top: calc(1px * attr(data-pos-y number, 0));
   max-height: var(--max-height);
-}
-
-/* Classes for viewport adjustments */
-.note-status-popover-right {
-  left: auto !important;
-  right: calc(1px * (attr(data-offset-right number, 10)));
-}
-
-.note-status-popover-bottom {
-  top: auto !important;
-  bottom: calc(1px * (attr(data-offset-bottom number, 10)));
 }
 
 /* Since attr() with units doesn't have widespread support yet,
@@ -1152,9 +1144,27 @@
 
 /* Fallback positioning for right/bottom adjustments */
 .note-status-popover-right {
+  left: auto !important;
   right: var(--right-offset-px, 10px);
 }
 
 .note-status-popover-bottom {
+  top: auto !important;
   bottom: var(--bottom-offset-px, 10px);
 }
+
+.status-color-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--dot-color, #ffffff);
+  margin-right: 4px;
+}
+
+.template-buttons {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
