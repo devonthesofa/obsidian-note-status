@@ -311,7 +311,12 @@ export default class NoteStatus extends Plugin {
 		// Multiple files selection menu
 		this.registerEvent(
 			this.app.workspace.on('files-menu', (menu, files) => {
-			const mdFiles = files.filter(file => file instanceof TFile && file.extension === 'md') as TFile[];
+			const mdFiles: TFile[] = [];
+			for (const file of files) {
+				if (file instanceof TFile && file.extension === 'md') {
+					mdFiles.push(file);
+				}
+			}
 			if (mdFiles.length > 0) {
 				menu.addItem((item) =>
 				item
@@ -465,12 +470,12 @@ export default class NoteStatus extends Plugin {
 	checkNoteStatus(): void {
 		try {
 			const activeFile = this.app.workspace.getActiveFile();
-			if (!activeFile || activeFile.extension !== 'md') {
+			if (!activeFile || !(activeFile instanceof TFile) || activeFile.extension !== 'md') {
 				this.statusBar.update(['unknown']);
 				this.statusDropdown.update(['unknown']);
 				return;
 			}
-
+		
 			const statuses = this.statusService.getFileStatuses(activeFile);
 			this.statusBar.update(statuses);
 			this.statusDropdown.update(statuses);
@@ -491,7 +496,7 @@ export default class NoteStatus extends Plugin {
 	getCurrentStatuses(): string[] {
 		try {
 			const activeFile = this.app.workspace.getActiveFile();
-			if (!activeFile || activeFile.extension !== 'md') {
+			if (!activeFile || !(activeFile instanceof TFile) || activeFile.extension !== 'md') {
 				return ['unknown'];
 			}
 			return this.statusService.getFileStatuses(activeFile);

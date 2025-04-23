@@ -35,13 +35,13 @@ export class StatusContextMenu {
   public showForFiles(files: TFile[], position?: { x: number; y: number }): void {
     if (files.length === 0) return;
     
-    // Para un solo archivo, mostrar dropdown directamente
+    // For a single file, show dropdown directly
     if (files.length === 1) {
       this.showSingleFileDropdown(files[0], position);
       return;
     }
     
-    // Para múltiples archivos, mostrar menú primero
+    // For multiple files, show menu first
     this.showMultipleFilesMenu(files, position);
   }
   
@@ -116,6 +116,11 @@ export class StatusContextMenu {
    * Shows a context menu for a single file
    */
   public showForFile(file: TFile, event: MouseEvent): void {
+    // Ensure file is a valid TFile instance before proceeding
+    if (!(file instanceof TFile) || file.extension !== 'md') {
+      return;
+    }
+    
     const position = { x: event.clientX, y: event.clientY };
   
     this.statusDropdown.openStatusDropdown({
@@ -133,7 +138,8 @@ export class StatusContextMenu {
    * Handle status update for a specific file
    */
   private async handleStatusUpdateForFile(file: TFile, statuses: string[]): Promise<void> {
-    if (statuses.length === 0) return;
+    // Add instanceof check for safety
+    if (!(file instanceof TFile) || file.extension !== 'md' || statuses.length === 0) return;
     
     // Update the file with the selected status
     if (this.settings.useMultipleStatuses) {

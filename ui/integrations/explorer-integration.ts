@@ -329,20 +329,20 @@ export class ExplorerIntegration {
   public getSelectedFiles(): TFile[] {
     const fileExplorer = this.app.workspace.getLeavesOfType('file-explorer')[0];
     if (!fileExplorer || !fileExplorer.view) return [];
-
+  
     const fileExplorerView = fileExplorer.view as FileExplorerView;
     if (!fileExplorerView.fileItems) return [];
-
+  
     const selectedFiles: TFile[] = [];
     
     Object.entries(fileExplorerView.fileItems).forEach(([_, item]) => {
       if (item.el?.classList.contains('is-selected') && 
-        item.file instanceof TFile && 
-        item.file.extension === 'md') {
+          item.file && item.file instanceof TFile && 
+          item.file.extension === 'md') {
         selectedFiles.push(item.file);
       }
     });
-
+  
     return selectedFiles;
   }
 

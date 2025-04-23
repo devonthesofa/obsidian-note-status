@@ -165,7 +165,7 @@ export class StatusService {
    */
   public async updateNoteStatuses(newStatuses: string[], file?: TFile): Promise<void> {
     const targetFile = file || this.app.workspace.getActiveFile();
-    if (!targetFile || targetFile.extension !== 'md') return;
+    if (!targetFile || !(targetFile instanceof TFile) || targetFile.extension !== 'md') return;
   
     // Use processFrontMatter instead of manual read/modify
     await this.app.fileManager.processFrontMatter(targetFile, (frontmatter) => {
@@ -261,7 +261,7 @@ export class StatusService {
    */
   public async addNoteStatus(statusToAdd: string, file?: TFile): Promise<void> {
     const targetFile = file || this.app.workspace.getActiveFile();
-    if (!targetFile || targetFile.extension !== 'md') return;
+    if (!targetFile || !(targetFile instanceof TFile) || targetFile.extension !== 'md') return;
     
     const currentStatuses = this.getFileStatuses(targetFile);
     
@@ -285,7 +285,7 @@ export class StatusService {
    */
   public async removeNoteStatus(statusToRemove: string, file?: TFile): Promise<void> {
     const targetFile = file || this.app.workspace.getActiveFile();
-    if (!targetFile || targetFile.extension !== 'md') return;
+    if (!targetFile || !(targetFile instanceof TFile) || targetFile.extension !== 'md') return;
     
     const currentStatuses = this.getFileStatuses(targetFile);
     const newStatuses = currentStatuses.filter(status => status !== statusToRemove);

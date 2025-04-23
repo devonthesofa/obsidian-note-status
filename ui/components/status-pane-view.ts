@@ -1,7 +1,6 @@
 import { TFile, WorkspaceLeaf, View, Menu, Notice, setIcon } from 'obsidian';
 import { NoteStatusSettings } from '../../models/types';
 import { StatusService } from '../../services/status-service';
-import { ICONS } from '../../constants/icons';
 import NoteStatus from 'main';
 
 /**
@@ -159,96 +158,96 @@ export class StatusPaneView extends View {
 	private renderStatusGroup(container: HTMLElement, status: string, files: TFile[]): void {
 		const groupEl = container.createDiv({ cls: 'status-group nav-folder' });
 		const titleEl = groupEl.createDiv({ cls: 'nav-folder-title' });
-	
+
 		// Create a container for the collapse button and title
 		const collapseContainer = titleEl.createDiv({ cls: 'collapse-indicator' });
 		setIcon(collapseContainer, 'chevron-down');
-	
+
 		// Create a container for the title content
 		const titleContentContainer = titleEl.createDiv({ cls: 'nav-folder-title-content' });
-	
+
 		const statusIcon = this.statusService.getStatusIcon(status);
 		titleContentContainer.createSpan({
-		  text: `${status} ${statusIcon} (${files.length})`,
-		  cls: `status-${status}`
+			text: `${status} ${statusIcon} (${files.length})`,
+			cls: `status-${status}`
 		});
-	
+
 		// Handle collapsing/expanding behavior
 		titleEl.style.cursor = 'pointer';
 		const isCollapsed = this.settings.collapsedStatuses[status] ?? false;
-	
+
 		if (isCollapsed) {
-		  groupEl.addClass('is-collapsed');
-		  collapseContainer.empty();
-		  setIcon(collapseContainer, 'chevron-right');
-		}
-	
-		titleEl.addEventListener('click', (e) => {
-		  e.preventDefault();
-		  const isCurrentlyCollapsed = groupEl.hasClass('is-collapsed');
-	
-		  // Toggle the collapsed state
-		  if (isCurrentlyCollapsed) {
-			groupEl.removeClass('is-collapsed');
-			collapseContainer.empty();
-			setIcon(collapseContainer, 'chevron-down');
-		  } else {
 			groupEl.addClass('is-collapsed');
 			collapseContainer.empty();
 			setIcon(collapseContainer, 'chevron-right');
-		  }
-	
-		  // Update the settings
-		  this.settings.collapsedStatuses[status] = !isCurrentlyCollapsed;
-	
-		  // Trigger settings save
-		  window.dispatchEvent(new CustomEvent('note-status:settings-changed'));
+		}
+
+		titleEl.addEventListener('click', (e) => {
+			e.preventDefault();
+			const isCurrentlyCollapsed = groupEl.hasClass('is-collapsed');
+
+			// Toggle the collapsed state
+			if (isCurrentlyCollapsed) {
+			groupEl.removeClass('is-collapsed');
+			collapseContainer.empty();
+			setIcon(collapseContainer, 'chevron-down');
+			} else {
+			groupEl.addClass('is-collapsed');
+			collapseContainer.empty();
+			setIcon(collapseContainer, 'chevron-right');
+			}
+
+			// Update the settings
+			this.settings.collapsedStatuses[status] = !isCurrentlyCollapsed;
+
+			// Trigger settings save
+			window.dispatchEvent(new CustomEvent('note-status:settings-changed'));
 		});
-	
+
 		// Create and populate child elements
 		const childrenEl = groupEl.createDiv({ cls: 'nav-folder-children' });
-	
+
 		// Sort files by name
 		files.sort((a, b) => a.basename.localeCompare(b.basename));
-	
+
 		// Create file list items
 		files.forEach(file => {
-		  this.createFileListItem(childrenEl, file, status);
+			this.createFileListItem(childrenEl, file, status);
 		});
 	}
 
 	private createFileListItem(container: HTMLElement, file: TFile, status: string): void {
 		const fileEl = container.createDiv({ cls: 'nav-file' });
 		const fileTitleEl = fileEl.createDiv({ cls: 'nav-file-title' });
-	
+
 		// Add file icon if in standard view
 		if (!this.settings.compactView) {
-		  const fileIcon = fileTitleEl.createDiv({ cls: 'nav-file-icon' });
-		  setIcon(fileIcon, 'file');
+			const fileIcon = fileTitleEl.createDiv({ cls: 'nav-file-icon' });
+			setIcon(fileIcon, 'file');
 		}
-	
+
 		// Add file name
 		fileTitleEl.createSpan({
-		  text: file.basename,
-		  cls: 'nav-file-title-content'
+			text: file.basename,
+			cls: 'nav-file-title-content'
 		});
-	
+
 		// Add status indicator
 		fileTitleEl.createSpan({
-		  cls: `note-status-icon nav-file-tag status-${status}`,
-		  text: this.statusService.getStatusIcon(status)
+			cls: `note-status-icon nav-file-tag status-${status}`,
+			text: this.statusService.getStatusIcon(status)
 		});
-	
+
 		// Add click handler to open the file
 		fileEl.addEventListener('click', (e) => {
-		  e.preventDefault();
-		  this.app.workspace.openLinkText(file.path, file.path, true);
+			e.preventDefault();
+			this.app.workspace.openLinkText(file.path, file.path, true);
 		});
-	
+
 		// Add context menu
 		fileEl.addEventListener('contextmenu', (e) => {
-		  e.preventDefault();
-		  this.showFileContextMenu(e, file);
+			e.preventDefault();
+			this.showFileContextMenu(e, file);
 		});
 	}
 
