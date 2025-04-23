@@ -1073,3 +1073,88 @@
 .note-status-batch-menu {
   z-index: 1000;
 }
+
+
+
+
+
+
+
+
+
+
+/* Positioning classes for dropdowns to avoid inline styles */
+.note-status-dummy-target {
+  position: fixed;
+  z-index: 1000;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.note-status-popover-fixed {
+  position: fixed;
+  z-index: 999;
+}
+
+/* Use CSS custom properties with attr() for dynamic positioning */
+.note-status-popover-fixed {
+  --pos-x: 0;
+  --pos-y: 0;
+  --max-height: 300px;
+  left: calc(1px * attr(data-pos-x number, 0));
+  top: calc(1px * attr(data-pos-y number, 0));
+  max-height: var(--max-height);
+}
+
+/* Classes for viewport adjustments */
+.note-status-popover-right {
+  left: auto !important;
+  right: calc(1px * (attr(data-offset-right number, 10)));
+}
+
+.note-status-popover-bottom {
+  top: auto !important;
+  bottom: calc(1px * (attr(data-offset-bottom number, 10)));
+}
+
+/* Since attr() with units doesn't have widespread support yet,
+   we'll add a fallback using CSS variables that can be updated via JS */
+.note-status-popover-fixed {
+  left: var(--pos-x-px, 0);
+  top: var(--pos-y-px, 0);
+  max-height: var(--max-height-px, 300px);
+}
+
+/* Status dropdown and popover animation classes */
+.note-status-popover-animate-in {
+  animation: statusDropdownFadeIn 0.22s var(--ease-out) forwards;
+}
+
+.note-status-popover-animate-out {
+  animation: statusDropdownFadeOut 0.22s var(--ease-out) forwards;
+}
+
+/* Status Option during selection animation */
+.note-status-option-selecting {
+  background-color: var(--interactive-accent) !important;
+  color: var(--text-on-accent) !important;
+  animation: pulse 0.3s var(--ease-out);
+}
+
+/* Chip animation for removing */
+.note-status-chip-removing {
+  transform: scale(0.8);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.15s ease-out;
+}
+
+/* Fallback positioning for right/bottom adjustments */
+.note-status-popover-right {
+  right: var(--right-offset-px, 10px);
+}
+
+.note-status-popover-bottom {
+  bottom: var(--bottom-offset-px, 10px);
+}

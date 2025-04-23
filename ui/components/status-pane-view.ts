@@ -63,7 +63,8 @@ export class StatusPaneView extends View {
 		const searchWrapper = searchContainer.createDiv({ cls: 'search-input-wrapper' });
 
 		// Search icon
-		searchWrapper.createEl('span', { cls: 'search-input-icon' }).innerHTML = ICONS.search;
+		const searchIcon = searchWrapper.createEl('span', { cls: 'search-input-icon' });
+		setIcon(searchIcon, 'search');
 
 		// Create the search input
 		this.searchInput = searchWrapper.createEl('input', {
@@ -80,7 +81,7 @@ export class StatusPaneView extends View {
 
 		// Clear search button (hidden by default)
 		const clearSearchBtn = searchWrapper.createEl('span', { cls: 'search-input-clear-button' });
-		clearSearchBtn.innerHTML = ICONS.clear;
+		setIcon(clearSearchBtn, 'x');
 
 		clearSearchBtn.addEventListener('click', () => {
 			if (this.searchInput) {
@@ -100,43 +101,41 @@ export class StatusPaneView extends View {
 
 	private createActionToolbar(container: HTMLElement): void {
 		const actionsContainer = container.createDiv({ cls: 'status-pane-actions-container' });
-	  
+		
 		// Toggle compact view button
 		const viewToggleButton = actionsContainer.createEl('button', {
-		  type: 'button',
-		  title: this.settings.compactView ? 'Switch to Standard View' : 'Switch to Compact View',
-		  cls: 'note-status-view-toggle clickable-icon'
+			type: 'button',
+			title: this.settings.compactView ? 'Switch to Standard View' : 'Switch to Compact View',
+			cls: 'note-status-view-toggle clickable-icon'
 		});
-	  
-		// Use setIcon instead of innerHTML
+		
 		setIcon(viewToggleButton, this.settings.compactView ? 'layout' : 'table');
-	  
+		
 		viewToggleButton.addEventListener('click', async () => {
-		  this.settings.compactView = !this.settings.compactView;
-		  viewToggleButton.title = this.settings.compactView ? 'Switch to Standard View' : 'Switch to Compact View';
-		  viewToggleButton.empty();
-		  setIcon(viewToggleButton, this.settings.compactView ? 'layout' : 'table');
-	  
-		  // Trigger settings update
-		  window.dispatchEvent(new CustomEvent('note-status:settings-changed'));
-	  
-		  this.containerEl.toggleClass('compact-view', this.settings.compactView);
-		  await this.renderGroups(this.searchInput?.value.toLowerCase() || '');
+			this.settings.compactView = !this.settings.compactView;
+			viewToggleButton.title = this.settings.compactView ? 'Switch to Standard View' : 'Switch to Compact View';
+			viewToggleButton.empty();
+			setIcon(viewToggleButton, this.settings.compactView ? 'layout' : 'table');
+		
+			// Trigger settings update
+			window.dispatchEvent(new CustomEvent('note-status:settings-changed'));
+		
+			this.containerEl.toggleClass('compact-view', this.settings.compactView);
+			await this.renderGroups(this.searchInput?.value.toLowerCase() || '');
 		});
-	  
+		
 		// Refresh button
 		const refreshButton = actionsContainer.createEl('button', {
-		  type: 'button',
-		  title: 'Refresh Statuses',
-		  cls: 'note-status-actions-refresh clickable-icon'
+			type: 'button',
+			title: 'Refresh Statuses',
+			cls: 'note-status-actions-refresh clickable-icon'
 		});
-	  
-		// Use setIcon instead of innerHTML
+		
 		setIcon(refreshButton, 'refresh-cw');
-	  
+		
 		refreshButton.addEventListener('click', async () => {
-		  await this.renderGroups(this.searchInput?.value.toLowerCase() || '');
-		  new Notice('Status pane refreshed');
+			await this.renderGroups(this.searchInput?.value.toLowerCase() || '');
+			new Notice('Status pane refreshed');
 		});
 	}
 
@@ -163,7 +162,6 @@ export class StatusPaneView extends View {
 	
 		// Create a container for the collapse button and title
 		const collapseContainer = titleEl.createDiv({ cls: 'collapse-indicator' });
-		// Use setIcon instead of innerHTML
 		setIcon(collapseContainer, 'chevron-down');
 	
 		// Create a container for the title content

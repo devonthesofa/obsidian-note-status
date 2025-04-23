@@ -130,10 +130,19 @@ export default class NoteStatus extends Plugin {
 	 */
 	private registerIcons(): void {
 		Object.entries(ICONS).forEach(([name, svg]) => {
+			// Create a parser and get a DOM element for the SVG
+			const parser = new DOMParser();
+			const svgDoc = parser.parseFromString(svg, 'image/svg+xml');
+			const svgElement = svgDoc.documentElement;
+			
+			// Get the SVG as a string using XMLSerializer
+			const serializer = new XMLSerializer();
+			const sanitizedSvg = serializer.serializeToString(svgElement);
+			
 			if (name === 'statusPane') {
-				addIcon('status-pane', svg);
+				addIcon('status-pane', sanitizedSvg);
 			} else {
-				addIcon(`note-status-${name}`, svg);
+				addIcon(`note-status-${name}`, sanitizedSvg);
 			}
 		});
 	}
@@ -281,52 +290,52 @@ export default class NoteStatus extends Plugin {
 		// File explorer context menu
 		this.registerEvent(
 			this.app.workspace.on('file-menu', (menu, file, source) => {
-				if (source === 'file-explorer-context-menu' && file instanceof TFile && file.extension === 'md') {
-					menu.addItem((item) =>
-						item
-							.setTitle('Change Status')
-							.setIcon('tag')
-							.onClick(() => {
-								const selectedFiles = this.explorerIntegration.getSelectedFiles();
-								if (selectedFiles.length > 1) {
-									this.statusContextMenu.showForFiles(selectedFiles);
-								} else {
-									this.statusContextMenu.showForFiles([file]);
-								}
-							})
-					);
-				}
+			if (source === 'file-explorer-context-menu' && file instanceof TFile && file.extension === 'md') {
+				menu.addItem((item) =>
+				item
+					.setTitle('Change Status')
+					.setIcon('tag')
+					.onClick(() => {
+					const selectedFiles = this.explorerIntegration.getSelectedFiles();
+					if (selectedFiles.length > 1) {
+						this.statusContextMenu.showForFiles(selectedFiles);
+					} else {
+						this.statusContextMenu.showForFiles([file]);
+					}
+					})
+				);
+			}
 			})
 		);
-
+		
 		// Multiple files selection menu
 		this.registerEvent(
 			this.app.workspace.on('files-menu', (menu, files) => {
-				const mdFiles = files.filter(file => file instanceof TFile && file.extension === 'md') as TFile[];
-				if (mdFiles.length > 0) {
-					menu.addItem((item) =>
-						item
-							.setTitle('Change Status')
-							.setIcon('tag')
-							.onClick(() => {
-								this.statusContextMenu.showForFiles(mdFiles);
-							})
-					);
-				}
+			const mdFiles = files.filter(file => file instanceof TFile && file.extension === 'md') as TFile[];
+			if (mdFiles.length > 0) {
+				menu.addItem((item) =>
+				item
+					.setTitle('Change Status')
+					.setIcon('tag')
+					.onClick(() => {
+					this.statusContextMenu.showForFiles(mdFiles);
+					})
+				);
+			}
 			})
 		);
-
+		
 		// Editor context menu
 		this.registerEvent(
 			this.app.workspace.on('editor-menu', (menu, editor, view) => {
-				if (view instanceof MarkdownView) {
-					menu.addItem((item) =>
-						item
-							.setTitle('Change Note Status')
-							.setIcon('tag')
-							.onClick(() => this.statusDropdown.showInContextMenu(editor, view))
-					);
-				}
+			if (view instanceof MarkdownView) {
+				menu.addItem((item) =>
+				item
+					.setTitle('Change Note Status')
+					.setIcon('tag')
+					.onClick(() => this.statusDropdown.showInContextMenu(editor, view))
+				);
+			}
 			})
 		);
 	}
