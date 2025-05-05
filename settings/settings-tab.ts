@@ -22,7 +22,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 		this.displayTemplateSettings(containerEl.createDiv());
 
 		// UI section
-		new Setting(containerEl).setName('User Interface').setHeading();
+		new Setting(containerEl).setName('User interface').setHeading();
 
 
 		// Status bar settings
@@ -82,7 +82,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 
-		new Setting(containerEl).setName('Status Tag').setHeading();
+		new Setting(containerEl).setName('Status tag').setHeading();
 
 		// Option to use multiple statuses
 		new Setting(containerEl)
@@ -119,7 +119,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 
 
 		// Status management section
-		new Setting(containerEl).setName('Custom Statuses').setHeading();
+		new Setting(containerEl).setName('Custom statuses').setHeading();
 		
 		// Option to use only custom statuses
 		new Setting(containerEl)
@@ -232,7 +232,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 	 * Display template settings section
 	 */
 	private displayTemplateSettings(containerEl: HTMLElement): void {
-		new Setting(containerEl).setName('Status Templates').setHeading();
+		new Setting(containerEl).setName('Status templates').setHeading();
 		containerEl.createEl('p', { 
 			text: 'Enable predefined templates to quickly add common status workflows',
 			cls: 'setting-item-description'
@@ -306,7 +306,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 		
 		// Import button
 		const importButton = buttonsContainer.createEl('button', {
-			text: 'Import Template',
+			text: 'Import template',
 			cls: 'mod-cta'
 		});
 		
@@ -317,7 +317,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 		
 		// Export button
 		const exportButton = buttonsContainer.createEl('button', {
-			text: 'Export Templates',
+			text: 'Export templates',
 			cls: ''
 		});
 		

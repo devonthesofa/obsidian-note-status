@@ -80,7 +80,7 @@ export class StatusDropdown {
 		// Create the button element
 		this.toolbarButton = document.createElement('button');
 		this.toolbarButton.addClass('note-status-toolbar-button', 'clickable-icon', 'view-action');
-		this.toolbarButton.setAttribute('aria-label', 'Note Status');
+		this.toolbarButton.setAttribute('aria-label', 'Note status');
 
 		// Update initial button state
 		this.updateToolbarButton();
@@ -495,7 +495,7 @@ export class StatusDropdown {
 		// Create new button
 		this.toolbarButton = document.createElement('button');
 		this.toolbarButton.addClass('note-status-toolbar-button', 'clickable-icon', 'view-action');
-		this.toolbarButton.setAttribute('aria-label', 'Note Status');
+		this.toolbarButton.setAttribute('aria-label', 'Note status');
 
 		// Update the button state
 		this.updateToolbarButton();

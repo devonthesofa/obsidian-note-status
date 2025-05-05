@@ -24,7 +24,7 @@ export class StatusPaneView extends View {
 	}
 
 	getDisplayText(): string {
-		return 'Status Pane';
+		return 'Status pane';
 	}
 
 	getIcon(): string {
@@ -126,7 +126,7 @@ export class StatusPaneView extends View {
 		// Refresh button
 		const refreshButton = actionsContainer.createEl('button', {
 			type: 'button',
-			title: 'Refresh Statuses',
+			title: 'Refresh statuses',
 			cls: 'note-status-actions-refresh clickable-icon'
 		});
 		
@@ -255,7 +255,7 @@ export class StatusPaneView extends View {
 	
 		// Add status change options
 		menu.addItem((item) =>
-		item.setTitle('Change Status')
+		item.setTitle('Change status')
 			.setIcon('tag')
 			.onClick(() => {
 			// Use the position from the event
@@ -266,7 +266,7 @@ export class StatusPaneView extends View {
 	
 		// Add open options
 		menu.addItem((item) =>
-		item.setTitle('Open in New Tab')
+		item.setTitle('Open in new tab')
 			.setIcon('lucide-external-link')
 			.onClick(() => {
 			this.app.workspace.openLinkText(file.path, file.path, 'tab');

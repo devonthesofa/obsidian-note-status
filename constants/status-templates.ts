@@ -16,7 +16,7 @@ export interface StatusTemplate {
 export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
     {
         id: 'colorful',
-        name: 'Colorful Workflow',
+        name: 'Colorful workflow',
         description: 'A colorful set of workflow statuses with descriptive icons',
         statuses: [
             { name: 'idea', icon: '💡', color: '#FFEB3B' },
@@ -32,7 +32,7 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
     },
     {
         id: 'minimal',
-        name: 'Minimal Workflow',
+        name: 'Minimal workflow',
         description: 'A simplified set of essential workflow statuses',
         statuses: [
             { name: 'todo', icon: '📌', color: '#F44336' },
@@ -43,7 +43,7 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
     },
     {
         id: 'academic',
-        name: 'Academic Research',
+        name: 'Academic research',
         description: 'Status workflow for academic research and writing',
         statuses: [
             { name: 'research', icon: '🔍', color: '#2196F3' },
@@ -57,7 +57,7 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
     },
     {
         id: 'project',
-        name: 'Project Management',
+        name: 'Project management',
         description: 'Status workflow for project management and tracking',
         statuses: [
             { name: 'planning', icon: '🗓️', color: '#9E9E9E' },

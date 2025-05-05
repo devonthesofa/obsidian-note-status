@@ -157,7 +157,7 @@ export default class NoteStatus extends Plugin {
 		});
 
 		// Add ribbon icon
-		this.addRibbonIcon('status-pane', 'Open Status Pane', () => {
+		this.addRibbonIcon('status-pane', 'Open status pane', () => {
 			this.openStatusPane();
 		});
 	}
@@ -231,7 +231,7 @@ export default class NoteStatus extends Plugin {
 		// Refresh status command
 		this.addCommand({
 			id: 'refresh-status',
-			name: 'Refresh Status',
+			name: 'Refresh status',
 			callback: () => {
 				this.checkNoteStatus();
 				new Notice('Note status refreshed!');
@@ -240,7 +240,7 @@ export default class NoteStatus extends Plugin {
 
 		this.addCommand({
 			id: 'force-refresh-ui',
-			name: 'Force Refresh UI',
+			name: 'Force refresh user interface',
 			callback: () => this.forceRefreshUI()
 		});
 
@@ -248,7 +248,7 @@ export default class NoteStatus extends Plugin {
 		// Insert status metadata command
 		this.addCommand({
 			id: 'insert-status-metadata',
-			name: 'Insert Status Metadata',
+			name: 'Insert status metadata',
 			editorCallback: (editor: Editor, view: MarkdownView) => {
 				this.statusService.insertStatusMetadataInEditor(editor);
 				new Notice('Status metadata inserted');
@@ -258,14 +258,14 @@ export default class NoteStatus extends Plugin {
 		// Open status pane command
 		this.addCommand({
 			id: 'open-status-pane',
-			name: 'Open Status Pane',
+			name: 'Open status pane',
 			callback: () => this.openStatusPane()
 		});
 
 		// Add status to note command
 		this.addCommand({
 			id: 'add-status-to-note',
-			name: 'Add Status to Current Note',
+			name: 'Add status to current note',
 			callback: () => this.showAddStatusToNoteMenu()
 		});
 	}
@@ -293,7 +293,7 @@ export default class NoteStatus extends Plugin {
 			if (source === 'file-explorer-context-menu' && file instanceof TFile && file.extension === 'md') {
 				menu.addItem((item) =>
 				item
-					.setTitle('Change Status')
+					.setTitle('Change status')
 					.setIcon('tag')
 					.onClick(() => {
 					const selectedFiles = this.explorerIntegration.getSelectedFiles();
@@ -320,7 +320,7 @@ export default class NoteStatus extends Plugin {
 			if (mdFiles.length > 0) {
 				menu.addItem((item) =>
 				item
-					.setTitle('Change Status')
+					.setTitle('Change status')
 					.setIcon('tag')
 					.onClick(() => {
 					this.statusContextMenu.showForFiles(mdFiles);
@@ -336,7 +336,7 @@ export default class NoteStatus extends Plugin {
 			if (view instanceof MarkdownView) {
 				menu.addItem((item) =>
 				item
-					.setTitle('Change Note Status')
+					.setTitle('Change note status')
 					.setIcon('tag')
 					.onClick(() => this.statusDropdown.showInContextMenu(editor, view))
 				);

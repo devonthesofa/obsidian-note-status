@@ -235,7 +235,7 @@ export class StatusDropdownComponent {
     const titleEl = headerEl.createDiv({ cls: 'note-status-popover-title' });
     const iconContainer = titleEl.createDiv({ cls: 'note-status-popover-icon' });
     setIcon(iconContainer, 'tag');
-    titleEl.createSpan({ text: 'Note Status', cls: 'note-status-popover-label' });
+    titleEl.createSpan({ text: 'Note status', cls: 'note-status-popover-label' });
   }
   
   /**
