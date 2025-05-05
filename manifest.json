@@ -10,7 +10,6 @@
 		"PayPal": "https://paypal.me/aleixsoler"
 	},
 	"isDesktopOnly": false,
-	"keywords": ["status", "notes", "organization", "productivity", "workflow"],
 	"license": "MIT",
 	"icon": "status-pane",
 	"repository": "https://github.com/devonthesofa/obsidian-note-status",
