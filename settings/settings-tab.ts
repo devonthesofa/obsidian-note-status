@@ -22,7 +22,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 		this.displayTemplateSettings(containerEl.createDiv());
 
 		// UI section
-		new Setting(containerEl).setName('UI Settings').setHeading();
+		new Setting(containerEl).setName('User Interface').setHeading();
 
 
 		// Status bar settings
@@ -82,7 +82,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 
-		new Setting(containerEl).setName('Status Tag Settings').setHeading();
+		new Setting(containerEl).setName('Status Tag').setHeading();
 
 		// Option to use multiple statuses
 		new Setting(containerEl)
