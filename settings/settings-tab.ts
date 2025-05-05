@@ -22,7 +22,8 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 		this.displayTemplateSettings(containerEl.createDiv());
 
 		// UI section
-		containerEl.createEl('h3', { text: 'UI Settings' });
+		new Setting(containerEl).setName('UI Settings').setHeading();
+
 
 		// Status bar settings
 		new Setting(containerEl)
@@ -81,7 +82,8 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 
-		containerEl.createEl('h3', { text: 'Status Tag Settings' });
+		new Setting(containerEl).setName('Status Tag Settings').setHeading();
+
 		// Option to use multiple statuses
 		new Setting(containerEl)
 			.setName('Enable multiple statuses')
@@ -117,7 +119,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 
 
 		// Status management section
-		containerEl.createEl('h3', { text: 'Custom Statuses' });
+		new Setting(containerEl).setName('Custom Statuses').setHeading();
 		
 		// Option to use only custom statuses
 		new Setting(containerEl)
@@ -230,7 +232,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 	 * Display template settings section
 	 */
 	private displayTemplateSettings(containerEl: HTMLElement): void {
-		containerEl.createEl('h3', { text: 'Status Templates' });
+		new Setting(containerEl).setName('Status Templates').setHeading();
 		containerEl.createEl('p', { 
 			text: 'Enable predefined templates to quickly add common status workflows',
 			cls: 'setting-item-description'
