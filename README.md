@@ -67,7 +67,7 @@ The Status Pane provides an overview of all your notes grouped by status:
 
 To open the Status Pane:
 - Click the status pane icon in the left sidebar
-- Use the command palette: "Note Status: Open Status Pane"
+- Use the command palette: "Open status pane"
 In the Status Pane you can:
 - View all notes grouped by status
 - Click on any note to open it
@@ -101,7 +101,7 @@ To add additional statuses:
 #### Batch Updates
 To update multiple files at once:
 1. Select multiple files in the file explorer (using Ctrl/Cmd or Shift)
-2. Right-click and choose "Change Status"
+2. Right-click and choose "Change status"
 3. Select whether to replace or add the status
 4. Choose the status to apply
 
@@ -114,10 +114,10 @@ Access plugin settings via Settings → Note Status
 
 Choose from predefined status templates:
 
-- **Colorful Workflow**: A colorful set of workflow statuses with descriptive icons
-- **Minimal Workflow**: A simplified set of essential workflow statuses
-- **Academic Research**: Status workflow for academic research and writing
-- **Project Management**: Status workflow for project management and tracking
+- **Colorful workflow**: A colorful set of workflow statuses with descriptive icons
+- **Minimal workflow**: A simplified set of essential workflow statuses
+- **Academic research**: Status workflow for academic research and writing
+- **Project management**: Status workflow for project management and tracking
 
 ![Status Templates](images/status-templates.png)
 
@@ -143,11 +143,11 @@ Configure how statuses are displayed:
 
 ## Commands
 The plugin provides several commands accessible via the Command Palette:
-- `Note Status: Open Status Pane` - Opens the status view
-- `Note Status: Refresh Status` - Refreshes current note's status
-- `Note Status: Add Status to Current Note` - Shows status menu
-- `Note Status: Insert Status Metadata` - Adds status frontmatter
-- `Note Status: Force Refresh UI` - Complete UI refresh
+- `Open status pane` - Opens the status view
+- `Refresh status` - Refreshes current note's status
+- `Add status to current note` - Shows status menu
+- `Insert status metadata` - Adds status frontmatter
+- `Force refresh user interface` - Complete UI refresh
 
 ## Technical Details
 ### Frontmatter Format

@@ -1,4 +1,4 @@
-import { App, setIcon, TFile } from 'obsidian';
+import { App, setIcon, TFile, setTooltip } from 'obsidian';
 import { NoteStatusSettings, Status } from '../../models/types';
 import { StatusService } from '../../services/status-service';
 
@@ -235,7 +235,7 @@ export class StatusDropdownComponent {
     const titleEl = headerEl.createDiv({ cls: 'note-status-popover-title' });
     const iconContainer = titleEl.createDiv({ cls: 'note-status-popover-icon' });
     setIcon(iconContainer, 'tag');
-    titleEl.createSpan({ text: 'Note Status', cls: 'note-status-popover-label' });
+    titleEl.createSpan({ text: 'Note status', cls: 'note-status-popover-label' });
   }
   
   /**
@@ -320,8 +320,7 @@ export class StatusDropdownComponent {
     const tooltipValue = statusObj?.description ? `${status} - ${statusObj.description}`: status;
     
     // Add tooltip to the chip element
-    chipEl.setAttribute('aria-label', tooltipValue);
-    chipEl.setAttribute('data-tooltip-position', 'top');
+    setTooltip(chipEl, tooltipValue);
     
     const removeBtn = chipEl.createDiv({ 
       cls: 'note-status-chip-remove',
@@ -456,8 +455,7 @@ export class StatusDropdownComponent {
     
     // Add tooltip with description if available
     if (status.description) {
-      optionEl.setAttribute('aria-label', `${status.name} - ${status.description}`);
-      optionEl.setAttribute('data-tooltip-position', 'right');
+      setTooltip(optionEl, `${status.name} - ${status.description}`);
     }
     
     // Check icon for selected status

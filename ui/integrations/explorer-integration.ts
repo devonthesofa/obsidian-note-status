@@ -1,4 +1,4 @@
-import { App, TFile, debounce } from 'obsidian';
+import { App, TFile, debounce, setTooltip } from 'obsidian';
 import { FileExplorerView, NoteStatusSettings } from '../../models/types';
 import { StatusService } from '../../services/status-service';
 
@@ -237,8 +237,7 @@ export class ExplorerIntegration {
     // Add tooltip with status name
     const statusObj = this.statusService.getAllStatuses().find(s => s.name === status);
     const tooltipValue = statusObj?.description ? `${status} - ${statusObj.description}`: status;
-    iconEl.setAttribute('aria-label', tooltipValue);
-    iconEl.setAttribute('data-tooltip-position', 'right');
+    setTooltip(iconEl, tooltipValue);
   }
 
   /**
