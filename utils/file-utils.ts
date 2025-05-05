@@ -73,22 +73,22 @@ export function updateFrontmatterProperty(
  * Reads frontmatter property from file
  * Always returns an array (even if the property is stored as a string)
  */
-export async function getFrontmatterProperty(
+export function getFrontmatterProperty(
 	app: App,
 	file: TFile,
 	property: string
-): Promise<string[] | null> {
+): string[] | null {
 	const cache = app.metadataCache.getFileCache(file);
 
 	if (cache?.frontmatter && property in cache.frontmatter) {
-        const value = cache.frontmatter[property];
-        
-        // Always return as array
-        if (Array.isArray(value)) {
-            return value;
-        } else if (value !== null && value !== undefined) {
-            return [value.toString()];
-        }
+		const value = cache.frontmatter[property];
+		
+		// Always return as array
+		if (Array.isArray(value)) {
+			return value;
+		} else if (value !== null && value !== undefined) {
+			return [value.toString()];
+		}
 	}
 
 	return null;
