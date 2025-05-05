@@ -1,3 +1,4 @@
+import { setTooltip } from 'obsidian';
 import { NoteStatusSettings } from '../../models/types';
 import { StatusService } from '../../services/status-service';
 
@@ -65,8 +66,7 @@ export class StatusBar {
 	    });
 	    
 	    // Add tooltip
-	    statusText.setAttribute('aria-label', tooltipValue);
-	    statusText.setAttribute('data-tooltip-position', 'top');
+	    setTooltip(statusText, tooltipValue);
 	
 	    // Create status icon
 	    const statusIcon = this.statusBarEl.createEl('span', {
@@ -75,8 +75,7 @@ export class StatusBar {
 	    });
 	    
 	    // Add tooltip to icon too
-	    statusIcon.setAttribute('aria-label', tooltipValue);
-	    statusIcon.setAttribute('data-tooltip-position', 'top');
+	    setTooltip(statusIcon, tooltipValue);
 	  } else {
 	    // Display multiple statuses
 	    // Create status text
@@ -100,8 +99,7 @@ export class StatusBar {
 	      });
 	      
 	      // Add tooltip
-	      badge.setAttribute('aria-label', tooltipValue);
-	      badge.setAttribute('data-tooltip-position', 'top');
+	      setTooltip(badge, tooltipValue);
 	      
 	      badge.createEl('span', {
 	        text: this.statusService.getStatusIcon(status),
