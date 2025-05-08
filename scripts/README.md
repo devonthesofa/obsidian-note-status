@@ -20,6 +20,7 @@
 - `--tag-prefix` or `-t`: Status tag prefix (default: obsidian-note-status)
 - `--depth` or `-d`: Maximum folder depth (default: 5)
 - `--max-per-folder` or `-m`: Maximum files per folder (default: 200)
+- `--no-status` or `-n`: Generate notes without status tags (default: false)
 
 ## Performance Considerations
 The script creates a realistic vault structure with:

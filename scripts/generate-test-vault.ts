@@ -20,6 +20,7 @@ program
   .option('-t, --tag-prefix <string>', 'Status tag prefix', 'obsidian-note-status')
   .option('-d, --depth <number>', 'Maximum folder depth', '5')
   .option('-m, --max-per-folder <number>', 'Maximum files per folder', '200')
+  .option('-n, --no-status', 'Generate notes without status tags')
   .parse(process.argv);
 
 const options = program.opts();
@@ -30,6 +31,7 @@ const outputDir = options.output;
 const tagPrefix = options.tagPrefix;
 const maxDepth = parseInt(options.depth, 10);
 const maxPerFolder = parseInt(options.maxPerFolder, 10);
+const includeStatus = options.status !== false; // true by default, false if --no-status is used
 
 if (isNaN(noteCount) || noteCount <= 0) {
   console.error('Error: Note count must be a positive number');
@@ -109,21 +111,25 @@ function generateContent(): string {
   return content;
 }
 
-// Create a note with frontmatter containing status
+// Create a note with optional frontmatter containing status
 function createNote(title: string, folderPath: string): void {
   const safeName = title.replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, ' ');
   const fileName = `${safeName}.md`;
   const filePath = path.join(folderPath, fileName);
   
-  // Create frontmatter with random status
-  const status = getRandomStatus();
-  const frontmatter = `---\n${tagPrefix}: ${status}\n---\n\n`;
+  let fileContent = '';
+  
+  if (includeStatus) {
+    // Create frontmatter with random status
+    const status = getRandomStatus();
+    fileContent = `---\n${tagPrefix}: ${status}\n---\n\n`;
+  }
   
   // Create content
-  const content = `# ${title}\n\n${generateContent()}`;
+  fileContent += `# ${title}\n\n${generateContent()}`;
   
   // Write file
-  fs.writeFileSync(filePath, frontmatter + content);
+  fs.writeFileSync(filePath, fileContent);
 }
 
 // Generate a folder structure and notes
@@ -225,7 +231,7 @@ function createObsidianConfig(baseDir: string): void {
 }
 
 // Main execution
-console.log(`Generating ${noteCount} notes in ${outputDir} with tag prefix '${tagPrefix}'`);
+console.log(`Generating ${noteCount} notes in ${outputDir}${includeStatus ? ` with tag prefix '${tagPrefix}'` : ' without status tags'}`);
 console.time('Generation completed in');
 
 // Create test vault
