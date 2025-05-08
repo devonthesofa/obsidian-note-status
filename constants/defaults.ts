@@ -22,7 +22,8 @@ export const DEFAULT_SETTINGS: NoteStatusSettings = {
 	enabledTemplates: DEFAULT_ENABLED_TEMPLATES,
 	useCustomStatusesOnly: false,
 	useMultipleStatuses: true,
-	tagPrefix: 'obsidian-note-status'
+	tagPrefix: 'obsidian-note-status',
+	excludeUnknownStatus: true, // Default to exclude unknown status files for better performance
 };
 
 /**
