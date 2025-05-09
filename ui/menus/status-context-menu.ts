@@ -65,7 +65,6 @@ export class StatusContextMenu {
    */
   private showMultipleFilesMenu(files: TFile[], position?: { x: number; y: number }): void {
     const menu = new Menu();
-    //menu.addClass('note-status-batch-menu');
     
     // Add title section
     menu.addItem((item) => {
@@ -74,35 +73,18 @@ export class StatusContextMenu {
       return item;
     });
 
-    // Add "Replace with status" option
+    // Simplified toggle-based approach for multiple files
     menu.addItem((item) => 
       item
-        .setTitle('Replace with status...')
+        .setTitle('Manage statuses...')
         .setIcon('tag')
         .onClick(() => {
           this.statusDropdown.openStatusDropdown({
             position: position,
-            files: files,
-            mode: 'replace'
+            files: files
           });
         })
     );
-
-    // Add "Add status" option (only for multiple status mode)
-    if (this.settings.useMultipleStatuses) {
-      menu.addItem((item) => 
-        item
-          .setTitle('Add status...')
-          .setIcon('plus')
-          .onClick(() => {
-            this.statusDropdown.openStatusDropdown({
-              position: position,
-              files: files,
-              mode: 'add'
-            });
-          })
-      );
-    }
     
     // Show the menu
     if (position) {

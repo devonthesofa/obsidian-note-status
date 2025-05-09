@@ -82,6 +82,24 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 
+		// Add option to exclude unknown status in pane view for performance
+		new Setting(containerEl)
+		.setName('Exclude unassigned notes from status pane')
+		.setDesc('Improves performance by excluding notes with no assigned status from the status pane. Recommended for large vaults.')
+		.addToggle(toggle => toggle
+			.setValue(this.plugin.settings.excludeUnknownStatus || false)
+			.onChange(async (value) => {
+				this.plugin.settings.excludeUnknownStatus = value;
+				await this.plugin.saveSettings();
+				
+				// Refresh the status pane if open
+				const statusPane = this.app.workspace.getLeavesOfType('status-pane')[0];
+				if (statusPane && statusPane.view) {
+					// Trigger refresh
+					window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+				}
+			}));
+
 		new Setting(containerEl).setName('Status tag').setHeading();
 
 		// Option to use multiple statuses

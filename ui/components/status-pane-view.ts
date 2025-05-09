@@ -11,12 +11,22 @@ export class StatusPaneView extends View {
 	searchInput: HTMLInputElement | null = null;
 	private settings: NoteStatusSettings;
 	private statusService: StatusService;
+	private paginationState: {
+		itemsPerPage: number;
+		currentPage: Record<string, number>;
+	};
 
 	constructor(leaf: WorkspaceLeaf, plugin: NoteStatus) {
 		super(leaf);
 		this.plugin = plugin;
 		this.settings = plugin.settings;
 		this.statusService = plugin.statusService;
+		
+		// Initialize pagination
+		this.paginationState = {
+			itemsPerPage: 100, // Show 100 items per page by default
+			currentPage: {} // Track current page for each status
+		};
 	}
 
 	getViewType(): string {
@@ -33,7 +43,6 @@ export class StatusPaneView extends View {
 
 	async onOpen(): Promise<void> {
 		await this.setupPane();
-		await this.renderGroups('');
 	}
 
 	async setupPane(): Promise<void> {
@@ -54,7 +63,17 @@ export class StatusPaneView extends View {
 		containerEl.toggleClass('compact-view', this.settings.compactView);
 
 		// Add a container for the groups
-		containerEl.createDiv({ cls: 'note-status-groups-container' });
+		const groupsContainer = containerEl.createDiv({ cls: 'note-status-groups-container' });
+		
+		// Add loading indicator
+		const loadingIndicator = groupsContainer.createDiv({ cls: 'note-status-loading' });
+		loadingIndicator.innerHTML = '<span>Loading notes...</span>';
+		
+		// Use non-blocking render
+		setTimeout(async () => {
+			await this.renderGroups('');
+			loadingIndicator.remove();
+		}, 10);
 	}
 
 	private createSearchInput(container: HTMLElement): void {
@@ -143,16 +162,89 @@ export class StatusPaneView extends View {
 		const groupsContainer = containerEl.querySelector('.note-status-groups-container');
 		if (!groupsContainer) return;
 
-		groupsContainer.empty();
+		// Show loading indicator for non-empty search queries
+		if (searchQuery) {
+			groupsContainer.empty();
+			const loadingIndicator = groupsContainer.createDiv({ cls: 'note-status-loading' });
+			loadingIndicator.innerHTML = `<span>Searching for "${searchQuery}"...</span>`;
+			
+			// Let the UI update before continuing
+			await new Promise(resolve => setTimeout(resolve, 0));
+		} else {
+			groupsContainer.empty();
+		}
 
-		// Group files by status
-		const statusGroups = this.statusService.groupFilesByStatus(searchQuery);
+		// Group files by status (with optimizations)
+		const statusGroups = this.getFilteredStatusGroups(searchQuery);
+		
+		// Remove the loading indicator if it exists
+		const loadingIndicator = groupsContainer.querySelector('.note-status-loading');
+		if (loadingIndicator) {
+			loadingIndicator.remove();
+		}
+
 		// Render each status group
 		Object.entries(statusGroups).forEach(([status, files]) => {
 			if (files.length > 0) {
+				// Skip unknown status if setting enabled
+				if (status === 'unknown' && this.settings.excludeUnknownStatus) {
+					return;
+				}
 				this.renderStatusGroup(groupsContainer as HTMLElement, status, files);
 			}
 		});
+		
+		// If no groups were rendered, show a message
+		if (groupsContainer.childElementCount === 0) {
+			const emptyMessage = groupsContainer.createDiv({ cls: 'note-status-empty-indicator' });
+			if (searchQuery) {
+				emptyMessage.textContent = `No notes found matching "${searchQuery}"`;
+			} else if (this.settings.excludeUnknownStatus) {
+				// Clear any existing content and use a structured layout
+				emptyMessage.empty();
+				
+				// Add message text in its own container
+				emptyMessage.createDiv({
+					text: 'No notes with status found. Unassigned notes are currently hidden.',
+					cls: 'note-status-empty-message'
+				});
+				
+				// Create separate container for the button
+				const btnContainer = emptyMessage.createDiv({
+					cls: 'note-status-button-container'
+				});
+				
+				// Add a styled button in its own container
+				const showUnknownBtn = btnContainer.createEl('button', {
+					text: 'Show unassigned notes',
+					cls: 'note-status-show-unassigned-button'
+				});
+				
+				showUnknownBtn.addEventListener('click', async () => {
+					this.settings.excludeUnknownStatus = false;
+					await this.plugin.saveSettings();
+					this.renderGroups(searchQuery);
+				});
+			}
+		}
+	}
+	
+	/**
+	 * Optimized method to get status groups with filtering
+	 */
+	private getFilteredStatusGroups(searchQuery = ''): Record<string, TFile[]> {
+		// Use the statusService but apply our own filtering for better performance
+		const rawGroups = this.statusService.groupFilesByStatus(searchQuery);
+		const filteredGroups: Record<string, TFile[]> = {};
+		
+		// Filter out empty groups and respect the excludeUnknownStatus setting
+		Object.entries(rawGroups).forEach(([status, files]) => {
+			if (files.length > 0 && !(status === 'unknown' && this.settings.excludeUnknownStatus)) {
+				filteredGroups[status] = files;
+			}
+		});
+		
+		return filteredGroups;
 	}
 
 	private renderStatusGroup(container: HTMLElement, status: string, files: TFile[]): void {
@@ -187,13 +279,13 @@ export class StatusPaneView extends View {
 
 			// Toggle the collapsed state
 			if (isCurrentlyCollapsed) {
-			groupEl.removeClass('is-collapsed');
-			collapseContainer.empty();
-			setIcon(collapseContainer, 'chevron-down');
+				groupEl.removeClass('is-collapsed');
+				collapseContainer.empty();
+				setIcon(collapseContainer, 'chevron-down');
 			} else {
-			groupEl.addClass('is-collapsed');
-			collapseContainer.empty();
-			setIcon(collapseContainer, 'chevron-right');
+				groupEl.addClass('is-collapsed');
+				collapseContainer.empty();
+				setIcon(collapseContainer, 'chevron-right');
 			}
 
 			// Update the settings
@@ -208,14 +300,81 @@ export class StatusPaneView extends View {
 
 		// Sort files by name
 		files.sort((a, b) => a.basename.localeCompare(b.basename));
-
-		// Create file list items
-		files.forEach(file => {
+		
+		// Initialize pagination for this status if not already done
+		if (!this.paginationState.currentPage[status]) {
+			this.paginationState.currentPage[status] = 0;
+		}
+		
+		// Calculate pagination
+		const currentPage = this.paginationState.currentPage[status];
+		const itemsPerPage = this.paginationState.itemsPerPage;
+		const totalPages = Math.ceil(files.length / itemsPerPage);
+		const startIndex = currentPage * itemsPerPage;
+		const endIndex = Math.min(startIndex + itemsPerPage, files.length);
+		
+		// Create file list items for current page only
+		const filesToRender = files.slice(startIndex, endIndex);
+		filesToRender.forEach(file => {
 			this.createFileListItem(childrenEl, file, status);
 		});
+		
+		// Add pagination controls if needed
+		if (files.length > itemsPerPage) {
+			this.addPaginationControls(childrenEl, status, currentPage, totalPages, files.length);
+		}
+	}
+	
+	/**
+	 * Add pagination controls to a group
+	 */
+	private addPaginationControls(
+		container: HTMLElement, 
+		status: string, 
+		currentPage: number, 
+		totalPages: number,
+		totalItems: number
+	): void {
+		const paginationEl = container.createDiv({ cls: 'note-status-pagination' });
+		
+		// Add previous page button if not on first page
+		if (currentPage > 0) {
+			const prevButton = paginationEl.createEl('button', {
+				text: 'Previous',
+				cls: 'note-status-pagination-button'
+			});
+			
+			prevButton.addEventListener('click', (e) => {
+				e.stopPropagation();
+				this.paginationState.currentPage[status] = currentPage - 1;
+				this.renderGroups(this.searchInput?.value.toLowerCase() || '');
+			});
+		}
+		
+		// Add page indicator
+		paginationEl.createSpan({
+			text: `Page ${currentPage + 1} of ${totalPages} (${totalItems} notes)`,
+			cls: 'note-status-pagination-info'
+		});
+		
+		// Add next page button if not on last page
+		if (currentPage < totalPages - 1) {
+			const nextButton = paginationEl.createEl('button', {
+				text: 'Next',
+				cls: 'note-status-pagination-button'
+			});
+			
+			nextButton.addEventListener('click', (e) => {
+				e.stopPropagation();
+				this.paginationState.currentPage[status] = currentPage + 1;
+				this.renderGroups(this.searchInput?.value.toLowerCase() || '');
+			});
+		}
 	}
 
 	private createFileListItem(container: HTMLElement, file: TFile, status: string): void {
+		if (!file || !(file instanceof TFile)) return; // Skip if file is invalid
+		
 		const fileEl = container.createDiv({ cls: 'nav-file' });
 		const fileTitleEl = fileEl.createDiv({ cls: 'nav-file-title' });
 
@@ -225,7 +384,7 @@ export class StatusPaneView extends View {
 			setIcon(fileIcon, 'file');
 		}
 
-		// Add file name
+		// Add file name with proper class for styling
 		fileTitleEl.createSpan({
 			text: file.basename,
 			cls: 'nav-file-title-content'
@@ -259,7 +418,6 @@ export class StatusPaneView extends View {
 			.setIcon('tag')
 			.onClick(() => {
 			// Use the position from the event
-			// const position = { x: e.clientX, y: e.clientY };
 			this.plugin.statusContextMenu.showForFile(file, e);
 			})
 		);

@@ -6,6 +6,16 @@ Enhance your Obsidian workflow with a powerful status tracking system for your n
 
 ![Hello World Screenshot](images/hello-world.png)
 
+## Table of Contents
+- [Features](#features)
+- [Installation](#installation)
+- [User Guide](#user-guide)
+- [Configuration](#configuration)
+- [Performance Recommendations](#performance-recommendations)
+- [Development](#development)
+- [Roadmap](#roadmap)
+- [Support](#support-the-development)
+
 ## Features
 - **Status Assignment**: Mark notes with statuses (active, on hold, completed, dropped)
 - **Multiple Statuses**: Apply more than one status to a single note
@@ -17,12 +27,11 @@ Enhance your Obsidian workflow with a powerful status tracking system for your n
 - **Custom Statuses**: Create your own statuses with icons and colors
 - **Status Templates**: Choose from predefined templates or create your own
 - **Highly Customizable**: Configure where and how statuses appear
+- **Large Vault Support**: Optimized for performance with pagination and filtering options
 
 ## Installation
-> Coming soon to the Obsidian Community Plugins marketplace!
 
 ### Marketplace Installation (Recommended)
-Once available in the marketplace:
 1. Open Obsidian → Settings → Community plugins
 2. Disable Safe mode
 3. Click "Browse" and search for "Note Status"
@@ -99,6 +108,7 @@ To add additional statuses:
 3. Click on an active status to remove it
 
 #### Batch Updates
+
 To update multiple files at once:
 1. Select multiple files in the file explorer (using Ctrl/Cmd or Shift)
 2. Right-click and choose "Change status"
@@ -107,9 +117,17 @@ To update multiple files at once:
 
 ![Batch Updates](images/batch-updates.png)
 
+#### Large Vault Performance
+If you have a large vault with thousands of notes, use these features for better performance:
+
+1. Enable "Exclude unassigned notes from status pane" in settings
+2. Use the search function to filter notes ![Show Unassigned Notes](images/show-unassigned-notes.png)
+3. Use pagination controls to navigate through large status groups ![Pagination](images/pagination.png)
+
 ## Configuration
 ### Status Management
 Access plugin settings via Settings → Note Status
+
 #### Status Templates
 
 Choose from predefined status templates:
@@ -137,9 +155,19 @@ Configure how statuses are displayed:
 - Auto-hide status bar when status is unknown
 - Show/hide status icons in file explorer
 - Hide unknown status in file explorer
+- **Exclude unassigned notes from status pane** (recommended for large vaults)
 - Toggle compact view in status pane
 - Enable/disable multiple statuses mode
 - Customize frontmatter tag name
+
+## Performance Recommendations
+If you have a large vault (1000+ notes), consider these settings for optimal performance:
+
+1. Enable "Exclude unassigned notes from status pane"
+2. Enable "Hide unknown status in file explorer"
+3. Use specific searches rather than browsing all notes
+4. Consider using "Compact view" in the status pane
+
 
 ## Commands
 The plugin provides several commands accessible via the Command Palette:
@@ -236,7 +264,6 @@ Contributions welcome! Please feel free to submit a Pull Request.
 The following features and improvements are planned for upcoming releases:
 
 ### Short-term
-- **Bug Fix**: Resolve selection context issue when changing status of a single file while multiple files are selected in the explorer view
 - **Batch Modification Enhancement**: Implement a modal dialog with file preview and status selection for more intuitive batch operations
 - **Dropdown Refinement**: Restructure status options to be grouped by categories (workflow, templates, custom) with visual separators
 - **Obsidian API Compliance**: Refactor code to follow Obsidian guidelines for better performance and compatibility:
@@ -251,3 +278,8 @@ The following features and improvements are planned for upcoming releases:
 - **Canvas integration**: Show status on canvas cards
 - **Graph view integration**: Visualize notes by status in graph view
 - **Mobile optimization**: Improved experience on mobile devices
+
+## Support the Development
+If you find this plugin useful and would like to support its development, you can make a donation through my PayPal account. Any contribution is greatly appreciated and helps me continue improving the plugin!
+
+PayPal: https://paypal.me/aleixsoler

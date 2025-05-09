@@ -337,13 +337,17 @@ export class StatusDropdownComponent {
       // Add remove animation
       chipEl.addClass('note-status-chip-removing');
       
-      // Only proceed with removal if we have a target file
-      if (this.targetFile) {
-        // Wait for animation to complete before actually removing
-        setTimeout(async () => {
+      // Wait for animation to complete before actually removing
+      setTimeout(async () => {
+        if (this.targetFile) {
+          // Remove status from single file
           await this.removeStatus(status);
-        }, 150);
-      }
+        } else {
+          // This is a batch operation - remove from all files
+          // Call the onStatusChange callback with the status to be removed
+          this.onStatusChange([status]);
+        }
+      }, 150);
     });
   }
   
