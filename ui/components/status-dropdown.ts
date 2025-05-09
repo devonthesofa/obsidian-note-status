@@ -338,6 +338,48 @@ export class StatusDropdown {
 		this._openStatusDropdown(options);
 	}
 
+	/**
+	 * Find common statuses across multiple files
+	 */
+	private findCommonStatuses(files: TFile[]): string[] {
+		if (files.length === 0) return ['unknown'];
+		
+		// Get statuses for first file
+		const firstFileStatuses = this.statusService.getFileStatuses(files[0]);
+		
+		// Filter to only include statuses that exist on all files
+		return firstFileStatuses.filter(status => {
+			// Skip unknown status
+			if (status === 'unknown') return false;
+			
+			// Check if status exists on all files
+			return files.every(file => 
+				this.statusService.getFileStatuses(file).includes(status)
+			);
+		});
+	}
+
+	/**
+	 * Toggle a status across multiple files
+	 */
+	private async toggleStatusForFiles(files: TFile[], status: string): Promise<void> {
+		// Count how many files have this status
+		const filesWithStatus = files.filter(file => 
+			this.statusService.getFileStatuses(file).includes(status)
+		);
+		
+		// If more than half have the status, remove it; otherwise, add it
+		const shouldRemove = filesWithStatus.length > files.length / 2;
+		
+		for (const file of files) {
+			if (shouldRemove) {
+				await this.statusService.removeNoteStatus(status, file);
+			} else {
+				await this.statusService.addNoteStatus(status, file);
+			}
+		}
+	}
+
 	private _openStatusDropdown(options: {
 		target?: HTMLElement;
 		position?: { x: number, y: number };
@@ -353,46 +395,58 @@ export class StatusDropdown {
 			new Notice('No files selected');
 			return;
 		}
-		
+
 		// IMPORTANT: Always reset state at the beginning of each operation
 		// This ensures no lingering callbacks or files from previous operations
 		this.dropdownComponent.setTargetFile(null);
 		this.dropdownComponent.setOnStatusChange(() => {});
-		
+
 		// Determine if we're handling single or multiple files
 		const isSingleFile = files.length === 1;
 		const targetFile = isSingleFile ? files[0] : null;
-		
+
 		// Set target file (if single) or null (if multiple)
 		this.dropdownComponent.setTargetFile(targetFile);
+
+		// Get current statuses appropriately
+		let currentStatuses: string[];
 		
-		// Get current statuses if single file, or reset to unknown for multiple
-		const currentStatuses = targetFile ?
-			this.statusService.getFileStatuses(targetFile) :
-			['unknown'];
-		
+		if (targetFile) {
+			// For single file, get its current statuses
+			currentStatuses = this.statusService.getFileStatuses(targetFile);
+		} else if (files.length > 1) {
+			// For multiple files, find common statuses to display
+			currentStatuses = this.findCommonStatuses(files);
+		} else {
+			currentStatuses = ['unknown'];
+		}
+
 		// Update dropdown with current statuses
 		this.dropdownComponent.updateStatuses(currentStatuses);
-		
+
 		// Set custom callback for status changes if provided
 		if (options.onStatusChange) {
-			// Use the provided callback directly, no need for timeout restoration
+			// Use the provided callback directly
 			this.dropdownComponent.setOnStatusChange(options.onStatusChange);
-		} else if (!isSingleFile && options.mode) {
+		} else if (!isSingleFile) {
 			// Create a local copy of files to avoid closure issues
 			const filesForBatch = [...files];
 			
 			// Set batch operation callback for multiple files
+			// Use toggle behavior for batch operations like single files
 			this.dropdownComponent.setOnStatusChange(async (statuses) => {
 				if (statuses.length > 0) {
-					await this.statusService.batchUpdateStatuses(filesForBatch, statuses, options.mode || 'replace');
-			
+					// Get the last selected status for toggling
+					const toggledStatus = statuses[statuses.length - 1];
+					
+					// Toggle this status across all files
+					await this.toggleStatusForFiles(filesForBatch, toggledStatus);
+
 					// Dispatch events for UI update
 					window.dispatchEvent(new CustomEvent('note-status:batch-update-complete', {
 						detail: {
-							statuses,
-							fileCount: filesForBatch.length,
-							mode: options.mode
+							status: toggledStatus,
+							fileCount: filesForBatch.length
 						}
 					}));
 					window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
@@ -408,13 +462,13 @@ export class StatusDropdown {
 				window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
 			});
 		}
-		
+
 		// For dropdown from editor
 		if (options.editor && options.view) {
 			const position = this.getCursorPosition(options.editor, options.view);
 			const dummyTarget = this.createDummyTarget(position);
 			this.dropdownComponent.open(dummyTarget, position);
-		
+
 			// Clean up dummy target
 			setTimeout(() => {
 				if (dummyTarget.parentNode) {
@@ -423,7 +477,7 @@ export class StatusDropdown {
 			}, 100);
 			return;
 		}
-		
+
 		// For dropdown from toolbar button
 		if (options.target) {
 			if (options.position) {
@@ -438,7 +492,7 @@ export class StatusDropdown {
 			}
 			return;
 		}
-		
+
 		// For direct position (context menus)
 		if (options.position) {
 			const dummyTarget = document.createElement('div');
@@ -446,9 +500,9 @@ export class StatusDropdown {
 			dummyTarget.style.setProperty('--pos-x-px', `${options.position.x}px`);
 			dummyTarget.style.setProperty('--pos-y-px', `${options.position.y}px`);
 			document.body.appendChild(dummyTarget);
-		
+
 			this.dropdownComponent.open(dummyTarget, options.position);
-		
+
 			// Clean up dummy target
 			setTimeout(() => {
 				if (dummyTarget.parentNode) {
@@ -457,7 +511,7 @@ export class StatusDropdown {
 			}, 100);
 			return;
 		}
-		
+
 		// Fallback to center position
 		const center = {
 			x: window.innerWidth / 2,
@@ -468,9 +522,9 @@ export class StatusDropdown {
 		fallbackTarget.style.setProperty('--pos-x-px', `${center.x}px`);
 		fallbackTarget.style.setProperty('--pos-y-px', `${center.y}px`);
 		document.body.appendChild(fallbackTarget);
-		
+
 		this.dropdownComponent.open(fallbackTarget, center);
-		
+
 		// Clean up fallback target
 		setTimeout(() => {
 			if (fallbackTarget.parentNode) {
@@ -525,5 +579,4 @@ export class StatusDropdown {
 			toolbarContainer.appendChild(this.toolbarButton);
 		}
 	}
-
 }
