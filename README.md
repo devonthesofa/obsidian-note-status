@@ -6,6 +6,16 @@ Enhance your Obsidian workflow with a powerful status tracking system for your n
 
 ![Hello World Screenshot](images/hello-world.png)
 
+## Table of Contents
+- [Features](#features)
+- [Installation](#installation)
+- [User Guide](#user-guide)
+- [Configuration](#configuration)
+- [Performance Recommendations](#performance-recommendations)
+- [Development](#development)
+- [Roadmap](#roadmap)
+- [Support](#support-the-development)
+
 ## Features
 - **Status Assignment**: Mark notes with statuses (active, on hold, completed, dropped)
 - **Multiple Statuses**: Apply more than one status to a single note
@@ -117,6 +127,7 @@ If you have a large vault with thousands of notes, use these features for better
 ## Configuration
 ### Status Management
 Access plugin settings via Settings → Note Status
+
 #### Status Templates
 
 Choose from predefined status templates:
@@ -149,6 +160,15 @@ Configure how statuses are displayed:
 - Enable/disable multiple statuses mode
 - Customize frontmatter tag name
 
+## Performance Recommendations
+If you have a large vault (1000+ notes), consider these settings for optimal performance:
+
+1. Enable "Exclude unassigned notes from status pane"
+2. Enable "Hide unknown status in file explorer"
+3. Use specific searches rather than browsing all notes
+4. Consider using "Compact view" in the status pane
+
+
 ## Commands
 The plugin provides several commands accessible via the Command Palette:
 - `Open status pane` - Opens the status view
@@ -172,14 +192,6 @@ obsidian-note-status: ["active", "inProgress"]
 ---
 ```
 The frontmatter tag name can be customized in settings.
-
-## Performance Recommendations
-If you have a large vault (1000+ notes), consider these settings for optimal performance:
-
-1. Enable "Exclude unassigned notes from status pane"
-2. Enable "Hide unknown status in file explorer"
-3. Use specific searches rather than browsing all notes
-4. Consider using "Compact view" in the status pane
 
 ## Development
 ### Project Structure
@@ -252,7 +264,6 @@ Contributions welcome! Please feel free to submit a Pull Request.
 The following features and improvements are planned for upcoming releases:
 
 ### Short-term
-- **Bug Fix**: Resolve selection context issue when changing status of a single file while multiple files are selected in the explorer view
 - **Batch Modification Enhancement**: Implement a modal dialog with file preview and status selection for more intuitive batch operations
 - **Dropdown Refinement**: Restructure status options to be grouped by categories (workflow, templates, custom) with visual separators
 - **Obsidian API Compliance**: Refactor code to follow Obsidian guidelines for better performance and compatibility:
