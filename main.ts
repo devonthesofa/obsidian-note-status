@@ -63,18 +63,74 @@ export default class NoteStatus extends Plugin {
 		try {
 			// Load settings first before initializing other components
 			await this.loadSettings();
-
+	
 			this.boundSaveSettings = this.saveSettings.bind(this);
 			this.boundCheckNoteStatus = this.checkNoteStatus.bind(this);
 			this.boundRefreshDropdown = () => this.statusDropdown?.render();
 			this.boundRefreshUI = () => this.checkNoteStatus();
-
-			// Then initialize the rest of the plugin
-			await this.initialize();
+	
+			// Register icons and essential services first
+			this.registerIcons();
+			this.statusService = new StatusService(this.app, this.settings);
+			this.styleService = new StyleService(this.settings);
+	
+			// Register views and commands right away
+			this.registerViews();
+			this.registerCommands();
+			
+			// Add settings tab
+			this.addSettingTab(new NoteStatusSettingTab(this.app, this));
+	
+			// Set up custom events early
+			this.setupCustomEvents();
+	
+			// Delay UI-heavy initialization until the layout is ready
+			this.app.workspace.onLayoutReady(async () => {
+				// Split initialization into phases for better performance
+				await this.initializeUIComponents();
+			});
 		} catch (error) {
 			console.error('Error loading Note Status plugin:', error);
 			new Notice('Error loading Note Status plugin. Check console for details.');
 		}
+	}
+
+	private async initializeUIComponents(): Promise<void> {
+		// Initialize UI components
+		this.statusBar = new StatusBar(this.addStatusBarItem(), this.settings, this.statusService);
+		this.statusDropdown = new StatusDropdown(this.app, this.settings, this.statusService);
+		
+		// Initialize explorer integration with a slight delay
+		setTimeout(() => {
+			this.explorerIntegration = new ExplorerIntegration(this.app, this.settings, this.statusService);
+			this.statusContextMenu = new StatusContextMenu(
+				this.app, 
+				this.settings, 
+				this.statusService, 
+				this.statusDropdown, 
+				this.explorerIntegration
+			);
+		
+			// Register events after explorer integration is ready
+			this.registerMenuHandlers();
+			this.registerEvents();
+		
+			// Check status for active file only initially
+			this.checkNoteStatus();
+		
+			// Update only active file icon initially for better performance
+			const activeFile = this.app.workspace.getActiveFile();
+			if (activeFile && this.settings.showStatusIconsInExplorer) {
+				this.explorerIntegration.updateFileExplorerIcons(activeFile);
+			}
+		
+			// Delay full explorer icon update to avoid startup lag
+			if (this.settings.showStatusIconsInExplorer) {
+				setTimeout(() => {
+					this.explorerIntegration.updateAllFileExplorerIcons();
+				}, 2000);
+			}
+		}, 300);
 	}
 
 	/**
@@ -509,18 +565,20 @@ export default class NoteStatus extends Plugin {
 	/**
 	 * Open the status pane
 	 */
-	async openStatusPane(): Promise<void> {
+	public async openStatusPane(): Promise<void> {
 		try {
+			// Check if already open
 			const existing = this.app.workspace.getLeavesOfType('status-pane')[0];
 			if (existing) {
 				this.app.workspace.setActiveLeaf(existing);
-				await this.updateStatusPane();
-			} else {
-				const leaf = this.app.workspace.getLeftLeaf(false);
-				if (leaf) {
-					await leaf.setViewState({ type: 'status-pane', active: true });
-					this.statusPaneLeaf = leaf;
-				}
+				return;
+			}
+			
+			// Create a new leaf and show loading state
+			const leaf = this.app.workspace.getLeftLeaf(false);
+			if (leaf) {
+				await leaf.setViewState({ type: 'status-pane', active: true });
+				this.statusPaneLeaf = leaf;
 			}
 		} catch (error) {
 			console.error('Error opening status pane:', error);
