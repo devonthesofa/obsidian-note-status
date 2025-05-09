@@ -353,56 +353,68 @@ export class StatusDropdown {
 			new Notice('No files selected');
 			return;
 		}
-	
+		
+		// IMPORTANT: Always reset state at the beginning of each operation
+		// This ensures no lingering callbacks or files from previous operations
+		this.dropdownComponent.setTargetFile(null);
+		this.dropdownComponent.setOnStatusChange(() => {});
+		
 		// Determine if we're handling single or multiple files
 		const isSingleFile = files.length === 1;
 		const targetFile = isSingleFile ? files[0] : null;
-	
+		
 		// Set target file (if single) or null (if multiple)
 		this.dropdownComponent.setTargetFile(targetFile);
-	
+		
 		// Get current statuses if single file, or reset to unknown for multiple
 		const currentStatuses = targetFile ?
 			this.statusService.getFileStatuses(targetFile) :
 			['unknown'];
-	
+		
 		// Update dropdown with current statuses
 		this.dropdownComponent.updateStatuses(currentStatuses);
-	
+		
 		// Set custom callback for status changes if provided
 		if (options.onStatusChange) {
-			const originalCallback = this.dropdownComponent.getOnStatusChange();
+			// Use the provided callback directly, no need for timeout restoration
 			this.dropdownComponent.setOnStatusChange(options.onStatusChange);
-	
-			// Restore original callback after operation
-			setTimeout(() => {
-				this.dropdownComponent.setOnStatusChange(originalCallback);
-			}, 300);
 		} else if (!isSingleFile && options.mode) {
+			// Create a local copy of files to avoid closure issues
+			const filesForBatch = [...files];
+			
 			// Set batch operation callback for multiple files
 			this.dropdownComponent.setOnStatusChange(async (statuses) => {
 				if (statuses.length > 0) {
-					await this.statusService.batchUpdateStatuses(files, statuses, options.mode || 'replace');
-	
+					await this.statusService.batchUpdateStatuses(filesForBatch, statuses, options.mode || 'replace');
+			
 					// Dispatch events for UI update
 					window.dispatchEvent(new CustomEvent('note-status:batch-update-complete', {
 						detail: {
 							statuses,
-							fileCount: files.length,
+							fileCount: filesForBatch.length,
 							mode: options.mode
 						}
 					}));
 					window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
 				}
 			});
+		} else {
+			// Default callback for standard operations
+			this.dropdownComponent.setOnStatusChange((statuses) => {
+				// Just emit events for UI updates
+				window.dispatchEvent(new CustomEvent('note-status:status-changed', {
+					detail: { statuses }
+				}));
+				window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+			});
 		}
-	
+		
 		// For dropdown from editor
 		if (options.editor && options.view) {
 			const position = this.getCursorPosition(options.editor, options.view);
 			const dummyTarget = this.createDummyTarget(position);
 			this.dropdownComponent.open(dummyTarget, position);
-	
+		
 			// Clean up dummy target
 			setTimeout(() => {
 				if (dummyTarget.parentNode) {
@@ -411,7 +423,7 @@ export class StatusDropdown {
 			}, 100);
 			return;
 		}
-	
+		
 		// For dropdown from toolbar button
 		if (options.target) {
 			if (options.position) {
@@ -426,7 +438,7 @@ export class StatusDropdown {
 			}
 			return;
 		}
-	
+		
 		// For direct position (context menus)
 		if (options.position) {
 			const dummyTarget = document.createElement('div');
@@ -434,9 +446,9 @@ export class StatusDropdown {
 			dummyTarget.style.setProperty('--pos-x-px', `${options.position.x}px`);
 			dummyTarget.style.setProperty('--pos-y-px', `${options.position.y}px`);
 			document.body.appendChild(dummyTarget);
-	
+		
 			this.dropdownComponent.open(dummyTarget, options.position);
-	
+		
 			// Clean up dummy target
 			setTimeout(() => {
 				if (dummyTarget.parentNode) {
@@ -445,7 +457,7 @@ export class StatusDropdown {
 			}, 100);
 			return;
 		}
-	
+		
 		// Fallback to center position
 		const center = {
 			x: window.innerWidth / 2,
@@ -456,9 +468,9 @@ export class StatusDropdown {
 		fallbackTarget.style.setProperty('--pos-x-px', `${center.x}px`);
 		fallbackTarget.style.setProperty('--pos-y-px', `${center.y}px`);
 		document.body.appendChild(fallbackTarget);
-	
+		
 		this.dropdownComponent.open(fallbackTarget, center);
-	
+		
 		// Clean up fallback target
 		setTimeout(() => {
 			if (fallbackTarget.parentNode) {
@@ -466,7 +478,6 @@ export class StatusDropdown {
 			}
 		}, 100);
 	}
-
 
 	/**
 	 * Adds the toolbar button to the active leaf
