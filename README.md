@@ -111,8 +111,8 @@ To update multiple files at once:
 If you have a large vault with thousands of notes, use these features for better performance:
 
 1. Enable "Exclude unassigned notes from status pane" in settings
-2. Use the search function to filter notes
-3. Use pagination controls to navigate through large status groups
+2. Use the search function to filter notes ![Show Unassigned Notes](images/show-unassigned-notes.png)
+3. Use pagination controls to navigate through large status groups ![Pagination](images/pagination.png)
 
 ## Configuration
 ### Status Management
