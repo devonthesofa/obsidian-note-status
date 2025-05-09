@@ -1310,3 +1310,39 @@
   text-overflow: ellipsis;
   margin-right: 4px; /* Add margin to prevent overlap */
 }
+
+.note-status-empty-message {
+  margin-bottom: 12px;
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.note-status-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.note-status-show-unassigned-button {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+  padding: 8px 16px;
+  border-radius: var(--radius-s, 4px);
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-ui-small);
+  transition: all 0.2s var(--ease-out);
+  box-shadow: var(--shadow-s);
+}
+
+.note-status-show-unassigned-button:hover {
+  background-color: var(--interactive-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-m);
+}
+
+.note-status-show-unassigned-button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-xs);
+}

@@ -200,12 +200,24 @@ export class StatusPaneView extends View {
 			if (searchQuery) {
 				emptyMessage.textContent = `No notes found matching "${searchQuery}"`;
 			} else if (this.settings.excludeUnknownStatus) {
-				emptyMessage.textContent = 'No notes with status found. Unassigned notes are currently hidden.';
+				// Clear any existing content and use a structured layout
+				emptyMessage.empty();
 				
-				// Add a button to show unknown status
-				const showUnknownBtn = emptyMessage.createEl('button', {
+				// Add message text in its own container
+				emptyMessage.createDiv({
+					text: 'No notes with status found. Unassigned notes are currently hidden.',
+					cls: 'note-status-empty-message'
+				});
+				
+				// Create separate container for the button
+				const btnContainer = emptyMessage.createDiv({
+					cls: 'note-status-button-container'
+				});
+				
+				// Add a styled button in its own container
+				const showUnknownBtn = btnContainer.createEl('button', {
 					text: 'Show unassigned notes',
-					cls: 'note-status-action-button'
+					cls: 'note-status-show-unassigned-button'
 				});
 				
 				showUnknownBtn.addEventListener('click', async () => {
@@ -213,8 +225,6 @@ export class StatusPaneView extends View {
 					await this.plugin.saveSettings();
 					this.renderGroups(searchQuery);
 				});
-			} else {
-				emptyMessage.textContent = 'No notes found';
 			}
 		}
 	}
