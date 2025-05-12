@@ -28,10 +28,10 @@ export class StatusService {
    * Updates the combined list of all statuses (from templates and custom)
    */
   private updateAllStatuses(): void {
-    // Start with custom statuses if not using templates exclusively
+    // Start with custom statuses
     this.allStatuses = [...this.settings.customStatuses];
 
-    // Add statuses from enabled templates
+    // Add statuses from enabled templates if not using custom only
     if (!this.settings.useCustomStatusesOnly) {
       const templateStatuses = this.getTemplateStatuses();
       
@@ -167,7 +167,7 @@ export class StatusService {
     const targetFile = file || this.app.workspace.getActiveFile();
     if (!targetFile || !(targetFile instanceof TFile) || targetFile.extension !== 'md') return;
   
-    // Use processFrontMatter instead of manual read/modify
+    // Use processFrontMatter to handle the update
     await this.app.fileManager.processFrontMatter(targetFile, (frontmatter) => {
       frontmatter[this.settings.tagPrefix] = newStatuses;
     });
@@ -203,11 +203,6 @@ export class StatusService {
     const newStatuses = [...filteredStatuses, statusToAdd];
     
     await this.updateNoteStatuses(newStatuses, targetFile);
-    
-    // Trigger UI updates
-    window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-      detail: { statuses: newStatuses }
-    }));
   }
 
   /**
@@ -221,11 +216,6 @@ export class StatusService {
     const newStatuses = currentStatuses.filter(status => status !== statusToRemove);
     
     await this.updateNoteStatuses(newStatuses, targetFile);
-    
-    // Trigger UI updates
-    window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-      detail: { statuses: newStatuses }
-    }));
   }
 
   /**
@@ -247,19 +237,10 @@ export class StatusService {
     }
     
     await this.updateNoteStatuses(newStatuses, targetFile);
-    
-    // Ensure UI updates
-    window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-      detail: { statuses: newStatuses }
-    }));
   }
 
   /**
    * Batch update multiple files' statuses
-   * @param files Array of files to update
-   * @param statusesToSet Array of statuses to set
-   * @param mode 'replace' to replace all statuses, 'add' to add to existing
-   * @param showNotice Whether to show a notification (default: true)
    */
   public async batchUpdateStatuses(
     files: TFile[], 
@@ -285,11 +266,14 @@ export class StatusService {
       }
     }
 
-    // Only show notice if explicitly requested and we're dealing with multiple files
+    // Show notice if requested and we're dealing with multiple files
     if (showNotice && files.length > 1) {
       const statusText = this.formatStatusText(statusesToSet);
       new Notice(`Updated ${files.length} files with ${statusText}`);
     }
+    
+    // Trigger UI updates
+    window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
   }
   
   /**
@@ -300,7 +284,6 @@ export class StatusService {
       ? statusesToSet[0] 
       : `${statusesToSet.length} statuses`;
   }
-
 
   /**
    * Insert status metadata in the editor
