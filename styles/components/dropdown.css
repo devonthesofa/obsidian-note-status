@@ -1,0 +1,250 @@
+/*
+ * Dropdown component styles
+ */
+.note-status-popover {
+  position: absolute;
+  background: var(--background-primary);
+  border-radius: var(--radius-m);
+  box-shadow: var(--status-box-shadow);
+  z-index: calc(var(--layer-popover) + 10);
+  max-height: 300px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--background-modifier-border);
+  min-width: 200px;
+  overflow: hidden;
+  width: auto !important;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity var(--status-transition-time) var(--ease-out),
+              transform var(--status-transition-time) var(--ease-out);
+  transform-origin: top left;
+  pointer-events: all !important;
+}
+
+.note-status-popover.note-status-popover-animate-in {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.note-status-popover.note-status-popover-animate-out {
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+}
+
+/* Search container */
+.note-status-popover-search {
+  padding: 8px;
+  position: sticky;
+  top: 0;
+  background: var(--background-primary);
+  z-index: 3;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+/* Status options container */
+.note-status-options-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 250px;
+  padding: var(--size-4-1, 4px);
+  scrollbar-width: thin;
+  scrollbar-color: var(--background-modifier-border) transparent;
+}
+
+.note-status-options-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.note-status-options-container::-webkit-scrollbar-thumb {
+  background-color: var(--background-modifier-border);
+  border-radius: 3px;
+}
+
+.note-status-options-container::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* Empty status options */
+.note-status-empty-options {
+  padding: 16px 12px;
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: var(--font-smaller);
+}
+
+/* Status option items */
+.note-status-option {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  margin: 2px 4px;
+  border-radius: var(--radius-s);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  cursor: pointer !important;
+  transition: background-color 0.15s ease;
+}
+
+.note-status-option:hover {
+  background: var(--background-modifier-hover);
+}
+
+.note-status-option.is-selected {
+  background: var(--background-secondary-alt);
+  font-weight: var(--font-medium);
+}
+
+.note-status-option-selecting {
+  background-color: var(--interactive-accent) !important;
+  color: var(--text-on-accent) !important;
+  animation: note-status-pulse 0.3s var(--ease-out);
+}
+
+.note-status-option-icon {
+  margin-right: 8px;
+  font-size: 1.1em;
+}
+
+.note-status-option-text {
+  flex: 1;
+  font-size: var(--font-smaller);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-status-option-check {
+  margin-left: auto;
+  color: var(--text-accent);
+}
+
+/* Unified dropdown */
+.note-status-unified-dropdown {
+  width: 280px;
+  max-width: 90vw;
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  box-shadow: var(--shadow-m);
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  z-index: 9999 !important;
+  pointer-events: all !important;
+}
+
+/* Animation for unified dropdown */
+.note-status-popover-animate-in {
+  animation: note-status-dropdown-fade-in 0.22s var(--ease-out) forwards;
+}
+
+@keyframes note-status-dropdown-fade-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes note-status-dropdown-fade-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.95); }
+}
+
+/* Popover header */
+.note-status-popover-header {
+  padding: 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary-alt);
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.note-status-popover-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: var(--font-semibold);
+  color: var(--text-normal);
+}
+
+.note-status-popover-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-accent);
+}
+
+.note-status-popover-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px;
+  background: var(--background-primary-alt);
+  max-height: 120px;
+  overflow-y: auto;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+/* Status chips styling */
+.note-status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: var(--background-secondary);
+  border-radius: 16px;
+  box-shadow: var(--shadow-xs);
+  font-size: var(--font-smaller);
+  transition: all 0.15s var(--ease-out);
+  border: 1px solid var(--background-modifier-border);
+  max-width: 180px;
+  animation: note-status-scale-in 0.2s var(--ease-out);
+}
+
+.note-status-chip.clickable {
+  cursor: pointer;
+}
+
+.note-status-chip.clickable:hover {
+  background: var(--background-modifier-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--status-hover-shadow);
+}
+
+.note-status-chip-removing {
+  transform: scale(0.8);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.15s ease-out;
+}
+
+.note-status-chip-icon {
+  margin-right: 6px;
+}
+
+.note-status-chip-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-status-chip-remove {
+  margin-left: 6px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--background-modifier-border);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s var(--ease-out);
+}
+
+.note-status-chip-remove:hover {
+  background: var(--text-accent);
+  color: var(--text-on-accent);
+  transform: scale(1.1);
+}

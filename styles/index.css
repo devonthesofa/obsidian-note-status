@@ -1,0 +1,14 @@
+/*
+ * Note Status Plugin for Obsidian
+ * Main CSS file importing all components
+ *
+ * Author: Aleix Soler
+ */
+
+@import 'base.css';
+@import 'utils.css';
+@import 'components/status-bar.css';
+@import 'components/status-pane.css';
+@import 'components/dropdown.css';
+@import 'components/explorer.css';
+@import 'components/settings.css';
