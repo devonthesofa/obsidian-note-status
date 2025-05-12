@@ -53,9 +53,16 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.showStatusIconsInExplorer)
 				.onChange(async (value) => {
-					this.plugin.settings.showStatusIconsInExplorer = value;
-					await this.plugin.saveSettings();
-				}));
+				this.plugin.settings.showStatusIconsInExplorer = value;
+				await this.plugin.saveSettings();
+				
+				// Explicitly refresh explorer icons
+				if (value) {
+					this.plugin.explorerIntegration.updateAllFileExplorerIcons();
+				} else {
+					this.plugin.explorerIntegration.removeAllFileExplorerIcons();
+				}
+			}));
 				
 		// NEW SETTING: Hide unknown status in explorer
 		new Setting(containerEl)

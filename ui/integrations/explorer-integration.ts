@@ -30,16 +30,24 @@ export class ExplorerIntegration {
    */
   public updateSettings(settings: NoteStatusSettings): void {
     const previousShowIcons = this.settings.showStatusIconsInExplorer;
+    const previousHideUnknown = this.settings.hideUnknownStatusInExplorer;
     this.settings = settings;
 
-    if (previousShowIcons !== this.settings.showStatusIconsInExplorer) {
+    // Force refresh icons if relevant settings changed
+    if (previousShowIcons !== this.settings.showStatusIconsInExplorer || 
+        previousHideUnknown !== this.settings.hideUnknownStatusInExplorer) {
+      // First remove all icons to ensure clean slate
+      this.removeAllFileExplorerIcons();
+      
+      // Then add back if icons should be shown
       if (this.settings.showStatusIconsInExplorer) {
-        this.updateAllFileExplorerIcons();
-      } else {
-        this.removeAllFileExplorerIcons();
+        // Use a small delay to ensure DOM has been updated
+        setTimeout(() => {
+          this.updateAllFileExplorerIcons();
+        }, 50);
       }
     } else if (this.settings.showStatusIconsInExplorer) {
-      // If setting hasn't changed but is enabled, refresh the icons
+      // If settings haven't changed but icons should be shown, refresh them
       this.updateAllFileExplorerIcons();
     }
   }
