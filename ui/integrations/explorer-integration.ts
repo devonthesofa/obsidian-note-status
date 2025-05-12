@@ -194,7 +194,7 @@ export class ExplorerIntegration {
     } else {
       // Just show primary status
       const primaryStatus = statuses[0] || 'unknown';
-      if (primaryStatus !== 'unknown' || !this.settings.autoHideStatusBar) {
+      if (primaryStatus !== 'unknown' || !this.settings.hideUnknownStatusInExplorer) {
         this.addSingleStatusIcon(iconContainer, primaryStatus);
       }
     }
