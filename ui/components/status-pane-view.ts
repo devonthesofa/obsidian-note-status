@@ -60,7 +60,7 @@ export class StatusPaneView extends View {
 		this.createActionToolbar(headerContainer);
 
 		// Set initial compact view state
-		containerEl.toggleClass('compact-view', this.settings.compactView);
+		containerEl.toggleClass('note-status-compact-view', this.settings.compactView);
 
 		// Add a container for the groups
 		const groupsContainer = containerEl.createDiv({ cls: 'note-status-groups-container' });
@@ -138,7 +138,7 @@ export class StatusPaneView extends View {
 			// Trigger settings update
 			window.dispatchEvent(new CustomEvent('note-status:settings-changed'));
 		
-			this.containerEl.toggleClass('compact-view', this.settings.compactView);
+			this.containerEl.toggleClass('note-status-compact-view', this.settings.compactView);
 			await this.renderGroups(this.searchInput?.value.toLowerCase() || '');
 		});
 		
@@ -248,11 +248,11 @@ export class StatusPaneView extends View {
 	}
 
 	private renderStatusGroup(container: HTMLElement, status: string, files: TFile[]): void {
-		const groupEl = container.createDiv({ cls: 'status-group nav-folder' });
+		const groupEl = container.createDiv({ cls: 'note-status-group nav-folder' });
 		const titleEl = groupEl.createDiv({ cls: 'nav-folder-title' });
 
 		// Create a container for the collapse button and title
-		const collapseContainer = titleEl.createDiv({ cls: 'collapse-indicator' });
+		const collapseContainer = titleEl.createDiv({ cls: 'note-status-collapse-indicator' });
 		setIcon(collapseContainer, 'chevron-down');
 
 		// Create a container for the title content
@@ -268,22 +268,22 @@ export class StatusPaneView extends View {
 		const isCollapsed = this.settings.collapsedStatuses[status] ?? false;
 
 		if (isCollapsed) {
-			groupEl.addClass('is-collapsed');
+			groupEl.addClass('note-status-is-collapsed');
 			collapseContainer.empty();
 			setIcon(collapseContainer, 'chevron-right');
 		}
 
 		titleEl.addEventListener('click', (e) => {
 			e.preventDefault();
-			const isCurrentlyCollapsed = groupEl.hasClass('is-collapsed');
+			const isCurrentlyCollapsed = groupEl.hasClass('note-status-is-collapsed');
 
 			// Toggle the collapsed state
 			if (isCurrentlyCollapsed) {
-				groupEl.removeClass('is-collapsed');
+				groupEl.removeClass('note-status-is-collapsed');
 				collapseContainer.empty();
 				setIcon(collapseContainer, 'chevron-down');
 			} else {
-				groupEl.addClass('is-collapsed');
+				groupEl.addClass('note-status-is-collapsed');
 				collapseContainer.empty();
 				setIcon(collapseContainer, 'chevron-right');
 			}
@@ -444,7 +444,7 @@ export class StatusPaneView extends View {
 	 */
 	updateSettings(settings: NoteStatusSettings): void {
 		this.settings = settings;
-		this.containerEl.toggleClass('compact-view', settings.compactView);
+		this.containerEl.toggleClass('note-status-compact-view', settings.compactView);
 
 		// Refresh the view with the current search query
 		this.renderGroups(this.searchInput?.value.toLowerCase() || '');
