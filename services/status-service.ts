@@ -35,30 +35,19 @@ export class StatusService {
     if (!this.settings.useCustomStatusesOnly) {
       const templateStatuses = this.getTemplateStatuses();
       
-      // Add template statuses that don't have the same name as existing statuses
       for (const status of templateStatuses) {
-        if (!this.allStatuses.some(s => s.name.toLowerCase() === status.name.toLowerCase())) {
+        const existingIndex = this.allStatuses.findIndex(s => 
+          s.name.toLowerCase() === status.name.toLowerCase());
+        
+        if (existingIndex === -1) {
+          // Add new status
           this.allStatuses.push(status);
-        } else {
-          this.updateExistingStatusColor(status);
+        } else if (status.color) {
+          // Update color in settings if it doesn't exist
+          if (!this.settings.statusColors[status.name]) {
+            this.settings.statusColors[status.name] = status.color;
+          }
         }
-      }
-    }
-  }
-
-  /**
-   * Update color for an existing status if it comes from a template
-   */
-  private updateExistingStatusColor(status: Status): void {
-    // Update status colors if they come from a template and have colors
-    const existingStatusIndex = this.allStatuses.findIndex(
-      s => s.name.toLowerCase() === status.name.toLowerCase()
-    );
-    
-    if (existingStatusIndex !== -1 && status.color) {
-      // Update color in settings if it doesn't exist
-      if (!this.settings.statusColors[status.name]) {
-        this.settings.statusColors[status.name] = status.color;
       }
     }
   }
@@ -67,17 +56,10 @@ export class StatusService {
    * Gets all statuses from enabled templates
    */
   public getTemplateStatuses(): Status[] {
-    const statuses: Status[] = [];
-    
-    // Find templates that are enabled
-    for (const templateId of this.settings.enabledTemplates) {
-      const template = PREDEFINED_TEMPLATES.find(t => t.id === templateId);
-      if (template) {
-        statuses.push(...template.statuses);
-      }
-    }
-    
-    return statuses;
+    return this.settings.enabledTemplates
+      .map(id => PREDEFINED_TEMPLATES.find(t => t.id === id))
+      .filter(Boolean)
+      .flatMap(template => template ? template.statuses : []);
   }
 
   /**
@@ -89,55 +71,38 @@ export class StatusService {
 
   /**
    * Get the statuses of a file from its metadata
-   * Returns an array of status names
    */
   public getFileStatuses(file: TFile): string[] {
     const cachedMetadata = this.app.metadataCache.getFileCache(file);
-    const statuses: string[] = [];
+    if (!cachedMetadata?.frontmatter) return ['unknown'];
   
-    if (cachedMetadata?.frontmatter) {
-      // Check for status using the configured tag prefix
-      const frontmatterStatus = cachedMetadata.frontmatter[this.settings.tagPrefix];
-      
-      if (frontmatterStatus) {
-        if (Array.isArray(frontmatterStatus)) {
-          // Handle array format
-          this.processStatusArray(frontmatterStatus, statuses);
-        } else {
-          // Handle single value format (string) - convert to array format internally
-          this.processSingleStatus(frontmatterStatus.toString(), statuses);
-        }
+    const frontmatterStatus = cachedMetadata.frontmatter[this.settings.tagPrefix];
+    if (!frontmatterStatus) return ['unknown'];
+    
+    const statuses: string[] = [];
+    
+    if (Array.isArray(frontmatterStatus)) {
+      for (const statusName of frontmatterStatus) {
+        this.addValidStatus(statusName.toString(), statuses);
       }
+    } else {
+      this.addValidStatus(frontmatterStatus.toString(), statuses);
     }
 
-    // Return 'unknown' if no statuses found
     return statuses.length > 0 ? statuses : ['unknown'];
   }
   
   /**
-   * Process an array of statuses from frontmatter
+   * Add a status to the list if it's valid
    */
-  private processStatusArray(statusArray: any[], targetStatuses: string[]): void {
-    for (const statusName of statusArray) {
-      const normalizedStatus = statusName.toString().toLowerCase();
-      const matchingStatus = this.allStatuses.find(s => 
-        s.name.toLowerCase() === normalizedStatus);
-      
-      if (matchingStatus) {
-        targetStatuses.push(matchingStatus.name);
-      }
-    }
-  }
-  
-  /**
-   * Process a single status string from frontmatter
-   */
-  private processSingleStatus(statusString: string, targetStatuses: string[]): void {
-    const normalizedStatus = statusString.toLowerCase();
-    const matchingStatus = this.allStatuses.find(s =>
+  private addValidStatus(statusName: string, targetStatuses: string[]): void {
+    const normalizedStatus = statusName.toLowerCase();
+    const matchingStatus = this.allStatuses.find(s => 
       s.name.toLowerCase() === normalizedStatus);
-
-    if (matchingStatus) targetStatuses.push(matchingStatus.name);
+    
+    if (matchingStatus) {
+      targetStatuses.push(matchingStatus.name);
+    }
   }
 
   /**
@@ -160,29 +125,22 @@ export class StatusService {
 
   /**
    * Update the statuses of a note
-   * @param newStatuses Array of status names to set
-   * @param file Optional file to update, otherwise uses active file
    */
   public async updateNoteStatuses(newStatuses: string[], file?: TFile): Promise<void> {
     const targetFile = file || this.app.workspace.getActiveFile();
-    if (!targetFile || !(targetFile instanceof TFile) || targetFile.extension !== 'md') return;
+    if (!targetFile || targetFile.extension !== 'md') return;
   
-    // Use processFrontMatter to handle the update
     await this.app.fileManager.processFrontMatter(targetFile, (frontmatter) => {
       frontmatter[this.settings.tagPrefix] = newStatuses;
     });
     
-    // Dispatch events for UI update
-    window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-      detail: { statuses: newStatuses, file: targetFile.path }
-    }));
+    this.notifyStatusChanged(newStatuses, targetFile);
   }
 
   /**
    * Legacy method to update a single status for backward compatibility
    */
   public async updateNoteStatus(newStatus: string, file?: TFile): Promise<void> {
-    // Always store as an array even in single status mode
     await this.updateNoteStatuses([newStatus], file);
   }
 
@@ -191,17 +149,13 @@ export class StatusService {
    */
   public async addNoteStatus(statusToAdd: string, file?: TFile): Promise<void> {
     const targetFile = file || this.app.workspace.getActiveFile();
-    if (!targetFile || !(targetFile instanceof TFile) || targetFile.extension !== 'md') return;
+    if (!targetFile || targetFile.extension !== 'md') return;
     
     const currentStatuses = this.getFileStatuses(targetFile);
-    
-    // Don't add if already exists
     if (currentStatuses.includes(statusToAdd)) return;
     
     // Filter out 'unknown' status when adding valid statuses
-    const filteredStatuses = currentStatuses.filter(s => s !== 'unknown');
-    const newStatuses = [...filteredStatuses, statusToAdd];
-    
+    const newStatuses = [...currentStatuses.filter(s => s !== 'unknown'), statusToAdd];
     await this.updateNoteStatuses(newStatuses, targetFile);
   }
 
@@ -210,7 +164,7 @@ export class StatusService {
    */
   public async removeNoteStatus(statusToRemove: string, file?: TFile): Promise<void> {
     const targetFile = file || this.app.workspace.getActiveFile();
-    if (!targetFile || !(targetFile instanceof TFile) || targetFile.extension !== 'md') return;
+    if (!targetFile || targetFile.extension !== 'md') return;
     
     const currentStatuses = this.getFileStatuses(targetFile);
     const newStatuses = currentStatuses.filter(status => status !== statusToRemove);
@@ -226,15 +180,10 @@ export class StatusService {
     if (!targetFile || targetFile.extension !== 'md') return;
     
     const currentStatuses = this.getFileStatuses(targetFile);
-    let newStatuses: string[];
     
-    if (currentStatuses.includes(statusToToggle)) {
-      newStatuses = currentStatuses.filter(status => status !== statusToToggle);
-    } else {
-      // Filter out 'unknown' status when adding valid statuses
-      const filteredStatuses = currentStatuses.filter(s => s !== 'unknown');
-      newStatuses = [...filteredStatuses, statusToToggle];
-    }
+    const newStatuses = currentStatuses.includes(statusToToggle)
+      ? currentStatuses.filter(status => status !== statusToToggle)
+      : [...currentStatuses.filter(s => s !== 'unknown'), statusToToggle];
     
     await this.updateNoteStatuses(newStatuses, targetFile);
   }
@@ -249,40 +198,39 @@ export class StatusService {
     showNotice = true
   ): Promise<void> {
     if (files.length === 0) {
-      if (showNotice) {
-        new Notice('No files selected');
-      }
+      if (showNotice) new Notice('No files selected');
       return;
     }
 
-    for (const file of files) {
+    const updatePromises = files.map(async (file) => {
       if (mode === 'replace') {
         await this.updateNoteStatuses(statusesToSet, file);
       } else {
-        // Add each status
         for (const status of statusesToSet) {
           await this.addNoteStatus(status, file);
         }
       }
-    }
+    });
+    
+    await Promise.all(updatePromises);
 
-    // Show notice if requested and we're dealing with multiple files
     if (showNotice && files.length > 1) {
-      const statusText = this.formatStatusText(statusesToSet);
+      const statusText = statusesToSet.length === 1 
+        ? statusesToSet[0] 
+        : `${statusesToSet.length} statuses`;
       new Notice(`Updated ${files.length} files with ${statusText}`);
     }
     
-    // Trigger UI updates
     window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
   }
   
   /**
-   * Format status text for notifications
+   * Dispatch status changed event
    */
-  private formatStatusText(statusesToSet: string[]): string {
-    return statusesToSet.length === 1 
-      ? statusesToSet[0] 
-      : `${statusesToSet.length} statuses`;
+  private notifyStatusChanged(statuses: string[], file: TFile): void {
+    window.dispatchEvent(new CustomEvent('note-status:status-changed', {
+      detail: { statuses, file: file.path }
+    }));
   }
 
   /**
@@ -313,16 +261,11 @@ export class StatusService {
     statusMetadata: string
   ): void {
     const frontMatter = frontMatterMatch[1];
-    let updatedFrontMatter = frontMatter;
-
-    // Check if status tag already exists in frontmatter
     const statusTagRegex = new RegExp(`${this.settings.tagPrefix}:\\s*\\[?[^\\]]*\\]?`, 'm');
     
-    if (frontMatter.match(statusTagRegex)) {
-      updatedFrontMatter = frontMatter.replace(statusTagRegex, statusMetadata);
-    } else {
-      updatedFrontMatter = `${frontMatter}\n${statusMetadata}`;
-    }
+    const updatedFrontMatter = frontMatter.match(statusTagRegex)
+      ? frontMatter.replace(statusTagRegex, statusMetadata)
+      : `${frontMatter}\n${statusMetadata}`;
 
     const updatedContent = content.replace(/^---\n([\s\S]+?)\n---/, `---\n${updatedFrontMatter}\n---`);
     editor.setValue(updatedContent);
@@ -341,14 +284,11 @@ export class StatusService {
    */
   public getMarkdownFiles(searchQuery = ''): TFile[] {
     const files = this.app.vault.getMarkdownFiles();
+    if (!searchQuery) return files;
 
-    if (!searchQuery) {
-      return files;
-    }
-
-    return files.filter(file =>
-      file.basename.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const lowerQuery = searchQuery.toLowerCase();
+    return files.filter(file => 
+      file.basename.toLowerCase().includes(lowerQuery));
   }
 
   /**
@@ -358,22 +298,18 @@ export class StatusService {
     const statusGroups: Record<string, TFile[]> = {};
 
     // Initialize groups for all statuses
-    this.allStatuses.forEach(status => {
+    for (const status of this.allStatuses) {
       statusGroups[status.name] = [];
-    });
-
-    // Ensure 'unknown' status is included
-    if (!statusGroups['unknown']) {
-      statusGroups['unknown'] = [];
     }
+    
+    // Ensure 'unknown' status exists
+    statusGroups['unknown'] = statusGroups['unknown'] || [];
 
-    // Get all markdown files and filter by search query
+    // Get and process all files matching the search query
     const files = this.getMarkdownFiles(searchQuery);
-
     for (const file of files) {
       const statuses = this.getFileStatuses(file);
       
-      // Add file to each of its status groups
       for (const status of statuses) {
         if (statusGroups[status]) {
           statusGroups[status].push(file);
