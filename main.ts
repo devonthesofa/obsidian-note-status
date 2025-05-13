@@ -375,19 +375,20 @@ export default class NoteStatus extends Plugin {
   private registerFileEvents(): void {
     // File modification events with optimization
     this.registerEvent(this.app.vault.on('modify', (file) => {
-      if (file instanceof TFile && file.extension === 'md') {
-        // Only update UI for the modified file
-        this.explorerIntegration.updateFileExplorerIcons(file);
+      if (!(file instanceof TFile) || file.extension !== 'md') return;
+      
+      // Only update UI for the modified file
+      this.explorerIntegration.updateFileExplorerIcons(file);
 
-        // If this is the active file, also update other UI elements
-        if (this.app.workspace.getActiveFile()?.path === file.path) {
-          this.checkNoteStatus();
-          this.statusDropdown.update(this.getCurrentStatuses());
-        }
-
-        // Update the status pane but debounced
-        this.debouncedUpdateStatusPane();
+      // If this is the active file, also update other UI elements
+      const activeFile = this.app.workspace.getActiveFile();
+      if (activeFile?.path === file.path) {
+        this.checkNoteStatus();
+        this.statusDropdown.update(this.getCurrentStatuses());
       }
+
+      // Update the status pane but debounced
+      this.debouncedUpdateStatusPane();
     }));
 
     // File creation, deletion, and rename events
@@ -445,22 +446,35 @@ export default class NoteStatus extends Plugin {
   checkNoteStatus(): void {
     try {
       const activeFile = this.app.workspace.getActiveFile();
-      if (!activeFile || !(activeFile instanceof TFile) || activeFile.extension !== 'md') {
-        this.statusBar.update(['unknown']);
-        this.statusDropdown.update(['unknown']);
+      if (!activeFile || activeFile.extension !== 'md') {
+        this.updateStatusComponents(['unknown']);
         return;
       }
     
       const statuses = this.statusService.getFileStatuses(activeFile);
-      this.statusBar.update(statuses);
-      this.statusDropdown.update(statuses);
+      this.updateStatusComponents(statuses);
     } catch (error) {
-      console.error('Error checking note status:', error);
-      if (!this.hasShownErrorNotification) {
-        new Notice('Error checking note status. Check console for details.');
-        this.hasShownErrorNotification = true;
-        setTimeout(() => { this.hasShownErrorNotification = false; }, 10000);
-      }
+      this.handleStatusError(error);
+    }
+  }
+
+  /**
+   * Update status components with new statuses
+   */
+  private updateStatusComponents(statuses: string[]): void {
+    this.statusBar.update(statuses);
+    this.statusDropdown.update(statuses);
+  }
+
+  /**
+   * Handle errors when checking status
+   */
+  private handleStatusError(error: any): void {
+    console.error('Error checking note status:', error);
+    if (!this.hasShownErrorNotification) {
+      new Notice('Error checking note status. Check console for details.');
+      this.hasShownErrorNotification = true;
+      setTimeout(() => { this.hasShownErrorNotification = false; }, 10000);
     }
   }
 
@@ -565,22 +579,45 @@ export default class NoteStatus extends Plugin {
   }
 
   /**
+   * Get the open status pane view if it exists
+   */
+  private getStatusPaneView(): StatusPaneView | null {
+    if (this.statusPaneLeaf && this.statusPaneLeaf.view instanceof StatusPaneView) {
+      return this.statusPaneLeaf.view as StatusPaneView;
+    }
+    
+    const leaf = this.app.workspace.getLeavesOfType('status-pane')[0];
+    if (leaf?.view instanceof StatusPaneView) {
+      this.statusPaneLeaf = leaf;
+      return leaf.view as StatusPaneView;
+    }
+    
+    return null;
+  }
+
+  /**
    * Update all components with new settings
    */
   private updateComponentSettings(): void {
-    // Update services with new settings
+    // Update services
     this.statusService.updateSettings(this.settings);
     this.styleService.updateSettings(this.settings);
 
-    // Update UI components with new settings
-    this.statusBar.updateSettings(this.settings);
-    this.statusDropdown.updateSettings(this.settings);
-    this.explorerIntegration.updateSettings(this.settings);
-    this.statusContextMenu.updateSettings(this.settings);
+    // Update UI components
+    const components = [
+      this.statusBar,
+      this.statusDropdown,
+      this.explorerIntegration,
+      this.statusContextMenu
+    ];
+    
+    components.forEach(component => 
+      component.updateSettings?.(this.settings));
 
     // Update status pane if open
-    if (this.statusPaneLeaf && this.statusPaneLeaf.view instanceof StatusPaneView) {
-      (this.statusPaneLeaf.view as StatusPaneView).updateSettings(this.settings);
+    const statusPane = this.getStatusPaneView();
+    if (statusPane) {
+      statusPane.updateSettings(this.settings);
     }
   }
 
@@ -590,9 +627,11 @@ export default class NoteStatus extends Plugin {
   public forceRefreshUI(): void {
     try {
       // Cancel any pending updates
-      this.debouncedCheckNoteStatus.cancel();
-      this.debouncedUpdateExplorer.cancel();
-      this.debouncedUpdateStatusPane.cancel();
+      [
+        this.debouncedCheckNoteStatus,
+        this.debouncedUpdateExplorer,
+        this.debouncedUpdateStatusPane
+      ].forEach(fn => fn.cancel());
 
       // Immediate updates
       this.checkNoteStatus();
