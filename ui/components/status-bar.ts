@@ -144,13 +144,10 @@ export class StatusBar {
                         this.currentStatuses[0] === 'unknown';
                         
     if (this.settings.autoHideStatusBar && onlyUnknown) {
-      this.statusBarEl.addClass('auto-hide');
-      setTimeout(() => {
-        if (onlyUnknown && this.settings.showStatusBar) {
-          this.statusBarEl.addClass('hidden');
-        }
-      }, 500);
+      this.statusBarEl.addClass('hidden');
+      this.statusBarEl.removeClass('visible');
     } else {
+      this.statusBarEl.removeClass('hidden');
       this.statusBarEl.addClass('visible');
     }
   }
