@@ -4,7 +4,6 @@ import { StatusService } from '../../services/status-service';
 
 /**
  * Unified dropdown component for status selection
- * This component handles the UI for selecting statuses across multiple contexts
  */
 export class StatusDropdownComponent {
   private app: App;
@@ -12,37 +11,28 @@ export class StatusDropdownComponent {
   private settings: NoteStatusSettings;
   private dropdownElement: HTMLElement | null = null;
   private currentStatuses: string[] = ['unknown'];
-  private onStatusChange: (statuses: string[]) => void;
+  private onStatusChange: (statuses: string[]) => void = () => {};
   private animationDuration = 220;
-  private clickOutsideHandler: (e: MouseEvent) => void;
   private targetFile: TFile | null = null;
   public isOpen = false;
 
+  // Bind methods once in constructor
+  private clickOutsideHandler: (e: MouseEvent) => void;
   
   constructor(app: App, statusService: StatusService, settings: NoteStatusSettings) {
     this.app = app;
     this.statusService = statusService;
     this.settings = settings;
-    this.onStatusChange = () => {};
     
-    // Bind methods
-    this.handleClickOutside = this.handleClickOutside.bind(this);
-    this.handleEscapeKey = this.handleEscapeKey.bind(this);
-    this.clickOutsideHandler = this.handleClickOutside;
+    this.clickOutsideHandler = this.handleClickOutside.bind(this);
   }
   
   /**
    * Updates the current statuses
    */
   public updateStatuses(statuses: string[] | string): void {
-    // Normalize input to always be an array
-    if (typeof statuses === 'string') {
-      this.currentStatuses = [statuses];
-    } else {
-      this.currentStatuses = [...statuses]; // Create a copy to ensure it's updated
-    }
+    this.currentStatuses = Array.isArray(statuses) ? [...statuses] : [statuses];
     
-    // Update dropdown if it's open
     if (this.isOpen && this.dropdownElement) {
       this.refreshDropdownContent();
     }
@@ -61,7 +51,6 @@ export class StatusDropdownComponent {
   public updateSettings(settings: NoteStatusSettings): void {
     this.settings = settings;
     
-    // Update dropdown if it's open
     if (this.isOpen && this.dropdownElement) {
       this.refreshDropdownContent();
     }
@@ -87,10 +76,7 @@ export class StatusDropdownComponent {
   public toggle(targetEl: HTMLElement, position?: { x: number, y: number }): void {
     if (this.isOpen) {
       this.close();
-      // Add small delay to ensure dropdown is fully closed before potentially reopening
-      // This prevents state conflicts when clicking in rapid succession
       setTimeout(() => {
-        // Check if we're still in the closing state to prevent reopening if user clicked elsewhere
         if (!this.isOpen && !this.dropdownElement) {
           this.open(targetEl, position);
         }
@@ -104,13 +90,9 @@ export class StatusDropdownComponent {
    * Open the dropdown
    */
   public open(targetEl: HTMLElement, position?: { x: number, y: number }): void {
-    // Make sure any existing dropdown is fully closed
     if (this.isOpen || this.dropdownElement) {
       this.close();
-      // Add small delay before opening new dropdown to ensure proper cleanup
-      setTimeout(() => {
-        this.actuallyOpen(targetEl, position);
-      }, 10);
+      setTimeout(() => this.actuallyOpen(targetEl, position), 10);
       return;
     }
     
@@ -120,23 +102,17 @@ export class StatusDropdownComponent {
   private actuallyOpen(targetEl: HTMLElement, position?: { x: number, y: number }): void {
     this.isOpen = true;
     
-    // Create dropdown element
+    // Create and position dropdown
     this.createDropdownElement();
-    
-    // Fill dropdown content
     this.refreshDropdownContent();
     
-    // Position the dropdown
-    if (position) {
-      this.positionAt(position.x, position.y);
-    } else {
+    position ? 
+      this.positionAt(position.x, position.y) : 
       this.positionRelativeTo(targetEl);
-    }
     
-    // Add animation class
     this.dropdownElement?.addClass('note-status-popover-animate-in');
     
-    // Add event listeners
+    // Add event listeners with slight delay to prevent immediate triggering
     setTimeout(() => {
       document.addEventListener('click', this.clickOutsideHandler);
       document.addEventListener('keydown', this.handleEscapeKey);
@@ -158,17 +134,13 @@ export class StatusDropdownComponent {
   public close(): void {
     if (!this.dropdownElement || !this.isOpen) return;
     
-    // Add exit animation
     this.dropdownElement.addClass('note-status-popover-animate-out');
     
-    // Clean up event listeners
     document.removeEventListener('click', this.clickOutsideHandler);
     document.removeEventListener('keydown', this.handleEscapeKey);
     
-    // Set isOpen to false immediately to prevent multiple open/close conflicts
     this.isOpen = false;
     
-    // Remove after animation completes
     setTimeout(() => {
       if (this.dropdownElement) {
         this.dropdownElement.remove();
@@ -183,16 +155,11 @@ export class StatusDropdownComponent {
   private refreshDropdownContent(): void {
     if (!this.dropdownElement) return;
     
-    // Clear content
     this.dropdownElement.empty();
     
-    // Create header
+    // Create UI sections
     this.createHeader();
-    
-    // Create status chips section
     this.createStatusChips();
-    
-    // Create search filter
     const searchInput = this.createSearchFilter();
     
     // Create status options container
@@ -200,11 +167,11 @@ export class StatusDropdownComponent {
       cls: 'note-status-options-container' 
     });
     
-    // Get all available statuses
+    // Get all available statuses (excluding 'unknown')
     const allStatuses = this.statusService.getAllStatuses()
       .filter(status => status.name !== 'unknown');
     
-    // Create a function to populate options with filtering
+    // Function to populate options with filtering
     const populateOptions = (filter = '') => {
       this.populateStatusOptions(statusOptionsContainer, allStatuses, filter);
     };
@@ -218,9 +185,7 @@ export class StatusDropdownComponent {
     });
     
     // Focus search input after a short delay
-    setTimeout(() => {
-      searchInput.focus();
-    }, 50);
+    setTimeout(() => searchInput.focus(), 50);
   }
   
   /**
@@ -230,11 +195,11 @@ export class StatusDropdownComponent {
     if (!this.dropdownElement) return;
     
     const headerEl = this.dropdownElement.createDiv({ cls: 'note-status-popover-header' });
-    
-    // Title with icon
     const titleEl = headerEl.createDiv({ cls: 'note-status-popover-title' });
+    
     const iconContainer = titleEl.createDiv({ cls: 'note-status-popover-icon' });
     setIcon(iconContainer, 'tag');
+    
     titleEl.createSpan({ text: 'Note status', cls: 'note-status-popover-label' });
   }
   
@@ -246,31 +211,17 @@ export class StatusDropdownComponent {
     
     const chipsContainer = this.dropdownElement.createDiv({ cls: 'note-status-popover-chips' });
     
-    // Show 'No status' indicator if no statuses or only unknown status
-    if (this.hasNoValidStatus()) {
-      this.createEmptyStatusIndicator(chipsContainer);
+    const hasNoValidStatus = this.currentStatuses.length === 0 || 
+      (this.currentStatuses.length === 1 && this.currentStatuses[0] === 'unknown');
+      
+    if (hasNoValidStatus) {
+      chipsContainer.createDiv({ 
+        cls: 'note-status-empty-indicator',
+        text: 'No status assigned'
+      });
     } else {
-      // Add chip for each status
       this.createStatusChipElements(chipsContainer);
     }
-  }
-  
-  /**
-   * Check if there are no valid statuses
-   */
-  private hasNoValidStatus(): boolean {
-    return this.currentStatuses.length === 0 || 
-           (this.currentStatuses.length === 1 && this.currentStatuses[0] === 'unknown');
-  }
-  
-  /**
-   * Create empty status indicator
-   */
-  private createEmptyStatusIndicator(container: HTMLElement): void {
-    container.createDiv({ 
-      cls: 'note-status-empty-indicator',
-      text: 'No status assigned'
-    });
   }
   
   /**
@@ -278,7 +229,7 @@ export class StatusDropdownComponent {
    */
   private createStatusChipElements(container: HTMLElement): void {
     this.currentStatuses.forEach(status => {
-      if (status === 'unknown') return; // Skip unknown status
+      if (status === 'unknown') return;
       
       const statusObj = this.statusService.getAllStatuses().find(s => s.name === status);
       if (!statusObj) return;
@@ -295,20 +246,17 @@ export class StatusDropdownComponent {
       cls: `note-status-chip status-${status}`
     });
     
-    // Status icon
+    // Status icon and name
     chipEl.createSpan({ 
       text: statusObj.icon,
       cls: 'note-status-chip-icon'
     });
     
-    // Status name
     chipEl.createSpan({ 
       text: statusObj.name,
       cls: 'note-status-chip-text' 
     });
     
-    // Add remove button regardless of the number of statuses
-    // This allows removal even when there's only one status
     this.addRemoveButton(chipEl, status);
   }
   
@@ -319,7 +267,6 @@ export class StatusDropdownComponent {
     const statusObj = this.statusService.getAllStatuses().find(s => s.name === status);
     const tooltipValue = statusObj?.description ? `${status} - ${statusObj.description}`: status;
     
-    // Add tooltip to the chip element
     setTooltip(chipEl, tooltipValue);
     
     const removeBtn = chipEl.createDiv({ 
@@ -334,17 +281,12 @@ export class StatusDropdownComponent {
     removeBtn.addEventListener('click', async (e) => {
       e.stopPropagation();
       
-      // Add remove animation
       chipEl.addClass('note-status-chip-removing');
       
-      // Wait for animation to complete before actually removing
       setTimeout(async () => {
         if (this.targetFile) {
-          // Remove status from single file
           await this.removeStatus(status);
         } else {
-          // This is a batch operation - remove from all files
-          // Call the onStatusChange callback with the status to be removed
           this.onStatusChange([status]);
         }
       }, 150);
@@ -357,19 +299,12 @@ export class StatusDropdownComponent {
   private async removeStatus(status: string): Promise<void> {
     if (!this.targetFile) return;
     
-    // Remove this status
     await this.statusService.removeNoteStatus(status, this.targetFile);
     
-    // Get updated statuses
     const updatedStatuses = this.statusService.getFileStatuses(this.targetFile);
-    
-    // Update current statuses
     this.currentStatuses = updatedStatuses;
     
-    // Refresh chips
     this.refreshDropdownContent();
-    
-    // Call status change callback
     this.onStatusChange(updatedStatuses);
   }
   
@@ -382,13 +317,12 @@ export class StatusDropdownComponent {
     }
     
     const searchContainer = this.dropdownElement.createDiv({ cls: 'note-status-popover-search' });
-    const searchInput = searchContainer.createEl('input', {
+    
+    return searchContainer.createEl('input', {
       type: 'text',
       placeholder: 'Filter statuses...',
       cls: 'note-status-popover-search-input'
     });
-    
-    return searchInput;
   }
   
   /**
@@ -401,37 +335,23 @@ export class StatusDropdownComponent {
   ): void {
     container.empty();
     
-    const filteredStatuses = this.filterStatuses(statuses, filter);
+    const filteredStatuses = filter ? 
+      statuses.filter(status => 
+        status.name.toLowerCase().includes(filter.toLowerCase()) ||
+        status.icon.includes(filter)
+      ) : 
+      statuses;
     
     if (filteredStatuses.length === 0) {
-      this.createNoMatchingStatusesMessage(container, filter);
+      container.createDiv({
+        cls: 'note-status-empty-options',
+        text: filter ? `No statuses match "${filter}"` : 'No statuses found'
+      });
       return;
     }
     
     filteredStatuses.forEach(status => {
       this.createStatusOption(container, status);
-    });
-  }
-  
-  /**
-   * Filter statuses based on search term
-   */
-  private filterStatuses(statuses: Status[], filter: string): Status[] {
-    if (!filter) return statuses;
-    
-    return statuses.filter(status => 
-      status.name.toLowerCase().includes(filter.toLowerCase()) ||
-      status.icon.includes(filter)
-    );
-  }
-  
-  /**
-   * Create a message for no matching statuses
-   */
-  private createNoMatchingStatusesMessage(container: HTMLElement, filter: string): void {
-    container.createDiv({
-      cls: 'note-status-empty-options',
-      text: filter ? `No statuses match "${filter}"` : 'No statuses found'
     });
   }
   
@@ -445,19 +365,18 @@ export class StatusDropdownComponent {
       cls: `note-status-option ${isSelected ? 'is-selected' : ''} status-${status.name}`
     });
     
-    // Status icon
+    // Status icon and name
     optionEl.createSpan({ 
       text: status.icon,
       cls: 'note-status-option-icon'
     });
     
-    // Status name
     optionEl.createSpan({ 
       text: status.name,
       cls: 'note-status-option-text' 
     });
     
-    // Add tooltip with description if available
+    // Add tooltip if description available
     if (status.description) {
       setTooltip(optionEl, `${status.name} - ${status.description}`);
     }
@@ -468,7 +387,6 @@ export class StatusDropdownComponent {
       setIcon(checkIcon, 'check');
     }
     
-    // Add click handler
     optionEl.addEventListener('click', () => this.handleStatusOptionClick(optionEl, status));
   }
   
@@ -476,27 +394,19 @@ export class StatusDropdownComponent {
    * Handle click on a status option
    */
   private handleStatusOptionClick(optionEl: HTMLElement, status: Status): void {
-    try {
-      // Add selection animation
-      optionEl.addClass('note-status-option-selecting');
-      
-      // Apply status changes after brief delay for animation
-      setTimeout(async () => {
-        if (this.targetFile) {
-          await this.handleStatusChangeForTargetFile(status);
-        } else {
-          // This is for batch operations or when no specific file is targeted
-          this.onStatusChange([status.name]);
-          
-          // Usually we want to close after selection in this case
-          if (!this.settings.useMultipleStatuses) {
-            this.close();
-          }
+    optionEl.addClass('note-status-option-selecting');
+    
+    setTimeout(async () => {
+      if (this.targetFile) {
+        await this.handleStatusChangeForTargetFile(status);
+      } else {
+        this.onStatusChange([status.name]);
+        
+        if (!this.settings.useMultipleStatuses) {
+          this.close();
         }
-      }, 150);
-    } catch (error) {
-      console.error('Error updating status:', error);
-    }
+      }
+    }, 150);
   }
   
   /**
@@ -509,17 +419,11 @@ export class StatusDropdownComponent {
       await this.statusService.toggleNoteStatus(status.name, this.targetFile);
     } else {
       await this.statusService.updateNoteStatuses([status.name], this.targetFile);
-      // Close dropdown in single status mode
       this.close();
     }
     
-    // Get fresh status from file
     const freshStatuses = this.statusService.getFileStatuses(this.targetFile);
-    
-    // Update current statuses
     this.currentStatuses = [...freshStatuses];
-    
-    // Call status change callback
     this.onStatusChange(freshStatuses);
   }
 
@@ -533,7 +437,6 @@ export class StatusDropdownComponent {
     this.dropdownElement.style.setProperty('--pos-x-px', `${x}px`);
     this.dropdownElement.style.setProperty('--pos-y-px', `${y}px`);
     
-    // Ensure dropdown doesn't go off-screen
     setTimeout(() => this.adjustPositionToViewport(), 0);
   }
   
@@ -559,7 +462,6 @@ export class StatusDropdownComponent {
       this.dropdownElement.removeClass('note-status-popover-bottom');
     }
     
-    // Set max height based on viewport
     const maxHeight = window.innerHeight - rect.top - 20;
     this.dropdownElement.style.setProperty('--max-height-px', `${maxHeight}px`);
   }
@@ -570,19 +472,13 @@ export class StatusDropdownComponent {
   private positionRelativeTo(targetEl: HTMLElement): void {
     if (!this.dropdownElement) return;
     
-    // Apply positioning class
     this.dropdownElement.addClass('note-status-popover-fixed');
     
-    // Get target element's position
     const targetRect = targetEl.getBoundingClientRect();
     
-    // Position below the element - using CSS custom properties
     this.dropdownElement.style.setProperty('--pos-y-px', `${targetRect.bottom + 5}px`);
-    
-    // Align to left edge of target by default
     this.dropdownElement.style.setProperty('--pos-x-px', `${targetRect.left}px`);
     
-    // Check if dropdown would go off-screen
     setTimeout(() => this.adjustRelativePosition(targetRect), 0);
   }
   
@@ -595,7 +491,6 @@ export class StatusDropdownComponent {
     const rect = this.dropdownElement.getBoundingClientRect();
     
     if (rect.right > window.innerWidth) {
-      // Align to right edge instead
       this.dropdownElement.addClass('note-status-popover-right');
       this.dropdownElement.style.setProperty('--right-offset-px', `${window.innerWidth - targetRect.right}px`);
     } else {
@@ -603,14 +498,12 @@ export class StatusDropdownComponent {
     }
     
     if (rect.bottom > window.innerHeight) {
-      // Position above the element instead
       this.dropdownElement.addClass('note-status-popover-bottom');
       this.dropdownElement.style.setProperty('--bottom-offset-px', `${window.innerHeight - targetRect.top + 5}px`);
     } else {
       this.dropdownElement.removeClass('note-status-popover-bottom');
     }
     
-    // Set max height based on viewport
     const maxHeight = window.innerHeight - rect.top - 20;
     this.dropdownElement.style.setProperty('--max-height-px', `${maxHeight}px`);
   }
@@ -627,7 +520,7 @@ export class StatusDropdownComponent {
   /**
    * Handle escape key to close dropdown
    */
-  private handleEscapeKey(e: KeyboardEvent): void {
+  private handleEscapeKey = (e: KeyboardEvent): void => {
     if (e.key === 'Escape') {
       this.close();
     }
