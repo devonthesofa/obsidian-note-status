@@ -141,13 +141,10 @@ export class StatusContextMenu {
    */
   private async updateFileStatus(file: TFile, statuses: string[]): Promise<void> {
     if (this.settings.useMultipleStatuses) {
-      const currentStatuses = this.statusService.getFileStatuses(file);
-      if (currentStatuses.includes(statuses[0])) {
-        await this.statusService.removeNoteStatus(statuses[0], file);
-      } else {
-        await this.statusService.addNoteStatus(statuses[0], file);
-      }
+      // Si tenemos múltiples estados, simplemente añadimos el nuevo
+      await this.statusService.addNoteStatus(statuses[0], file);
     } else {
+      // Reemplazamos todos los estados con el nuevo
       await this.statusService.updateNoteStatuses([statuses[0]], file);
     }
   }
