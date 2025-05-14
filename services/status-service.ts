@@ -310,4 +310,60 @@ export class StatusService {
     // Trigger UI refresh
     window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
   }
+
+  /**
+   * Handles UI-triggered status changes with appropriate logic based on context
+   */
+  public async handleStatusChange(options: {
+    files: TFile | TFile[];
+    statuses: string | string[];
+    isMultipleSelection?: boolean;
+    allowMultipleStatuses?: boolean;
+    afterChange?: (updatedStatuses: string[]) => void;
+  }): Promise<void> {
+    const { 
+      files, 
+      statuses, 
+      isMultipleSelection = false,
+      allowMultipleStatuses = this.settings.useMultipleStatuses,
+      afterChange
+    } = options;
+    
+    const targetFiles = Array.isArray(files) ? files : [files];
+    const targetStatuses = Array.isArray(statuses) ? statuses : [statuses];
+    
+    // Determine operation based on context
+    let operation: 'set' | 'add' | 'remove' | 'toggle';
+    
+    if (isMultipleSelection) {
+      // For multiple files, we need to check if we should add or remove
+      const firstStatus = targetStatuses[0]; // Use first status for multi-file operations
+      const filesWithStatus = targetFiles.filter(file => 
+        this.getFileStatuses(file).includes(firstStatus)
+      );
+      
+      operation = filesWithStatus.length > targetFiles.length / 2 ? 'remove' : 'add';
+    } else {
+      // For single file operations
+      if (allowMultipleStatuses) {
+        operation = 'toggle';
+      } else {
+        operation = 'set';
+      }
+    }
+    
+    // Apply the changes
+    await this.modifyNoteStatus({
+      files: targetFiles,
+      statuses: targetStatuses,
+      operation,
+      showNotice: isMultipleSelection
+    });
+    
+    // Optional callback with updated statuses
+    if (afterChange && targetFiles.length === 1 && !Array.isArray(files)) {
+      const updatedStatuses = this.getFileStatuses(files as TFile);
+      afterChange(updatedStatuses);
+    }
+  }
 }

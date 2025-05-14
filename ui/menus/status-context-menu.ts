@@ -126,14 +126,27 @@ export class StatusContextMenu {
   private async handleStatusUpdateForFile(file: TFile, statuses: string[]): Promise<void> {
     if (!(file instanceof TFile) || file.extension !== 'md' || statuses.length === 0) return;
     
-    await this.updateFileStatus(file, statuses);
-    
-    // Force explorer icon update
-    this.app.metadataCache.trigger('changed', file);
-    this.updateExplorerIcon(file);
-    
-    // Dispatch events to update other UI components
-    this.triggerUIUpdates(statuses, file);
+    await this.statusService.handleStatusChange({
+      files: file,
+      statuses: statuses,
+      afterChange: (updatedStatuses) => {
+        // Force explorer icon update
+        this.app.metadataCache.trigger('changed', file);
+        this.updateExplorerIcon(file);
+        
+        // Dispatch events to update other UI components
+        window.dispatchEvent(new CustomEvent('note-status:status-changed', {
+          detail: { statuses: updatedStatuses, file: file.path }
+        }));
+        
+        window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+        
+        // Force a full UI refresh with slight delay
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('note-status:force-refresh'));
+        }, 100);
+      }
+    });
   }
   
   /**

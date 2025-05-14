@@ -299,18 +299,16 @@ export class StatusDropdownComponent {
   private async removeStatus(status: string): Promise<void> {
     if (!this.targetFile) return;
     
-    await this.statusService.modifyNoteStatus({
+    await this.statusService.handleStatusChange({
       files: this.targetFile,
       statuses: status,
-      operation: 'remove',
-      showNotice: false
+      allowMultipleStatuses: false, // Queremos eliminar específicamente
+      afterChange: (updatedStatuses) => {
+        this.currentStatuses = updatedStatuses;
+        this.refreshDropdownContent();
+        this.onStatusChange(updatedStatuses);
+      }
     });
-    
-    const updatedStatuses = this.statusService.getFileStatuses(this.targetFile);
-    this.currentStatuses = updatedStatuses;
-    
-    this.refreshDropdownContent();
-    this.onStatusChange(updatedStatuses);
   }
   
   /**
@@ -398,18 +396,31 @@ export class StatusDropdownComponent {
   /**
    * Handle click on a status option
    */
-  private handleStatusOptionClick(optionEl: HTMLElement, status: Status): void {
+  private async handleStatusOptionClick(optionEl: HTMLElement, status: Status): void {
     optionEl.addClass('note-status-option-selecting');
     
-    if (this.targetFile) {
-      this.handleStatusChangeForTargetFile(status);
-    } else {
-      this.onStatusChange([status.name]);
-      
-      if (!this.settings.useMultipleStatuses) {
-        this.close();
+    setTimeout(async () => {
+      if (this.targetFile) {
+        await this.statusService.handleStatusChange({
+          files: this.targetFile,
+          statuses: status.name,
+          afterChange: (updatedStatuses) => {
+            this.currentStatuses = updatedStatuses;
+            this.onStatusChange(updatedStatuses);
+            
+            if (!this.settings.useMultipleStatuses) {
+              this.close();
+            }
+          }
+        });
+      } else {
+        this.onStatusChange([status.name]);
+        
+        if (!this.settings.useMultipleStatuses) {
+          this.close();
+        }
       }
-    }
+    }, 150);
   }
   
   /**

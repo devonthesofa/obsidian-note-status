@@ -149,23 +149,13 @@ export class StatusDropdown {
    * Update a file's status
    */
   private async updateFileStatus(file: TFile, statuses: string[]): Promise<void> {
-    if (this.settings.useMultipleStatuses) {
-      await this.statusService.modifyNoteStatus({
-        files: file,
-        statuses: statuses[0],
-        operation: 'toggle',
-        showNotice: false
-      });
-    } else {
-      await this.statusService.modifyNoteStatus({
-        files: file,
-        statuses: statuses,
-        operation: 'set',
-        showNotice: false
-      });
-    }
-
-    this.notifyStatusChanged(statuses);
+    await this.statusService.handleStatusChange({
+      files: file,
+      statuses: statuses,
+      afterChange: (updatedStatuses) => {
+        this.notifyStatusChanged(updatedStatuses);
+      }
+    });
   }
 
   /**
@@ -391,18 +381,19 @@ export class StatusDropdown {
    * Toggle a status across multiple files
    */
   private async toggleStatusForFiles(files: TFile[], status: string): Promise<void> {
-    const filesWithStatus = files.filter(file => 
-      this.statusService.getFileStatuses(file).includes(status)
-    );
-    
-    const shouldRemove = filesWithStatus.length > files.length / 2;
-    const operation = shouldRemove ? 'remove' : 'add';
-    
-    await this.statusService.modifyNoteStatus({
+    await this.statusService.handleStatusChange({
       files: files,
       statuses: status,
-      operation: operation,
-      showNotice: true
+      isMultipleSelection: true,
+      afterChange: () => {
+        window.dispatchEvent(new CustomEvent('note-status:batch-update-complete', {
+          detail: {
+            status: status,
+            fileCount: files.length
+          }
+        }));
+        window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+      }
     });
   }
 
