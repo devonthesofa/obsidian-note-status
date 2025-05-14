@@ -141,11 +141,19 @@ export class StatusContextMenu {
    */
   private async updateFileStatus(file: TFile, statuses: string[]): Promise<void> {
     if (this.settings.useMultipleStatuses) {
-      // Si tenemos múltiples estados, simplemente añadimos el nuevo
-      await this.statusService.addNoteStatus(statuses[0], file);
+      await this.statusService.modifyNoteStatus({
+        files: file,
+        statuses: statuses[0],
+        operation: 'add',
+        showNotice: false
+      });
     } else {
-      // Reemplazamos todos los estados con el nuevo
-      await this.statusService.updateNoteStatuses([statuses[0]], file);
+      await this.statusService.modifyNoteStatus({
+        files: file,
+        statuses: statuses[0],
+        operation: 'set',
+        showNotice: false
+      });
     }
   }
   
@@ -165,12 +173,5 @@ export class StatusContextMenu {
     window.dispatchEvent(new CustomEvent('note-status:status-changed', {
       detail: { statuses, file: file.path }
     }));
-    
-    window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
-    
-    // Force a full UI refresh with slight delay
-    setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('note-status:force-refresh'));
-    }, 100);
   }
 }

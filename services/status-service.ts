@@ -124,107 +124,6 @@ export class StatusService {
   }
 
   /**
-   * Update the statuses of a note
-   */
-  public async updateNoteStatuses(newStatuses: string[], file?: TFile): Promise<void> {
-    const targetFile = file || this.app.workspace.getActiveFile();
-    if (!targetFile || targetFile.extension !== 'md') return;
-  
-    await this.app.fileManager.processFrontMatter(targetFile, (frontmatter) => {
-      frontmatter[this.settings.tagPrefix] = newStatuses;
-    });
-    
-    this.notifyStatusChanged(newStatuses, targetFile);
-  }
-
-  /**
-   * Legacy method to update a single status for backward compatibility
-   */
-  public async updateNoteStatus(newStatus: string, file?: TFile): Promise<void> {
-    await this.updateNoteStatuses([newStatus], file);
-  }
-
-  /**
-   * Add a status to a note's existing statuses
-   */
-  public async addNoteStatus(statusToAdd: string, file?: TFile): Promise<void> {
-    const targetFile = file || this.app.workspace.getActiveFile();
-    if (!targetFile || targetFile.extension !== 'md') return;
-    
-    const currentStatuses = this.getFileStatuses(targetFile);
-    if (currentStatuses.includes(statusToAdd)) return;
-    
-    // Filter out 'unknown' status when adding valid statuses
-    const newStatuses = [...currentStatuses.filter(s => s !== 'unknown'), statusToAdd];
-    await this.updateNoteStatuses(newStatuses, targetFile);
-  }
-
-  /**
-   * Remove a status from a note's existing statuses
-   */
-  public async removeNoteStatus(statusToRemove: string, file?: TFile): Promise<void> {
-    const targetFile = file || this.app.workspace.getActiveFile();
-    if (!targetFile || targetFile.extension !== 'md') return;
-    
-    const currentStatuses = this.getFileStatuses(targetFile);
-    const newStatuses = currentStatuses.filter(status => status !== statusToRemove);
-    
-    await this.updateNoteStatuses(newStatuses, targetFile);
-  }
-
-  /**
-   * Toggle a status on/off for a note
-   */
-  public async toggleNoteStatus(statusToToggle: string, file?: TFile): Promise<void> {
-    const targetFile = file || this.app.workspace.getActiveFile();
-    if (!targetFile || targetFile.extension !== 'md') return;
-    
-    const currentStatuses = this.getFileStatuses(targetFile);
-    
-    const newStatuses = currentStatuses.includes(statusToToggle)
-      ? currentStatuses.filter(status => status !== statusToToggle)
-      : [...currentStatuses.filter(s => s !== 'unknown'), statusToToggle];
-    
-    await this.updateNoteStatuses(newStatuses, targetFile);
-  }
-
-  /**
-   * Batch update multiple files' statuses
-   */
-  public async batchUpdateStatuses(
-    files: TFile[], 
-    statusesToSet: string[], 
-    mode: 'replace' | 'add' = 'replace',
-    showNotice = true
-  ): Promise<void> {
-    if (files.length === 0) {
-      if (showNotice) new Notice('No files selected');
-      return;
-    }
-
-    const updatePromises = files.map(async (file) => {
-      if (mode === 'replace') {
-        await this.updateNoteStatuses(statusesToSet, file);
-      } else {
-        for (const status of statusesToSet) {
-          await this.addNoteStatus(status, file);
-        }
-      }
-    });
-    
-    await Promise.all(updatePromises);
-
-    if (showNotice && files.length > 1) {
-      const statusText = statusesToSet.length === 1 
-        ? statusesToSet[0] 
-        : `${statusesToSet.length} statuses`;
-      new Notice(`Updated ${files.length} files with ${statusText}`);
-    }
-    
-    window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
-  }
-  
-  /**
    * Dispatch status changed event
    */
   private notifyStatusChanged(statuses: string[], file: TFile): void {
@@ -318,5 +217,97 @@ export class StatusService {
     }
 
     return statusGroups;
+  }
+
+  /**
+   * Centralizes all status modification operations
+   */
+  public async modifyNoteStatus(options: {
+    files: TFile | TFile[];
+    statuses: string | string[];
+    operation: 'set' | 'add' | 'remove' | 'toggle';
+    showNotice?: boolean;
+  }): Promise<void> {
+    const { operation, showNotice = true } = options;
+    const targetFiles = Array.isArray(options.files) ? options.files : [options.files];
+    const targetStatuses = Array.isArray(options.statuses) ? options.statuses : [options.statuses];
+    
+    if (targetFiles.length === 0) {
+      if (showNotice) new Notice('No files selected');
+      return;
+    }
+
+    // Process each file
+    const updatePromises = targetFiles.map(async (file) => {
+      if (!file || file.extension !== 'md') return;
+      
+      // Get current statuses for the file
+      const currentStatuses = this.getFileStatuses(file);
+      let newStatuses: string[] = [];
+      
+      switch (operation) {
+        case 'set':
+          // Replace all statuses with the new ones
+          newStatuses = [...targetStatuses];
+          break;
+          
+        case 'add':
+          // Add new statuses without duplicates
+          newStatuses = [...new Set([
+            ...currentStatuses.filter(s => s !== 'unknown'),
+            ...targetStatuses
+          ])];
+          break;
+          
+        case 'remove':
+          // Remove specified statuses
+          newStatuses = currentStatuses.filter(
+            status => !targetStatuses.includes(status)
+          );
+          break;
+          
+        case 'toggle':
+          // Toggle each status (add if not present, remove if present)
+          newStatuses = [...currentStatuses];
+          for (const status of targetStatuses) {
+            if (currentStatuses.includes(status)) {
+              newStatuses = newStatuses.filter(s => s !== status);
+            } else {
+              newStatuses = [...newStatuses.filter(s => s !== 'unknown'), status];
+            }
+          }
+          break;
+      }
+      
+      // Handle empty result (should revert to unknown)
+      if (newStatuses.length === 0) {
+        newStatuses = ['unknown'];
+      }
+      
+      // Apply updates to frontmatter
+      await this.app.fileManager.processFrontMatter(file, (frontmatter) => {
+        frontmatter[this.settings.tagPrefix] = newStatuses;
+      });
+      
+      // Notify of changes for UI updates
+      this.notifyStatusChanged(newStatuses, file);
+    });
+    
+    await Promise.all(updatePromises);
+    
+    // Show notification for batch operations
+    if (showNotice && targetFiles.length > 1) {
+      const statusText = targetStatuses.length === 1 
+        ? targetStatuses[0] 
+        : `${targetStatuses.length} statuses`;
+      const operationText = operation === 'set' ? 'updated' : 
+                            operation === 'add' ? 'added to' : 
+                            operation === 'remove' ? 'removed from' : 'toggled on';
+      
+      new Notice(`${statusText} ${operationText} ${targetFiles.length} files`);
+    }
+    
+    // Trigger UI refresh
+    window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
   }
 }

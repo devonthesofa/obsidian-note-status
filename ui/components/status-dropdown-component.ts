@@ -299,7 +299,12 @@ export class StatusDropdownComponent {
   private async removeStatus(status: string): Promise<void> {
     if (!this.targetFile) return;
     
-    await this.statusService.removeNoteStatus(status, this.targetFile);
+    await this.statusService.modifyNoteStatus({
+      files: this.targetFile,
+      statuses: status,
+      operation: 'remove',
+      showNotice: false
+    });
     
     const updatedStatuses = this.statusService.getFileStatuses(this.targetFile);
     this.currentStatuses = updatedStatuses;
@@ -396,17 +401,15 @@ export class StatusDropdownComponent {
   private handleStatusOptionClick(optionEl: HTMLElement, status: Status): void {
     optionEl.addClass('note-status-option-selecting');
     
-    setTimeout(async () => {
-      if (this.targetFile) {
-        await this.handleStatusChangeForTargetFile(status);
-      } else {
-        this.onStatusChange([status.name]);
-        
-        if (!this.settings.useMultipleStatuses) {
-          this.close();
-        }
+    if (this.targetFile) {
+      this.handleStatusChangeForTargetFile(status);
+    } else {
+      this.onStatusChange([status.name]);
+      
+      if (!this.settings.useMultipleStatuses) {
+        this.close();
       }
-    }, 150);
+    }
   }
   
   /**
@@ -416,9 +419,19 @@ export class StatusDropdownComponent {
     if (!this.targetFile) return;
     
     if (this.settings.useMultipleStatuses) {
-      await this.statusService.toggleNoteStatus(status.name, this.targetFile);
+      await this.statusService.modifyNoteStatus({
+        files: this.targetFile,
+        statuses: status.name,
+        operation: 'toggle',
+        showNotice: false
+      });
     } else {
-      await this.statusService.updateNoteStatuses([status.name], this.targetFile);
+      await this.statusService.modifyNoteStatus({
+        files: this.targetFile,
+        statuses: [status.name],
+        operation: 'set',
+        showNotice: false
+      });
       this.close();
     }
     

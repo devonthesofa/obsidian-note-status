@@ -150,9 +150,19 @@ export class StatusDropdown {
    */
   private async updateFileStatus(file: TFile, statuses: string[]): Promise<void> {
     if (this.settings.useMultipleStatuses) {
-      await this.statusService.toggleNoteStatus(statuses[0], file);
+      await this.statusService.modifyNoteStatus({
+        files: file,
+        statuses: statuses[0],
+        operation: 'toggle',
+        showNotice: false
+      });
     } else {
-      await this.statusService.updateNoteStatuses(statuses, file);
+      await this.statusService.modifyNoteStatus({
+        files: file,
+        statuses: statuses,
+        operation: 'set',
+        showNotice: false
+      });
     }
 
     this.notifyStatusChanged(statuses);
@@ -386,14 +396,14 @@ export class StatusDropdown {
     );
     
     const shouldRemove = filesWithStatus.length > files.length / 2;
+    const operation = shouldRemove ? 'remove' : 'add';
     
-    for (const file of files) {
-      if (shouldRemove) {
-        await this.statusService.removeNoteStatus(status, file);
-      } else {
-        await this.statusService.addNoteStatus(status, file);
-      }
-    }
+    await this.statusService.modifyNoteStatus({
+      files: files,
+      statuses: status,
+      operation: operation,
+      showNotice: true
+    });
   }
 
   /**
