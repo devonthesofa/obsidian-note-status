@@ -31,17 +31,6 @@ export class StatusDropdownComponent {
   }
   
   /**
-   * Updates the current statuses
-   */
-  public updateStatuses(statuses: string[] | string): void {
-    this.currentStatuses = Array.isArray(statuses) ? [...statuses] : [statuses];
-    
-    if (this.isOpen && this.dropdownElement) {
-      this.refreshDropdownContent();
-    }
-  }
-  
-  /**
    * Set the target file for status updates
    */
   public setTargetFile(file: TFile | null): void {
@@ -53,17 +42,6 @@ export class StatusDropdownComponent {
   }
   public setOnSelectStatusHandler(handler: typeof this.onSelectStatusHandler): void {
     this.onSelectStatusHandler = handler
-  }
-  
-  /**
-   * Updates settings reference
-   */
-  public updateSettings(settings: NoteStatusSettings): void {
-    this.settings = settings;
-    
-    if (this.isOpen && this.dropdownElement) {
-      this.refreshDropdownContent();
-    }
   }
   
   /**
@@ -79,6 +57,29 @@ export class StatusDropdownComponent {
   public getOnStatusChange(): (statuses: string[]) => void {
     return this.onStatusChange;
   }
+
+  /**
+   * Updates the current statuses
+   */
+  public updateStatuses(statuses: string[] | string): void {
+    this.currentStatuses = Array.isArray(statuses) ? [...statuses] : [statuses];
+    
+    if (this.isOpen && this.dropdownElement) {
+      this.refreshDropdownContent();
+    }
+  }
+  
+  /**
+   * Updates settings reference
+   */
+  public updateSettings(settings: NoteStatusSettings): void {
+    this.settings = settings;
+    
+    if (this.isOpen && this.dropdownElement) {
+      this.refreshDropdownContent();
+    }
+  }
+    
   
   /**
    * Toggle the dropdown visibility
@@ -296,7 +297,7 @@ export class StatusDropdownComponent {
       setTimeout(async () => {
         if (this.targetFile) {
           await this.onRemoveStatusHandler(status, this.targetFile);
-          this.refreshDropdownContent(); // TODO: Pude es pot borrar
+          this.refreshDropdownContent(); // TODO: The propagation maybe is redunant
         } 
       }, 150);
     });
@@ -382,24 +383,18 @@ export class StatusDropdownComponent {
       setIcon(checkIcon, 'check');
     }
     
-    optionEl.addEventListener('click', () => this.handleStatusOptionClick(optionEl, status));
-  }
-  
-  /**
-   * Handle click on a status option
-   */
-  private handleStatusOptionClick(optionEl: HTMLElement, status: Status): void {
-    optionEl.addClass('note-status-option-selecting');
-    
-    setTimeout(async () => {
-      if (this.targetFile) {
-        await this.onSelectStatusHandler(status.name, this.targetFile);
-        
-        if (!this.settings.useMultipleStatuses) {
-          this.close();
-        }
-      } 
-    }, 150);
+    optionEl.addEventListener('click', () => {
+      optionEl.addClass('note-status-option-selecting');
+      setTimeout(async () => {
+        if (this.targetFile) {
+          await this.onSelectStatusHandler(status.name, this.targetFile);
+          
+          if (!this.settings.useMultipleStatuses) {
+            this.close();
+          }
+        } 
+      }, 150);
+    });
   }
   
   /**
