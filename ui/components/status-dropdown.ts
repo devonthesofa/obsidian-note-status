@@ -31,6 +31,27 @@ export class StatusDropdown {
       this.updateToolbarButton();
       this.statusService.notifyStatusChanged(statuses);
     });
+
+    this.dropdownComponent.setOnRemoveStatusHandler(async (status, targetFile) => {
+      if (!targetFile) return;
+      
+      await this.statusService.handleStatusChange({
+        files: targetFile,
+        statuses: status,
+        operation: 'remove',
+        showNotice: false,
+        afterChange: (updatedStatuses) => {
+          this.currentStatuses = updatedStatuses;
+        }
+      });
+    });
+    this.dropdownComponent.setOnSelectStatusHandler(async (status, targetFile) => {
+      await this.statusService.handleStatusChange({
+          files: targetFile,
+          statuses: status
+        });
+    });
+    
   }
 
 
@@ -128,17 +149,6 @@ export class StatusDropdown {
     this.openStatusDropdown({
       position,
       files: [activeFile]
-    });
-  }
-  
-  /**
-   * Update a file's status
-   */
-  private async updateFileStatus(file: TFile, statuses: string[]): Promise<void> {
-    await this.statusService.handleStatusChange({
-      files: file,
-      statuses: statuses,
-      showNotice: false
     });
   }
 

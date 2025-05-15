@@ -18,7 +18,10 @@ export class StatusDropdownComponent {
 
   // Bind methods once in constructor
   private clickOutsideHandler: (e: MouseEvent) => void;
-  
+  private onRemoveStatusHandler: (status: string, targetFile?: TFile) => Promise<void>;
+  private onSelectStatusHandler: (status: string, targetFile: TFile) => Promise<void>;
+
+
   constructor(app: App, statusService: StatusService, settings: NoteStatusSettings) {
     this.app = app;
     this.statusService = statusService;
@@ -43,6 +46,13 @@ export class StatusDropdownComponent {
    */
   public setTargetFile(file: TFile | null): void {
     this.targetFile = file;
+  }
+
+  public setOnRemoveStatusHandler(handler: typeof this.onRemoveStatusHandler): void {
+    this.onRemoveStatusHandler = handler
+  }
+  public setOnSelectStatusHandler(handler: typeof this.onSelectStatusHandler): void {
+    this.onSelectStatusHandler = handler
   }
   
   /**
@@ -285,32 +295,13 @@ export class StatusDropdownComponent {
       
       setTimeout(async () => {
         if (this.targetFile) {
-          await this.removeStatus(status);
-        } else {
-          this.onStatusChange([status]);
-        }
+          await this.onRemoveStatusHandler(status, this.targetFile);
+          this.refreshDropdownContent(); // TODO: Pude es pot borrar
+        } 
       }, 150);
     });
   }
   
-  /**
-   * Remove a status from the target file
-   */
-  private async removeStatus(status: string): Promise<void> {
-    if (!this.targetFile) return;
-    
-    await this.statusService.handleStatusChange({
-      files: this.targetFile,
-      statuses: status,
-      operation: 'remove',
-      showNotice: false,
-      afterChange: (updatedStatuses) => {
-        this.currentStatuses = updatedStatuses;
-        this.refreshDropdownContent();
-        this.onStatusChange(updatedStatuses);
-      }
-    });
-  }
   
   /**
    * Create the search filter input
@@ -402,22 +393,12 @@ export class StatusDropdownComponent {
     
     setTimeout(async () => {
       if (this.targetFile) {
-        await this.statusService.handleStatusChange({
-          files: this.targetFile,
-          statuses: status.name,
-          afterChange: (updatedStatuses) => {
-            if (!this.settings.useMultipleStatuses) {
-              this.close();
-            }
-          }
-        });
-      } else {
-        this.onStatusChange([status.name]);
+        await this.onSelectStatusHandler(status.name, this.targetFile);
         
         if (!this.settings.useMultipleStatuses) {
           this.close();
         }
-      }
+      } 
     }, 150);
   }
   
