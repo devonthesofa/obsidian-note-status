@@ -127,12 +127,7 @@ export class StatusDropdown {
     
     this.openStatusDropdown({
       position,
-      files: [activeFile],
-      onStatusChange: async (statuses) => {
-        if (statuses.length > 0) {
-          await this.updateFileStatus(activeFile, statuses);
-        }
-      }
+      files: [activeFile]
     });
   }
   
