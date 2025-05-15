@@ -406,9 +406,6 @@ export class StatusDropdownComponent {
           files: this.targetFile,
           statuses: status.name,
           afterChange: (updatedStatuses) => {
-            this.currentStatuses = updatedStatuses;
-            this.onStatusChange(updatedStatuses);
-            
             if (!this.settings.useMultipleStatuses) {
               this.close();
             }
