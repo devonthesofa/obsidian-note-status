@@ -29,19 +29,10 @@ export class StatusDropdown {
     this.dropdownComponent.setOnStatusChange((statuses) => {
       this.currentStatuses = [...statuses];
       this.updateToolbarButton();
-      this.notifyStatusChanged(statuses);
+      this.statusService.notifyStatusChanged(statuses);
     });
   }
 
-  /**
-   * Notify that status has changed
-   */
-  private notifyStatusChanged(statuses: string[]): void {
-    window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-      detail: { statuses }
-    }));
-    window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
-  }
 
   /**
    * Updates the toolbar button appearance
@@ -149,17 +140,11 @@ export class StatusDropdown {
    * Update a file's status
    */
   private async updateFileStatus(file: TFile, statuses: string[]): Promise<void> {
-    const operation = this.settings.useMultipleStatuses ? 'toggle' : 'set';
-    
-    await this.statusService.modifyNoteStatus({
+    await this.statusService.handleStatusChange({
       files: file,
       statuses: statuses,
-      operation: operation,
       showNotice: false
     });
-    
-    const updatedStatuses = this.statusService.getFileStatuses(file);
-    this.notifyStatusChanged(updatedStatuses);
   }
 
   /**
@@ -277,7 +262,7 @@ export class StatusDropdown {
     }, 
     files: TFile[], 
     isSingleFile: boolean
-  ): void {
+    ): void {
     if (options.onStatusChange) {
       this.dropdownComponent.setOnStatusChange(options.onStatusChange);
     } else if (!isSingleFile) {
@@ -286,19 +271,33 @@ export class StatusDropdown {
       this.dropdownComponent.setOnStatusChange(async (statuses) => {
         if (statuses.length > 0) {
           const toggledStatus = statuses[statuses.length - 1];
-          await this.toggleStatusForFiles(filesForBatch, toggledStatus);
           
-          window.dispatchEvent(new CustomEvent('note-status:batch-update-complete', {
-            detail: {
-              status: toggledStatus,
-              fileCount: filesForBatch.length
+          await this.statusService.handleStatusChange({
+            files: filesForBatch,
+            statuses: toggledStatus,
+            isMultipleSelection: true,
+            afterChange: () => {
+              // Keep the batch update event for any listeners that need it
+              window.dispatchEvent(new CustomEvent('note-status:batch-update-complete', {
+                detail: {
+                  status: toggledStatus,
+                  fileCount: filesForBatch.length
+                }
+              }));
             }
-          }));
-          window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+          });
         }
       });
     } else {
-      this.dropdownComponent.setOnStatusChange(this.notifyStatusChanged.bind(this));
+      // For single file, just use handleStatusChange directly
+      this.dropdownComponent.setOnStatusChange(async (statuses) => {
+        if (statuses.length > 0 && files[0]) {
+          await this.statusService.handleStatusChange({
+            files: files[0],
+            statuses: statuses
+          });
+        }
+      });
     }
   }
 
@@ -379,26 +378,6 @@ export class StatusDropdown {
       status !== 'unknown' && 
       files.every(file => this.statusService.getFileStatuses(file).includes(status))
     );
-  }
-
-  /**
-   * Toggle a status across multiple files
-   */
-  private async toggleStatusForFiles(files: TFile[], status: string): Promise<void> {
-    await this.statusService.handleStatusChange({
-      files: files,
-      statuses: status,
-      isMultipleSelection: true,
-      afterChange: () => {
-        window.dispatchEvent(new CustomEvent('note-status:batch-update-complete', {
-          detail: {
-            status: status,
-            fileCount: files.length
-          }
-        }));
-        window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
-      }
-    });
   }
 
   /**

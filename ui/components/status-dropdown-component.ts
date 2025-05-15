@@ -299,18 +299,17 @@ export class StatusDropdownComponent {
   private async removeStatus(status: string): Promise<void> {
     if (!this.targetFile) return;
     
-    await this.statusService.modifyNoteStatus({
+    await this.statusService.handleStatusChange({
       files: this.targetFile,
       statuses: status,
       operation: 'remove',
-      showNotice: false
+      showNotice: false,
+      afterChange: (updatedStatuses) => {
+        this.currentStatuses = updatedStatuses;
+        this.refreshDropdownContent();
+        this.onStatusChange(updatedStatuses);
+      }
     });
-    
-    // Get fresh statuses after the change
-    const updatedStatuses = this.statusService.getFileStatuses(this.targetFile);
-    this.currentStatuses = updatedStatuses;
-    this.refreshDropdownContent();
-    this.onStatusChange(updatedStatuses);
   }
   
   /**
@@ -425,34 +424,6 @@ export class StatusDropdownComponent {
     }, 150);
   }
   
-  /**
-   * Handle status change for a specific target file
-   */
-  private async handleStatusChangeForTargetFile(status: Status): Promise<void> {
-    if (!this.targetFile) return;
-    
-    if (this.settings.useMultipleStatuses) {
-      await this.statusService.modifyNoteStatus({
-        files: this.targetFile,
-        statuses: status.name,
-        operation: 'toggle',
-        showNotice: false
-      });
-    } else {
-      await this.statusService.modifyNoteStatus({
-        files: this.targetFile,
-        statuses: [status.name],
-        operation: 'set',
-        showNotice: false
-      });
-      this.close();
-    }
-    
-    const freshStatuses = this.statusService.getFileStatuses(this.targetFile);
-    this.currentStatuses = [...freshStatuses];
-    this.onStatusChange(freshStatuses);
-  }
-
   /**
    * Position the dropdown at specific coordinates
    */

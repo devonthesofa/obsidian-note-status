@@ -125,28 +125,12 @@ export class StatusContextMenu {
    */
   private async handleStatusUpdateForFile(file: TFile, statuses: string[]): Promise<void> {
     if (!(file instanceof TFile) || file.extension !== 'md' || statuses.length === 0) return;
-    const operation = this.settings.useMultipleStatuses ? 'toggle' : 'set';
     
-    await this.statusService.modifyNoteStatus({
+    await this.statusService.handleStatusChange({
       files: file,
       statuses: statuses,
-      operation: operation,
       showNotice: false
     });
-    
-    // Get fresh statuses
-    const updatedStatuses = this.statusService.getFileStatuses(file);
-    this.notifyStatusChanged(updatedStatuses);
-
-  }
-    /**
-   * Notify that status has changed
-   */
-  private notifyStatusChanged(statuses: string[]): void {
-    window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-      detail: { statuses }
-    }));
-    window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
   }
 
   /**

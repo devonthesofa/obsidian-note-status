@@ -126,10 +126,17 @@ export class StatusService {
   /**
    * Dispatch status changed event
    */
-  private notifyStatusChanged(statuses: string[], file: TFile): void {
+  public notifyStatusChanged(statuses: string[], file?: TFile): void {
+    // Dispatch the specific status change event
     window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-      detail: { statuses, file: file.path }
+      detail: { 
+        statuses,
+        file: file?.path
+      }
     }));
+    
+    // General UI refresh happens via this event
+    window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
   }
 
   /**
@@ -313,29 +320,36 @@ export class StatusService {
 
   /**
    * Handles UI-triggered status changes with appropriate logic based on context
+   * This is the central function that all UI components should call for status changes
    */
   public async handleStatusChange(options: {
-    files: TFile | TFile[];
-    statuses: string | string[];
-    isMultipleSelection?: boolean;
-    allowMultipleStatuses?: boolean;
-    afterChange?: (updatedStatuses: string[]) => void;
+      files: TFile | TFile[];
+      statuses: string | string[];
+      isMultipleSelection?: boolean;
+      allowMultipleStatuses?: boolean;
+      operation?: 'set' | 'add' | 'remove' | 'toggle';
+      showNotice?: boolean;
+      afterChange?: (updatedStatuses: string[]) => void;
   }): Promise<void> {
     const { 
       files, 
       statuses, 
       isMultipleSelection = false,
       allowMultipleStatuses = this.settings.useMultipleStatuses,
+      operation: explicitOperation,
+      showNotice = isMultipleSelection,
       afterChange
     } = options;
     
     const targetFiles = Array.isArray(files) ? files : [files];
     const targetStatuses = Array.isArray(statuses) ? statuses : [statuses];
     
-    // Determine operation based on context
+    // Determine operation based on context if not explicitly specified
     let operation: 'set' | 'add' | 'remove' | 'toggle';
     
-    if (isMultipleSelection) {
+    if (explicitOperation) {
+      operation = explicitOperation;
+    } else if (isMultipleSelection) {
       // For multiple files, we need to check if we should add or remove
       const firstStatus = targetStatuses[0]; // Use first status for multi-file operations
       const filesWithStatus = targetFiles.filter(file => 
@@ -357,7 +371,7 @@ export class StatusService {
       files: targetFiles,
       statuses: targetStatuses,
       operation,
-      showNotice: isMultipleSelection
+      showNotice
     });
     
     // Optional callback with updated statuses
@@ -365,5 +379,26 @@ export class StatusService {
       const updatedStatuses = this.getFileStatuses(files as TFile);
       afterChange(updatedStatuses);
     }
+    
+    // Ensure comprehensive UI updates
+    this.refreshUI(targetFiles);
   }
+
+  /**
+   * Centralizes UI refresh after status changes
+   */
+  private refreshUI(files: TFile[]): void {
+    // General UI refresh
+    window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+    
+    // If it's the active file, ensure status bar and toolbar are updated
+    const activeFile = this.app.workspace.getActiveFile();
+    if (activeFile && files.some(f => f.path === activeFile.path)) {
+        const statuses = this.getFileStatuses(activeFile);
+        window.dispatchEvent(new CustomEvent('note-status:status-changed', {
+            detail: { statuses, file: activeFile.path }
+        }));
+    }
+  }
+
 }
