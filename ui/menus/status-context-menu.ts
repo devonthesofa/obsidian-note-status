@@ -34,17 +34,6 @@ export class StatusContextMenu {
   public updateSettings(settings: NoteStatusSettings): void {
     this.settings = settings;
   }
-
-  /**
-   * Show the menu at the specified position
-   */
-  private showMenu(menu: Menu, position?: { x: number; y: number }): void {
-    if (position) {
-      menu.showAtPosition(position);
-    } else {
-      menu.showAtMouseEvent(new MouseEvent('contextmenu'));
-    }
-  }
   
   /**
    * Shows the context menu for changing status of one or more files
@@ -53,10 +42,7 @@ export class StatusContextMenu {
     if (files.length === 0) return;
     
     if (files.length === 1) {
-      this.statusDropdown.openStatusDropdown({
-        position,
-        files: [files[0]]
-      });
+      this.showForSingleFile(files[0], position);
     } else {
       const menu = new Menu();
       
@@ -78,17 +64,23 @@ export class StatusContextMenu {
           })
       );
       
-      this.showMenu(menu, position);
+      if (position) {
+        menu.showAtPosition(position);
+      } else {
+        menu.showAtMouseEvent(new MouseEvent('contextmenu'));
+      }
     }
   }
   
   /**
    * Shows a context menu for a single file
    */
-  public showForFile(file: TFile, event: MouseEvent): void {
+  public showForSingleFile(file: TFile, position?: { x: number; y: number }): void {
     if (!(file instanceof TFile) || file.extension !== 'md') return;
-    
-    const position = { x: event.clientX, y: event.clientY };
-    this.showForFiles([file], position);
+
+    this.statusDropdown.openStatusDropdown({
+      position,
+      files: [file]
+    });
   }
 }

@@ -253,7 +253,7 @@ export default class NoteStatus extends Plugin {
       return;
     }
 
-    this.statusContextMenu.showForFile(activeFile, new MouseEvent('click'));
+    this.statusContextMenu.showForSingleFile(activeFile);
   }
 
   /**

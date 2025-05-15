@@ -452,7 +452,8 @@ export class StatusPaneView extends View {
       item.setTitle('Change status')
         .setIcon('tag')
         .onClick(() => {
-          this.plugin.statusContextMenu.showForFile(file, e);
+          const position = { x: e.clientX, y: e.clientY };
+          this.plugin.statusContextMenu.showForSingleFile(file, position);
         })
     );
   
