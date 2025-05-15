@@ -132,43 +132,4 @@ export class StatusContextMenu {
       showNotice: false
     });
   }
-
-  /**
-   * Update file status based on settings
-   */
-  private async updateFileStatus(file: TFile, statuses: string[]): Promise<void> {
-    if (this.settings.useMultipleStatuses) {
-      await this.statusService.modifyNoteStatus({
-        files: file,
-        statuses: statuses[0],
-        operation: 'add',
-        showNotice: false
-      });
-    } else {
-      await this.statusService.modifyNoteStatus({
-        files: file,
-        statuses: statuses[0],
-        operation: 'set',
-        showNotice: false
-      });
-    }
-  }
-  
-  /**
-   * Update explorer icon for a file
-   */
-  private updateExplorerIcon(file: TFile): void {
-    setTimeout(() => {
-      this.explorerIntegration?.updateFileExplorerIcons(file);
-    }, 50);
-  }
-  
-  /**
-   * Trigger UI updates after status changes
-   */
-  private triggerUIUpdates(statuses: string[], file: TFile): void {
-    window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-      detail: { statuses, file: file.path }
-    }));
-  }
 }

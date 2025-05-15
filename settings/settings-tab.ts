@@ -2,16 +2,19 @@ import { App, PluginSettingTab, Setting, Notice } from 'obsidian';
 import { Status } from '../models/types';
 import { PREDEFINED_TEMPLATES } from '../constants/status-templates';
 import NoteStatus from 'main';
+import { StatusService } from 'services/status-service';
 
 /**
  * Settings tab for the Note Status plugin
  */
 export class NoteStatusSettingTab extends PluginSettingTab {
 	plugin: NoteStatus;
+	statusService: StatusService
 
-	constructor(app: App, plugin: any) {
+	constructor(app: App, plugin: any, statusService: StatusService) {
 		super(app, plugin);
 		this.plugin = plugin;
+		this.statusService = statusService;
 	}
 
 	display(): void {
@@ -102,8 +105,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 				// Refresh the status pane if open
 				const statusPane = this.app.workspace.getLeavesOfType('status-pane')[0];
 				if (statusPane && statusPane.view) {
-					// Trigger refresh
-					window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+					this.statusService.refreshUI([]);
 				}
 			}));
 
@@ -120,7 +122,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 					
 					// Refresh UI to show multi-select or single-select options
-					window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+					this.statusService.refreshUI([]);
 				}));
 
 		// Status tag prefix
@@ -137,9 +139,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 					
 					this.plugin.settings.tagPrefix = value.trim();
 					await this.plugin.saveSettings();
-					
-					// Add this line to trigger a full UI refresh
-					window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+					this.statusService.refreshUI([]);
 				}));
 
 
@@ -157,7 +157,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 					
 					// Refresh the UI to show/hide template statuses
-					window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+					this.statusService.refreshUI([]);
 					this.display();
 				}));
 		
@@ -295,9 +295,7 @@ export class NoteStatusSettingTab extends PluginSettingTab {
 				}
 				
 				await this.plugin.saveSettings();
-				
-				// Refresh UI
-				window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+				this.statusService.refreshUI([]);
 			});
 			
 			// Template name

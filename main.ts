@@ -64,7 +64,8 @@ export default class NoteStatus extends Plugin {
       this.registerCommands();
       
       // Add settings tab
-      this.addSettingTab(new NoteStatusSettingTab(this.app, this));
+      this.addSettingTab(new NoteStatusSettingTab(this.app, this, 
+        this.statusService));
       
       // Set up custom events
       this.setupCustomEvents();

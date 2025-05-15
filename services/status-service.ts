@@ -124,22 +124,6 @@ export class StatusService {
   }
 
   /**
-   * Dispatch status changed event
-   */
-  public notifyStatusChanged(statuses: string[], file?: TFile): void {
-    // Dispatch the specific status change event
-    window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-      detail: { 
-        statuses,
-        file: file?.path
-      }
-    }));
-    
-    // General UI refresh happens via this event
-    window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
-  }
-
-  /**
    * Insert status metadata in the editor
    */
   public insertStatusMetadataInEditor(editor: Editor): void {
@@ -296,8 +280,6 @@ export class StatusService {
         frontmatter[this.settings.tagPrefix] = newStatuses;
       });
       
-      // Notify of changes for UI updates
-      this.notifyStatusChanged(newStatuses, file);
     });
     
     await Promise.all(updatePromises);
@@ -313,9 +295,6 @@ export class StatusService {
       
       new Notice(`${statusText} ${operationText} ${targetFiles.length} files`);
     }
-    
-    // Trigger UI refresh
-    window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
   }
 
   /**
@@ -331,6 +310,7 @@ export class StatusService {
       showNotice?: boolean;
       afterChange?: (updatedStatuses: string[]) => void;
   }): Promise<void> {
+    console.log("changing", options)
     const { 
       files, 
       statuses, 
@@ -383,11 +363,24 @@ export class StatusService {
     // Ensure comprehensive UI updates
     this.refreshUI(targetFiles);
   }
+  
+  /**
+   * Dispatch status changed event
+   */
+  public notifyStatusChanged(statuses: string[], file?: TFile): void {
+    // Dispatch the specific status change event
+    window.dispatchEvent(new CustomEvent('note-status:status-changed', {
+      detail: { 
+        statuses,
+        file: file?.path
+      }
+    }));
+  }
 
   /**
    * Centralizes UI refresh after status changes
    */
-  private refreshUI(files: TFile[]): void {
+  public refreshUI(files: TFile[]): void {
     // General UI refresh
     window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
     
@@ -395,9 +388,7 @@ export class StatusService {
     const activeFile = this.app.workspace.getActiveFile();
     if (activeFile && files.some(f => f.path === activeFile.path)) {
         const statuses = this.getFileStatuses(activeFile);
-        window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-            detail: { statuses, file: activeFile.path }
-        }));
+        this.notifyStatusChanged(statuses, activeFile)
     }
   }
 
