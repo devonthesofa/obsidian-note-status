@@ -299,16 +299,18 @@ export class StatusDropdownComponent {
   private async removeStatus(status: string): Promise<void> {
     if (!this.targetFile) return;
     
-    await this.statusService.handleStatusChange({
+    await this.statusService.modifyNoteStatus({
       files: this.targetFile,
       statuses: status,
-      allowMultipleStatuses: false, // Queremos eliminar específicamente
-      afterChange: (updatedStatuses) => {
-        this.currentStatuses = updatedStatuses;
-        this.refreshDropdownContent();
-        this.onStatusChange(updatedStatuses);
-      }
+      operation: 'remove',
+      showNotice: false
     });
+    
+    // Get fresh statuses after the change
+    const updatedStatuses = this.statusService.getFileStatuses(this.targetFile);
+    this.currentStatuses = updatedStatuses;
+    this.refreshDropdownContent();
+    this.onStatusChange(updatedStatuses);
   }
   
   /**
@@ -396,7 +398,7 @@ export class StatusDropdownComponent {
   /**
    * Handle click on a status option
    */
-  private async handleStatusOptionClick(optionEl: HTMLElement, status: Status): void {
+  private handleStatusOptionClick(optionEl: HTMLElement, status: Status): void {
     optionEl.addClass('note-status-option-selecting');
     
     setTimeout(async () => {

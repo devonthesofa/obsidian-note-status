@@ -149,13 +149,17 @@ export class StatusDropdown {
    * Update a file's status
    */
   private async updateFileStatus(file: TFile, statuses: string[]): Promise<void> {
-    await this.statusService.handleStatusChange({
+    const operation = this.settings.useMultipleStatuses ? 'toggle' : 'set';
+    
+    await this.statusService.modifyNoteStatus({
       files: file,
       statuses: statuses,
-      afterChange: (updatedStatuses) => {
-        this.notifyStatusChanged(updatedStatuses);
-      }
+      operation: operation,
+      showNotice: false
     });
+    
+    const updatedStatuses = this.statusService.getFileStatuses(file);
+    this.notifyStatusChanged(updatedStatuses);
   }
 
   /**

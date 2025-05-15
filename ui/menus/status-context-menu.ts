@@ -125,30 +125,30 @@ export class StatusContextMenu {
    */
   private async handleStatusUpdateForFile(file: TFile, statuses: string[]): Promise<void> {
     if (!(file instanceof TFile) || file.extension !== 'md' || statuses.length === 0) return;
+    const operation = this.settings.useMultipleStatuses ? 'toggle' : 'set';
     
-    await this.statusService.handleStatusChange({
+    await this.statusService.modifyNoteStatus({
       files: file,
       statuses: statuses,
-      afterChange: (updatedStatuses) => {
-        // Force explorer icon update
-        this.app.metadataCache.trigger('changed', file);
-        this.updateExplorerIcon(file);
-        
-        // Dispatch events to update other UI components
-        window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-          detail: { statuses: updatedStatuses, file: file.path }
-        }));
-        
-        window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
-        
-        // Force a full UI refresh with slight delay
-        setTimeout(() => {
-          window.dispatchEvent(new CustomEvent('note-status:force-refresh'));
-        }, 100);
-      }
+      operation: operation,
+      showNotice: false
     });
+    
+    // Get fresh statuses
+    const updatedStatuses = this.statusService.getFileStatuses(file);
+    this.notifyStatusChanged(updatedStatuses);
+
   }
-  
+    /**
+   * Notify that status has changed
+   */
+  private notifyStatusChanged(statuses: string[]): void {
+    window.dispatchEvent(new CustomEvent('note-status:status-changed', {
+      detail: { statuses }
+    }));
+    window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
+  }
+
   /**
    * Update file status based on settings
    */
