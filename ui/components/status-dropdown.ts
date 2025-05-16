@@ -45,13 +45,35 @@ export class StatusDropdown {
         }
       });
     });
+    
     this.dropdownComponent.setOnSelectStatusHandler(async (status, targetFile) => {
-      await this.statusService.handleStatusChange({
+      // Verificamos si estamos manejando múltiples archivos
+      const isMultipleFiles = Array.isArray(targetFile) && targetFile.length > 1;
+      
+      if (isMultipleFiles) {
+        const files = targetFile as TFile[];
+        // Contamos cuántos archivos ya tienen este estado
+        const filesWithStatus = files.filter(file => 
+          this.statusService.getFileStatuses(file).includes(status)
+        );
+        
+        // Si TODOS tienen el estado, lo quitamos. Si es parcial o ninguno, lo añadimos
+        const operation = filesWithStatus.length === files.length ? 'remove' : 'add';
+        
+        await this.statusService.handleStatusChange({
+          files: targetFile,
+          statuses: status,
+          isMultipleSelection: true,
+          operation: operation
+        });
+      } else {
+        // Para archivos individuales, mantenemos el comportamiento predeterminado
+        await this.statusService.handleStatusChange({
           files: targetFile,
           statuses: status
         });
+      }
     });
-    
   }
 
 
@@ -237,15 +259,20 @@ export class StatusDropdown {
     this.resetDropdownState();
     
     const isSingleFile = files.length === 1;
-    const targetFile = isSingleFile ? files[0] : null;
-    this.dropdownComponent.setTargetFile(targetFile);
-
-    const currentStatuses = targetFile ? 
-      this.statusService.getFileStatuses(targetFile) : 
-      this.findCommonStatuses(files);
     
-    this.dropdownComponent.updateStatuses(currentStatuses);
-    this.setupStatusChangeCallback(options, files, isSingleFile);
+    // Actualizamos cómo configuramos los archivos objetivo
+    if (isSingleFile) {
+      const targetFile = files[0];
+      this.dropdownComponent.setTargetFile(targetFile);
+      const currentStatuses = this.statusService.getFileStatuses(targetFile);
+      this.dropdownComponent.updateStatuses(currentStatuses);
+    } else {
+      // Para múltiples archivos, configuramos toda la colección
+      this.dropdownComponent.setTargetFiles(files);
+      const commonStatuses = this.findCommonStatuses(files);
+      this.dropdownComponent.updateStatuses(commonStatuses);
+    }
+    
     this.positionAndOpenDropdown(options);
   }
   
@@ -255,55 +282,6 @@ export class StatusDropdown {
   private resetDropdownState(): void {
     this.dropdownComponent.setTargetFile(null);
     this.dropdownComponent.setOnStatusChange(() => {});
-  }
-
-  /**
-   * Setup the appropriate callback for status changes
-   */
-  private setupStatusChangeCallback(
-    options: {
-      onStatusChange?: (statuses: string[]) => void;
-      mode?: 'replace' | 'add';
-    }, 
-    files: TFile[], 
-    isSingleFile: boolean
-    ): void {
-    if (options.onStatusChange) {
-      this.dropdownComponent.setOnStatusChange(options.onStatusChange);
-    } else if (!isSingleFile) {
-      const filesForBatch = [...files];
-      
-      this.dropdownComponent.setOnStatusChange(async (statuses) => {
-        if (statuses.length > 0) {
-          const toggledStatus = statuses[statuses.length - 1];
-          
-          await this.statusService.handleStatusChange({
-            files: filesForBatch,
-            statuses: toggledStatus,
-            isMultipleSelection: true,
-            afterChange: () => {
-              // Keep the batch update event for any listeners that need it
-              window.dispatchEvent(new CustomEvent('note-status:batch-update-complete', {
-                detail: {
-                  status: toggledStatus,
-                  fileCount: filesForBatch.length
-                }
-              }));
-            }
-          });
-        }
-      });
-    } else {
-      // For single file, just use handleStatusChange directly
-      this.dropdownComponent.setOnStatusChange(async (statuses) => {
-        if (statuses.length > 0 && files[0]) {
-          await this.statusService.handleStatusChange({
-            files: files[0],
-            statuses: statuses
-          });
-        }
-      });
-    }
   }
 
   /**

@@ -14,12 +14,13 @@ export class StatusDropdownComponent {
   private onStatusChange: (statuses: string[]) => void = () => {};
   private animationDuration = 220;
   private targetFile: TFile | null = null;
+  private targetFiles: TFile[] = [];
   public isOpen = false;
 
   // Bind methods once in constructor
   private clickOutsideHandler: (e: MouseEvent) => void;
   private onRemoveStatusHandler: (status: string, targetFile?: TFile) => Promise<void>;
-  private onSelectStatusHandler: (status: string, targetFile: TFile) => Promise<void>;
+  private onSelectStatusHandler: (status: string, targetFile: TFile | TFile[]) => Promise<void>;
 
 
   constructor(app: App, statusService: StatusService, settings: NoteStatusSettings) {
@@ -35,6 +36,15 @@ export class StatusDropdownComponent {
    */
   public setTargetFile(file: TFile | null): void {
     this.targetFile = file;
+    this.targetFiles = file ? [file] : [];
+  }
+
+  /**
+   * Set multiple target files for status updates
+   */
+  public setTargetFiles(files: TFile[]): void {
+    this.targetFiles = [...files];
+    this.targetFile = files.length === 1 ? files[0] : null;
   }
 
   public setOnRemoveStatusHandler(handler: typeof this.onRemoveStatusHandler): void {
@@ -212,6 +222,14 @@ export class StatusDropdownComponent {
     setIcon(iconContainer, 'tag');
     
     titleEl.createSpan({ text: 'Note status', cls: 'note-status-popover-label' });
+    
+    // If multiple files are selected, show count
+    if (this.targetFiles.length > 1) {
+      titleEl.createSpan({ 
+        text: ` (${this.targetFiles.length} files)`, 
+        cls: 'note-status-popover-count'
+      });
+    }
   }
   
   /**
@@ -386,11 +404,16 @@ export class StatusDropdownComponent {
     optionEl.addEventListener('click', () => {
       optionEl.addClass('note-status-option-selecting');
       setTimeout(async () => {
-        if (this.targetFile) {
-          await this.onSelectStatusHandler(status.name, this.targetFile);
+        if (this.targetFiles.length > 0) {
+          // Use all target files or just the single target file
+          const filesToUpdate = this.targetFiles.length > 0 ? this.targetFiles : (this.targetFile ? [this.targetFile] : []);
           
-          if (!this.settings.useMultipleStatuses) {
-            this.close();
+          if (filesToUpdate.length > 0) {
+            await this.onSelectStatusHandler(status.name, filesToUpdate);
+            
+            if (!this.settings.useMultipleStatuses) {
+              this.close();
+            }
           }
         } 
       }, 150);

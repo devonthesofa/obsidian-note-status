@@ -310,7 +310,6 @@ export class StatusService {
       showNotice?: boolean;
       afterChange?: (updatedStatuses: string[]) => void;
   }): Promise<void> {
-    console.log("changing", options)
     const { 
       files, 
       statuses, 
