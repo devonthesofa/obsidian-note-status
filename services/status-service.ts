@@ -383,11 +383,10 @@ export class StatusService {
     // General UI refresh
     window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
     
-    // If it's the active file, ensure status bar and toolbar are updated
-    const activeFile = this.app.workspace.getActiveFile();
-    if (activeFile && files.some(f => f.path === activeFile.path)) {
-        const statuses = this.getFileStatuses(activeFile);
-        this.notifyStatusChanged(statuses, activeFile)
+    // Notify status changes for each modified file
+    for (const file of files) {
+      const statuses = this.getFileStatuses(file);
+      this.notifyStatusChanged(statuses, file);
     }
   }
 

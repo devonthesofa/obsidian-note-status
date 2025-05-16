@@ -12,7 +12,6 @@ import { StatusService } from './services/status-service';
 import { StyleService } from './services/style-service';
 
 // UI Components
-import { StatusBar } from './ui/components/status-bar';
 import { StatusDropdown } from './ui/components/status-dropdown';
 import { StatusPaneView } from './ui/components/status-pane-view';
 import { ExplorerIntegration } from './ui/integrations/explorer-integration';
@@ -20,6 +19,7 @@ import { StatusContextMenu } from './ui/menus/status-context-menu';
 
 // Settings
 import { NoteStatusSettingTab } from './settings/settings-tab';
+import { StatusBarController } from 'components/statusBar/status-bar-controller';
 
 /**
  * Main plugin class for Note Status functionality
@@ -28,7 +28,7 @@ export default class NoteStatus extends Plugin {
   settings: NoteStatusSettings;
   statusService: StatusService;
   styleService: StyleService;
-  statusBar: StatusBar;
+  statusBar: StatusBarController;
   statusDropdown: StatusDropdown;
   explorerIntegration: ExplorerIntegration;
   statusContextMenu: StatusContextMenu;
@@ -105,7 +105,7 @@ export default class NoteStatus extends Plugin {
    */
   private initializeUI(): void {
     // Init basic UI components
-    this.statusBar = new StatusBar(this.addStatusBarItem(), this.settings, this.statusService);
+    this.statusBar = new StatusBarController(this.addStatusBarItem(), this.settings, this.statusService);
     this.statusDropdown = new StatusDropdown(this.app, this.settings, this.statusService);
     
     // Initialize explorer integration with a slight delay to ensure UI elements are ready
