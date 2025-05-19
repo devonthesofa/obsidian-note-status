@@ -12,7 +12,6 @@ import { StatusService } from './services/status-service';
 import { StyleService } from './services/style-service';
 
 // UI Components
-import { StatusDropdown } from './ui/components/status-dropdown';
 import { StatusPaneView } from './ui/components/status-pane-view';
 import { ExplorerIntegration } from './ui/integrations/explorer-integration';
 import { StatusContextMenu } from './ui/menus/status-context-menu';
@@ -20,6 +19,7 @@ import { StatusContextMenu } from './ui/menus/status-context-menu';
 // Settings
 import { NoteStatusSettingTab } from './settings/settings-tab';
 import { StatusBarController } from 'components/statusBar/status-bar-controller';
+import { StatusDropdown } from 'components/status-dropdown';
 
 /**
  * Main plugin class for Note Status functionality

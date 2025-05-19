@@ -1,38 +1,44 @@
 import { MarkdownView, Editor, Notice, TFile } from 'obsidian';
-import { NoteStatusSettings } from '../../models/types';
-import { StatusService } from '../../services/status-service';
-import { StatusDropdownComponent } from './status-dropdown-component';
+import { DropdownUI } from './dropdown-ui';
+import { DropdownOptions, DropdownDependencies } from './types';
+import { createDummyTarget } from './dropdown-position';
+import { StatusService } from 'services/status-service';
+import { NoteStatusSettings } from 'models/types';
 
 /**
- * Manages status dropdown UI and interactions
+ * High-level manager for status dropdown interactions
  */
-export class StatusDropdown {
+export class DropdownManager {
   private app: any;
   private settings: NoteStatusSettings;
   private statusService: StatusService;
   private currentStatuses: string[] = ['unknown'];
   private toolbarButton?: HTMLElement;
-  private dropdownComponent: StatusDropdownComponent;
+  private dropdownUI: DropdownUI;
 
   constructor(app: any, settings: NoteStatusSettings, statusService: StatusService) {
     this.app = app;
     this.settings = settings;
     this.statusService = statusService;
-    this.dropdownComponent = new StatusDropdownComponent(app, statusService, settings);
+    
+    const deps: DropdownDependencies = { app, settings, statusService };
+    this.dropdownUI = new DropdownUI(deps);
+    
     this.setupDropdownCallbacks();
+    this.setupCustomEvents();
   }
 
   /**
-   * Set up the dropdown callbacks
+   * Set up dropdown callbacks
    */
   private setupDropdownCallbacks(): void {
-    this.dropdownComponent.setOnStatusChange((statuses) => {
+    this.dropdownUI.setOnStatusChange((statuses) => {
       this.currentStatuses = [...statuses];
       this.updateToolbarButton();
       this.statusService.notifyStatusChanged(statuses);
     });
 
-    this.dropdownComponent.setOnRemoveStatusHandler(async (status, targetFile) => {
+    this.dropdownUI.setOnRemoveStatusHandler(async (status, targetFile) => {
       if (!targetFile) return;
       
       await this.statusService.handleStatusChange({
@@ -46,18 +52,18 @@ export class StatusDropdown {
       });
     });
     
-    this.dropdownComponent.setOnSelectStatusHandler(async (status, targetFile) => {
-      // Verificamos si estamos manejando múltiples archivos
+    this.dropdownUI.setOnSelectStatusHandler(async (status, targetFile) => {
+      // Check if handling multiple files
       const isMultipleFiles = Array.isArray(targetFile) && targetFile.length > 1;
       
       if (isMultipleFiles) {
         const files = targetFile as TFile[];
-        // Contamos cuántos archivos ya tienen este estado
+        // Count how many files already have this status
         const filesWithStatus = files.filter(file => 
           this.statusService.getFileStatuses(file).includes(status)
         );
         
-        // Si TODOS tienen el estado, lo quitamos. Si es parcial o ninguno, lo añadimos
+        // If ALL have the status, remove it. Otherwise, add it
         const operation = filesWithStatus.length === files.length ? 'remove' : 'add';
         
         await this.statusService.handleStatusChange({
@@ -67,7 +73,7 @@ export class StatusDropdown {
           operation: operation
         });
       } else {
-        // Para archivos individuales, mantenemos el comportamiento predeterminado
+        // For individual files, maintain default behavior
         await this.statusService.handleStatusChange({
           files: targetFile,
           statuses: status
@@ -76,6 +82,16 @@ export class StatusDropdown {
     });
   }
 
+  /**
+   * Set up custom events
+   */
+  private setupCustomEvents(): void {
+    window.addEventListener('note-status:dropdown-close', () => {
+      if (this.dropdownUI.isOpen) {
+        this.dropdownUI.close();
+      }
+    });
+  }
 
   /**
    * Updates the toolbar button appearance
@@ -147,7 +163,7 @@ export class StatusDropdown {
       [...currentStatuses] : [currentStatuses];
     
     this.updateToolbarButton();
-    this.dropdownComponent.updateStatuses(this.currentStatuses);
+    this.dropdownUI.updateStatuses(this.currentStatuses);
   }
 
   /**
@@ -156,7 +172,7 @@ export class StatusDropdown {
   public updateSettings(settings: NoteStatusSettings): void {
     this.settings = settings;
     this.updateToolbarButton();
-    this.dropdownComponent.updateSettings(settings);
+    this.dropdownUI.updateSettings(settings);
   }
 
   /**
@@ -210,28 +226,22 @@ export class StatusDropdown {
    * Remove dropdown when plugin is unloaded
    */
   public unload(): void {
-    this.dropdownComponent.dispose();
+    this.dropdownUI.dispose();
     
     if (this.toolbarButton) {
       this.toolbarButton.remove();
       this.toolbarButton = undefined;
     }
+    
+    window.removeEventListener('note-status:dropdown-close', () => {});
   }
 
   /**
    * Universal function to open the status dropdown
    */
-  public openStatusDropdown(options: {
-    target?: HTMLElement;
-    position?: { x: number, y: number };
-    files?: TFile[];
-    editor?: Editor;
-    view?: MarkdownView;
-    mode?: 'replace' | 'add';
-    onStatusChange?: (statuses: string[]) => void;
-  }): void {
-    if (this.dropdownComponent.isOpen) {
-      this.dropdownComponent.close();
+  public openStatusDropdown(options: DropdownOptions): void {
+    if (this.dropdownUI.isOpen) {
+      this.dropdownUI.close();
       setTimeout(() => this._openStatusDropdown(options), 50);
     } else {
       this._openStatusDropdown(options);
@@ -241,15 +251,7 @@ export class StatusDropdown {
   /**
    * Internal method to open dropdown
    */
-  private _openStatusDropdown(options: {
-    target?: HTMLElement;
-    position?: { x: number, y: number };
-    files?: TFile[];
-    editor?: Editor;
-    view?: MarkdownView;
-    mode?: 'replace' | 'add';
-    onStatusChange?: (statuses: string[]) => void;
-  }): void {
+  private _openStatusDropdown(options: DropdownOptions): void {
     const files = options.files || [this.app.workspace.getActiveFile()].filter(Boolean);
     if (!files.length) {
       new Notice('No files selected');
@@ -260,17 +262,17 @@ export class StatusDropdown {
     
     const isSingleFile = files.length === 1;
     
-    // Actualizamos cómo configuramos los archivos objetivo
+    // Set up target files appropriately
     if (isSingleFile) {
       const targetFile = files[0];
-      this.dropdownComponent.setTargetFile(targetFile);
+      this.dropdownUI.setTargetFile(targetFile);
       const currentStatuses = this.statusService.getFileStatuses(targetFile);
-      this.dropdownComponent.updateStatuses(currentStatuses);
+      this.dropdownUI.updateStatuses(currentStatuses);
     } else {
-      // Para múltiples archivos, configuramos toda la colección
-      this.dropdownComponent.setTargetFiles(files);
+      // For multiple files, set the whole collection
+      this.dropdownUI.setTargetFiles(files);
       const commonStatuses = this.findCommonStatuses(files);
-      this.dropdownComponent.updateStatuses(commonStatuses);
+      this.dropdownUI.updateStatuses(commonStatuses);
     }
     
     this.positionAndOpenDropdown(options);
@@ -280,8 +282,8 @@ export class StatusDropdown {
    * Reset dropdown state before opening
    */
   private resetDropdownState(): void {
-    this.dropdownComponent.setTargetFile(null);
-    this.dropdownComponent.setOnStatusChange(() => {});
+    this.dropdownUI.setTargetFile(null);
+    this.dropdownUI.setOnStatusChange(() => {});
   }
 
   /**
@@ -301,10 +303,10 @@ export class StatusDropdown {
 
     if (options.target) {
       if (options.position) {
-        this.dropdownComponent.open(options.target, options.position);
+        this.dropdownUI.open(options.target, options.position);
       } else {
         const rect = options.target.getBoundingClientRect();
-        this.dropdownComponent.open(options.target, {
+        this.dropdownUI.open(options.target, {
           x: rect.left,
           y: rect.bottom + 5
         });
@@ -327,26 +329,14 @@ export class StatusDropdown {
    * Open dropdown at a specific position using dummy target
    */
   private openWithPosition(position: { x: number, y: number }): void {
-    const dummyTarget = this.createDummyTarget(position);
-    this.dropdownComponent.open(dummyTarget, position);
+    const dummyTarget = createDummyTarget(position);
+    this.dropdownUI.open(dummyTarget, position);
     
     setTimeout(() => {
       if (dummyTarget.parentNode) {
         dummyTarget.parentNode.removeChild(dummyTarget);
       }
     }, 100);
-  }
-
-  /**
-   * Create a dummy target element for positioning
-   */
-  private createDummyTarget(position: { x: number, y: number }): HTMLElement {
-    const dummyTarget = document.createElement('div');
-    dummyTarget.addClass('note-status-dummy-target');
-    dummyTarget.style.setProperty('--pos-x-px', `${position.x}px`);
-    dummyTarget.style.setProperty('--pos-y-px', `${position.y}px`);
-    document.body.appendChild(dummyTarget);
-    return dummyTarget;
   }
 
   /**
