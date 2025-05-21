@@ -2,6 +2,7 @@ import { App, Menu, TFile } from 'obsidian';
 import { NoteStatusSettings } from '../../models/types';
 import { ExplorerIntegration } from '../explorer/explorer-integration';
 import { StatusService } from 'services/status-service';
+import { StatusContextMenu } from './status-context-menu';
 
 /**
  * Gestiona menús contextuales del explorador de archivos
@@ -11,17 +12,20 @@ export class FileContextMenuIntegration {
   private settings: NoteStatusSettings;
   private statusService: StatusService;
   private explorerIntegration: ExplorerIntegration;
+  private statusContextMenu: StatusContextMenu;
 
   constructor(
     app: App, 
     settings: NoteStatusSettings, 
     statusService: StatusService,
-    explorerIntegration: ExplorerIntegration
+    explorerIntegration: ExplorerIntegration,
+    statusContextMenu: StatusContextMenu
   ) {
     this.app = app;
     this.settings = settings;
     this.statusService = statusService;
     this.explorerIntegration = explorerIntegration;
+    this.statusContextMenu = statusContextMenu;
   }
 
   /**
@@ -34,7 +38,7 @@ export class FileContextMenuIntegration {
   /**
    * Registra los elementos del menú de archivo
    */
-  public registerFileMenus(): void {
+  public registerFileContextMenuEvents(): void {
     this.app.workspace.on('file-menu', (menu, file, source) => {
       if (source === 'file-explorer-context-menu' && file instanceof TFile && file.extension === 'md') {
         this.addStatusChangeMenu(menu, file);
@@ -92,5 +96,6 @@ export class FileContextMenuIntegration {
     // Implementación que mostraría un modal para seleccionar estado
     // En la práctica, esta función delegaría en un servicio de UI
     console.log(`Cambiar estado para ${files.length} archivos`);
+    this.statusContextMenu.showForFiles(files)
   }
 }

@@ -9,12 +9,13 @@ import { ExplorerIntegration } from './integrations/explorer';
 import { EditorIntegration, ToolbarIntegration } from './integrations/editor';
 import { MetadataIntegration } from './integrations/metadata-cache';
 import { WorkspaceIntegration } from './integrations/workspace';
+import { FileContextMenuIntegration } from 'integrations/context-menu/file-context-menu-integration';
+import { NoteStatusSettingTab } from 'integrations/settings/settings-tab';
 
 // Importar componentes UI
-import { NoteStatusSettingTab } from 'integrations/settings/settings-tab';
 import { StatusBar } from 'components/status-bar';
 import { StatusDropdown } from 'components/status-dropdown';
-import { FileContextMenuIntegration } from 'integrations/context-menu/file-context-menu-integration';
+import { StatusContextMenu } from 'integrations/context-menu/status-context-menu';
 
 export default class NoteStatus extends Plugin {
   settings: NoteStatusSettings;
@@ -90,13 +91,9 @@ export default class NoteStatus extends Plugin {
     this.explorerIntegration = new ExplorerIntegration(this.app, this.settings, this.statusService);
     this.toolbarIntegration = new ToolbarIntegration(this.app, this.settings, this.statusService, this.statusDropdown);
     
-    // // 2. Integraciones que dependen de otras
-    // this.fileContextMenuIntegration = new FileContextMenuIntegration(
-    //   this.app, 
-    //   this.settings, 
-    //   this.statusService,
-    //   this.explorerIntegration
-    // );
+    // Integraciones que dependen de otras
+    const statusContextMenu = new StatusContextMenu(this.app, this.settings, this.statusService, this.statusDropdown, this.explorerIntegration);
+    this.fileContextMenuIntegration = new FileContextMenuIntegration(this.app, this.settings, this.statusService, this.explorerIntegration, statusContextMenu);
     
     // this.editorIntegration = new EditorIntegration(this.app, this.settings, this.statusService);
     
@@ -115,7 +112,7 @@ export default class NoteStatus extends Plugin {
     );
     
     // // 3. Registrar eventos en cada integración
-    // this.fileContextMenuIntegration.registerFileMenus();
+    this.fileContextMenuIntegration.registerFileContextMenuEvents();
     // this.editorIntegration.registerEditorMenus();
     // this.metadataIntegration.registerMetadataEvents();
     this.workspaceIntegration.registerWorkspaceEvents();
