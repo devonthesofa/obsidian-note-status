@@ -1,4 +1,4 @@
-import { MarkdownView, Editor, Notice, TFile } from 'obsidian';
+import { MarkdownView, Editor, Notice, TFile, App } from 'obsidian';
 import { DropdownUI } from './dropdown-ui';
 import { DropdownOptions, DropdownDependencies } from './types';
 import { createDummyTarget } from './dropdown-position';
@@ -9,12 +9,15 @@ import { NoteStatusSettings } from 'models/types';
  * High-level manager for status dropdown interactions
  */
 export class DropdownManager {
-  private app: any;
+  private app: App;
   private settings: NoteStatusSettings;
   private statusService: StatusService;
   private currentStatuses: string[] = ['unknown'];
   private toolbarButton?: HTMLElement;
-  private dropdownUI: DropdownUI;
+  private dropdownUI: DropdownUI;  
+  
+  // Singleton para gestionar todos los dropdowns
+  private static activeInstance: DropdownManager | null = null;
 
   constructor(app: any, settings: NoteStatusSettings, statusService: StatusService) {
     this.app = app;
@@ -35,7 +38,6 @@ export class DropdownManager {
     this.dropdownUI.setOnStatusChange((statuses) => {
       this.currentStatuses = [...statuses];
       this.updateToolbarButton();
-      // this.statusService.notifyStatusChanged(statuses);
     });
 
     this.dropdownUI.setOnRemoveStatusHandler(async (status, targetFile) => {
@@ -99,6 +101,7 @@ export class DropdownManager {
   private updateToolbarButton(): void {
     if (!this.toolbarButton) return;
 
+    DropdownManager.activeInstance?.dropdownUI.close();
     this.toolbarButton.empty();
     
     const hasValidStatus = this.currentStatuses.length > 0 &&
@@ -158,7 +161,8 @@ export class DropdownManager {
   /**
    * Updates the dropdown UI based on current statuses
    */
-  public update(currentStatuses: string[] | string): void {
+  public update(currentStatuses: string[] | string, file?: TFile): void {
+
     this.currentStatuses = Array.isArray(currentStatuses) ? 
       [...currentStatuses] : [currentStatuses];
     
@@ -240,18 +244,14 @@ export class DropdownManager {
    * Universal function to open the status dropdown
    */
   public openStatusDropdown(options: DropdownOptions): void {
-    if (this.dropdownUI.isOpen) {
-      this.dropdownUI.close();
-      setTimeout(() => this._openStatusDropdown(options), 50);
-    } else {
-      this._openStatusDropdown(options);
+    // Cerrar dropdown activo antes de abrir uno nuevo
+    if (DropdownManager.activeInstance && DropdownManager.activeInstance !== this) {
+      console.log("close this:, ",DropdownManager.activeInstance)
+      this.resetDropdownState();
+      DropdownManager.activeInstance.dropdownUI.close();
     }
-  }
+    DropdownManager.activeInstance = this;
 
-  /**
-   * Internal method to open dropdown
-   */
-  private _openStatusDropdown(options: DropdownOptions): void {
     const files = options.files || [this.app.workspace.getActiveFile()].filter(Boolean);
     if (!files.length) {
       new Notice('No files selected');
@@ -277,6 +277,7 @@ export class DropdownManager {
     
     this.positionAndOpenDropdown(options);
   }
+
   
   /**
    * Reset dropdown state before opening

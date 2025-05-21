@@ -62,7 +62,7 @@ export class WorkspaceIntegration {
     this.toolbarIntegration.addToolbarButtonToActiveLeaf();
     
     // Actualiza estado
-    this.propagateNoteStatusChange();
+    this.propagateNoteStatusChange(file);
   }
 
   /**
@@ -91,7 +91,7 @@ export class WorkspaceIntegration {
   /**
    * Verifica y propaga el estado de la nota activa
    */
-  private propagateNoteStatusChange(): void {
+  private propagateNoteStatusChange(file: TFile): void {
     try {
       const activeFile = this.app.workspace.getActiveFile();
       let fileStatuses: string[] = [];
@@ -100,7 +100,7 @@ export class WorkspaceIntegration {
       }
       // Dispara evento para que otros componentes se actualicen
       window.dispatchEvent(new CustomEvent('note-status:status-changed', { 
-        detail: { statuses: fileStatuses } 
+        detail: { statuses: fileStatuses, file: file } 
       }));
     } catch (error) {
       console.error('Error checking note status:', error);

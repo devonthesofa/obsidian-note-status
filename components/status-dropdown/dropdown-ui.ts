@@ -184,12 +184,10 @@ export class DropdownUI {
     
     this.isOpen = false;
     
-    setTimeout(() => {
-      if (this.dropdownElement) {
-        this.dropdownElement.remove();
-        this.dropdownElement = null;
-      }
-    }, this.animationDuration);
+    if (this.dropdownElement) {
+      this.dropdownElement.remove();
+      this.dropdownElement = null;
+    }
   }
   
   /**
