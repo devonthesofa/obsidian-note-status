@@ -271,7 +271,9 @@ export class StatusService {
       await this.app.fileManager.processFrontMatter(file, (frontmatter) => {
         frontmatter[this.settings.tagPrefix] = newStatuses;
       });
-      
+
+
+      this.notifyStatusChanged(newStatuses, file)
     });
     
     await Promise.all(updatePromises);
@@ -345,20 +347,12 @@ export class StatusService {
       showNotice
     });
     
-    // Optional callback with updated statuses
-    if (afterChange && targetFiles.length === 1 && !Array.isArray(files)) {
-      const updatedStatuses = this.getFileStatuses(files as TFile);
-      afterChange(updatedStatuses);
-    }
-    
-    // Ensure comprehensive UI updates
-    this.refreshUI(targetFiles);
   }
   
   /**
    * Dispatch status changed event
    */
-  public notifyStatusChanged(statuses: string[], file?: TFile): void {
+  private notifyStatusChanged(statuses: string[], file?: TFile): void {
     // Dispatch the specific status change event
     window.dispatchEvent(new CustomEvent('note-status:status-changed', {
       detail: { 
@@ -367,19 +361,4 @@ export class StatusService {
       }
     }));
   }
-
-  /**
-   * Centralizes UI refresh after status changes
-   */
-  public refreshUI(files: TFile[]): void {
-    // General UI refresh
-    window.dispatchEvent(new CustomEvent('note-status:refresh-ui'));
-    
-    // Notify status changes for each modified file
-    for (const file of files) {
-      const statuses = this.getFileStatuses(file);
-      this.notifyStatusChanged(statuses, file);
-    }
-  }
-
 }
