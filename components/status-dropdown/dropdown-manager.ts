@@ -35,7 +35,7 @@ export class DropdownManager {
     this.dropdownUI.setOnStatusChange((statuses) => {
       this.currentStatuses = [...statuses];
       this.updateToolbarButton();
-      this.statusService.notifyStatusChanged(statuses);
+      // this.statusService.notifyStatusChanged(statuses);
     });
 
     this.dropdownUI.setOnRemoveStatusHandler(async (status, targetFile) => {

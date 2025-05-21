@@ -19,11 +19,12 @@ export class ToolbarIntegration {
     app: App, 
     settings: NoteStatusSettings, 
     statusService: StatusService,
+    statusDropdown: StatusDropdown
   ) {
     this.app = app;
     this.settings = settings;
     this.statusService = statusService;
-    this.statusDropdown = new StatusDropdown(this.app, this.settings, this.statusService);
+    this.statusDropdown = statusDropdown;
     this.buttonView = new ToolbarButton(settings, statusService);
   }
   
@@ -33,7 +34,7 @@ export class ToolbarIntegration {
     this.updateStatusDisplay([]);
   }
 
-  public addToolbarButtonToActiveLeaf(): void {
+  public addToolbarButtonToActiveLeaf(statuses?: string[]): void {
     const activeLeaf = this.app.workspace.activeLeaf;
     if (!activeLeaf?.view || !(activeLeaf.view instanceof MarkdownView)) return;
 
@@ -53,7 +54,7 @@ export class ToolbarIntegration {
       toolbarContainer.appendChild(this.buttonElement);
     }
     
-    this.updateButtonDisplay();
+    this.updateButtonDisplay(statuses);
   }
 
   private removeToolbarButton(): void {
@@ -71,11 +72,12 @@ export class ToolbarIntegration {
     this.buttonElement = null;
   }
 
-  private updateButtonDisplay(): void {
+  private updateButtonDisplay(overrideStatutes?: string[]): void {
     const activeFile = this.app.workspace.getActiveFile();
     if (!activeFile || !this.buttonElement) return;
     
-    const statuses = this.statusService.getFileStatuses(activeFile);
+    
+    const statuses = overrideStatutes?.length ? overrideStatutes : this.statusService.getFileStatuses(activeFile);
     this.buttonView.updateDisplay(statuses);
   }
 
@@ -94,7 +96,7 @@ export class ToolbarIntegration {
 
   public updateStatusDisplay(statuses: string[]): void {
     this.removeToolbarButton();
-    this.addToolbarButtonToActiveLeaf();
+    this.addToolbarButtonToActiveLeaf(statuses);
   }
 
   public unload(): void {

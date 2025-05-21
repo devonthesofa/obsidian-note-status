@@ -13,6 +13,7 @@ import { WorkspaceIntegration } from './integrations/workspace';
 // Importar componentes UI
 import { NoteStatusSettingTab } from 'integrations/settings/settings-tab';
 import { StatusBar } from 'components/status-bar';
+import { StatusDropdown } from 'components/status-dropdown';
 
 export default class NoteStatus extends Plugin {
   settings: NoteStatusSettings;
@@ -23,6 +24,7 @@ export default class NoteStatus extends Plugin {
   
   // Componentes UI
   statusBar: StatusBar;
+  statusDropdown: StatusDropdown
   
   // Integraciones
   explorerIntegration: ExplorerIntegration;
@@ -84,10 +86,9 @@ export default class NoteStatus extends Plugin {
 
   private initializeIntegrations() {
     // Crear integraciones en orden de dependencia
-    
     // // 1. Integraciones básicas primero
     // this.explorerIntegration = new ExplorerIntegration(this.app, this.settings, this.statusService);
-    this.toolbarIntegration = new ToolbarIntegration(this.app, this.settings, this.statusService);
+    this.toolbarIntegration = new ToolbarIntegration(this.app, this.settings, this.statusService, this.statusDropdown);
     
     // // 2. Integraciones que dependen de otras
     // this.fileMenuIntegration = new FileMenuIntegration(
@@ -168,6 +169,8 @@ export default class NoteStatus extends Plugin {
   }
 
   private initializeUI() {
+    this.statusDropdown = new StatusDropdown(this.app, this.settings, this.statusService); 
+
     // Inicializar barra de estado
     this.statusBar = new StatusBar(
       this.addStatusBarItem(), 
@@ -192,7 +195,7 @@ export default class NoteStatus extends Plugin {
     
     // // Actualizar toolbar
     this.toolbarIntegration.updateStatusDisplay(statuses);
-    
+    this.statusDropdown.update(statuses);
     // // Actualizar explorador si es necesario
     // if (file) {
     //   const fileObj = this.app.vault.getFileByPath(file);
