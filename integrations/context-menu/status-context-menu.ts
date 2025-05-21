@@ -94,33 +94,37 @@ export class StatusContextMenu {
    * @param position Posición opcional para mostrar el menú
    */
   private showForMultipleFiles(files: TFile[], position?: { x: number; y: number }): void {
-    const menu = new Menu();
-    
-    // Elemento de información (deshabilitado)
-    menu.addItem((item) => {
-      item.setTitle(`Update ${files.length} files`)
-        .setDisabled(true);
-      return item;
-    });
+      const menu = new Menu();
+      
+      // Elemento de información (deshabilitado)
+      menu.addItem((item) => {
+        item.setTitle(`Update ${files.length} files`)
+          .setDisabled(true);
+        return item;
+      });
 
-    // Opción para gestionar estados
-    menu.addItem((item) => 
-      item
-        .setTitle('Manage statuses...')
-        .setIcon('tag')
-        .onClick(() => {
-          this.statusDropdown.openStatusDropdown({
-            position,
-            files
-          });
-        })
-    );
-    
-    // Mostrar el menú en la posición adecuada
-    if (position) {
-      menu.showAtPosition(position);
-    } else {
-      menu.showAtMouseEvent(new MouseEvent('contextmenu'));
+      // Opción para gestionar estados
+      menu.addItem((item) => 
+        item
+          .setTitle('Manage statuses...')
+          .setIcon('tag')
+          .onClick(() => {
+            this.statusDropdown.openStatusDropdown({
+              position,
+              files
+            });
+          })
+      );
+      
+      // Mostrar el menú en la posición adecuada
+      if (position) {
+        menu.showAtPosition(position);
+      } else {
+        // Use a centered position
+        menu.showAtPosition({
+          x: window.innerWidth / 2,
+          y: window.innerHeight / 3
+        });
+      }
     }
-  }
 }
