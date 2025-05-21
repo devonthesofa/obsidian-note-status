@@ -1,6 +1,6 @@
 import { App, TFile, WorkspaceLeaf } from 'obsidian';
 import { NoteStatusSettings } from '../../models/types';
-import { ToolbarIntegration } from '../editor/ToolbarIntegration';
+import { ToolbarIntegration } from '../editor/toolbar-integration';
 import { StatusService } from 'services/status-service';
 
 /**

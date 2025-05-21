@@ -1,2 +1,2 @@
-export { EditorIntegration } from './EditorIntegration';
-export { ToolbarIntegration } from './ToolbarIntegration';
+export { EditorIntegration } from './editor-integration';
+export { ToolbarIntegration } from './toolbar-integration';

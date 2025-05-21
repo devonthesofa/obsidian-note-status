@@ -1,2 +1,2 @@
-export { ExplorerIntegration } from './ExplorerIntegration';
-export { FileMenuIntegration } from './FileMenuIntegration';
+export { ExplorerIntegration } from './explorer-integration';
+export { FileMenuIntegration } from './file-menu-integration';

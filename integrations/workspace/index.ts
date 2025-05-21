@@ -1,1 +1,1 @@
-export { WorkspaceIntegration } from './WorkspaceIntegration';
+export { WorkspaceIntegration } from './workspace-integration';

@@ -1,1 +1,0 @@
-export { MetadataIntegration } from './MetadataIntegration';

@@ -1,6 +1,6 @@
 import { App, TFile } from 'obsidian';
 import { NoteStatusSettings } from '../../models/types';
-import { ExplorerIntegration } from '../explorer/ExplorerIntegration';
+import { ExplorerIntegration } from '../explorer/explorer-integration';
 import { StatusService } from 'services/status-service';
 
 /**
