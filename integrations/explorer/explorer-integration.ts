@@ -1,14 +1,16 @@
-import { App, TFile, debounce, setTooltip } from 'obsidian';
-import { FileExplorerView, NoteStatusSettings } from '../../models/types';
+import { App, TFile, setTooltip, debounce } from 'obsidian';
+import { NoteStatusSettings, FileExplorerView } from '../../models/types';
 import { StatusService } from 'services/status-service';
 
+
 /**
- * Gestiona la integración de iconos en el explorador de archivos
+ * Manages the logic for file explorer status integration
  */
 export class ExplorerIntegration {
   private app: App;
   private settings: NoteStatusSettings;
   private statusService: StatusService;
+  private ui: ExplorerIntegrationUI;
   private iconUpdateQueue = new Set<string>();
   private isProcessingQueue = false;
   private debouncedUpdateAll: ReturnType<typeof debounce>;
@@ -17,11 +19,12 @@ export class ExplorerIntegration {
     this.app = app;
     this.settings = settings;
     this.statusService = statusService;
+    this.ui = new ExplorerIntegrationUI(app, settings, statusService);
     this.debouncedUpdateAll = debounce(this.processUpdateQueue.bind(this), 100, true);
   }
 
   /**
-   * Actualiza la configuración y refresca la UI si es necesario
+   * Updates settings and refreshes UI if necessary
    */
   public updateSettings(settings: NoteStatusSettings): void {
     const shouldRefreshIcons = 
@@ -29,9 +32,10 @@ export class ExplorerIntegration {
       this.settings.hideUnknownStatusInExplorer !== settings.hideUnknownStatusInExplorer;
     
     this.settings = settings;
+    this.ui.updateSettings(settings);
 
     if (shouldRefreshIcons) {
-      this.removeAllFileExplorerIcons();
+      this.ui.removeAllFileExplorerIcons();
       
       if (settings.showStatusIconsInExplorer) {
         setTimeout(() => this.updateAllFileExplorerIcons(), 50);
@@ -42,41 +46,25 @@ export class ExplorerIntegration {
   }
 
   /**
-   * Encuentra la vista del explorador de archivos
-   */
-  private findFileExplorerView(): FileExplorerView | null {
-    const leaf = this.app.workspace.getLeavesOfType('file-explorer')[0];
-    if (leaf?.view) return leaf.view as FileExplorerView;
-    
-    for (const leaf of this.app.workspace.getLeavesOfType('')) {
-      if (leaf.view && 'fileItems' in leaf.view) {
-        return leaf.view as FileExplorerView;
-      }
-    }
-    
-    return null;
-  }
-
-  /**
-   * Actualiza los iconos para un archivo específico
+   * Updates icons for a specific file
    */
   public updateFileExplorerIcons(file: TFile): void {
     if (!file || !this.settings.showStatusIconsInExplorer || file.extension !== 'md') return;
     
     const activeFile = this.app.workspace.getActiveFile();
     if (activeFile?.path === file.path) {
-      this.updateSingleFileIconDirectly(file);
+      this.ui.updateSingleFileIconDirectly(file, this.statusService);
     }
     
     this.queueFileUpdate(file);
   }
 
   /**
-   * Actualiza todos los iconos en el explorador
+   * Updates all icons in the explorer
    */
   public updateAllFileExplorerIcons(): void {
     if (!this.settings.showStatusIconsInExplorer) {
-      this.removeAllFileExplorerIcons();
+      this.ui.removeAllFileExplorerIcons();
       return;
     }
     
@@ -84,37 +72,15 @@ export class ExplorerIntegration {
   }
 
   /**
-   * Elimina todos los iconos de estado
+   * Gets selected files from the explorer
    */
-  public removeAllFileExplorerIcons(): void {
-    const fileExplorer = this.findFileExplorerView();
-    if (!fileExplorer?.fileItems) return;
-    
-    Object.values(fileExplorer.fileItems).forEach(fileItem => {
-      const titleEl = fileItem.titleEl || fileItem.selfEl;
-      if (titleEl) this.removeExistingIcons(titleEl);
-    });
-    
-    this.iconUpdateQueue.clear();
+  public getSelectedFiles(): TFile[] {
+    return this.ui.getSelectedFiles();
   }
 
   /**
-   * Obtiene los archivos seleccionados del explorador
+   * Queue a file for icon update
    */
-  public getSelectedFiles(): TFile[] {
-    const fileExplorer = this.findFileExplorerView();
-    if (!fileExplorer?.fileItems) return [];
-  
-    return Object.values(fileExplorer.fileItems)
-      .filter(item => 
-        item.el?.classList.contains('is-selected') && 
-        item.file instanceof TFile && 
-        item.file.extension === 'md')
-      .map(item => item.file as TFile);
-  }
-
-  // Métodos para procesamiento por lotes
-  
   private queueFileUpdate(file: TFile): void {
     if (!this.settings.showStatusIconsInExplorer || file.extension !== 'md') return;
     
@@ -122,13 +88,16 @@ export class ExplorerIntegration {
     this.debouncedUpdateAll();
   }
 
+  /**
+   * Process the update queue
+   */
   private async processUpdateQueue(): Promise<void> {
     if (this.isProcessingQueue || this.iconUpdateQueue.size === 0) return;
     
     this.isProcessingQueue = true;
     
     try {
-      const fileExplorerView = this.findFileExplorerView();
+      const fileExplorerView = this.ui.findFileExplorerView();
       if (!fileExplorerView) {
         setTimeout(() => this.debouncedUpdateAll(), 200);
         return;
@@ -155,16 +124,22 @@ export class ExplorerIntegration {
     }
   }
   
-  private async processBatch(paths: string[], fileExplorerView: FileExplorerView): Promise<void> {
+  /**
+   * Process a batch of files
+   */
+  private async processBatch(paths: string[], fileExplorerView: any): Promise<void> {
     for (const path of paths) {
       const file = this.app.vault.getFileByPath(path);
       if (file instanceof TFile) {
-        this.updateSingleFileIcon(file, fileExplorerView);
+        this.ui.updateSingleFileIcon(file, fileExplorerView, this.statusService);
       }
       this.iconUpdateQueue.delete(path);
     }
   }
 
+  /**
+   * Process files in batches
+   */
   private async processFilesInBatches(): Promise<void> {
     const files = this.app.vault.getMarkdownFiles();
     const batchSize = 100;
@@ -178,9 +153,54 @@ export class ExplorerIntegration {
     }
   }
 
-  // Métodos para manipular iconos
-  
-  private updateSingleFileIcon(file: TFile, fileExplorerView: FileExplorerView): void {
+  /**
+   * Cleanup when unloading the plugin
+   */
+  public unload(): void {
+    this.ui.removeAllFileExplorerIcons();
+    this.debouncedUpdateAll.cancel();
+  }
+}
+
+/**
+ * Manages UI operations for file explorer icons
+ */
+export class ExplorerIntegrationUI {
+  private app: App;
+  private settings: NoteStatusSettings;
+
+  constructor(app: App, settings: NoteStatusSettings, statusService: StatusService) {
+    this.app = app;
+    this.settings = settings;
+  }
+
+  /**
+   * Updates the settings
+   */
+  public updateSettings(settings: NoteStatusSettings): void {
+    this.settings = settings;
+  }
+
+  /**
+   * Finds the file explorer view
+   */
+  public findFileExplorerView(): FileExplorerView | null {
+    const leaf = this.app.workspace.getLeavesOfType('file-explorer')[0];
+    if (leaf?.view) return leaf.view as FileExplorerView;
+    
+    for (const leaf of this.app.workspace.getLeavesOfType('')) {
+      if (leaf.view && 'fileItems' in leaf.view) {
+        return leaf.view as FileExplorerView;
+      }
+    }
+    
+    return null;
+  }
+
+  /**
+   * Updates a single file icon
+   */
+  public updateSingleFileIcon(file: TFile, fileExplorerView: FileExplorerView, statusService: StatusService): void {
     if (!this.settings.showStatusIconsInExplorer || file.extension !== 'md') return;
   
     try {
@@ -190,31 +210,68 @@ export class ExplorerIntegration {
       const titleEl = fileItem.titleEl || fileItem.selfEl;
       if (!titleEl) return;
       
-      const statuses = this.statusService.getFileStatuses(file);
+      const statuses = statusService.getFileStatuses(file);
       
       this.removeExistingIcons(titleEl);
   
       if (this.shouldSkipIcon(statuses)) return;
   
-      this.addStatusIcons(titleEl, statuses);
+      this.addStatusIcons(titleEl, statuses, statusService);
     } catch (error) {
       console.error(`Note Status: Error updating icon for ${file.path}`, error);
     }
   }
   
-  private updateSingleFileIconDirectly(file: TFile): void {
+  /**
+   * Updates the icon for the active file directly
+   */
+  public updateSingleFileIconDirectly(file: TFile, statusService: StatusService): void {
     const fileExplorer = this.findFileExplorerView();
     if (fileExplorer) {
-      this.updateSingleFileIcon(file, fileExplorer);
+      this.updateSingleFileIcon(file, fileExplorer, statusService);
     }
   }
+
+  /**
+   * Removes all file explorer icons
+   */
+  public removeAllFileExplorerIcons(): void {
+    const fileExplorer = this.findFileExplorerView();
+    if (!fileExplorer?.fileItems) return;
+    
+    Object.values(fileExplorer.fileItems).forEach(fileItem => {
+      const titleEl = fileItem.titleEl || fileItem.selfEl;
+      if (titleEl) this.removeExistingIcons(titleEl);
+    });
+  }
+
+  /**
+   * Gets the currently selected files
+   */
+  public getSelectedFiles(): TFile[] {
+    const fileExplorer = this.findFileExplorerView();
+    if (!fileExplorer?.fileItems) return [];
   
+    return Object.values(fileExplorer.fileItems)
+      .filter(item => 
+        item.el?.classList.contains('is-selected') && 
+        item.file instanceof TFile && 
+        item.file.extension === 'md')
+      .map(item => item.file as TFile);
+  }
+
+  /**
+   * Checks if the icon should be skipped based on status
+   */
   private shouldSkipIcon(statuses: string[]): boolean {
     return this.settings.hideUnknownStatusInExplorer && 
            statuses.length === 1 && 
            statuses[0] === 'unknown';
   }
   
+  /**
+   * Removes existing status icons
+   */
   private removeExistingIcons(element: HTMLElement): void {
     const iconSelectors = '.note-status-icon, .note-status-icon-container';
     element.querySelectorAll(iconSelectors).forEach(icon => {
@@ -225,16 +282,19 @@ export class ExplorerIntegration {
     });
   }
   
-  private addStatusIcons(titleEl: HTMLElement, statuses: string[]): void {
+  /**
+   * Adds status icons to an element
+   */
+  private addStatusIcons(titleEl: HTMLElement, statuses: string[], statusService: StatusService): void {
     const iconContainer = document.createElement('span');
     iconContainer.className = 'note-status-icon-container';
 
     if (this.settings.useMultipleStatuses && statuses.length > 0 && statuses[0] !== 'unknown') {
-      statuses.forEach(status => this.addSingleStatusIcon(iconContainer, status));
+      statuses.forEach(status => this.addSingleStatusIcon(iconContainer, status, statusService));
     } else {
       const primaryStatus = statuses[0] || 'unknown';
       if (primaryStatus !== 'unknown' || !this.settings.hideUnknownStatusInExplorer) {
-        this.addSingleStatusIcon(iconContainer, primaryStatus);
+        this.addSingleStatusIcon(iconContainer, primaryStatus, statusService);
       }
     }
     
@@ -243,23 +303,18 @@ export class ExplorerIntegration {
     }
   }
   
-  private addSingleStatusIcon(container: HTMLElement, status: string): void {
+  /**
+   * Adds a single status icon
+   */
+  private addSingleStatusIcon(container: HTMLElement, status: string, statusService: StatusService): void {
     const iconEl = document.createElement('span');
     iconEl.className = `note-status-icon nav-file-tag status-${status}`;
-    iconEl.textContent = this.statusService.getStatusIcon(status);
+    iconEl.textContent = statusService.getStatusIcon(status);
     
-    const statusObj = this.statusService.getAllStatuses().find(s => s.name === status);
+    const statusObj = statusService.getAllStatuses().find(s => s.name === status);
     const tooltipValue = statusObj?.description ? `${status} - ${statusObj.description}`: status;
     setTooltip(iconEl, tooltipValue);
     
     container.appendChild(iconEl);
-  }
-
-  /**
-   * Limpieza al descargar el plugin
-   */
-  public unload(): void {
-    this.removeAllFileExplorerIcons();
-    this.debouncedUpdateAll.cancel();
   }
 }
