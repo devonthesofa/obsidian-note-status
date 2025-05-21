@@ -1,11 +1,11 @@
 import { App, Menu, TFile } from 'obsidian';
-import { NoteStatusSettings } from '../../models/types';
-import { ExplorerIntegration } from '../explorer/explorer-integration';
+import { NoteStatusSettings } from 'models/types';
 import { StatusService } from 'services/status-service';
-import { StatusContextMenu } from './status-context-menu';
+import { ExplorerIntegration } from 'integrations/explorer/explorer-integration';
+import { StatusContextMenu } from 'integrations/context-menu/status-context-menu';
 
 /**
- * Gestiona menús contextuales del explorador de archivos
+ * Gestiona la integración de menús contextuales con el explorador de archivos
  */
 export class FileContextMenuIntegration {
   private app: App;
@@ -36,15 +36,17 @@ export class FileContextMenuIntegration {
   }
 
   /**
-   * Registra los elementos del menú de archivo
+   * Registra los eventos del menú contextual de archivos
    */
   public registerFileContextMenuEvents(): void {
+    // Evento para archivo único
     this.app.workspace.on('file-menu', (menu, file, source) => {
       if (source === 'file-explorer-context-menu' && file instanceof TFile && file.extension === 'md') {
         this.addStatusChangeMenu(menu, file);
       }
     });
 
+    // Evento para múltiples archivos
     this.app.workspace.on('files-menu', (menu, files) => {
       const mdFiles = files.filter(file => 
         file instanceof TFile && file.extension === 'md'
@@ -57,45 +59,25 @@ export class FileContextMenuIntegration {
   }
 
   /**
-   * Añade opción de cambio de estado al menú de archivo
+   * Añade opción de cambio de estado al menú contextual de un archivo
    */
   private addStatusChangeMenu(menu: Menu, file: TFile): void {
-    menu.addItem(item => 
-      item
-        .setTitle('Change status')
-        .setIcon('tag')
-        .onClick(() => {
-          const selectedFiles = this.explorerIntegration.getSelectedFiles();
-          if (selectedFiles.length > 1) {
-            this.showStatusChangeModal(selectedFiles);
-          } else {
-            this.showStatusChangeModal([file]);
-          }
-        })
-    );
+    this.statusContextMenu.addStatusMenuItemToSingleFile(menu, file, (file) => {
+      const selectedFiles = this.explorerIntegration.getSelectedFiles();
+      if (selectedFiles.length > 1) {
+        this.statusContextMenu.showForFiles(selectedFiles);
+      } else {
+        this.statusContextMenu.showForFiles([file]);
+      }
+    });
   }
 
   /**
    * Añade opción de cambio de estado para múltiples archivos
    */
   private addBatchStatusChangeMenu(menu: Menu, files: TFile[]): void {
-    menu.addItem(item => 
-      item
-        .setTitle('Change status')
-        .setIcon('tag')
-        .onClick(() => {
-          this.showStatusChangeModal(files);
-        })
-    );
-  }
-
-  /**
-   * Muestra el modal para cambiar estado
-   */
-  private showStatusChangeModal(files: TFile[]): void {
-    // Implementación que mostraría un modal para seleccionar estado
-    // En la práctica, esta función delegaría en un servicio de UI
-    console.log(`Cambiar estado para ${files.length} archivos`);
-    this.statusContextMenu.showForFiles(files)
+    this.statusContextMenu.addStatusMenuItemToBatch(menu, files, (files) => {
+      this.statusContextMenu.showForFiles(files);
+    });
   }
 }
