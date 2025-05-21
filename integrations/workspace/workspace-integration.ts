@@ -59,7 +59,7 @@ export class WorkspaceIntegration {
    */
   private handleFileOpen(file: TFile): void {
     // Añade el botón de la barra de herramientas
-    // this.toolbarIntegration.addToolbarButtonToActiveLeaf();
+    this.toolbarIntegration.addToolbarButtonToActiveLeaf();
     
     // Actualiza estado
     this.propagateNoteStatusChange();
@@ -69,12 +69,12 @@ export class WorkspaceIntegration {
    * Maneja cambio de hoja activa
    */
   private handleActiveLeafChange(leaf: WorkspaceLeaf): void {
-    // // Añade el botón de la barra de herramientas
-    // this.toolbarIntegration.addToolbarButtonToActiveLeaf();
+    // Añade el botón de la barra de herramientas
+    this.toolbarIntegration.addToolbarButtonToActiveLeaf();
     
-    // const activeFile = this.app.workspace.getActiveFile();
+    const activeFile = this.app.workspace.getActiveFile();
     
-    // // Solo actualiza si el archivo realmente cambió
+    // Solo actualiza si el archivo realmente cambió
     // if (this.lastActiveFile?.path !== activeFile?.path) {
     //   this.lastActiveFile = activeFile;
     //   this.propagateNoteStatusChange();

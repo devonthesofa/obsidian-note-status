@@ -87,7 +87,7 @@ export default class NoteStatus extends Plugin {
     
     // // 1. Integraciones básicas primero
     // this.explorerIntegration = new ExplorerIntegration(this.app, this.settings, this.statusService);
-    // this.toolbarIntegration = new ToolbarIntegration(this.app, this.settings, this.statusService);
+    this.toolbarIntegration = new ToolbarIntegration(this.app, this.settings, this.statusService);
     
     // // 2. Integraciones que dependen de otras
     // this.fileMenuIntegration = new FileMenuIntegration(
@@ -191,7 +191,7 @@ export default class NoteStatus extends Plugin {
     this.statusBar.update(statuses);
     
     // // Actualizar toolbar
-    // this.toolbarIntegration.updateStatusDisplay(statuses);
+    this.toolbarIntegration.updateStatusDisplay(statuses);
     
     // // Actualizar explorador si es necesario
     // if (file) {
