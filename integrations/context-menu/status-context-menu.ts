@@ -1,8 +1,8 @@
 import { App, Menu, TFile } from 'obsidian';
 import { NoteStatusSettings } from '../../models/types';
 import { StatusService } from '../../services/status-service';
-import { StatusDropdown } from '../components/status-dropdown';
-import { ExplorerIntegration } from '../integrations/explorer-integration';
+import { StatusDropdown } from 'components/status-dropdown';
+import { ExplorerIntegration } from 'integrations/explorer';
 
 /**
  * Handles context menu interactions for status changes

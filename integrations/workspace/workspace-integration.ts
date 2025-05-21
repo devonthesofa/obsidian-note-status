@@ -59,68 +59,51 @@ export class WorkspaceIntegration {
    */
   private handleFileOpen(file: TFile): void {
     // Añade el botón de la barra de herramientas
-    this.toolbarIntegration.addToolbarButtonToActiveLeaf();
+    // this.toolbarIntegration.addToolbarButtonToActiveLeaf();
     
     // Actualiza estado
-    this.checkNoteStatus();
+    this.propagateNoteStatusChange();
   }
 
   /**
    * Maneja cambio de hoja activa
    */
   private handleActiveLeafChange(leaf: WorkspaceLeaf): void {
-    // Añade el botón de la barra de herramientas
-    this.toolbarIntegration.addToolbarButtonToActiveLeaf();
+    // // Añade el botón de la barra de herramientas
+    // this.toolbarIntegration.addToolbarButtonToActiveLeaf();
     
-    const activeFile = this.app.workspace.getActiveFile();
+    // const activeFile = this.app.workspace.getActiveFile();
     
-    // Solo actualiza si el archivo realmente cambió
-    if (this.lastActiveFile?.path !== activeFile?.path) {
-      this.lastActiveFile = activeFile;
-      this.checkNoteStatus();
-    }
+    // // Solo actualiza si el archivo realmente cambió
+    // if (this.lastActiveFile?.path !== activeFile?.path) {
+    //   this.lastActiveFile = activeFile;
+    //   this.propagateNoteStatusChange();
+    // }
   }
 
   /**
-   * Maneja cambio de layout
+   * Maneja y propaga el cambio de layout
    */
   private handleLayoutChange(): void {
-    // Actualiza componentes que dependen del layout
-    this.updateStatusPane();
+    window.dispatchEvent(new CustomEvent('note-status:update-pane'));
   }
 
   /**
-   * Verifica y actualiza el estado de la nota activa
+   * Verifica y propaga el estado de la nota activa
    */
-  private checkNoteStatus(): void {
+  private propagateNoteStatusChange(): void {
     try {
       const activeFile = this.app.workspace.getActiveFile();
-      if (!activeFile || activeFile.extension !== 'md') {
-        this.updateStatusComponents(['unknown']);
-        return;
+      let fileStatuses: string[] = [];
+      if (activeFile && activeFile.extension === 'md') {
+        fileStatuses = this.statusService.getFileStatuses(activeFile)
       }
-    
-      const statuses = this.statusService.getFileStatuses(activeFile);
-      this.updateStatusComponents(statuses);
+      // Dispara evento para que otros componentes se actualicen
+      window.dispatchEvent(new CustomEvent('note-status:status-changed', { 
+        detail: { statuses: fileStatuses } 
+      }));
     } catch (error) {
       console.error('Error checking note status:', error);
     }
-  }
-
-  /**
-   * Actualiza componentes de estado con nuevos estados
-   */
-  private updateStatusComponents(statuses: string[]): void {
-    // Dispara evento para que otros componentes se actualicen
-    window.dispatchEvent(new CustomEvent('note-status:status-changed', { 
-      detail: { statuses } 
-    }));
-  }
-
-  /**
-   * Actualiza el panel de estado
-   */
-  private updateStatusPane(): void {
-    window.dispatchEvent(new CustomEvent('note-status:update-pane'));
   }
 }

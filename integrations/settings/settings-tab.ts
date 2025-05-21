@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting, Notice } from 'obsidian';
-import { Status } from '../models/types';
-import { PREDEFINED_TEMPLATES } from '../constants/status-templates';
+import { Status } from '../../models/types';
+import { PREDEFINED_TEMPLATES } from '../../constants/status-templates';
 import NoteStatus from 'main';
 import { StatusService } from 'services/status-service';
 

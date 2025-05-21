@@ -33,6 +33,20 @@ export class StyleService {
   }
 
   /**
+   * Updates the dynamic styles based on current settings
+   */
+  private updateDynamicStyles(): void {
+    if (!this.dynamicStyleEl) {
+      this.initializeDynamicStyles();
+      return;
+    }
+
+    const allColors = this.getAllStatusColors();
+    const cssRules = this.generateColorCssRules(allColors);
+    this.dynamicStyleEl.textContent = cssRules;
+  }
+  
+  /**
    * Get all status colors including those from enabled templates
    */
   private getAllStatusColors(): Record<string, string> {
@@ -55,20 +69,6 @@ export class StyleService {
     return colors;
   }
 
-  /**
-   * Updates the dynamic styles based on current settings
-   */
-  public updateDynamicStyles(): void {
-    if (!this.dynamicStyleEl) {
-      this.initializeDynamicStyles();
-      return;
-    }
-
-    const allColors = this.getAllStatusColors();
-    const cssRules = this.generateColorCssRules(allColors);
-    this.dynamicStyleEl.textContent = cssRules;
-  }
-  
   /**
    * Generate CSS rules for status colors
    */

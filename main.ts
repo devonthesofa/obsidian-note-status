@@ -7,12 +7,12 @@ import { StyleService } from 'services/style-service';
 // Importar integraciones
 import { ExplorerIntegration, FileMenuIntegration } from './integrations/explorer';
 import { EditorIntegration, ToolbarIntegration } from './integrations/editor';
-import { MetadataIntegration } from './integrations/metadataCache';
+import { MetadataIntegration } from './integrations/metadata-cache';
 import { WorkspaceIntegration } from './integrations/workspace';
 
 // Importar componentes UI
-import { NoteStatusSettingTab } from 'settings/settings-tab';
-import { StatusBarController } from 'components/status-bar/status-bar-controller';
+import { NoteStatusSettingTab } from 'integrations/settings/settings-tab';
+import { StatusBar } from 'components/status-bar';
 
 export default class NoteStatus extends Plugin {
   settings: NoteStatusSettings;
@@ -22,7 +22,7 @@ export default class NoteStatus extends Plugin {
   styleService: StyleService;
   
   // Componentes UI
-  statusBarController: StatusBarController;
+  statusBar: StatusBar;
   
   // Integraciones
   explorerIntegration: ExplorerIntegration;
@@ -35,26 +35,22 @@ export default class NoteStatus extends Plugin {
   async onload() {
     try {
       await this.loadSettings();
-      
-      // 1. Inicializar servicios básicos
-      // this.initializeServices();
+      this.initializeServices();
       
       // 2. Registrar vistas y componentes UI
       // this.registerViews();
       
+      this.initializeUI();
+
       // 3. Inicializar integraciones
-      // this.initializeIntegrations();
+      this.initializeIntegrations();
       
       // 4. Registrar comandos
       // this.registerCommands();
       
       // 5. Registrar eventos personalizados
-      // this.setupCustomEvents();
+      this.setupCustomEvents();
       
-      // 6. Esperar a que el layout esté listo para inicializar UI
-      // this.app.workspace.onLayoutReady(() => {
-      //   this.initializeUI();
-      // });
       
     } catch (error) {
       console.error('Error loading Note Status plugin:', error);
@@ -67,8 +63,8 @@ export default class NoteStatus extends Plugin {
   }
 
   private initializeServices() {
-    // this.statusService = new StatusService(this.app, this.settings);
-    // this.styleService = new StyleService(this.settings);
+    this.statusService = new StatusService(this.app, this.settings);
+    this.styleService = new StyleService(this.settings);
   }
 
   private registerViews() {
@@ -110,18 +106,18 @@ export default class NoteStatus extends Plugin {
     //   this.explorerIntegration
     // );
     
-    // this.workspaceIntegration = new WorkspaceIntegration(
-    //   this.app, 
-    //   this.settings,
-    //   this.statusService,
-    //   this.toolbarIntegration
-    // );
+    this.workspaceIntegration = new WorkspaceIntegration(
+      this.app, 
+      this.settings,
+      this.statusService,
+      this.toolbarIntegration
+    );
     
     // // 3. Registrar eventos en cada integración
     // this.fileMenuIntegration.registerFileMenus();
     // this.editorIntegration.registerEditorMenus();
     // this.metadataIntegration.registerMetadataEvents();
-    // this.workspaceIntegration.registerWorkspaceEvents();
+    this.workspaceIntegration.registerWorkspaceEvents();
   }
 
   private registerCommands() {
@@ -164,20 +160,20 @@ export default class NoteStatus extends Plugin {
     // // Evento para cambios de configuración
     // window.addEventListener('note-status:settings-changed', this.saveSettings.bind(this));
     
-    // // Evento para cambios de estado
-    // window.addEventListener('note-status:status-changed', this.handleStatusChanged.bind(this));
+    // Evento para cambios de estado
+    window.addEventListener('note-status:status-changed', this.handleStatusChanged.bind(this));
     
     // // Evento para actualización de UI
     // window.addEventListener('note-status:refresh-ui', this.refreshUI.bind(this));
   }
 
   private initializeUI() {
-    // // Inicializar barra de estado
-    // this.statusBarController = new StatusBarController(
-    //   this.addStatusBarItem(), 
-    //   this.settings, 
-    //   this.statusService
-    // );
+    // Inicializar barra de estado
+    this.statusBar = new StatusBar(
+      this.addStatusBarItem(), 
+      this.settings, 
+      this.statusService
+    );
     
     // // Inicializar iconos del explorador (con retraso para evitar ralentizar el inicio)
     // if (this.settings.showStatusIconsInExplorer) {
@@ -188,10 +184,11 @@ export default class NoteStatus extends Plugin {
   }
 
   private handleStatusChanged(event: CustomEvent) {
-    // const { statuses, file } = event.detail;
+    const { statuses, file } = event.detail;
     
-    // // Actualizar barra de estado
-    // this.statusBarController.update(statuses);
+    console.log("Note status changed", statuses)
+    // Actualizar barra de estado
+    this.statusBar.update(statuses);
     
     // // Actualizar toolbar
     // this.toolbarIntegration.updateStatusDisplay(statuses);
@@ -268,7 +265,7 @@ export default class NoteStatus extends Plugin {
     // this.workspaceIntegration.updateSettings(this.settings);
     
     // // Actualizar componentes UI
-    // this.statusBarController.updateSettings(this.settings);
+    // this.statusBar.updateSettings(this.settings);
   }
 
   onunload() {
@@ -285,6 +282,6 @@ export default class NoteStatus extends Plugin {
     // this.styleService.unload();
     
     // // Limpiar componentes UI
-    // this.statusBarController.unload();
+    // this.statusBar.unload();
   }
 }

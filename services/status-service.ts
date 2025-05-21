@@ -106,14 +106,6 @@ export class StatusService {
   }
 
   /**
-   * Get the primary status of a file (first one, or 'unknown')
-   */
-  public getFilePrimaryStatus(file: TFile): string {
-    const statuses = this.getFileStatuses(file);
-    return statuses[0] || 'unknown';
-  }
-
-  /**
    * Get the icon for a given status
    */
   public getStatusIcon(status: string): string {
@@ -213,7 +205,7 @@ export class StatusService {
   /**
    * Centralizes all status modification operations
    */
-  public async modifyNoteStatus(options: {
+  private async modifyNoteStatus(options: {
     files: TFile | TFile[];
     statuses: string | string[];
     operation: 'set' | 'add' | 'remove' | 'toggle';

@@ -11,25 +11,12 @@ export class StatusBarController {
   private statusService: StatusService;
   private currentStatuses: string[] = ['unknown'];
 
-  constructor(statusBarEl: HTMLElement, settings: NoteStatusSettings, statusService: StatusService) {
-    this.view = new StatusBarView(statusBarEl);
+  constructor(statusBarContainer: HTMLElement, settings: NoteStatusSettings, statusService: StatusService) {
+    this.view = new StatusBarView(statusBarContainer);
     this.settings = settings;
     this.statusService = statusService;
     
-    // Register right-click handler for force refresh
-    this.setupContextMenu(statusBarEl);
-    
     this.update(['unknown']);
-  }
-
-  /**
-   * Set up right-click context menu for force refresh
-   */
-  private setupContextMenu(element: HTMLElement): void {
-    element.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-      window.dispatchEvent(new CustomEvent('note-status:force-refresh'));
-    });
   }
 
   /**
@@ -60,21 +47,21 @@ export class StatusBarController {
     this.handleAutoHide();
   }
   
-    /**
-     * Render statuses - handles both single and multiple status cases
-     */
-    private renderStatuses(statuses: string[]): void {
-        const statusDetails = statuses.map(status => {
-            const statusObj = this.statusService.getAllStatuses().find(s => s.name === status);
-            return {
-                name: status,
-                icon: this.statusService.getStatusIcon(status),
-                tooltipText: statusObj?.description ? `${status} - ${statusObj.description}` : status
-            };
-        });
+  /**
+   * Render statuses - handles both single and multiple status cases
+   */
+  private renderStatuses(statuses: string[]): void {
+    const statusDetails = statuses.map(status => {
+        const statusObj = this.statusService.getAllStatuses().find(s => s.name === status);
+        return {
+            name: status,
+            icon: this.statusService.getStatusIcon(status),
+            tooltipText: statusObj?.description ? `${status} - ${statusObj.description}` : status
+        };
+    });
 
-        this.view.renderStatuses(statusDetails);
-    }
+    this.view.renderStatuses(statusDetails);
+  }
   
   /**
    * Handle auto-hide behavior
