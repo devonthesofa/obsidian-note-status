@@ -21,7 +21,6 @@ export class DropdownUI {
   private animationDuration = 220;
   
   public isOpen = false;
-  private onStatusChange: (statuses: string[]) => void = () => {};
   private onRemoveStatus: StatusRemoveHandler = async () => {};
   private onSelectStatus: StatusSelectHandler = async () => {};
   
@@ -67,20 +66,6 @@ export class DropdownUI {
    */
   public setOnSelectStatusHandler(handler: StatusSelectHandler): void {
     this.onSelectStatus = handler;
-  }
-  
-  /**
-   * Set callback for status changes
-   */
-  public setOnStatusChange(callback: (statuses: string[]) => void): void {
-    this.onStatusChange = callback;
-  }
-  
-  /**
-   * Get the current status change callback
-   */
-  public getOnStatusChange(): (statuses: string[]) => void {
-    return this.onStatusChange;
   }
 
   /**

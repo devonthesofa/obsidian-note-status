@@ -306,11 +306,6 @@ function createStatusOption(options: {
     setTimeout(async () => {
       if (targetFiles.length > 0) {
         await onSelectStatus(status.name, targetFiles);
-        
-        if (!settings.useMultipleStatuses) {
-          // Close signal - The manager component will handle this
-          window.dispatchEvent(new CustomEvent('note-status:dropdown-close'));
-        }
       }
     }, 150);
   });

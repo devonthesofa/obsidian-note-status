@@ -50,7 +50,7 @@ export class ToolbarButton {
     if (this.settings.useMultipleStatuses && statuses.length > 1) {
       const countBadge = document.createElement('span');
       countBadge.addClass('note-status-count-badge');
-      countBadge.textContent = `+${statuses.length - 1}`;
+      countBadge.textContent = `${statuses.length}`;
       container.appendChild(countBadge);
     }
   }

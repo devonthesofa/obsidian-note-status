@@ -46,6 +46,7 @@ export class ToolbarIntegration {
     
     // Create a new button
     this.buttonElement = this.buttonView.createElement();
+
     this.buttonElement.addEventListener('click', this.handleButtonClick.bind(this));
     
     if (toolbarContainer.firstChild) {
@@ -84,7 +85,6 @@ export class ToolbarIntegration {
   private handleButtonClick(e: MouseEvent): void {
     e.stopPropagation();
     e.preventDefault();
-    
     const activeFile = this.app.workspace.getActiveFile();
     if (!activeFile) return;
     

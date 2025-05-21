@@ -16,9 +16,6 @@ export class DropdownManager {
   private toolbarButton?: HTMLElement;
   private dropdownUI: DropdownUI;  
   
-  // Singleton para gestionar todos los dropdowns
-  private static activeInstance: DropdownManager | null = null;
-
   constructor(app: any, settings: NoteStatusSettings, statusService: StatusService) {
     this.app = app;
     this.settings = settings;
@@ -26,19 +23,13 @@ export class DropdownManager {
     
     const deps: DropdownDependencies = { app, settings, statusService };
     this.dropdownUI = new DropdownUI(deps);
-    
     this.setupDropdownCallbacks();
-    this.setupCustomEvents();
   }
 
   /**
    * Set up dropdown callbacks
    */
   private setupDropdownCallbacks(): void {
-    this.dropdownUI.setOnStatusChange((statuses) => {
-      this.currentStatuses = [...statuses];
-      this.updateToolbarButton();
-    });
 
     this.dropdownUI.setOnRemoveStatusHandler(async (status, targetFile) => {
       if (!targetFile) return;
@@ -47,10 +38,7 @@ export class DropdownManager {
         files: targetFile,
         statuses: status,
         operation: 'remove',
-        showNotice: false,
-        afterChange: (updatedStatuses) => {
-          this.currentStatuses = updatedStatuses;
-        }
+        showNotice: false
       });
     });
     
@@ -85,88 +73,12 @@ export class DropdownManager {
   }
 
   /**
-   * Set up custom events
-   */
-  private setupCustomEvents(): void {
-    window.addEventListener('note-status:dropdown-close', () => {
-      if (this.dropdownUI.isOpen) {
-        this.dropdownUI.close();
-      }
-    });
-  }
-
-  /**
-   * Updates the toolbar button appearance
-   */
-  private updateToolbarButton(): void {
-    if (!this.toolbarButton) return;
-
-    DropdownManager.activeInstance?.dropdownUI.close();
-    this.toolbarButton.empty();
-    
-    const hasValidStatus = this.currentStatuses.length > 0 &&
-      !this.currentStatuses.every(status => status === 'unknown');
-
-    const badgeContainer = document.createElement('div');
-    badgeContainer.addClass('note-status-toolbar-badge-container');
-
-    if (hasValidStatus) {
-      this.addPrimaryStatusIcon(badgeContainer);
-    } else {
-      this.addUnknownStatusIcon(badgeContainer);
-    }
-
-    this.toolbarButton.appendChild(badgeContainer);
-  }
-  
-  /**
-   * Add primary status icon to container
-   */
-  private addPrimaryStatusIcon(container: HTMLElement): void {
-    const primaryStatus = this.currentStatuses[0];
-    const statusInfo = this.statusService.getAllStatuses().find(s => s.name === primaryStatus);
-
-    if (statusInfo) {
-      const iconSpan = document.createElement('span');
-      iconSpan.addClass(`note-status-toolbar-icon`, `status-${primaryStatus}`);
-      iconSpan.textContent = statusInfo.icon;
-      container.appendChild(iconSpan);
-
-      if (this.settings.useMultipleStatuses && this.currentStatuses.length > 1) {
-        this.addCountBadge(container);
-      }
-    }
-  }
-  
-  /**
-   * Add unknown status icon
-   */
-  private addUnknownStatusIcon(container: HTMLElement): void {
-    const iconSpan = document.createElement('span');
-    iconSpan.addClass('note-status-toolbar-icon', 'status-unknown');
-    iconSpan.textContent = this.statusService.getStatusIcon('unknown');
-    container.appendChild(iconSpan);
-  }
-  
-  /**
-   * Add count badge for multiple statuses
-   */
-  private addCountBadge(container: HTMLElement): void {
-    const countBadge = document.createElement('span');
-    countBadge.addClass('note-status-count-badge');
-    countBadge.textContent = `+${this.currentStatuses.length - 1}`;
-    container.appendChild(countBadge);
-  }
-
-  /**
    * Updates the dropdown UI based on current statuses
    */
   public update(currentStatuses: string[] | string, file?: TFile): void {
-
     this.currentStatuses = Array.isArray(currentStatuses) ? 
       [...currentStatuses] : [currentStatuses];
     
-    this.updateToolbarButton();
     this.dropdownUI.updateStatuses(this.currentStatuses);
   }
 
@@ -175,23 +87,7 @@ export class DropdownManager {
    */
   public updateSettings(settings: NoteStatusSettings): void {
     this.settings = settings;
-    this.updateToolbarButton();
     this.dropdownUI.updateSettings(settings);
-  }
-
-  /**
-   * Show status dropdown in context menu
-   */
-  public showInContextMenu(editor: Editor, view: MarkdownView): void {
-    const activeFile = this.app.workspace.getActiveFile();
-    if (!activeFile) return;
-
-    const position = this.getCursorPosition(editor, view);
-    
-    this.openStatusDropdown({
-      position,
-      files: [activeFile]
-    });
   }
 
   /**
@@ -219,46 +115,21 @@ export class DropdownManager {
     return { x: window.innerWidth / 2, y: window.innerHeight / 3 };
   }
 
-  /**
-   * Render method (kept for compatibility)
-   */
-  public render(): void {
-    // No-op - dropdown component handles rendering internally
-  }
-
-  /**
-   * Remove dropdown when plugin is unloaded
-   */
-  public unload(): void {
-    this.dropdownUI.dispose();
-    
-    if (this.toolbarButton) {
-      this.toolbarButton.remove();
-      this.toolbarButton = undefined;
-    }
-    
-    window.removeEventListener('note-status:dropdown-close', () => {});
-  }
 
   /**
    * Universal function to open the status dropdown
    */
   public openStatusDropdown(options: DropdownOptions): void {
-    // Cerrar dropdown activo antes de abrir uno nuevo
-    if (DropdownManager.activeInstance && DropdownManager.activeInstance !== this) {
-      console.log("close this:, ",DropdownManager.activeInstance)
-      this.resetDropdownState();
-      DropdownManager.activeInstance.dropdownUI.close();
-    }
-    DropdownManager.activeInstance = this;
-
     const files = options.files || [this.app.workspace.getActiveFile()].filter(Boolean);
-    if (!files.length) {
+    if (!files.length || !files[0]) {
       new Notice('No files selected');
       return;
     }
 
-    this.resetDropdownState();
+    if (this.dropdownUI.isOpen) {
+      this.resetDropdown();
+      return
+    }
     
     const isSingleFile = files.length === 1;
     
@@ -282,9 +153,9 @@ export class DropdownManager {
   /**
    * Reset dropdown state before opening
    */
-  private resetDropdownState(): void {
+  public resetDropdown(): void {
+    this.dropdownUI.close();
     this.dropdownUI.setTargetFile(null);
-    this.dropdownUI.setOnStatusChange(() => {});
   }
 
   /**
@@ -354,61 +225,24 @@ export class DropdownManager {
     );
   }
 
-  /**
-   * Adds the toolbar button to the active leaf
-   */
-  public addToolbarButtonToActiveLeaf(): void {
-    const activeLeaf = this.app.workspace.activeLeaf;
-    if (!activeLeaf?.view || !(activeLeaf.view instanceof MarkdownView)) return;
-
-    const toolbarContainer = activeLeaf.view.containerEl.querySelector('.view-header .view-actions');
-    if (!toolbarContainer) return;
-
-    const existingButton = toolbarContainer.querySelector('.note-status-toolbar-button');
-    if (existingButton) {
-      this.toolbarButton = existingButton as HTMLElement;
-      this.updateToolbarButton();
-      return;
-    }
-
-    this.toolbarButton = this.createToolbarButton();
-
-    if (toolbarContainer.firstChild) {
-      toolbarContainer.insertBefore(this.toolbarButton, toolbarContainer.firstChild);
-    } else {
-      toolbarContainer.appendChild(this.toolbarButton);
-    }
-  }
   
   /**
-   * Create the toolbar button
+   * Render method (kept for compatibility)
    */
-  private createToolbarButton(): HTMLElement {
-    const button = document.createElement('button');
-    button.addClass('note-status-toolbar-button', 'clickable-icon', 'view-action');
-    button.setAttribute('aria-label', 'Note status');
-    
-    this.updateToolbarButton();
-    
-    button.addEventListener('click', (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      this.toggleStatusPopover();
-    });
-    
-    return button;
+  public render(): void {
+    // No-op - dropdown component handles rendering internally
   }
-  
-  /**
-   * Toggle the status popover
-   */
-  private toggleStatusPopover(): void {
-    const activeFile = this.app.workspace.getActiveFile();
-    if (!activeFile) return;
 
-    this.openStatusDropdown({
-      target: this.toolbarButton,
-      files: [activeFile]
-    });
+  /**
+   * Remove dropdown when plugin is unloaded
+   */
+  public unload(): void {
+    this.dropdownUI.dispose();
+    
+    if (this.toolbarButton) {
+      this.toolbarButton.remove();
+      this.toolbarButton = undefined;
+    }
   }
+
 }
