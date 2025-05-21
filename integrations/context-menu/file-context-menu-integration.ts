@@ -1,12 +1,12 @@
 import { App, Menu, TFile } from 'obsidian';
 import { NoteStatusSettings } from '../../models/types';
-import { ExplorerIntegration } from './explorer-integration';
+import { ExplorerIntegration } from '../explorer/explorer-integration';
 import { StatusService } from 'services/status-service';
 
 /**
  * Gestiona menús contextuales del explorador de archivos
  */
-export class FileMenuIntegration {
+export class FileContextMenuIntegration {
   private app: App;
   private settings: NoteStatusSettings;
   private statusService: StatusService;

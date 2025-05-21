@@ -5,7 +5,7 @@ import { StatusService } from 'services/status-service';
 import { StyleService } from 'services/style-service';
 
 // Importar integraciones
-import { ExplorerIntegration, FileMenuIntegration } from './integrations/explorer';
+import { ExplorerIntegration } from './integrations/explorer';
 import { EditorIntegration, ToolbarIntegration } from './integrations/editor';
 import { MetadataIntegration } from './integrations/metadata-cache';
 import { WorkspaceIntegration } from './integrations/workspace';
@@ -14,6 +14,7 @@ import { WorkspaceIntegration } from './integrations/workspace';
 import { NoteStatusSettingTab } from 'integrations/settings/settings-tab';
 import { StatusBar } from 'components/status-bar';
 import { StatusDropdown } from 'components/status-dropdown';
+import { FileContextMenuIntegration } from 'integrations/context-menu/file-context-menu-integration';
 
 export default class NoteStatus extends Plugin {
   settings: NoteStatusSettings;
@@ -28,7 +29,7 @@ export default class NoteStatus extends Plugin {
   
   // Integraciones
   explorerIntegration: ExplorerIntegration;
-  fileMenuIntegration: FileMenuIntegration;
+  fileContextMenuIntegration: FileContextMenuIntegration;
   editorIntegration: EditorIntegration;
   toolbarIntegration: ToolbarIntegration;
   metadataIntegration: MetadataIntegration;
@@ -86,12 +87,11 @@ export default class NoteStatus extends Plugin {
 
   private initializeIntegrations() {
     // Crear integraciones en orden de dependencia
-    // // 1. Integraciones básicas primero
-    // this.explorerIntegration = new ExplorerIntegration(this.app, this.settings, this.statusService);
+    this.explorerIntegration = new ExplorerIntegration(this.app, this.settings, this.statusService);
     this.toolbarIntegration = new ToolbarIntegration(this.app, this.settings, this.statusService, this.statusDropdown);
     
     // // 2. Integraciones que dependen de otras
-    // this.fileMenuIntegration = new FileMenuIntegration(
+    // this.fileContextMenuIntegration = new FileContextMenuIntegration(
     //   this.app, 
     //   this.settings, 
     //   this.statusService,
@@ -115,7 +115,7 @@ export default class NoteStatus extends Plugin {
     );
     
     // // 3. Registrar eventos en cada integración
-    // this.fileMenuIntegration.registerFileMenus();
+    // this.fileContextMenuIntegration.registerFileMenus();
     // this.editorIntegration.registerEditorMenus();
     // this.metadataIntegration.registerMetadataEvents();
     this.workspaceIntegration.registerWorkspaceEvents();
@@ -178,12 +178,12 @@ export default class NoteStatus extends Plugin {
       this.statusService
     );
     
-    // // Inicializar iconos del explorador (con retraso para evitar ralentizar el inicio)
-    // if (this.settings.showStatusIconsInExplorer) {
-    //   setTimeout(() => {
-    //     this.explorerIntegration.updateAllFileExplorerIcons();
-    //   }, 2000);
-    // }
+    // Inicializar iconos del explorador (con retraso para evitar ralentizar el inicio)
+    if (this.settings.showStatusIconsInExplorer) {
+      setTimeout(() => {
+        this.explorerIntegration.updateAllFileExplorerIcons();
+      }, 2000);
+    }
   }
 
   private handleStatusChanged(event: CustomEvent) {
@@ -192,17 +192,16 @@ export default class NoteStatus extends Plugin {
     console.log("Note status changed", statuses)
     // Actualizar barra de estado
     this.statusBar.update(statuses);
-    
-    // // Actualizar toolbar
+    // Actualizar toolbar
     this.toolbarIntegration.updateStatusDisplay(statuses);
     this.statusDropdown.update(statuses);
-    // // Actualizar explorador si es necesario
-    // if (file) {
-    //   const fileObj = this.app.vault.getFileByPath(file);
-    //   if (fileObj) {
-    //     this.explorerIntegration.updateFileExplorerIcons(fileObj);
-    //   }
-    // }
+    // Actualizar explorador si es necesario
+    if (this.settings.showStatusIconsInExplorer && file) {
+      const fileObj = this.app.vault.getFileByPath(file);
+      if (fileObj) {
+        this.explorerIntegration.updateFileExplorerIcons(fileObj);
+      }
+    }
   }
 
   private refreshStatus() {
@@ -261,7 +260,7 @@ export default class NoteStatus extends Plugin {
   private updateIntegrationsSettings() {
     // // Actualizar configuración en todas las integraciones
     // this.explorerIntegration.updateSettings(this.settings);
-    // this.fileMenuIntegration.updateSettings(this.settings);
+    // this.fileContextMenuIntegration.updateSettings(this.settings);
     // this.editorIntegration.updateSettings(this.settings);
     // this.toolbarIntegration.updateSettings(this.settings);
     // this.metadataIntegration.updateSettings(this.settings);
