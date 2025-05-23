@@ -1,4 +1,4 @@
-import { TFile, WorkspaceLeaf, View, Menu, Notice } from 'obsidian';
+import { TFile, WorkspaceLeaf, View, Notice } from 'obsidian';
 import { NoteStatusSettings } from '../../models/types';
 import { StatusService } from '../../services/status-service';
 import NoteStatus from 'main';
@@ -9,7 +9,7 @@ export class StatusPaneViewController extends View {
 	private settings: NoteStatusSettings;
 	private statusService: StatusService;
 	private plugin: NoteStatus;
-	private searchQuery: string = '';
+	private searchQuery = '';
 	private paginationState = {
 		itemsPerPage: 100,
 		currentPage: {} as Record<string, number>
@@ -47,6 +47,10 @@ export class StatusPaneViewController extends View {
 
 		this.renderer.createHeader(containerEl, this.settings.compactView, {
 			onSearch: (query) => {
+				this.paginationState = {
+					itemsPerPage: 100,
+					currentPage: {} as Record<string, number>
+				}
 				this.searchQuery = query;
 				this.renderGroups(query);
 			},
@@ -103,7 +107,6 @@ export class StatusPaneViewController extends View {
 						window.dispatchEvent(new CustomEvent('note-status:settings-changed'));
 					},
 					onContextMenu: (e, file) => {
-						this.showFileContextMenu(e, file);
 					},
 					onPageChange: (status, page) => {
 						this.paginationState.currentPage[status] = page;
@@ -138,29 +141,6 @@ export class StatusPaneViewController extends View {
 		});
 
 		return filteredGroups;
-	}
-
-	private showFileContextMenu(e: MouseEvent, file: TFile): void {
-		const menu = new Menu();
-
-		menu.addItem((item) =>
-			item.setTitle('Change status')
-				.setIcon('tag')
-				.onClick(() => {
-					const position = { x: e.clientX, y: e.clientY };
-					this.plugin.statusContextMenu.showForSingleFile(file, position);
-				})
-		);
-
-		menu.addItem((item) =>
-			item.setTitle('Open in new tab')
-				.setIcon('lucide-external-link')
-				.onClick(() => {
-					this.app.workspace.openLinkText(file.path, file.path, 'tab');
-				})
-		);
-
-		menu.showAtMouseEvent(e);
 	}
 
 	updateSettings(settings: NoteStatusSettings): void {

@@ -11,6 +11,9 @@ import { MetadataIntegration } from './integrations/metadata-cache';
 import { WorkspaceIntegration } from './integrations/workspace';
 import { FileContextMenuIntegration } from 'integrations/context-menu/file-context-menu-integration';
 import { NoteStatusSettingTab } from 'integrations/settings/settings-tab';
+//
+// Importar vistas
+import { StatusPaneViewController } from './views/status-pane-view';
 
 // Importar componentes UI
 import { StatusBar } from 'components/status-bar';
@@ -40,15 +43,9 @@ export default class NoteStatus extends Plugin {
     try {
       await this.loadSettings();
       this.initializeServices();
-      
-      // 2. Registrar vistas y componentes UI
-      // this.registerViews();
-      
+      this.registerViews();
       this.initializeUI();
-
-      // 3. Inicializar integraciones
       this.initializeIntegrations();
-      
       // 4. Registrar comandos
       // this.registerCommands();
       
@@ -72,15 +69,15 @@ export default class NoteStatus extends Plugin {
   }
 
   private registerViews() {
-    // Registrar vista del panel de estado
-    // this.registerView('status-pane', (leaf) => {
-    //   return new StatusPaneView(leaf, this);
-    // });
+	// Register status pane view
+    this.registerView('status-pane', (leaf) => {
+        return new StatusPaneViewController(leaf, this);
+    });
 
-    // Añadir ícono en la barra lateral
-    // this.addRibbonIcon('status-pane', 'Open status pane', () => {
-    //   this.openStatusPane();
-    // });
+    // Add ribbon icon
+    this.addRibbonIcon('status-pane', 'Open status pane', () => {
+        this.openStatusPane();
+    });
     
     // Añadir pestaña de configuración
     // this.addSettingTab(new NoteStatusSettingTab(this.app, this, this.statusService));
@@ -229,18 +226,18 @@ export default class NoteStatus extends Plugin {
   }
 
   private async openStatusPane() {
-    // // Comprobar si ya está abierto
-    // const existing = this.app.workspace.getLeavesOfType('status-pane')[0];
-    // if (existing) {
-    //   this.app.workspace.setActiveLeaf(existing);
-    //   return;
-    // }
+	// Check if already open
+    const existing = this.app.workspace.getLeavesOfType('status-pane')[0];
+    if (existing) {
+        this.app.workspace.setActiveLeaf(existing);
+        return;
+    }
     
-    // // Crear una nueva hoja
-    // const leaf = this.app.workspace.getLeftLeaf(false);
-    // if (leaf) {
-    //   await leaf.setViewState({ type: 'status-pane', active: true });
-    // }
+    // Create new leaf
+    const leaf = this.app.workspace.getLeftLeaf(false);
+    if (leaf) {
+        await leaf.setViewState({ type: 'status-pane', active: true });
+    }
   }
 
   async saveSettings() {
