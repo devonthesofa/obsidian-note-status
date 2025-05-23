@@ -14,13 +14,34 @@ export class ExplorerIntegration {
   private iconUpdateQueue = new Set<string>();
   private isProcessingQueue = false;
   private debouncedUpdateAll: ReturnType<typeof debounce>;
+  private fileItemsWasUndefined = false;
 
   constructor(app: App, settings: NoteStatusSettings, statusService: StatusService) {
     this.app = app;
     this.settings = settings;
     this.statusService = statusService;
-    this.ui = new ExplorerIntegrationUI(app, settings, statusService);
+    this.ui = new ExplorerIntegrationUI(app, settings, statusService, () => {
+      this.fileItemsWasUndefined = true;
+    });
     this.debouncedUpdateAll = debounce(this.processUpdateQueue.bind(this), 100, true);
+    
+    // Listen for layout changes to detect when file explorer becomes available
+    this.app.workspace.on('layout-change', () => {
+      this.checkFileExplorerAvailability();
+    });
+  }
+
+  /**
+   * Check if file explorer became available after being unavailable
+   */
+  private checkFileExplorerAvailability(): void {
+    if (!this.settings.showStatusIconsInExplorer) return;
+    
+    const fileExplorer = this.ui.findFileExplorerView();
+    if (fileExplorer?.fileItems && this.fileItemsWasUndefined) {
+      this.fileItemsWasUndefined = false;
+      setTimeout(() => this.updateAllFileExplorerIcons(), 100);
+    }
   }
 
   /**
@@ -98,7 +119,8 @@ export class ExplorerIntegration {
     
     try {
       const fileExplorerView = this.ui.findFileExplorerView();
-      if (!fileExplorerView) {
+      if (!fileExplorerView || !fileExplorerView.fileItems) {
+        this.fileItemsWasUndefined = true;
         setTimeout(() => this.debouncedUpdateAll(), 200);
         return;
       }
@@ -168,10 +190,12 @@ export class ExplorerIntegration {
 export class ExplorerIntegrationUI {
   private app: App;
   private settings: NoteStatusSettings;
+  private onFileItemsUndefined: () => void;
 
-  constructor(app: App, settings: NoteStatusSettings, statusService: StatusService) {
+  constructor(app: App, settings: NoteStatusSettings, statusService: StatusService, onFileItemsUndefined: () => void) {
     this.app = app;
     this.settings = settings;
+    this.onFileItemsUndefined = onFileItemsUndefined;
   }
 
   /**
@@ -204,6 +228,12 @@ export class ExplorerIntegrationUI {
     if (!this.settings.showStatusIconsInExplorer || file.extension !== 'md') return;
   
     try {
+      // Check if fileItems is initialized
+      if (!fileExplorerView.fileItems) {
+        this.onFileItemsUndefined();
+        return;
+      }
+      
       const fileItem = fileExplorerView.fileItems[file.path];
       if (!fileItem) return;
       
