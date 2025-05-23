@@ -148,4 +148,11 @@ export class StatusPaneViewController extends View {
 		this.containerEl.toggleClass('note-status-compact-view', settings.compactView);
 		this.renderGroups(this.searchQuery);
 	}
+
+	public update(): void {
+		// TODO: needs to be improved/fixed, every change 
+		// this.renderGroups(this.searchQuery).then(() => {
+		//
+		// });
+	}
 }

@@ -189,6 +189,11 @@ export default class NoteStatus extends Plugin {
     // Actualizar toolbar
     this.toolbarIntegration.updateStatusDisplay(statuses);
     this.statusDropdown.update(statuses);
+	// Actualizar status pane si está abierto
+	const statusPaneLeaf = this.app.workspace.getLeavesOfType('status-pane')[0];
+	if (statusPaneLeaf?.view) {
+		(statusPaneLeaf.view as StatusPaneViewController).update();
+	}
     // Actualizar explorador si es necesario
     if (this.settings.showStatusIconsInExplorer && file) {
       const fileObj = this.app.vault.getFileByPath(file);
