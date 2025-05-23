@@ -27,7 +27,7 @@ export class StatusPaneViewController extends View {
 
 	getDisplayText(): string { return 'Status pane'; }
 
-	getIcon(): string { return 'status-pane'; }
+	getIcon(): string { return 'tag'; }
 
 	async onOpen(): Promise<void> {
 		await this.setupPane();

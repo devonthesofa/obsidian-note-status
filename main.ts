@@ -75,7 +75,7 @@ export default class NoteStatus extends Plugin {
     });
 
     // Add ribbon icon
-    this.addRibbonIcon('status-pane', 'Open status pane', () => {
+    this.addRibbonIcon('tag', 'Open status pane', () => {
         this.openStatusPane();
     });
     
