@@ -14,6 +14,7 @@ export class ToolbarIntegration {
   private statusDropdown: StatusDropdown;
   private buttonView: ToolbarButton;
   private buttonElement: HTMLElement | null = null;
+  private currentLeafId: string | null = null;
 
   constructor(
     app: App, 
@@ -38,15 +39,25 @@ export class ToolbarIntegration {
     const activeLeaf = this.app.workspace.activeLeaf;
     if (!activeLeaf?.view || !(activeLeaf.view instanceof MarkdownView)) return;
 
-    const toolbarContainer = activeLeaf.view.containerEl.querySelector('.view-header .view-actions');
+    const leafId = (activeLeaf as any).id || activeLeaf.view.containerEl.id;
+    
+    // Only recreate button if we're on a different leaf or button doesn't exist
+    if (this.currentLeafId !== leafId || !this.buttonElement || !this.isButtonInDOM()) {
+      this.recreateButton(activeLeaf.view, leafId);
+    }
+    
+    this.updateButtonDisplay(statuses);
+  }
+
+  private recreateButton(view: MarkdownView, leafId: string): void {
+    const toolbarContainer = view.containerEl.querySelector('.view-header .view-actions');
     if (!toolbarContainer) return;
 
-    // Always remove existing button first
+    // Remove old button if it exists
     this.removeToolbarButton();
     
-    // Create a new button
+    // Create new button
     this.buttonElement = this.buttonView.createElement();
-
     this.buttonElement.addEventListener('click', this.handleButtonClick.bind(this));
     
     if (toolbarContainer.firstChild) {
@@ -55,30 +66,28 @@ export class ToolbarIntegration {
       toolbarContainer.appendChild(this.buttonElement);
     }
     
-    this.updateButtonDisplay(statuses);
+    this.currentLeafId = leafId;
+  }
+
+  private isButtonInDOM(): boolean {
+    return this.buttonElement?.isConnected === true;
   }
 
   private removeToolbarButton(): void {
-    const activeLeaf = this.app.workspace.activeLeaf;
-    if (!activeLeaf?.view || !(activeLeaf.view instanceof MarkdownView)) return;
-
-    const toolbarContainer = activeLeaf.view.containerEl.querySelector('.view-header .view-actions');
-    if (!toolbarContainer) return;
-
-    const existingButton = toolbarContainer.querySelector('.note-status-toolbar-button');
-    if (existingButton) {
-      existingButton.remove();
+    if (this.buttonElement) {
+      this.buttonElement.remove();
+      this.buttonElement = null;
     }
-    
-    this.buttonElement = null;
+    this.currentLeafId = null;
   }
 
-  private updateButtonDisplay(overrideStatutes?: string[]): void {
+  private updateButtonDisplay(overrideStatuses?: string[]): void {
+    if (!this.buttonElement) return;
+    
     const activeFile = this.app.workspace.getActiveFile();
-    if (!activeFile || !this.buttonElement) return;
+    if (!activeFile) return;
     
-    
-    const statuses = overrideStatutes?.length ? overrideStatutes : this.statusService.getFileStatuses(activeFile);
+    const statuses = overrideStatuses?.length ? overrideStatuses : this.statusService.getFileStatuses(activeFile);
     this.buttonView.updateDisplay(statuses);
   }
 
@@ -95,13 +104,11 @@ export class ToolbarIntegration {
   }
 
   public updateStatusDisplay(statuses: string[]): void {
-    this.removeToolbarButton();
-    this.addToolbarButtonToActiveLeaf(statuses);
+    this.updateButtonDisplay(statuses);
   }
 
   public unload(): void {
     this.buttonView.destroy();
-    this.statusDropdown.unload();
     this.removeToolbarButton();
   }
 }
