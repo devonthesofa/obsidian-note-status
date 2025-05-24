@@ -1,4 +1,4 @@
-import { TFile, WorkspaceLeaf, View, Notice } from 'obsidian';
+import { TFile, WorkspaceLeaf, View, Notice, App } from 'obsidian';
 import { NoteStatusSettings } from '../../models/types';
 import { StatusService } from '../../services/status-service';
 import NoteStatus from 'main';
@@ -14,6 +14,19 @@ export class StatusPaneViewController extends View {
 		itemsPerPage: 100,
 		currentPage: {} as Record<string, number>
 	};
+
+	static async open(app: App): Promise<void> {
+		const existing = app.workspace.getLeavesOfType('status-pane')[0];
+		if (existing) {
+			app.workspace.setActiveLeaf(existing);
+			return;
+		}
+		
+		const leaf = app.workspace.getLeftLeaf(false);
+		if (leaf) {
+			await leaf.setViewState({ type: 'status-pane', active: true });
+		}
+	}
 
 	constructor(leaf: WorkspaceLeaf, plugin: NoteStatus) {
 		super(leaf);

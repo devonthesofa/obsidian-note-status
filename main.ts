@@ -191,7 +191,7 @@ export default class NoteStatus extends Plugin {
     this.statusDropdown.update(statuses);
 	// Actualizar status pane si está abierto
 	const statusPaneLeaf = this.app.workspace.getLeavesOfType('status-pane')[0];
-	if (statusPaneLeaf?.view) {
+	if (statusPaneLeaf?.view && statusPaneLeaf.view instanceof StatusPaneViewController) {
 		(statusPaneLeaf.view as StatusPaneViewController).update();
 	}
     // Actualizar explorador si es necesario
@@ -231,18 +231,7 @@ export default class NoteStatus extends Plugin {
   }
 
   private async openStatusPane() {
-	// Check if already open
-    const existing = this.app.workspace.getLeavesOfType('status-pane')[0];
-    if (existing) {
-        this.app.workspace.setActiveLeaf(existing);
-        return;
-    }
-    
-    // Create new leaf
-    const leaf = this.app.workspace.getLeftLeaf(false);
-    if (leaf) {
-        await leaf.setViewState({ type: 'status-pane', active: true });
-    }
+    await StatusPaneViewController.open(this.app);
   }
 
   async saveSettings() {
