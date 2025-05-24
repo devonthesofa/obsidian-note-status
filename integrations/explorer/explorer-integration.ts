@@ -52,7 +52,7 @@ export class ExplorerIntegration {
       this.settings.showStatusIconsInExplorer !== settings.showStatusIconsInExplorer || 
       this.settings.hideUnknownStatusInExplorer !== settings.hideUnknownStatusInExplorer;
     
-    this.settings = settings;
+    this.settings = {...settings};
     this.ui.updateSettings(settings);
 
     if (shouldRefreshIcons) {
