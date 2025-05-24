@@ -36,31 +36,37 @@ export class EditorIntegration {
     this.app.workspace.on('editor-menu', this.editorMenuRef);
   }
 
-  private addStatusMenuItems(menu: Menu, editor: Editor, view: MarkdownView): void {
-    menu.addItem(item => 
-      item
-        .setTitle('Change note status')
-        .setIcon('tag')
-        .onClick(() => {
-          if (view.file) {
-            this.statusDropdown.openStatusDropdown({
-              files: [view.file],
-              editor,
-              view
-            });
-          }
-        })
-    );
-    
-    menu.addItem(item => 
-      item
-        .setTitle('Insert status metadata')
-        .setIcon('plus-circle')
-        .onClick(() => {
-          this.insertStatusMetadata(editor);
-        })
-    );
+private addStatusMenuItems(menu: Menu, editor: Editor, view: MarkdownView): void {
+  menu.addItem(item => 
+    item
+      .setTitle('Change note status')
+      .setIcon('tag')
+      .onClick(() => {
+        if (view.file) {
+          this.statusDropdown.openStatusDropdown({
+            files: [view.file],
+            editor,
+            view
+          });
+        }
+      })
+  );
+  
+  // Only show insert metadata if it doesn't exist
+  if (view.file) {
+    const statuses = this.statusService.getFileStatuses(view.file);
+    if (statuses.length === 1 && statuses[0] === 'unknown') {
+      menu.addItem(item => 
+        item
+          .setTitle('Insert status metadata')
+          .setIcon('plus-circle')
+          .onClick(() => {
+            this.insertStatusMetadata(editor);
+          })
+      );
+    }
   }
+}
 
   public insertStatusMetadata(editor: Editor): void {
     this.statusService.insertStatusMetadataInEditor(editor);
