@@ -73,13 +73,17 @@ export class ToolbarIntegration {
     return this.buttonElement?.isConnected === true;
   }
 
-  private removeToolbarButton(): void {
-    if (this.buttonElement) {
-      this.buttonElement.remove();
-      this.buttonElement = null;
+private removeToolbarButton(): void {
+  this.app.workspace.iterateAllLeaves(leaf => {
+    if (leaf.view instanceof MarkdownView) {
+      const buttons = leaf.view.containerEl.querySelectorAll('.note-status-toolbar-button');
+      buttons.forEach(button => button.remove());
     }
-    this.currentLeafId = null;
-  }
+  });
+  
+  this.buttonElement = null;
+  this.currentLeafId = null;
+}
 
   private updateButtonDisplay(overrideStatuses?: string[]): void {
     if (!this.buttonElement) return;
@@ -108,7 +112,7 @@ export class ToolbarIntegration {
   }
 
   public unload(): void {
-    this.buttonView.destroy();
+    // this.buttonView.destroy();
     this.removeToolbarButton();
   }
 }

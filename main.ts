@@ -155,14 +155,8 @@ export default class NoteStatus extends Plugin {
   }
 
   private setupCustomEvents() {
-    // // Evento para cambios de configuración
-    // window.addEventListener('note-status:settings-changed', this.saveSettings.bind(this));
-    
     // Evento para cambios de estado
     window.addEventListener('note-status:status-changed', this.handleStatusChanged.bind(this));
-    
-    // // Evento para actualización de UI
-    // window.addEventListener('note-status:refresh-ui', this.refreshUI.bind(this));
   }
 
   private initializeUI() {
@@ -223,19 +217,6 @@ export default class NoteStatus extends Plugin {
     // this.refreshStatus();
   }
 
-  private forceRefreshUI() {
-    // // Actualizar todos los elementos visibles
-    // this.refreshStatus();
-    
-    // if (this.settings.showStatusIconsInExplorer) {
-    //   this.explorerIntegration.updateAllFileExplorerIcons();
-    // }
-    
-    // window.dispatchEvent(new CustomEvent('note-status:update-pane'));
-    
-    // new Notice('UI forcefully refreshed');
-  }
-
   private async openStatusPane() {
     await StatusPaneViewController.open(this.app);
   }
@@ -260,20 +241,19 @@ export default class NoteStatus extends Plugin {
     this.statusDropdown.updateSettings(this.settings)
   }
 
-  onunload() {
-    // // Limpiar eventos personalizados
-    // window.removeEventListener('note-status:settings-changed', this.saveSettings.bind(this));
-    // window.removeEventListener('note-status:status-changed', this.handleStatusChanged.bind(this));
-    // window.removeEventListener('note-status:refresh-ui', this.refreshUI.bind(this));
-    
-    // // Limpiar integraciones
-    // this.explorerIntegration.unload();
-    // this.toolbarIntegration.unload();
-    
-    // // Limpiar servicios
-    // this.styleService.unload();
-    
-    // // Limpiar componentes UI
-    // this.statusBar.unload();
-  }
+onunload() {
+  // Clean up event listeners
+  window.removeEventListener('note-status:status-changed', this.handleStatusChanged.bind(this));
+  
+  // Clean up integrations
+  this.explorerIntegration?.unload();
+  this.toolbarIntegration?.unload();
+  
+  // Clean up services
+  this.styleService?.unload();
+  
+  // Clean up UI components
+  this.statusBar?.unload();
+  this.statusDropdown?.unload();
+}
 }

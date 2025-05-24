@@ -117,7 +117,6 @@ export class StatusPaneViewController extends View {
 					},
 					onStatusToggle: (status, collapsed) => {
 						this.settings.collapsedStatuses[status] = collapsed;
-						window.dispatchEvent(new CustomEvent('note-status:settings-changed'));
 					},
 					onContextMenu: (e, file) => {
 					},
