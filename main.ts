@@ -39,6 +39,8 @@ export default class NoteStatus extends Plugin {
   metadataIntegration: MetadataIntegration;
   workspaceIntegration: WorkspaceIntegration;
 
+  statusPane: StatusPaneViewController;
+
   async onload() {
     try {
       await this.loadSettings();
@@ -71,7 +73,8 @@ export default class NoteStatus extends Plugin {
   private registerViews() {
 	// Register status pane view
     this.registerView('status-pane', (leaf) => {
-        return new StatusPaneViewController(leaf, this);
+		this.statusPane = new StatusPaneViewController(leaf, this);
+        return this.statusPane;
     });
 
     // Add ribbon icon
@@ -251,8 +254,8 @@ export default class NoteStatus extends Plugin {
     //this.metadataIntegration.updateSettings(this.settings);
     this.toolbarIntegration.updateSettings(this.settings);
     this.workspaceIntegration.updateSettings(this.settings);
-    
-    // // Actualizar componentes UI
+	this.statusPane.updateSettings(this.settings);
+    // Actualizar componentes UI
     this.statusBar.updateSettings(this.settings);
     this.statusDropdown.updateSettings(this.settings)
   }
