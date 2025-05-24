@@ -128,20 +128,34 @@ export class StatusService {
   /**
    * Insert status metadata in the editor
    */
-  public insertStatusMetadataInEditor(editor: Editor): void {
-    const content = editor.getValue();
+public insertStatusMetadataInEditor(editor: Editor): void {
+  const content = editor.getValue();
+  const frontMatterMatch = content.match(/^---\n([\s\S]+?)\n---/);
+  
+  // Check if status metadata already exists
+  const statusTagRegex = new RegExp(`${this.settings.tagPrefix}:\\s*\\[?[^\\]]*\\]?`, 'm');
+  
+  if (frontMatterMatch) {
+    const frontMatter = frontMatterMatch[1];
+    if (frontMatter.match(statusTagRegex)) {
+      // Status already exists, do nothing
+      return;
+    }
+    // Add to existing frontmatter
     const defaultStatuses = ['unknown'];
     const statusMetadata = `${this.settings.tagPrefix}: ${JSON.stringify(defaultStatuses)}`;
-
-    // Check if frontmatter exists
-    const frontMatterMatch = content.match(/^---\n([\s\S]+?)\n---/);
-
-    if (frontMatterMatch) {
-      this.insertIntoExistingFrontmatter(editor, content, frontMatterMatch, statusMetadata);
-    } else {
-      this.createFrontmatterWithStatus(editor, content, statusMetadata);
+    this.insertIntoExistingFrontmatter(editor, content, frontMatterMatch, statusMetadata);
+  } else {
+    // No frontmatter, check if status exists in content somehow
+    if (content.match(statusTagRegex)) {
+      return;
     }
+    // Create new frontmatter
+    const defaultStatuses = ['unknown'];
+    const statusMetadata = `${this.settings.tagPrefix}: ${JSON.stringify(defaultStatuses)}`;
+    this.createFrontmatterWithStatus(editor, content, statusMetadata);
   }
+}
   
   /**
    * Insert status metadata into existing frontmatter
