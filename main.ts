@@ -97,7 +97,7 @@ export default class NoteStatus extends Plugin {
     const statusContextMenu = new StatusContextMenu(this.app, this.settings, this.statusService, this.statusDropdown, this.explorerIntegration);
     this.fileContextMenuIntegration = new FileContextMenuIntegration(this.app, this.settings, this.statusService, this.explorerIntegration, statusContextMenu);
     
-    // this.editorIntegration = new EditorIntegration(this.app, this.settings, this.statusService);
+    this.editorIntegration = new EditorIntegration(this.app, this.settings, this.statusService, this.statusDropdown);
     
     this.metadataIntegration = new MetadataIntegration(
       this.app, 
@@ -115,7 +115,7 @@ export default class NoteStatus extends Plugin {
     
     // // 3. Registrar eventos en cada integración
     this.fileContextMenuIntegration.registerFileContextMenuEvents();
-    // this.editorIntegration.registerEditorMenus();
+    this.editorIntegration.registerEditorMenus();
     // this.metadataIntegration.registerMetadataEvents();
 this.metadataIntegration.registerMetadataEvents();
     this.workspaceIntegration.registerWorkspaceEvents();
@@ -236,7 +236,7 @@ this.metadataIntegration.registerMetadataEvents();
     // Actualizar integraciones
     this.explorerIntegration.updateSettings(this.settings);
     this.fileContextMenuIntegration.updateSettings(this.settings);
-    // this.editorIntegration.updateSettings(this.settings);
+    this.editorIntegration.updateSettings(this.settings);
     //this.metadataIntegration.updateSettings(this.settings);
     this.toolbarIntegration.updateSettings(this.settings);
     this.workspaceIntegration.updateSettings(this.settings);
@@ -258,6 +258,7 @@ onunload() {
   this.fileContextMenuIntegration?.unload();
   this.workspaceIntegration?.unload();
   this.metadataIntegration?.unload();
+  this.editorIntegration?.unload();
   
   // Clean up services
   this.styleService?.unload();

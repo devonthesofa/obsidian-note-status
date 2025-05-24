@@ -1,49 +1,54 @@
-import { App, Editor, MarkdownView, Menu } from 'obsidian';
+import { App, Editor, MarkdownView, Menu, TFile } from 'obsidian';
 import { NoteStatusSettings } from '../../models/types';
 import { StatusService } from 'services/status-service';
+import { StatusDropdown } from 'components/status-dropdown';
 
-/**
- * Gestiona la integración con el editor de Obsidian
- */
 export class EditorIntegration {
   private app: App;
   private settings: NoteStatusSettings;
   private statusService: StatusService;
+  private statusDropdown: StatusDropdown;
+  private editorMenuRef: any;
 
-  constructor(app: App, settings: NoteStatusSettings, statusService: StatusService) {
+  constructor(
+    app: App, 
+    settings: NoteStatusSettings, 
+    statusService: StatusService,
+    statusDropdown: StatusDropdown
+  ) {
     this.app = app;
     this.settings = settings;
     this.statusService = statusService;
+    this.statusDropdown = statusDropdown;
   }
 
-  /**
-   * Actualiza la configuración
-   */
   public updateSettings(settings: NoteStatusSettings): void {
     this.settings = settings;
   }
 
-  /**
-   * Registra los menús contextuales del editor
-   */
   public registerEditorMenus(): void {
-    this.app.workspace.on('editor-menu', (menu, editor, view) => {
-      if (view instanceof MarkdownView) {
+    this.editorMenuRef = (menu: Menu, editor: Editor, view: MarkdownView) => {
+      if (view.file) {
         this.addStatusMenuItems(menu, editor, view);
       }
-    });
+    };
+
+    this.app.workspace.on('editor-menu', this.editorMenuRef);
   }
 
-  /**
-   * Añade opciones de estado al menú del editor
-   */
   private addStatusMenuItems(menu: Menu, editor: Editor, view: MarkdownView): void {
     menu.addItem(item => 
       item
         .setTitle('Change note status')
         .setIcon('tag')
         .onClick(() => {
-          this.showStatusChangeUI(editor, view);
+          if (view.file) {
+            this.statusDropdown.openStatusDropdown({
+              files: [view.file],
+              editor,
+              view
+            });
+          }
         })
     );
     
@@ -57,21 +62,13 @@ export class EditorIntegration {
     );
   }
 
-  /**
-   * Muestra la UI para cambiar estado
-   */
-  private showStatusChangeUI(editor: Editor, view: MarkdownView): void {
-    const file = view.file;
-    if (!file) return;
-    
-    // En la implementación real, esto mostraría un dropdown o modal
-    console.log("Mostrar UI de cambio de estado");
-  }
-
-  /**
-   * Inserta metadatos de estado en el editor
-   */
   public insertStatusMetadata(editor: Editor): void {
     this.statusService.insertStatusMetadataInEditor(editor);
+  }
+
+  public unload(): void {
+    if (this.editorMenuRef) {
+      this.app.workspace.off('editor-menu', this.editorMenuRef);
+    }
   }
 }
