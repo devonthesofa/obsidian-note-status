@@ -11,7 +11,8 @@ import { MetadataIntegration } from './integrations/metadata-cache';
 import { WorkspaceIntegration } from './integrations/workspace';
 import { FileContextMenuIntegration } from 'integrations/context-menu/file-context-menu-integration';
 import { NoteStatusSettingTab } from 'integrations/settings/settings-tab';
-//
+import { CommandIntegration } from 'integrations/commands/command-integration';
+
 // Importar vistas
 import { StatusPaneViewController } from './views/status-pane-view';
 
@@ -38,6 +39,7 @@ export default class NoteStatus extends Plugin {
   toolbarIntegration: ToolbarIntegration;
   metadataIntegration: MetadataIntegration;
   workspaceIntegration: WorkspaceIntegration;
+  commandIntegration: CommandIntegration;
 
   statusPane: StatusPaneViewController;
 
@@ -98,7 +100,13 @@ export default class NoteStatus extends Plugin {
     this.fileContextMenuIntegration = new FileContextMenuIntegration(this.app, this.settings, this.statusService, this.explorerIntegration, statusContextMenu);
     
     this.editorIntegration = new EditorIntegration(this.app, this.settings, this.statusService, this.statusDropdown);
-    
+    this.commandIntegration = new CommandIntegration(
+      this.app,
+      this,
+      this.settings,
+      this.statusService,
+      this.statusDropdown
+    );  
     this.metadataIntegration = new MetadataIntegration(
       this.app, 
       this.settings, 
@@ -116,45 +124,9 @@ export default class NoteStatus extends Plugin {
     // // 3. Registrar eventos en cada integración
     this.fileContextMenuIntegration.registerFileContextMenuEvents();
     this.editorIntegration.registerEditorMenus();
-    // this.metadataIntegration.registerMetadataEvents();
+    this.commandIntegration.registerCommands();
 this.metadataIntegration.registerMetadataEvents();
     this.workspaceIntegration.registerWorkspaceEvents();
-  }
-
-  private registerCommands() {
-    // // Comando para actualizar estado
-    // this.addCommand({
-    //   id: 'refresh-status',
-    //   name: 'Refresh status',
-    //   callback: () => {
-    //     this.refreshStatus();
-    //     new Notice('Note status refreshed!');
-    //   }
-    // });
-
-    // // Comando para forzar actualización de UI
-    // this.addCommand({
-    //   id: 'force-refresh-ui',
-    //   name: 'Force refresh user interface',
-    //   callback: () => this.forceRefreshUI()
-    // });
-
-    // // Comando para insertar metadatos de estado
-    // this.addCommand({
-    //   id: 'insert-status-metadata',
-    //   name: 'Insert status metadata',
-    //   editorCallback: (editor) => {
-    //     this.editorIntegration.insertStatusMetadata(editor);
-    //     new Notice('Status metadata inserted');
-    //   }
-    // });
-
-    // // Comando para abrir panel de estado
-    // this.addCommand({
-    //   id: 'open-status-pane',
-    //   name: 'Open status pane',
-    //   callback: () => this.openStatusPane()
-    // });
   }
 
   private setupCustomEvents() {
@@ -237,7 +209,8 @@ this.metadataIntegration.registerMetadataEvents();
     this.explorerIntegration.updateSettings(this.settings);
     this.fileContextMenuIntegration.updateSettings(this.settings);
     this.editorIntegration.updateSettings(this.settings);
-    //this.metadataIntegration.updateSettings(this.settings);
+    this.metadataIntegration?.updateSettings(this.settings);
+	this.commandIntegration?.updateSettings(this.settings);
     this.toolbarIntegration.updateSettings(this.settings);
     this.workspaceIntegration.updateSettings(this.settings);
 	this.statusPane?.updateSettings(this.settings);
