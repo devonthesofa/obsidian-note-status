@@ -99,12 +99,12 @@ export default class NoteStatus extends Plugin {
     
     // this.editorIntegration = new EditorIntegration(this.app, this.settings, this.statusService);
     
-    // this.metadataIntegration = new MetadataIntegration(
-    //   this.app, 
-    //   this.settings, 
-    //   this.statusService,
-    //   this.explorerIntegration
-    // );
+    this.metadataIntegration = new MetadataIntegration(
+      this.app, 
+      this.settings, 
+      this.statusService,
+      this.explorerIntegration
+    );
     
     this.workspaceIntegration = new WorkspaceIntegration(
       this.app, 
@@ -117,6 +117,7 @@ export default class NoteStatus extends Plugin {
     this.fileContextMenuIntegration.registerFileContextMenuEvents();
     // this.editorIntegration.registerEditorMenus();
     // this.metadataIntegration.registerMetadataEvents();
+this.metadataIntegration.registerMetadataEvents();
     this.workspaceIntegration.registerWorkspaceEvents();
   }
 
@@ -256,6 +257,7 @@ onunload() {
   this.toolbarIntegration?.unload();
   this.fileContextMenuIntegration?.unload();
   this.workspaceIntegration?.unload();
+  this.metadataIntegration?.unload();
   
   // Clean up services
   this.styleService?.unload();

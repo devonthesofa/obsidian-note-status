@@ -3,14 +3,13 @@ import { NoteStatusSettings } from '../../models/types';
 import { ExplorerIntegration } from '../explorer/explorer-integration';
 import { StatusService } from 'services/status-service';
 
-/**
- * Gestiona la integración con la caché de metadatos
- */
 export class MetadataIntegration {
   private app: App;
   private settings: NoteStatusSettings;
   private statusService: StatusService;
   private explorerIntegration: ExplorerIntegration;
+  private metadataChangedRef: any;
+  private metadataResolvedRef: any;
 
   constructor(
     app: App, 
@@ -24,50 +23,49 @@ export class MetadataIntegration {
     this.explorerIntegration = explorerIntegration;
   }
 
-  /**
-   * Actualiza la configuración
-   */
   public updateSettings(settings: NoteStatusSettings): void {
     this.settings = settings;
   }
 
-  /**
-   * Registra los eventos de metadatos
-   */
   public registerMetadataEvents(): void {
-    // Evento cuando cambian los metadatos de un archivo
-    this.app.metadataCache.on('changed', (file) => {
+    this.metadataChangedRef = (file: TFile) => {
       if (file instanceof TFile && file.extension === 'md') {
         this.handleMetadataChanged(file);
       }
-    });
+    };
 
-    // Evento cuando se resuelven todos los metadatos (al cargar)
-    this.app.metadataCache.on('resolved', () => {
+    this.metadataResolvedRef = () => {
       setTimeout(() => {
         if (this.settings.showStatusIconsInExplorer) {
           this.explorerIntegration.updateAllFileExplorerIcons();
         }
       }, 500);
-    });
+    };
+
+    this.app.metadataCache.on('changed', this.metadataChangedRef);
+    this.app.metadataCache.on('resolved', this.metadataResolvedRef);
   }
 
-  /**
-   * Maneja cambios en metadatos de un archivo
-   */
   private handleMetadataChanged(file: TFile): void {
-    // Actualiza el explorador si está habilitado
     if (this.settings.showStatusIconsInExplorer) {
       this.explorerIntegration.updateFileExplorerIcons(file);
     }
     
-    // Actualiza otros componentes si es el archivo activo
     const activeFile = this.app.workspace.getActiveFile();
     if (activeFile?.path === file.path) {
       const statuses = this.statusService.getFileStatuses(file);
       window.dispatchEvent(new CustomEvent('note-status:status-changed', { 
         detail: { statuses, file: file.path } 
       }));
+    }
+  }
+
+  public unload(): void {
+    if (this.metadataChangedRef) {
+      this.app.metadataCache.off('changed', this.metadataChangedRef);
+    }
+    if (this.metadataResolvedRef) {
+      this.app.metadataCache.off('resolved', this.metadataResolvedRef);
     }
   }
 }
