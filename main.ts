@@ -41,6 +41,8 @@ export default class NoteStatus extends Plugin {
 
   statusPane: StatusPaneViewController;
 
+  private boundHandleStatusChanged: (event: CustomEvent) => void;
+
   async onload() {
     try {
       await this.loadSettings();
@@ -156,7 +158,9 @@ export default class NoteStatus extends Plugin {
 
   private setupCustomEvents() {
     // Evento para cambios de estado
-    window.addEventListener('note-status:status-changed', this.handleStatusChanged.bind(this));
+
+    this.boundHandleStatusChanged = this.handleStatusChanged.bind(this);
+    window.addEventListener('note-status:status-changed', this.boundHandleStatusChanged);
   }
 
   private initializeUI() {
@@ -243,11 +247,15 @@ export default class NoteStatus extends Plugin {
 
 onunload() {
   // Clean up event listeners
-  window.removeEventListener('note-status:status-changed', this.handleStatusChanged.bind(this));
+  if (this.boundHandleStatusChanged) {
+    window.removeEventListener('note-status:status-changed', this.boundHandleStatusChanged);
+  }
   
   // Clean up integrations
   this.explorerIntegration?.unload();
   this.toolbarIntegration?.unload();
+  this.fileContextMenuIntegration?.unload();
+  this.workspaceIntegration?.unload();
   
   // Clean up services
   this.styleService?.unload();

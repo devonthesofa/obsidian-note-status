@@ -13,6 +13,8 @@ export class FileContextMenuIntegration {
   private statusService: StatusService;
   private explorerIntegration: ExplorerIntegration;
   private statusContextMenu: StatusContextMenu;
+  private fileMenuEventRef: any;
+  private filesMenuEventRef: any;
 
   constructor(
     app: App, 
@@ -38,16 +40,14 @@ export class FileContextMenuIntegration {
   /**
    * Registra los eventos del menú contextual de archivos
    */
-  public registerFileContextMenuEvents(): void {
-    // Evento para archivo único
-    this.app.workspace.on('file-menu', (menu, file, source) => {
+public registerFileContextMenuEvents(): void {
+    this.fileMenuEventRef = (menu: Menu, file: any, source: string) => {
       if (source === 'file-explorer-context-menu' && file instanceof TFile && file.extension === 'md') {
         this.addStatusChangeMenu(menu, file);
       }
-    });
+    };
 
-    // Evento para múltiples archivos
-    this.app.workspace.on('files-menu', (menu, files) => {
+    this.filesMenuEventRef = (menu: Menu, files: any[]) => {
       const mdFiles = files.filter(file => 
         file instanceof TFile && file.extension === 'md'
       ) as TFile[];
@@ -55,7 +55,10 @@ export class FileContextMenuIntegration {
       if (mdFiles.length > 0) {
         this.addBatchStatusChangeMenu(menu, mdFiles);
       }
-    });
+    };
+
+    this.app.workspace.on('file-menu', this.fileMenuEventRef);
+    this.app.workspace.on('files-menu', this.filesMenuEventRef);
   }
 
   /**
@@ -79,5 +82,14 @@ export class FileContextMenuIntegration {
     this.statusContextMenu.addStatusMenuItemToBatch(menu, files, (files) => {
       this.statusContextMenu.showForFiles(files);
     });
+  }
+
+  public unload(): void {
+    if (this.fileMenuEventRef) {
+      this.app.workspace.off('file-menu', this.fileMenuEventRef);
+    }
+    if (this.filesMenuEventRef) {
+      this.app.workspace.off('files-menu', this.filesMenuEventRef);
+    }
   }
 }

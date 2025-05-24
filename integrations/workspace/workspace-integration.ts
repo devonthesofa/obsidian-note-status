@@ -12,6 +12,9 @@ export class WorkspaceIntegration {
   private statusService: StatusService;
   private toolbarIntegration: ToolbarIntegration;
   private lastActiveFile: TFile | null = null;
+  private fileOpenEventRef: any;
+  private activeLeafChangeEventRef: any;
+  private layoutChangeEventRef: any;
 
   constructor(
     app: App, 
@@ -36,22 +39,23 @@ export class WorkspaceIntegration {
    * Registra eventos del workspace
    */
   public registerWorkspaceEvents(): void {
-    // Evento al abrir un archivo
-    this.app.workspace.on('file-open', (file) => {
+    this.fileOpenEventRef = (file: any) => {
       if (file instanceof TFile) {
         this.handleFileOpen(file);
       }
-    });
+    };
 
-    // Evento de cambio de hoja activa
-    this.app.workspace.on('active-leaf-change', (leaf: WorkspaceLeaf) => {
+    this.activeLeafChangeEventRef = (leaf: WorkspaceLeaf) => {
       this.handleActiveLeafChange(leaf);
-    });
+    };
 
-    // Evento de cambio en el layout
-    this.app.workspace.on('layout-change', () => {
+    this.layoutChangeEventRef = () => {
       this.handleLayoutChange();
-    });
+    };
+
+    this.app.workspace.on('file-open', this.fileOpenEventRef);
+    this.app.workspace.on('active-leaf-change', this.activeLeafChangeEventRef);
+    this.app.workspace.on('layout-change', this.layoutChangeEventRef);
   }
 
   /**
@@ -104,6 +108,17 @@ export class WorkspaceIntegration {
       }));
     } catch (error) {
       console.error('Error checking note status:', error);
+    }
+  }
+  public unload(): void {
+    if (this.fileOpenEventRef) {
+      this.app.workspace.off('file-open', this.fileOpenEventRef);
+    }
+    if (this.activeLeafChangeEventRef) {
+      this.app.workspace.off('active-leaf-change', this.activeLeafChangeEventRef);
+    }
+    if (this.layoutChangeEventRef) {
+      this.app.workspace.off('layout-change', this.layoutChangeEventRef);
     }
   }
 }
