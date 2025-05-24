@@ -19,7 +19,7 @@ export interface DropdownOptions {
 /**
  * Status removal handler function type
  */
-export type StatusRemoveHandler = (status: string, targetFile?: TFile) => Promise<void>;
+export type StatusRemoveHandler = (status: string, targetFile?: TFile | TFile[]) => Promise<void>;
 
 /**
  * Status selection handler function type

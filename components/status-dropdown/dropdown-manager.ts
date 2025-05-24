@@ -34,11 +34,13 @@ export class DropdownManager {
     this.dropdownUI.setOnRemoveStatusHandler(async (status, targetFile) => {
       if (!targetFile) return;
       
+      const isMultiple = Array.isArray(targetFile);
+      
       await this.statusService.handleStatusChange({
         files: targetFile,
         statuses: status,
         operation: 'remove',
-        showNotice: false
+        showNotice: isMultiple
       });
     });
     

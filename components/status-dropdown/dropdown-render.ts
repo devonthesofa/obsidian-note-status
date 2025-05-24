@@ -31,7 +31,9 @@ export function renderDropdownContent(options: {
   
   // Create UI sections
   createHeader(dropdownElement, targetFiles);
-  createStatusChips(dropdownElement, currentStatuses, statusService, targetFile, onRemoveStatus);
+
+  const target = targetFiles.length > 1 ? targetFiles : targetFile;
+  createStatusChips(dropdownElement, currentStatuses, statusService, target ?? [], onRemoveStatus);
   const searchInput = createSearchFilter(dropdownElement);
   
   // Create status options container
@@ -96,7 +98,7 @@ function createStatusChips(
   dropdownElement: HTMLElement, 
   currentStatuses: string[], 
   statusService: StatusService,
-  targetFile: TFile | null,
+  targetFile: TFile | TFile[],
   onRemoveStatus: StatusRemoveHandler
 ): void {
   const chipsContainer = dropdownElement.createDiv({ cls: 'note-status-popover-chips' });
@@ -121,7 +123,7 @@ function createStatusChipElements(
   container: HTMLElement, 
   currentStatuses: string[], 
   statusService: StatusService,
-  targetFile: TFile | null,
+  target: TFile | TFile[],
   onRemoveStatus: StatusRemoveHandler
 ): void {
   currentStatuses.forEach(status => {
@@ -130,7 +132,7 @@ function createStatusChipElements(
     const statusObj = statusService.getAllStatuses().find(s => s.name === status);
     if (!statusObj) return;
     
-    createSingleStatusChip(container, status, statusObj, targetFile, onRemoveStatus);
+    createSingleStatusChip(container, status, statusObj, target, onRemoveStatus);
   });
 }
 
@@ -141,7 +143,7 @@ function createSingleStatusChip(
   container: HTMLElement, 
   status: string, 
   statusObj: Status,
-  targetFile: TFile | null,
+  target: TFile | TFile[],
   onRemoveStatus: StatusRemoveHandler
 ): void {
   const chipEl = container.createDiv({ 
@@ -159,7 +161,7 @@ function createSingleStatusChip(
     cls: 'note-status-chip-text' 
   });
   
-  addRemoveButton(chipEl, status, statusObj, targetFile, onRemoveStatus);
+  addRemoveButton(chipEl, status, statusObj, target, onRemoveStatus);
 }
 
 /**
@@ -169,7 +171,7 @@ function addRemoveButton(
   chipEl: HTMLElement, 
   status: string, 
   statusObj: Status, 
-  targetFile: TFile | null,
+  targetFile: TFile | TFile[] | null,
   onRemoveStatus: StatusRemoveHandler
 ): void {
   const tooltipValue = statusObj.description ? `${status} - ${statusObj.description}`: status;
