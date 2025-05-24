@@ -241,7 +241,7 @@ export default class NoteStatus extends Plugin {
   }
 
   async saveSettings() {
-    // await this.saveData(this.settings);
+    await this.saveData(this.settings);
     
     // Actualizar servicios
     this.statusService.updateSettings(this.settings);
@@ -254,7 +254,7 @@ export default class NoteStatus extends Plugin {
     //this.metadataIntegration.updateSettings(this.settings);
     this.toolbarIntegration.updateSettings(this.settings);
     this.workspaceIntegration.updateSettings(this.settings);
-	this.statusPane.updateSettings(this.settings);
+	this.statusPane?.updateSettings(this.settings);
     // Actualizar componentes UI
     this.statusBar.updateSettings(this.settings);
     this.statusDropdown.updateSettings(this.settings)
