@@ -56,7 +56,7 @@ export class DropdownManager {
         );
         
         // If ALL have the status, remove it. Otherwise, add it
-        const operation = filesWithStatus.length === files.length ? 'remove' : 'add';
+        let operation = filesWithStatus.length === files.length ? 'remove' : (!this.settings.useMultipleStatuses) ? 'set':'add';
         
         await this.statusService.handleStatusChange({
           files: targetFile,
