@@ -80,7 +80,7 @@ export default class NoteStatus extends Plugin {
     });
     
     // Añadir pestaña de configuración
-    // this.addSettingTab(new NoteStatusSettingTab(this.app, this, this.statusService));
+    this.addSettingTab(new NoteStatusSettingTab(this.app, this, this.statusService));
   }
 
   private initializeIntegrations() {
@@ -240,25 +240,21 @@ export default class NoteStatus extends Plugin {
   async saveSettings() {
     // await this.saveData(this.settings);
     
-    // // Actualizar servicios
-    // this.statusService.updateSettings(this.settings);
-    // this.styleService.updateSettings(this.settings);
+    // Actualizar servicios
+    this.statusService.updateSettings(this.settings);
+    this.styleService.updateSettings(this.settings);
     
-    // // Actualizar integraciones
-    // this.updateIntegrationsSettings();
-  }
-
-  private updateIntegrationsSettings() {
-    // // Actualizar configuración en todas las integraciones
-    // this.explorerIntegration.updateSettings(this.settings);
-    // this.fileContextMenuIntegration.updateSettings(this.settings);
+    // Actualizar integraciones
+    this.explorerIntegration.updateSettings(this.settings);
+    this.fileContextMenuIntegration.updateSettings(this.settings);
     // this.editorIntegration.updateSettings(this.settings);
-    // this.toolbarIntegration.updateSettings(this.settings);
-    // this.metadataIntegration.updateSettings(this.settings);
-    // this.workspaceIntegration.updateSettings(this.settings);
+    //this.metadataIntegration.updateSettings(this.settings);
+    this.toolbarIntegration.updateSettings(this.settings);
+    this.workspaceIntegration.updateSettings(this.settings);
     
     // // Actualizar componentes UI
-    // this.statusBar.updateSettings(this.settings);
+    this.statusBar.updateSettings(this.settings);
+    this.statusDropdown.updateSettings(this.settings)
   }
 
   onunload() {
