@@ -160,6 +160,14 @@ export class NoteStatusSettingsUI {
             this.callbacks.onSettingChange('tagPrefix', value.trim());
           }
         }));
+
+
+    new Setting(containerEl)
+      .setName('Strict status validation')
+      .setDesc('Only show statuses that are defined in templates or custom statuses. ⚠️ WARNING: When enabled, any unknown statuses will be automatically removed when modifying file statuses.')
+      .addToggle(toggle => toggle
+        .setValue(settings.strictStatuses || false)
+        .onChange(value => this.callbacks.onSettingChange('strictStatuses', value)));
   }
 
   /**

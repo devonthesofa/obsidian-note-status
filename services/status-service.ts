@@ -83,12 +83,22 @@ export class StatusService {
     
     if (Array.isArray(frontmatterStatus)) {
       for (const statusName of frontmatterStatus) {
-        this.addValidStatus(statusName.toString(), statuses);
+        if (this.settings.strictStatuses) {
+          this.addValidStatus(statusName.toString(), statuses);
+        } else {
+          const cleanStatus = statusName.toString().trim();
+          if (cleanStatus) statuses.push(cleanStatus);
+        }
       }
     } else {
-      this.addValidStatus(frontmatterStatus.toString(), statuses);
+      if (this.settings.strictStatuses) {
+        this.addValidStatus(frontmatterStatus.toString(), statuses);
+      } else {
+        const cleanStatus = frontmatterStatus.toString().trim();
+        if (cleanStatus) statuses.push(cleanStatus);
+      }
     }
-
+  
     return statuses.length > 0 ? statuses : ['unknown'];
   }
   
