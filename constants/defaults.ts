@@ -1,20 +1,20 @@
-import { NoteStatusSettings } from '../models/types';
-import { DEFAULT_ENABLED_TEMPLATES } from '../constants/status-templates';
+import { NoteStatusSettings } from "../models/types";
+import { DEFAULT_ENABLED_TEMPLATES } from "../constants/status-templates";
 
 /**
  * Default plugin settings
  */
 export const DEFAULT_SETTINGS: NoteStatusSettings = {
 	statusColors: {
-		active: 'var(--text-success)',
-		onHold: 'var(--text-warning)',
-		completed: 'var(--text-accent)',
-		dropped: 'var(--text-error)',
-		unknown: 'var(--text-muted)'
+		active: "var(--text-success)",
+		onHold: "var(--text-warning)",
+		completed: "var(--text-accent)",
+		dropped: "var(--text-error)",
+		unknown: "var(--text-muted)",
 	},
 	showStatusBar: true,
 	autoHideStatusBar: false,
-    customStatuses: [],
+	customStatuses: [],
 	showStatusIconsInExplorer: true,
 	hideUnknownStatusInExplorer: false, // Default to show unknown status
 	collapsedStatuses: {},
@@ -22,19 +22,19 @@ export const DEFAULT_SETTINGS: NoteStatusSettings = {
 	enabledTemplates: DEFAULT_ENABLED_TEMPLATES,
 	useCustomStatusesOnly: false,
 	useMultipleStatuses: true,
-	tagPrefix: 'obsidian-note-status',
+	tagPrefix: "obsidian-note-status",
 	strictStatuses: false, // Default to show all statuses from frontmatter
 	excludeUnknownStatus: true, // Default to exclude unknown status files for better performance
-	quickStatusCommands: ['active', 'completed'], // Add default quick commands
+	quickStatusCommands: ["active", "completed"], // Add default quick commands
 };
 
 /**
  * Default colors in hexadecimal format for backup and reset
  */
 export const DEFAULT_COLORS: Record<string, string> = {
-	active: '#00ff00',    // Green for success
-	onHold: '#ffaa00',    // Orange for warning
-	completed: '#00aaff', // Blue for accent
-	dropped: '#ff0000',   // Red for error
-	unknown: '#888888'    // Gray for muted
+	active: "#00ff00", // Green for success
+	onHold: "#ffaa00", // Orange for warning
+	completed: "#00aaff", // Blue for accent
+	dropped: "#ff0000", // Red for error
+	unknown: "#888888", // Gray for muted
 };

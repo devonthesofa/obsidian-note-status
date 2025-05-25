@@ -1,4 +1,4 @@
-import { StatusBarController } from './status-bar-controller';
+import { StatusBarController } from "./status-bar-controller";
 
-export { StatusBarController as StatusBar};
+export { StatusBarController as StatusBar };
 export default StatusBarController;

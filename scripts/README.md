@@ -1,14 +1,19 @@
 ## Installation and Usage
 
 1. Install dependencies:
+
 ```bash
     npm install commander
 ```
+
 2. Install tsx for executing TypeScript directly:
+
 ```bash
     npm install -g tsx
 ```
+
 3. Run the script:
+
 ```bash
     tsx generate-test-vault.ts --count 40000 --output ./test-vault
 ```
@@ -23,6 +28,7 @@
 - `--no-status` or `-n`: Generate notes without status tags (default: false)
 
 ## Performance Considerations
+
 The script creates a realistic vault structure with:
 
 - Multiple folder levels

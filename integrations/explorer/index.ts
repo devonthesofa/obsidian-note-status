@@ -1,1 +1,1 @@
-export { ExplorerIntegration } from './explorer-integration';
+export { ExplorerIntegration } from "./explorer-integration";

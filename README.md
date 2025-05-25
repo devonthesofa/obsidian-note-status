@@ -7,6 +7,7 @@ Enhance your Obsidian workflow with a powerful status tracking system for your n
 ![Hello World Screenshot](images/hello-world.png)
 
 ## Table of Contents
+
 - [Features](#features)
 - [Installation](#installation)
 - [User Guide](#user-guide)
@@ -17,6 +18,7 @@ Enhance your Obsidian workflow with a powerful status tracking system for your n
 - [Support](#support-the-development)
 
 ## Features
+
 - **Status Assignment**: Mark notes with statuses (active, on hold, completed, dropped)
 - **Multiple Statuses**: Apply more than one status to a single note
 - **File Explorer Integration**: View status icons directly in your file explorer
@@ -32,12 +34,14 @@ Enhance your Obsidian workflow with a powerful status tracking system for your n
 ## Installation
 
 ### Marketplace Installation (Recommended)
+
 1. Open Obsidian → Settings → Community plugins
 2. Disable Safe mode
 3. Click "Browse" and search for "Note Status"
 4. Click Install and Enable
 
 ### Manual Installation
+
 1. **Download the Plugin**:
     - Grab the latest release from the [GitHub Releases page](https://github.com/devonthesofa/obsidian-note-status/releases).
     - Download the files `main.js`, `styles.css` and `manifest.json`
@@ -51,8 +55,11 @@ Enhance your Obsidian workflow with a powerful status tracking system for your n
     - Find "Note Status" in the list and toggle it on.
 
 ## User Guide
+
 ### Basic Usage
+
 #### 1. Assign Status from the Toolbar
+
 The simplest way to set a note's status is using the toolbar button:
 
 ![Status From Toolbar](images/status-from-toolbar.png)
@@ -63,6 +70,7 @@ The simplest way to set a note's status is using the toolbar button:
 4. The status will be applied and visible in both toolbar and status bar
 
 #### 2. Status Bar
+
 The status bar at the bottom of your editor shows the current status of your note:
 
 ![Status Bar](images/status-bar.png)
@@ -70,14 +78,16 @@ The status bar at the bottom of your editor shows the current status of your not
 - When multiple statuses are enabled, all applied statuses will be displayed here
 
 #### 3. Status Pane
+
 The Status Pane provides an overview of all your notes grouped by status:
 
 ![Status Pane](images/status-pane.png)
 
 To open the Status Pane:
+
 - Click the status pane icon in the left sidebar
 - Use the command palette: "Open status pane"
-In the Status Pane you can:
+  In the Status Pane you can:
 - View all notes grouped by status
 - Click on any note to open it
 - Search for specific notes
@@ -85,6 +95,7 @@ In the Status Pane you can:
 - Right-click on notes for more options
 
 #### 4. File Explorer Integration
+
 Status icons appear directly in your file explorer:
 
 ![File Explorer](images/file-explorer.png)
@@ -93,7 +104,9 @@ Status icons appear directly in your file explorer:
 - Select multiple files to batch update their statuses
 
 ### Advanced Usage
+
 #### Multiple Statuses
+
 When enabled in settings, you can assign multiple statuses to a single note:
 
 ![Multiple Statuses Selector](images/multiple-statuses-selector.png)
@@ -103,6 +116,7 @@ When enabled in settings, you can assign multiple statuses to a single note:
 ![Multiple Statuses Status Bar](images/multiple-statuses-status-bar.png)
 
 To add additional statuses:
+
 1. Open the status dropdown
 2. Click on another status to add it
 3. Click on an active status to remove it
@@ -110,6 +124,7 @@ To add additional statuses:
 #### Batch Updates
 
 To update multiple files at once:
+
 1. Select multiple files in the file explorer (using Ctrl/Cmd or Shift)
 2. Right-click and choose "Change status"
 3. Select whether to replace or add the status
@@ -118,6 +133,7 @@ To update multiple files at once:
 ![Batch Updates](images/batch-updates.png)
 
 #### Large Vault Performance
+
 If you have a large vault with thousands of notes, use these features for better performance:
 
 1. Enable "Exclude unassigned notes from status pane" in settings
@@ -125,7 +141,9 @@ If you have a large vault with thousands of notes, use these features for better
 3. Use pagination controls to navigate through large status groups ![Pagination](images/pagination.png)
 
 ## Configuration
+
 ### Status Management
+
 Access plugin settings via Settings → Note Status
 
 #### Status Templates
@@ -150,7 +168,9 @@ Create your own statuses by:
 ![Custom Statuses](images/custom-statuses.png)
 
 ### Display Options
+
 Configure how statuses are displayed:
+
 - Show/hide status bar
 - Auto-hide status bar when status is unknown
 - Show/hide status icons in file explorer
@@ -161,6 +181,7 @@ Configure how statuses are displayed:
 - Customize frontmatter tag name
 
 ## Performance Recommendations
+
 If you have a large vault (1000+ notes), consider these settings for optimal performance:
 
 1. Enable "Exclude unassigned notes from status pane"
@@ -168,9 +189,10 @@ If you have a large vault (1000+ notes), consider these settings for optimal per
 3. Use specific searches rather than browsing all notes
 4. Consider using "Compact view" in the status pane
 
-
 ## Commands
+
 The plugin provides several commands accessible via the Command Palette:
+
 - `Open status pane` - Opens the status view
 - `Refresh status` - Refreshes current note's status
 - `Add status to current note` - Shows status menu
@@ -178,24 +200,33 @@ The plugin provides several commands accessible via the Command Palette:
 - `Force refresh user interface` - Complete UI refresh
 
 ## Technical Details
+
 ### Frontmatter Format
+
 Status information is stored in your note's frontmatter using the following format:
+
 ```yaml
 ---
 obsidian-note-status: ["active"]
 ---
 ```
+
 Multiple statuses:
+
 ```yaml
 ---
 obsidian-note-status: ["active", "inProgress"]
 ---
 ```
+
 The frontmatter tag name can be customized in settings.
 
 ## Development
+
 ### Project Structure
+
 The plugin has been recently restructured with a modern, modular architecture:
+
 ```
 note-status/
 ├── src/
@@ -237,10 +268,12 @@ note-status/
 ```
 
 ### Prerequisites
+
 - Node.js and npm installed.
 - Obsidian API knowledge (TypeScript-based).
 
 ### CSS Modularization
+
 The plugin's CSS has been modularized to improve maintainability:
 
 - **Component-based**: Each UI component has its own CSS file
@@ -248,44 +281,58 @@ The plugin's CSS has been modularized to improve maintainability:
 - **Development workflow**: CSS changes are hot-reloaded during development
 
 When making CSS changes:
+
 1. Modify the appropriate file in the `styles/` directory
 2. For new components, create a dedicated CSS file and import it in `styles/index.css`
 3. The build process will automatically bundle everything into `styles.css`
 
 ### Building the Plugin
+
 1. Clone this repository:
+
 ```bash
 git clone https://github.com/devonthesofa/obsidian-note-status.git
 cd obsidian-note-status
 ```
+
 2. Install dependencies:
+
 ```bash
 npm install
 ```
+
 3. Build the plugin:
+
 ```bash
 npm run build
 ```
+
 4. For development with auto-rebuilding:
+
 ```bash
 npm run dev
 ```
+
 5. The compiled plugin will be in the root directory, ready to copy into `.obsidian/plugins/`.
 
 ## Contributing
+
 Contributions welcome! Please feel free to submit a Pull Request.
+
 1. Fork the repository
 2. Create your feature branch: `git checkout -b feature/my-new-feature`
 3. Commit your changes: `git commit -am 'Add some feature'`
 4. Push to the branch: `git push origin feature/my-new-feature`
 5. Submit a pull request
-   
+
 - Report issues or suggest features via the Issues tab.
 
 ## Roadmap
+
 The following features and improvements are planned for upcoming releases:
 
 ### Short-term
+
 - **Batch Modification Enhancement**: Implement a modal dialog with file preview and status selection for more intuitive batch operations
 - **Dropdown Refinement**: Restructure status options to be grouped by categories (workflow, templates, custom) with visual separators
 - **Obsidian API Compliance**: Refactor code to follow Obsidian guidelines for better performance and compatibility:
@@ -294,14 +341,17 @@ The following features and improvements are planned for upcoming releases:
     - Improve plugin teardown process to prevent memory leaks
 
 ### Medium-term
+
 - **Export/import configurations**: Share your status setups with others
 
 ### Long-term
+
 - **Canvas integration**: Show status on canvas cards
 - **Graph view integration**: Visualize notes by status in graph view
 - **Mobile optimization**: Improved experience on mobile devices
 
 ## Support the Development
+
 If you find this plugin useful and would like to support its development, you can make a donation through my PayPal account. Any contribution is greatly appreciated and helps me continue improving the plugin!
 
 PayPal: https://paypal.me/aleixsoler
