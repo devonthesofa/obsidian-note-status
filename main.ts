@@ -52,13 +52,7 @@ export default class NoteStatus extends Plugin {
       this.registerViews();
       this.initializeUI();
       this.initializeIntegrations();
-      // 4. Registrar comandos
-      // this.registerCommands();
-      
-      // 5. Registrar eventos personalizados
       this.setupCustomEvents();
-      
-      
     } catch (error) {
       console.error('Error loading Note Status plugin:', error);
       new Notice('Error loading Note Status plugin. Check console for details.');
@@ -91,11 +85,8 @@ export default class NoteStatus extends Plugin {
   }
 
   private initializeIntegrations() {
-    // Crear integraciones en orden de dependencia
     this.explorerIntegration = new ExplorerIntegration(this.app, this.settings, this.statusService);
     this.toolbarIntegration = new ToolbarIntegration(this.app, this.settings, this.statusService, this.statusDropdown);
-    
-    // Integraciones que dependen de otras
     const statusContextMenu = new StatusContextMenu(this.app, this.settings, this.statusService, this.statusDropdown, this.explorerIntegration);
     this.fileContextMenuIntegration = new FileContextMenuIntegration(this.app, this.settings, this.statusService, this.explorerIntegration, statusContextMenu);
     
@@ -121,17 +112,15 @@ export default class NoteStatus extends Plugin {
       this.toolbarIntegration
     );
     
-    // // 3. Registrar eventos en cada integración
+    // Registrar eventos en cada integración
     this.fileContextMenuIntegration.registerFileContextMenuEvents();
     this.editorIntegration.registerEditorMenus();
     this.commandIntegration.registerCommands();
-this.metadataIntegration.registerMetadataEvents();
+    this.metadataIntegration.registerMetadataEvents();
     this.workspaceIntegration.registerWorkspaceEvents();
   }
 
   private setupCustomEvents() {
-    // Evento para cambios de estado
-
     this.boundHandleStatusChanged = this.handleStatusChanged.bind(this);
     window.addEventListener('note-status:status-changed', this.boundHandleStatusChanged);
   }
@@ -157,7 +146,6 @@ this.metadataIntegration.registerMetadataEvents();
   private handleStatusChanged(event: CustomEvent) {
     const { statuses, file } = event.detail;
     
-    console.log("Note status changed", statuses)
     // Actualizar barra de estado
     this.statusBar.update(statuses);
     // Actualizar toolbar
@@ -165,6 +153,7 @@ this.metadataIntegration.registerMetadataEvents();
     if (activeFile?.path === file) {
         this.toolbarIntegration.updateStatusDisplay(statuses);
     }
+    // Actualizar dropdown
     this.statusDropdown.update(statuses);
 	// Actualizar status pane si está abierto
 	const statusPaneLeaf = this.app.workspace.getLeavesOfType('status-pane')[0];
@@ -178,20 +167,6 @@ this.metadataIntegration.registerMetadataEvents();
         this.explorerIntegration.updateFileExplorerIcons(fileObj);
       }
     }
-  }
-
-  private refreshStatus() {
-    // const activeFile = this.app.workspace.getActiveFile();
-    // if (activeFile) {
-    //   const statuses = this.statusService.getFileStatuses(activeFile);
-    //   window.dispatchEvent(new CustomEvent('note-status:status-changed', { 
-    //     detail: { statuses, file: activeFile.path } 
-    //   }));
-    // }
-  }
-
-  private refreshUI() {
-    // this.refreshStatus();
   }
 
   private async openStatusPane() {
