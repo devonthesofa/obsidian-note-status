@@ -57,19 +57,19 @@ Track the status of your notes with a powerful, customizable status management s
 
 ### For Users
 
-- **[📚 Quick Start Guide](wiki/📚-Quick-Start-Guide)** - Get running in 5 minutes
-- **[[User Manual|📖 User Manual]]** - Complete feature documentation
-- **[[Configuration Guide|⚙️ Configuration Guide]]** - Settings and customization
-- **[[Performance Tuning|🚀 Performance Tuning]]** - Optimize for large vaults
+- \*\*[📚 Quick Start Guide](https://github.com/devonthesofa/obsidian-note-status/wiki/📚-Quick-Start-Guide - Get running in 5 minutes
+- **[📖 User Manual](https://github.com/devonthesofa/obsidian-note-status/wiki/📖-User-Manual)** - Complete feature documentation
+- **[⚙️ Configuration Guide](https://github.com/devonthesofa/obsidian-note-status/wiki/⚙%EF%B8%8F-Configuration-Guide)** - Settings and customization
+- **[🚀 Performance Tuning](https://github.com/devonthesofa/obsidian-note-status/wiki/🚀-Performance-Tuning)** - Optimize for large vaults
 
 ### For Developers
 
-- **[[Architecture Overview|🏗️ Architecture Overview]]** - Plugin structure and design
-- **[[Development Setup|🔧 Development Setup]]** - Contributing guide
+- **[🏗️ Architecture Overview](https://github.com/devonthesofa/obsidian-note-status/wiki/%F0%9F%8F%97%EF%B8%8F-Architecture-Overview)** - Plugin structure and design
+- **[🔧 Development Setup](https://github.com/devonthesofa/obsidian-note-status/wiki/%F0%9F%94%A7-Development-Setup)** - Contributing guide
 
 ### Reference
 
-- **[[Frontmatter Format|📝 Frontmatter Format]]** - Technical specification
+- **[📝 Frontmatter Format](https://github.com/devonthesofa/obsidian-note-status/wiki/%F0%9F%93%9D-Frontmatter-Format)** - Technical specification
 
 ## Data Format
 
