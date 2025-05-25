@@ -223,12 +223,34 @@ note-status/
 │   │   └── file-utils.ts                # File-related helpers
 │   └── settings/                        # Settings UI
 │       └── settings-tab.ts              # Settings tab definition
-└── styles.css                           # CSS styles
+├── styles/                              # Modular CSS files
+│   ├── base.css                         # Variables and base styles
+│   ├── utils.css                        # Utility classes
+│   ├── components/                      # Component-specific styles
+│   │   ├── status-bar.css               # Status bar styles
+│   │   ├── status-pane.css              # Status pane styles
+│   │   ├── dropdown.css                 # Dropdown component styles
+│   │   ├── explorer.css                 # File explorer styles
+│   │   └── settings.css                 # Settings UI styles
+│   └── index.css                        # Main CSS import file
+└── styles.css                           # Auto-generated final CSS
 ```
 
 ### Prerequisites
 - Node.js and npm installed.
 - Obsidian API knowledge (TypeScript-based).
+
+### CSS Modularization
+The plugin's CSS has been modularized to improve maintainability:
+
+- **Component-based**: Each UI component has its own CSS file
+- **Auto-bundling**: The build process automatically bundles all CSS files into `styles.css`
+- **Development workflow**: CSS changes are hot-reloaded during development
+
+When making CSS changes:
+1. Modify the appropriate file in the `styles/` directory
+2. For new components, create a dedicated CSS file and import it in `styles/index.css`
+3. The build process will automatically bundle everything into `styles.css`
 
 ### Building the Plugin
 1. Clone this repository:

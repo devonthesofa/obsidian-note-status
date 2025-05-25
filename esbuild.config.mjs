@@ -11,6 +11,17 @@ if you want to view the source, please visit the github repository of this plugi
 
 const prod = (process.argv[2] === "production");
 
+// CSS bundling function
+const buildStyles = async () => {
+	await esbuild.build({
+		entryPoints: ["styles/index.css"],
+		bundle: true,
+		outfile: "styles.css",
+		minify: prod,
+		logLevel: "info",
+	});
+};
+
 const context = await esbuild.context({
 	banner: {
 		js: banner,
@@ -31,7 +42,8 @@ const context = await esbuild.context({
 		"@lezer/common",
 		"@lezer/highlight",
 		"@lezer/lr",
-		...builtins],
+		...builtins
+	],
 	format: "cjs",
 	target: "es2018",
 	logLevel: "info",
@@ -41,9 +53,20 @@ const context = await esbuild.context({
 	minify: prod,
 });
 
+// CSS context for watch mode
+const cssContext = await esbuild.context({
+	entryPoints: ["styles/index.css"],
+	bundle: true,
+	outfile: "styles.css",
+	minify: prod,
+	logLevel: "info",
+});
+
 if (prod) {
 	await context.rebuild();
+	await buildStyles(); // Build CSS in production mode
 	process.exit(0);
 } else {
 	await context.watch();
+	await cssContext.watch(); // Watch CSS files in development mode
 }

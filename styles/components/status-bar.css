@@ -1,0 +1,64 @@
+/*
+ * Status bar styles
+ */
+.note-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: var(--radius-s);
+  transition: all 0.2s var(--ease-out);
+  cursor: pointer;
+  height: 22px;
+}
+
+.note-status-bar:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.note-status-badges {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.note-status-badge {
+  display: flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: var(--background-secondary-alt);
+  font-size: var(--font-ui-smaller);
+  max-width: 100px;
+  margin-right: 2px;
+}
+
+.note-status-badge-icon {
+  margin-right: 2px;
+}
+
+.note-status-badge-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Status bar positioning and visibility */
+.status-bar .note-status-icon::after {
+  bottom: auto;
+  top: -30px;
+}
+
+/* Auto-hide behavior */
+.note-status-bar.hidden {
+  display: none;
+}
+
+.note-status-bar.auto-hide {
+  opacity: 0.5;
+  transition: opacity 0.2s var(--ease-out);
+}
+
+.note-status-bar.visible {
+  opacity: 1;
+}

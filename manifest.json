@@ -11,7 +11,7 @@
 	},
 	"isDesktopOnly": false,
 	"license": "MIT",
-	"icon": "status-pane",
+	"icon": "tag",
 	"repository": "https://github.com/devonthesofa/obsidian-note-status",
 	"issues": "https://github.com/devonthesofa/obsidian-note-status/issues",
 	"releaseNotes": "Initial release with status management, customizable UI, and file explorer integration.",

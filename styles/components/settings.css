@@ -1,0 +1,62 @@
+/*
+ * Settings styles
+ */
+/* Template styling */
+.status-color-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--dot-color, #ffffff);
+  margin-right: 4px;
+}
+
+.template-buttons {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+/* Template selection styling */
+.template-item {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--status-border-radius);
+  margin-bottom: 10px;
+  padding: 10px;
+  background: var(--background-primary-alt);
+}
+
+.template-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.template-checkbox {
+  margin-right: 10px;
+}
+
+.template-name {
+  font-weight: bold;
+}
+
+.template-description {
+  font-size: 0.9em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.template-statuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.template-status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--background-secondary);
+  font-size: 0.85em;
+}

@@ -1,0 +1,58 @@
+/*
+ * Explorer integration styles
+ */
+.note-status-toolbar-badge-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.note-status-toolbar-icon {
+  color: var(--text-normal) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.note-status-count-badge {
+  position: absolute;
+  top: -5px;
+  right: -8px;
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border-radius: 10px;
+  font-size: 10px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-bold);
+}
+
+/* Explorer icons container */
+.note-status-icon-container {
+  display: inline-flex;
+  margin-left: var(--size-4-1, 4px);
+  gap: 2px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Individual status icons in explorer */
+.note-status-icon {
+  font-size: var(--font-ui-smaller);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--status-icon-size);
+  height: var(--status-icon-size);
+  position: relative;
+  z-index: 500; /* Higher than most elements */
+}
+
+.nav-file-title .note-status-icon::after {
+  bottom: 150%; /* Position above in file explorer */
+}

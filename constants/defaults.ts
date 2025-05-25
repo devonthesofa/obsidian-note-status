@@ -23,6 +23,7 @@ export const DEFAULT_SETTINGS: NoteStatusSettings = {
 	useCustomStatusesOnly: false,
 	useMultipleStatuses: true,
 	tagPrefix: 'obsidian-note-status',
+	strictStatuses: false, // Default to show all statuses from frontmatter
 	excludeUnknownStatus: true, // Default to exclude unknown status files for better performance
 };
 

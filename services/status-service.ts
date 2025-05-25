@@ -28,37 +28,26 @@ export class StatusService {
    * Updates the combined list of all statuses (from templates and custom)
    */
   private updateAllStatuses(): void {
-    // Start with custom statuses if not using templates exclusively
+    // Start with custom statuses
     this.allStatuses = [...this.settings.customStatuses];
 
-    // Add statuses from enabled templates
+    // Add statuses from enabled templates if not using custom only
     if (!this.settings.useCustomStatusesOnly) {
       const templateStatuses = this.getTemplateStatuses();
       
-      // Add template statuses that don't have the same name as existing statuses
       for (const status of templateStatuses) {
-        if (!this.allStatuses.some(s => s.name.toLowerCase() === status.name.toLowerCase())) {
+        const existingIndex = this.allStatuses.findIndex(s => 
+          s.name.toLowerCase() === status.name.toLowerCase());
+        
+        if (existingIndex === -1) {
+          // Add new status
           this.allStatuses.push(status);
-        } else {
-          this.updateExistingStatusColor(status);
+        } else if (status.color) {
+          // Update color in settings if it doesn't exist
+          if (!this.settings.statusColors[status.name]) {
+            this.settings.statusColors[status.name] = status.color;
+          }
         }
-      }
-    }
-  }
-
-  /**
-   * Update color for an existing status if it comes from a template
-   */
-  private updateExistingStatusColor(status: Status): void {
-    // Update status colors if they come from a template and have colors
-    const existingStatusIndex = this.allStatuses.findIndex(
-      s => s.name.toLowerCase() === status.name.toLowerCase()
-    );
-    
-    if (existingStatusIndex !== -1 && status.color) {
-      // Update color in settings if it doesn't exist
-      if (!this.settings.statusColors[status.name]) {
-        this.settings.statusColors[status.name] = status.color;
       }
     }
   }
@@ -67,17 +56,10 @@ export class StatusService {
    * Gets all statuses from enabled templates
    */
   public getTemplateStatuses(): Status[] {
-    const statuses: Status[] = [];
-    
-    // Find templates that are enabled
-    for (const templateId of this.settings.enabledTemplates) {
-      const template = PREDEFINED_TEMPLATES.find(t => t.id === templateId);
-      if (template) {
-        statuses.push(...template.statuses);
-      }
-    }
-    
-    return statuses;
+    return this.settings.enabledTemplates
+      .map(id => PREDEFINED_TEMPLATES.find(t => t.id === id))
+      .filter(Boolean)
+      .flatMap(template => template ? template.statuses : []);
   }
 
   /**
@@ -89,63 +71,48 @@ export class StatusService {
 
   /**
    * Get the statuses of a file from its metadata
-   * Returns an array of status names
    */
   public getFileStatuses(file: TFile): string[] {
     const cachedMetadata = this.app.metadataCache.getFileCache(file);
-    const statuses: string[] = [];
+    if (!cachedMetadata?.frontmatter) return ['unknown'];
   
-    if (cachedMetadata?.frontmatter) {
-      // Check for status using the configured tag prefix
-      const frontmatterStatus = cachedMetadata.frontmatter[this.settings.tagPrefix];
-      
-      if (frontmatterStatus) {
-        if (Array.isArray(frontmatterStatus)) {
-          // Handle array format
-          this.processStatusArray(frontmatterStatus, statuses);
+    const frontmatterStatus = cachedMetadata.frontmatter[this.settings.tagPrefix];
+    if (!frontmatterStatus) return ['unknown'];
+    
+    const statuses: string[] = [];
+    
+    if (Array.isArray(frontmatterStatus)) {
+      for (const statusName of frontmatterStatus) {
+        if (this.settings.strictStatuses) {
+          this.addValidStatus(statusName.toString(), statuses);
         } else {
-          // Handle single value format (string) - convert to array format internally
-          this.processSingleStatus(frontmatterStatus.toString(), statuses);
+          const cleanStatus = statusName.toString().trim();
+          if (cleanStatus) statuses.push(cleanStatus);
         }
       }
+    } else {
+      if (this.settings.strictStatuses) {
+        this.addValidStatus(frontmatterStatus.toString(), statuses);
+      } else {
+        const cleanStatus = frontmatterStatus.toString().trim();
+        if (cleanStatus) statuses.push(cleanStatus);
+      }
     }
-
-    // Return 'unknown' if no statuses found
+  
     return statuses.length > 0 ? statuses : ['unknown'];
   }
   
   /**
-   * Process an array of statuses from frontmatter
+   * Add a status to the list if it's valid
    */
-  private processStatusArray(statusArray: any[], targetStatuses: string[]): void {
-    for (const statusName of statusArray) {
-      const normalizedStatus = statusName.toString().toLowerCase();
-      const matchingStatus = this.allStatuses.find(s => 
-        s.name.toLowerCase() === normalizedStatus);
-      
-      if (matchingStatus) {
-        targetStatuses.push(matchingStatus.name);
-      }
-    }
-  }
-  
-  /**
-   * Process a single status string from frontmatter
-   */
-  private processSingleStatus(statusString: string, targetStatuses: string[]): void {
-    const normalizedStatus = statusString.toLowerCase();
-    const matchingStatus = this.allStatuses.find(s =>
+  private addValidStatus(statusName: string, targetStatuses: string[]): void {
+    const normalizedStatus = statusName.toLowerCase();
+    const matchingStatus = this.allStatuses.find(s => 
       s.name.toLowerCase() === normalizedStatus);
-
-    if (matchingStatus) targetStatuses.push(matchingStatus.name);
-  }
-
-  /**
-   * Get the primary status of a file (first one, or 'unknown')
-   */
-  public getFilePrimaryStatus(file: TFile): string {
-    const statuses = this.getFileStatuses(file);
-    return statuses[0] || 'unknown';
+    
+    if (matchingStatus) {
+      targetStatuses.push(matchingStatus.name);
+    }
   }
 
   /**
@@ -159,166 +126,36 @@ export class StatusService {
   }
 
   /**
-   * Update the statuses of a note
-   * @param newStatuses Array of status names to set
-   * @param file Optional file to update, otherwise uses active file
-   */
-  public async updateNoteStatuses(newStatuses: string[], file?: TFile): Promise<void> {
-    const targetFile = file || this.app.workspace.getActiveFile();
-    if (!targetFile || !(targetFile instanceof TFile) || targetFile.extension !== 'md') return;
-  
-    // Use processFrontMatter instead of manual read/modify
-    await this.app.fileManager.processFrontMatter(targetFile, (frontmatter) => {
-      frontmatter[this.settings.tagPrefix] = newStatuses;
-    });
-    
-    // Dispatch events for UI update
-    window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-      detail: { statuses: newStatuses, file: targetFile.path }
-    }));
-  }
-
-  /**
-   * Legacy method to update a single status for backward compatibility
-   */
-  public async updateNoteStatus(newStatus: string, file?: TFile): Promise<void> {
-    // Always store as an array even in single status mode
-    await this.updateNoteStatuses([newStatus], file);
-  }
-
-  /**
-   * Add a status to a note's existing statuses
-   */
-  public async addNoteStatus(statusToAdd: string, file?: TFile): Promise<void> {
-    const targetFile = file || this.app.workspace.getActiveFile();
-    if (!targetFile || !(targetFile instanceof TFile) || targetFile.extension !== 'md') return;
-    
-    const currentStatuses = this.getFileStatuses(targetFile);
-    
-    // Don't add if already exists
-    if (currentStatuses.includes(statusToAdd)) return;
-    
-    // Filter out 'unknown' status when adding valid statuses
-    const filteredStatuses = currentStatuses.filter(s => s !== 'unknown');
-    const newStatuses = [...filteredStatuses, statusToAdd];
-    
-    await this.updateNoteStatuses(newStatuses, targetFile);
-    
-    // Trigger UI updates
-    window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-      detail: { statuses: newStatuses }
-    }));
-  }
-
-  /**
-   * Remove a status from a note's existing statuses
-   */
-  public async removeNoteStatus(statusToRemove: string, file?: TFile): Promise<void> {
-    const targetFile = file || this.app.workspace.getActiveFile();
-    if (!targetFile || !(targetFile instanceof TFile) || targetFile.extension !== 'md') return;
-    
-    const currentStatuses = this.getFileStatuses(targetFile);
-    const newStatuses = currentStatuses.filter(status => status !== statusToRemove);
-    
-    await this.updateNoteStatuses(newStatuses, targetFile);
-    
-    // Trigger UI updates
-    window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-      detail: { statuses: newStatuses }
-    }));
-  }
-
-  /**
-   * Toggle a status on/off for a note
-   */
-  public async toggleNoteStatus(statusToToggle: string, file?: TFile): Promise<void> {
-    const targetFile = file || this.app.workspace.getActiveFile();
-    if (!targetFile || targetFile.extension !== 'md') return;
-    
-    const currentStatuses = this.getFileStatuses(targetFile);
-    let newStatuses: string[];
-    
-    if (currentStatuses.includes(statusToToggle)) {
-      newStatuses = currentStatuses.filter(status => status !== statusToToggle);
-    } else {
-      // Filter out 'unknown' status when adding valid statuses
-      const filteredStatuses = currentStatuses.filter(s => s !== 'unknown');
-      newStatuses = [...filteredStatuses, statusToToggle];
-    }
-    
-    await this.updateNoteStatuses(newStatuses, targetFile);
-    
-    // Ensure UI updates
-    window.dispatchEvent(new CustomEvent('note-status:status-changed', {
-      detail: { statuses: newStatuses }
-    }));
-  }
-
-  /**
-   * Batch update multiple files' statuses
-   * @param files Array of files to update
-   * @param statusesToSet Array of statuses to set
-   * @param mode 'replace' to replace all statuses, 'add' to add to existing
-   * @param showNotice Whether to show a notification (default: true)
-   */
-  public async batchUpdateStatuses(
-    files: TFile[], 
-    statusesToSet: string[], 
-    mode: 'replace' | 'add' = 'replace',
-    showNotice = true
-  ): Promise<void> {
-    if (files.length === 0) {
-      if (showNotice) {
-        new Notice('No files selected');
-      }
-      return;
-    }
-
-    for (const file of files) {
-      if (mode === 'replace') {
-        await this.updateNoteStatuses(statusesToSet, file);
-      } else {
-        // Add each status
-        for (const status of statusesToSet) {
-          await this.addNoteStatus(status, file);
-        }
-      }
-    }
-
-    // Only show notice if explicitly requested and we're dealing with multiple files
-    if (showNotice && files.length > 1) {
-      const statusText = this.formatStatusText(statusesToSet);
-      new Notice(`Updated ${files.length} files with ${statusText}`);
-    }
-  }
-  
-  /**
-   * Format status text for notifications
-   */
-  private formatStatusText(statusesToSet: string[]): string {
-    return statusesToSet.length === 1 
-      ? statusesToSet[0] 
-      : `${statusesToSet.length} statuses`;
-  }
-
-
-  /**
    * Insert status metadata in the editor
    */
-  public insertStatusMetadataInEditor(editor: Editor): void {
-    const content = editor.getValue();
+public insertStatusMetadataInEditor(editor: Editor): void {
+  const content = editor.getValue();
+  const frontMatterMatch = content.match(/^---\n([\s\S]+?)\n---/);
+  
+  // Check if status metadata already exists
+  const statusTagRegex = new RegExp(`${this.settings.tagPrefix}:\\s*\\[?[^\\]]*\\]?`, 'm');
+  
+  if (frontMatterMatch) {
+    const frontMatter = frontMatterMatch[1];
+    if (frontMatter.match(statusTagRegex)) {
+      // Status already exists, do nothing
+      return;
+    }
+    // Add to existing frontmatter
     const defaultStatuses = ['unknown'];
     const statusMetadata = `${this.settings.tagPrefix}: ${JSON.stringify(defaultStatuses)}`;
-
-    // Check if frontmatter exists
-    const frontMatterMatch = content.match(/^---\n([\s\S]+?)\n---/);
-
-    if (frontMatterMatch) {
-      this.insertIntoExistingFrontmatter(editor, content, frontMatterMatch, statusMetadata);
-    } else {
-      this.createFrontmatterWithStatus(editor, content, statusMetadata);
+    this.insertIntoExistingFrontmatter(editor, content, frontMatterMatch, statusMetadata);
+  } else {
+    // No frontmatter, check if status exists in content somehow
+    if (content.match(statusTagRegex)) {
+      return;
     }
+    // Create new frontmatter
+    const defaultStatuses = ['unknown'];
+    const statusMetadata = `${this.settings.tagPrefix}: ${JSON.stringify(defaultStatuses)}`;
+    this.createFrontmatterWithStatus(editor, content, statusMetadata);
   }
+}
   
   /**
    * Insert status metadata into existing frontmatter
@@ -330,16 +167,11 @@ export class StatusService {
     statusMetadata: string
   ): void {
     const frontMatter = frontMatterMatch[1];
-    let updatedFrontMatter = frontMatter;
-
-    // Check if status tag already exists in frontmatter
     const statusTagRegex = new RegExp(`${this.settings.tagPrefix}:\\s*\\[?[^\\]]*\\]?`, 'm');
     
-    if (frontMatter.match(statusTagRegex)) {
-      updatedFrontMatter = frontMatter.replace(statusTagRegex, statusMetadata);
-    } else {
-      updatedFrontMatter = `${frontMatter}\n${statusMetadata}`;
-    }
+    const updatedFrontMatter = frontMatter.match(statusTagRegex)
+      ? frontMatter.replace(statusTagRegex, statusMetadata)
+      : `${frontMatter}\n${statusMetadata}`;
 
     const updatedContent = content.replace(/^---\n([\s\S]+?)\n---/, `---\n${updatedFrontMatter}\n---`);
     editor.setValue(updatedContent);
@@ -358,14 +190,11 @@ export class StatusService {
    */
   public getMarkdownFiles(searchQuery = ''): TFile[] {
     const files = this.app.vault.getMarkdownFiles();
+    if (!searchQuery) return files;
 
-    if (!searchQuery) {
-      return files;
-    }
-
-    return files.filter(file =>
-      file.basename.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const lowerQuery = searchQuery.toLowerCase();
+    return files.filter(file => 
+      file.basename.toLowerCase().includes(lowerQuery));
   }
 
   /**
@@ -375,22 +204,18 @@ export class StatusService {
     const statusGroups: Record<string, TFile[]> = {};
 
     // Initialize groups for all statuses
-    this.allStatuses.forEach(status => {
+    for (const status of this.allStatuses) {
       statusGroups[status.name] = [];
-    });
-
-    // Ensure 'unknown' status is included
-    if (!statusGroups['unknown']) {
-      statusGroups['unknown'] = [];
     }
+    
+    // Ensure 'unknown' status exists
+    statusGroups['unknown'] = statusGroups['unknown'] || [];
 
-    // Get all markdown files and filter by search query
+    // Get and process all files matching the search query
     const files = this.getMarkdownFiles(searchQuery);
-
     for (const file of files) {
       const statuses = this.getFileStatuses(file);
       
-      // Add file to each of its status groups
       for (const status of statuses) {
         if (statusGroups[status]) {
           statusGroups[status].push(file);
@@ -399,5 +224,165 @@ export class StatusService {
     }
 
     return statusGroups;
+  }
+
+  /**
+   * Centralizes all status modification operations
+   */
+  private async modifyNoteStatus(options: {
+    files: TFile | TFile[];
+    statuses: string | string[];
+    operation: 'set' | 'add' | 'remove' | 'toggle';
+    showNotice?: boolean;
+  }): Promise<void> {
+    const { operation, showNotice = true } = options;
+    const targetFiles = Array.isArray(options.files) ? options.files : [options.files];
+    const targetStatuses = Array.isArray(options.statuses) ? options.statuses : [options.statuses];
+    
+    if (targetFiles.length === 0) {
+      if (showNotice) new Notice('No files selected');
+      return;
+    }
+
+    // Process each file
+    const updatePromises = targetFiles.map(async (file) => {
+      if (!file || file.extension !== 'md') return;
+      
+      // Get current statuses for the file
+      const currentStatuses = this.getFileStatuses(file);
+      let newStatuses: string[] = [];
+      
+      switch (operation) {
+        case 'set':
+          // Replace all statuses with the new ones
+          newStatuses = [...targetStatuses];
+          break;
+          
+        case 'add':
+          // Add new statuses without duplicates
+          newStatuses = [...new Set([
+            ...currentStatuses.filter(s => s !== 'unknown'),
+            ...targetStatuses
+          ])];
+          break;
+          
+        case 'remove':
+          // Remove specified statuses
+          newStatuses = currentStatuses.filter(
+            status => !targetStatuses.includes(status)
+          );
+          break;
+          
+        case 'toggle':
+          // Toggle each status (add if not present, remove if present)
+          newStatuses = [...currentStatuses];
+          for (const status of targetStatuses) {
+            if (currentStatuses.includes(status)) {
+              newStatuses = newStatuses.filter(s => s !== status);
+            } else {
+              newStatuses = [...newStatuses.filter(s => s !== 'unknown'), status];
+            }
+          }
+          break;
+      }
+      
+      // Handle empty result (should revert to unknown)
+      if (newStatuses.length === 0) {
+        newStatuses = ['unknown'];
+      }
+      
+      // Apply updates to frontmatter
+      await this.app.fileManager.processFrontMatter(file, (frontmatter) => {
+        frontmatter[this.settings.tagPrefix] = newStatuses;
+      });
+
+
+      this.notifyStatusChanged(newStatuses, file)
+    });
+    
+    await Promise.all(updatePromises);
+    
+    // Show notification for batch operations
+    if (showNotice && targetFiles.length > 1) {
+      const statusText = targetStatuses.length === 1 
+        ? targetStatuses[0] 
+        : `${targetStatuses.length} statuses`;
+      const operationText = operation === 'set' ? 'updated' : 
+                            operation === 'add' ? 'added to' : 
+                            operation === 'remove' ? 'removed from' : 'toggled on';
+      
+      new Notice(`${statusText} ${operationText} ${targetFiles.length} files`);
+    }
+  }
+
+  /**
+   * Handles UI-triggered status changes with appropriate logic based on context
+   * This is the central function that all UI components should call for status changes
+   */
+  public async handleStatusChange(options: {
+      files: TFile | TFile[];
+      statuses: string | string[];
+      isMultipleSelection?: boolean;
+      allowMultipleStatuses?: boolean;
+      operation?: 'set' | 'add' | 'remove' | 'toggle';
+      showNotice?: boolean;
+      afterChange?: (updatedStatuses: string[]) => void;
+  }): Promise<void> {
+    const { 
+      files, 
+      statuses, 
+      isMultipleSelection = false,
+      allowMultipleStatuses = this.settings.useMultipleStatuses,
+      operation: explicitOperation,
+      showNotice = isMultipleSelection,
+      afterChange
+    } = options;
+    
+    const targetFiles = Array.isArray(files) ? files : [files];
+    const targetStatuses = Array.isArray(statuses) ? statuses : [statuses];
+    
+    // Determine operation based on context if not explicitly specified
+    let operation: 'set' | 'add' | 'remove' | 'toggle';
+    
+    if (explicitOperation) {
+      operation = explicitOperation;
+    } else if (isMultipleSelection) {
+      // For multiple files, we need to check if we should add or remove
+      const firstStatus = targetStatuses[0]; // Use first status for multi-file operations
+      const filesWithStatus = targetFiles.filter(file => 
+        this.getFileStatuses(file).includes(firstStatus)
+      );
+      
+      operation = filesWithStatus.length > targetFiles.length / 2 ? 'remove' : 'add';
+    } else {
+      // For single file operations
+      if (allowMultipleStatuses) {
+        operation = 'toggle';
+      } else {
+        operation = 'set';
+      }
+    }
+    
+    // Apply the changes
+    await this.modifyNoteStatus({
+      files: targetFiles,
+      statuses: targetStatuses,
+      operation,
+      showNotice
+    });
+    
+  }
+  
+  /**
+   * Dispatch status changed event
+   */
+  private notifyStatusChanged(statuses: string[], file?: TFile): void {
+    // Dispatch the specific status change event
+    window.dispatchEvent(new CustomEvent('note-status:status-changed', {
+      detail: { 
+        statuses,
+        file: file?.path
+      }
+    }));
   }
 }
