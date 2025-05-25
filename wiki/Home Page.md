@@ -16,6 +16,10 @@ Welcome to the comprehensive documentation for the Note Status plugin for Obsidi
 - **[[Architecture Overview|🏗️ Architecture Overview]]** - Plugin structure and design
 - **[[Development Setup|🔧 Development Setup]]** - Contributing guide
 
+### Reference
+
+- **[[Frontmatter Format|📝 Frontmatter Format]]** - Technical specification
+
 ## 📈 Features Overview
 
 ### Core Features
