@@ -38,6 +38,7 @@ export class NoteStatusSettingsUI {
     this.renderUISettings(containerEl, settings);
     this.renderTagSettings(containerEl, settings);
     this.renderCustomStatusSettings(containerEl, settings);
+    this.renderQuickCommandsSettings(containerEl, settings);
   }
 
   /**
@@ -168,6 +169,73 @@ export class NoteStatusSettingsUI {
       .addToggle(toggle => toggle
         .setValue(settings.strictStatuses || false)
         .onChange(value => this.callbacks.onSettingChange('strictStatuses', value)));
+
+  }
+
+  /**
+   * Renders the quick commands configuration section
+   */
+  private renderQuickCommandsSettings(containerEl: HTMLElement, settings: any): void {
+      new Setting(containerEl)
+        .setName('Quick status commands')
+        .setDesc('Select which statuses should have dedicated commands in the command palette. These can be assigned hotkeys for quick access.')
+        .setHeading();
+  
+      const quickCommandsContainer = containerEl.createDiv({ cls: 'quick-commands-container' });
+      
+      // Get all available statuses from service
+      const allStatuses = this.getAllAvailableStatuses(settings);
+      const currentQuickCommands = settings.quickStatusCommands || [];
+  
+      allStatuses.forEach(status => {
+        const setting = new Setting(quickCommandsContainer)
+          .setName(`${status.icon} ${status.name}`)
+          .addToggle(toggle => toggle
+            .setValue(currentQuickCommands.includes(status.name))
+            .onChange(async (value) => {
+              const updatedCommands = value 
+                ? [...currentQuickCommands.filter((cmd: string) => cmd !== status.name), status.name]
+                : currentQuickCommands.filter((cmd: string) => cmd !== status.name);
+              
+              await this.callbacks.onSettingChange('quickStatusCommands', updatedCommands);
+            }));
+        
+        if (status.description) {
+          setting.setDesc(status.description);
+        }
+      });
+  
+      if (allStatuses.length === 0) {
+        quickCommandsContainer.createDiv({
+          text: 'No statuses available. Enable templates or add custom statuses first.',
+          cls: 'setting-item-description'
+        });
+      }
+    }
+/**
+   * Get all available statuses from templates and custom statuses
+   */
+  private getAllAvailableStatuses(settings: any): Array<{name: string, icon: string, description?: string}> {
+    const statuses: Array<{name: string, icon: string, description?: string}> = [];
+    
+    // Add custom statuses
+    statuses.push(...settings.customStatuses);
+    
+    // Add template statuses if not using custom only
+    if (!settings.useCustomStatusesOnly) {
+      for (const templateId of settings.enabledTemplates) {
+        const template = PREDEFINED_TEMPLATES.find(t => t.id === templateId);
+        if (template) {
+          for (const status of template.statuses) {
+            if (!statuses.find(s => s.name === status.name)) {
+              statuses.push(status);
+            }
+          }
+        }
+      }
+    }
+    
+    return statuses.filter(s => s.name !== 'unknown');
   }
 
   /**
