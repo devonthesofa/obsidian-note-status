@@ -28,6 +28,7 @@ export interface NoteStatusSettings {
     tagPrefix: string; // Prefix for the status tag (default: 'status')
     strictStatuses: boolean; // Whether to only show known statuses
     excludeUnknownStatus: boolean; // Whether to exclude files with unknown status from the status pane
+    quickStatusCommands: string[];
 }
 
 /**

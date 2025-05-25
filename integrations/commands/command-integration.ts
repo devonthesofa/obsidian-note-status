@@ -29,6 +29,9 @@ export class CommandIntegration {
 
   public updateSettings(settings: NoteStatusSettings): void {
     this.settings = settings;
+    // Re-register commands when settings change
+    this.unload();
+    this.registerCommands();
   }
 
   public registerCommands(): void {
@@ -49,6 +52,24 @@ export class CommandIntegration {
         
         if (!checking) {
           this.statusDropdown.openStatusDropdown({ files: [file] });
+        }
+        return true;
+      }
+    });
+
+    // Add status to current note
+    this.plugin.addCommand({
+      id: 'add-status',
+      name: 'Add status to current note',
+      checkCallback: (checking: boolean) => {
+        const file = this.app.workspace.getActiveFile();
+        if (!file) return false;
+        
+        if (!checking) {
+          this.statusDropdown.openStatusDropdown({ 
+            files: [file],
+            mode: this.settings.useMultipleStatuses ? 'add' : 'replace'
+          });
         }
         return true;
       }
@@ -87,28 +108,8 @@ export class CommandIntegration {
       }
     });
 
-    // Quick status commands for common statuses
-    const quickStatuses = ['active', 'completed', 'onHold', 'dropped'];
-    quickStatuses.forEach(status => {
-      this.plugin.addCommand({
-        id: `set-status-${status}`,
-        name: `Set status to ${status}`,
-        checkCallback: (checking: boolean) => {
-          const file = this.app.workspace.getActiveFile();
-          if (!file) return false;
-          
-          if (!checking) {
-            this.statusService.handleStatusChange({
-              files: file,
-              statuses: status,
-              operation: 'set'
-            });
-            new Notice(`Status set to ${status}`);
-          }
-          return true;
-        }
-      });
-    });
+    // Register dynamic quick status commands
+    this.registerQuickStatusCommands();
 
     // Clear status
     this.plugin.addCommand({
@@ -197,6 +198,62 @@ export class CommandIntegration {
     });
   }
 
+/**
+   * Register quick status commands based on settings
+   */
+  private registerQuickStatusCommands(): void {
+    const quickCommands = this.settings.quickStatusCommands || [];
+    const allStatuses = this.statusService.getAllStatuses();
+    
+    quickCommands.forEach(statusName => {
+      const status = allStatuses.find(s => s.name === statusName);
+      if (!status) return;
+      
+      this.plugin.addCommand({
+        id: `set-status-${statusName}`,
+        name: `Set status to ${statusName}`,
+        checkCallback: (checking: boolean) => {
+          const file = this.app.workspace.getActiveFile();
+          if (!file) return false;
+          
+          if (!checking) {
+            this.statusService.handleStatusChange({
+              files: file,
+              statuses: statusName,
+              operation: 'set'
+            });
+            new Notice(`Status set to ${statusName}`);
+          }
+          return true;
+        }
+      });
+      
+      // Add toggle command for multiple status mode
+      if (this.settings.useMultipleStatuses) {
+        this.plugin.addCommand({
+          id: `toggle-status-${statusName}`,
+          name: `Toggle status ${statusName}`,
+          checkCallback: (checking: boolean) => {
+            const file = this.app.workspace.getActiveFile();
+            if (!file) return false;
+            
+            if (!checking) {
+              this.statusService.handleStatusChange({
+                files: file,
+                statuses: statusName,
+                operation: 'toggle'
+              });
+              const currentStatuses = this.statusService.getFileStatuses(file);
+              const hasStatus = currentStatuses.includes(statusName);
+              new Notice(`Status ${statusName} ${hasStatus ? 'added' : 'removed'}`);
+            }
+            return true;
+          }
+        });
+      }
+    });
+  }
+
   private cycleStatus(file: TFile): void {
     const allStatuses = this.statusService.getAllStatuses()
       .filter(s => s.name !== 'unknown')
@@ -224,4 +281,22 @@ export class CommandIntegration {
     
     new Notice(`Status changed to ${allStatuses[nextIndex]}`);
   }
+
+  public unload(): void {
+    // Remove existing commands
+    this.removeQuickStatusCommands();
+  }
+
+  /**
+   * Remove all quick status commands
+   */
+  private removeQuickStatusCommands(): void {
+    const allStatuses = this.statusService.getAllStatuses();
+    
+    allStatuses.forEach(status => {
+      (this.app as any).commands.removeCommand(`note-status:set-status-${status.name}`);
+      (this.app as any).commands.removeCommand(`note-status:toggle-status-${status.name}`);
+    });
+  }
+
 }
