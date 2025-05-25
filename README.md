@@ -57,7 +57,7 @@ Track the status of your notes with a powerful, customizable status management s
 
 ### For Users
 
-- \*\*[📚 Quick Start Guide](https://github.com/devonthesofa/obsidian-note-status/wiki/📚-Quick-Start-Guide - Get running in 5 minutes
+- **[📚 Quick Start Guide](https://github.com/devonthesofa/obsidian-note-status/wiki/📚-Quick-Start-Guide)** - Get running in 5 minutes
 - **[📖 User Manual](https://github.com/devonthesofa/obsidian-note-status/wiki/📖-User-Manual)** - Complete feature documentation
 - **[⚙️ Configuration Guide](https://github.com/devonthesofa/obsidian-note-status/wiki/⚙%EF%B8%8F-Configuration-Guide)** - Settings and customization
 - **[🚀 Performance Tuning](https://github.com/devonthesofa/obsidian-note-status/wiki/🚀-Performance-Tuning)** - Optimize for large vaults
@@ -86,7 +86,7 @@ obsidian-note-status:
 
 ## Contributing
 
-Contributions welcome! See [Development Setup](../../wiki/Development-Setup) for details.
+Contributions welcome! See [🔧-Development-Setup](https://github.com/devonthesofa/obsidian-note-status/wiki/🔧-Development-Setup) for details.
 
 ## Support the Development
 
