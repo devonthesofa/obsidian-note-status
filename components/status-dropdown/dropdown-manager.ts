@@ -16,7 +16,7 @@ export class DropdownManager {
   private toolbarButton?: HTMLElement;
   private dropdownUI: DropdownUI;  
   
-  constructor(app: any, settings: NoteStatusSettings, statusService: StatusService) {
+  constructor(app: App, settings: NoteStatusSettings, statusService: StatusService) {
     this.app = app;
     this.settings = settings;
     this.statusService = statusService;
@@ -56,7 +56,7 @@ export class DropdownManager {
         );
         
         // If ALL have the status, remove it. Otherwise, add it
-        let operation = filesWithStatus.length === files.length ? 'remove' : (!this.settings.useMultipleStatuses) ? 'set':'add';
+        const operation = filesWithStatus.length === files.length ? 'remove' : (!this.settings.useMultipleStatuses) ? 'set':'add';
         
         await this.statusService.handleStatusChange({
           files: targetFile,
@@ -77,7 +77,7 @@ export class DropdownManager {
   /**
    * Updates the dropdown UI based on current statuses
    */
-  public update(currentStatuses: string[] | string, file?: TFile): void {
+  public update(currentStatuses: string[] | string, _file?: TFile): void {
     this.currentStatuses = Array.isArray(currentStatuses) ? 
       [...currentStatuses] : [currentStatuses];
     
@@ -122,7 +122,12 @@ export class DropdownManager {
    * Universal function to open the status dropdown
    */
   public openStatusDropdown(options: DropdownOptions): void {
-    const files = options.files || [this.app.workspace.getActiveFile()].filter(Boolean);
+    const activeFile = this.app.workspace.getActiveFile();
+    const files = options.files || (activeFile ? [activeFile] : []);
+    if (!files.length) {
+      new Notice('No files selected');
+      return;
+    }
     if (!files.length || !files[0]) {
       new Notice('No files selected');
       return;
