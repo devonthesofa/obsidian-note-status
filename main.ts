@@ -207,6 +207,7 @@ onunload() {
   this.workspaceIntegration?.unload();
   this.metadataIntegration?.unload();
   this.editorIntegration?.unload();
+  this.commandIntegration?.unload();
   
   // Clean up services
   this.styleService?.unload();
