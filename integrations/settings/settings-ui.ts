@@ -23,6 +23,7 @@ export interface SettingsUICallbacks {
  */
 export class NoteStatusSettingsUI {
   private callbacks: SettingsUICallbacks;
+  private quickCommandsContainer: HTMLElement | null = null;
 
   constructor(callbacks: SettingsUICallbacks) {
     this.callbacks = callbacks;
@@ -67,6 +68,7 @@ export class NoteStatusSettingsUI {
       
       checkbox.addEventListener('change', () => {
         this.callbacks.onTemplateToggle(template.id, checkbox.checked);
+        this.refreshQuickCommandsList(settings);
       });
       
       headerEl.createEl('span', { 
@@ -181,14 +183,24 @@ export class NoteStatusSettingsUI {
         .setDesc('Select which statuses should have dedicated commands in the command palette. These can be assigned hotkeys for quick access.')
         .setHeading();
   
-      const quickCommandsContainer = containerEl.createDiv({ cls: 'quick-commands-container' });
+      this.quickCommandsContainer = containerEl.createDiv({ cls: 'quick-commands-container' });
+      this.populateQuickCommandsList(settings);
       
+    }
+
+ /**
+   * Populate the quick commands list
+   */
+  private populateQuickCommandsList(settings: any): void {
+    if (!this.quickCommandsContainer) return;
+    
+    this.quickCommandsContainer.empty();
       // Get all available statuses from service
       const allStatuses = this.getAllAvailableStatuses(settings);
       const currentQuickCommands = settings.quickStatusCommands || [];
   
       allStatuses.forEach(status => {
-        const setting = new Setting(quickCommandsContainer)
+        const setting = new Setting(this.quickCommandsContainer)
           .setName(`${status.icon} ${status.name}`)
           .addToggle(toggle => toggle
             .setValue(currentQuickCommands.includes(status.name))
@@ -206,12 +218,22 @@ export class NoteStatusSettingsUI {
       });
   
       if (allStatuses.length === 0) {
-        quickCommandsContainer.createDiv({
+        this.quickCommandsContainer.createDiv({
           text: 'No statuses available. Enable templates or add custom statuses first.',
           cls: 'setting-item-description'
         });
       }
     }
+  /**
+   * Refresh the quick commands list when statuses change
+   */
+  private refreshQuickCommandsList(settings: any): void {
+    // Add small delay to ensure settings are updated
+    setTimeout(() => {
+      this.populateQuickCommandsList(settings);
+    }, 50);
+  }
+
 /**
    * Get all available statuses from templates and custom statuses
    */
@@ -249,7 +271,11 @@ export class NoteStatusSettingsUI {
       .setDesc('Ignore template statuses and use only the custom statuses defined below')
       .addToggle(toggle => toggle
         .setValue(settings.useCustomStatusesOnly || false)
-        .onChange(value => this.callbacks.onSettingChange('useCustomStatusesOnly', value)));
+        .onChange(async (value) => {
+          await this.callbacks.onSettingChange('useCustomStatusesOnly', value);
+          // Update quick commands list when custom-only mode changes
+          this.refreshQuickCommandsList(settings);
+        }));
     
     const statusList = containerEl.createDiv({ cls: 'custom-status-list' });
     this.renderCustomStatuses(statusList, settings);
@@ -260,7 +286,10 @@ export class NoteStatusSettingsUI {
       .addButton(button => button
         .setButtonText('Add Status')
         .setCta()
-        .onClick(() => this.callbacks.onCustomStatusAdd()));
+        .onClick(async () => {
+          await this.callbacks.onCustomStatusAdd();
+          this.refreshQuickCommandsList(settings);
+        }));
   }
 
   /**
@@ -277,12 +306,19 @@ export class NoteStatusSettingsUI {
       setting.addText(text => text
         .setPlaceholder('Name')
         .setValue(status.name)
-        .onChange(value => this.callbacks.onCustomStatusChange(index, 'name', value || 'unnamed')));
+        .onChange(async (value) => {
+          await this.callbacks.onCustomStatusChange(index, 'name', value || 'unnamed');
+          // Update quick commands list when status name changes
+          this.refreshQuickCommandsList(settings);
+        }));
 
       setting.addText(text => text
         .setPlaceholder('Icon')
         .setValue(status.icon)
-        .onChange(value => this.callbacks.onCustomStatusChange(index, 'icon', value || '❓')));
+        .onChange(async (value) => {
+          await this.callbacks.onCustomStatusChange(index, 'icon', value || '❓');
+          this.refreshQuickCommandsList(settings);
+        }));
 
       setting.addColorPicker(colorPicker => colorPicker
         .setValue(settings.statusColors[status.name] || '#ffffff')
@@ -291,13 +327,19 @@ export class NoteStatusSettingsUI {
       setting.addText(text => text
         .setPlaceholder('Description')
         .setValue(status.description || '')
-        .onChange(value => this.callbacks.onCustomStatusChange(index, 'description', value)));
+        .onChange(async (value) => {
+          await this.callbacks.onCustomStatusChange(index, 'description', value);
+          this.refreshQuickCommandsList(settings);
+        }));
 
       setting.addButton(button => button
         .setButtonText('Remove')
         .setClass('status-remove-button')
         .setWarning()
-        .onClick(() => this.callbacks.onCustomStatusRemove(index)));
+        .onClick(async () => {
+          await this.callbacks.onCustomStatusRemove(index);
+          this.refreshQuickCommandsList(settings);
+        }));
     });
   }
 }
