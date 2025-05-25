@@ -57,7 +57,7 @@ Track the status of your notes with a powerful, customizable status management s
 
 ### For Users
 
-- **[[Quick Start Guide|📚 Quick Start Guide]]** - Get running in 5 minutes
+- **[📚 Quick Start Guide](wiki/📚-Quick-Start-Guide)** - Get running in 5 minutes
 - **[[User Manual|📖 User Manual]]** - Complete feature documentation
 - **[[Configuration Guide|⚙️ Configuration Guide]]** - Settings and customization
 - **[[Performance Tuning|🚀 Performance Tuning]]** - Optimize for large vaults
