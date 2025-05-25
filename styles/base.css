@@ -2,69 +2,93 @@
  * Base styles and variables for Note Status Plugin
  */
 :root {
-  --status-transition-time: 0.22s;
-  --status-border-radius: var(--radius-s, 4px);
-  --status-box-shadow: var(--shadow-s, 0 2px 8px rgba(0, 0, 0, 0.15));
-  --status-hover-shadow: var(--shadow-m, 0 4px 12px rgba(0, 0, 0, 0.2));
-  --status-icon-size: 16px;
-  
-  /* Animation curves */
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-out: cubic-bezier(0, 0, 0.2, 1);
-  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+	--status-transition-time: 0.22s;
+	--status-border-radius: var(--radius-s, 4px);
+	--status-box-shadow: var(--shadow-s, 0 2px 8px rgba(0, 0, 0, 0.15));
+	--status-hover-shadow: var(--shadow-m, 0 4px 12px rgba(0, 0, 0, 0.2));
+	--status-icon-size: 16px;
+
+	/* Animation curves */
+	--ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+	--ease-out: cubic-bezier(0, 0, 0.2, 1);
+	--ease-in: cubic-bezier(0.4, 0, 1, 1);
 }
 
 /* Animations */
 @keyframes note-status-scale-in {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+	from {
+		opacity: 0;
+		transform: scale(0.9);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
 }
 
 @keyframes note-status-slide-in-fade {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 @keyframes note-status-fade-in-slide-down {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
+	from {
+		opacity: 0;
+		transform: translateY(-6px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 @keyframes note-status-pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(0.98); }
-  100% { transform: scale(1); }
+	0% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(0.98);
+	}
+	100% {
+		transform: scale(1);
+	}
 }
 
 /* Dark mode adjustments */
 .theme-dark .note-status-popover {
-  box-shadow: var(--shadow-l);
+	box-shadow: var(--shadow-l);
 }
 
 .theme-dark .note-status-option-selecting {
-  box-shadow: 0 0 0 1px var(--interactive-accent);
+	box-shadow: 0 0 0 1px var(--interactive-accent);
 }
 
 /* High contrast improvements */
 @media (forced-colors: active) {
-  .note-status-chip,
-  .note-status-option.is-selected {
-    border: 1px solid currentColor;
-  }
-  
-  .note-status-action-button:focus-visible,
-  .note-status-chip:focus-visible,
-  .note-status-option:focus-visible {
-    outline: 2px solid currentColor;
-    outline-offset: 2px;
-  }
+	.note-status-chip,
+	.note-status-option.is-selected {
+		border: 1px solid currentColor;
+	}
+
+	.note-status-action-button:focus-visible,
+	.note-status-chip:focus-visible,
+	.note-status-option:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 2px;
+	}
 }
 
 /* Print styles */
 @media print {
-  .note-status-unified-dropdown,
-  .note-status-bar,
-  .note-status-pane {
-    display: none !important;
-  }
+	.note-status-unified-dropdown,
+	.note-status-bar,
+	.note-status-pane {
+		display: none !important;
+	}
 }

@@ -1,1 +1,1 @@
-export { MetadataIntegration } from './metadata-integration';
+export { MetadataIntegration } from "./metadata-integration";
