@@ -17,7 +17,9 @@ Statuses are stored in YAML frontmatter:
 
 ```yaml
 ---
-obsidian-note-status: ["active", "inProgress"]
+obsidian-note-status:
+    - idea
+    - HelloWorld
 ---
 ```
 
@@ -51,11 +53,15 @@ obsidian-note-status: ["active", "inProgress"]
 
 ### 4. File Explorer Integration
 
-**Visual**: Status icons next to file names **Interaction**: Right-click for context menu **Multi-select**: Select multiple files for batch operations
+**Visual**: Status icons next to file names
+**Interaction**: Right-click for context menu
+**Multi-select**: Select multiple files for batch operations
 
 ### 5. Status Pane
 
-**Location**: Left sidebar **Access**: Ribbon icon or Command Palette **Features**:
+**Location**: Left sidebar
+**Access**: Ribbon icon or Command Palette
+**Features**:
 
 - Notes grouped by status
 - Search functionality
@@ -187,107 +193,7 @@ All commands available via Command Palette:
 - `Toggle multiple statuses mode` - Enable/disable multi-status
 - `Search notes by current status` - Global search
 
-## Configuration Options
-
-### Display Settings
-
-- **Show status bar**: Toggle status bar visibility
-- **Auto-hide status bar**: Hide when status is unknown
-- **Show status icons in file explorer**: File tree integration
-- **Hide unknown status in file explorer**: Clean up display
-- **Default to compact view**: Status pane display mode
-
-### Performance Settings
-
-- **Exclude unassigned notes**: Skip unknown status files (recommended for large vaults)
-- **Items per page**: Pagination size for status groups
-
-### Behavior Settings
-
-- **Enable multiple statuses**: Allow multiple statuses per note
-- **Status tag prefix**: YAML frontmatter key (default: `obsidian-note-status`)
-- **Strict status validation**: Only allow defined statuses
-
-## Templates System
-
-### Predefined Templates
-
-#### Colorful Workflow
-
-Complete workflow with descriptive icons:
-
-- `idea` 💡 - Initial concepts
-- `draft` 📝 - First draft stage
-- `inProgress` 🔧 - Active work
-- `editing` 🖊️ - Review and editing
-- `pending` ⏳ - Waiting for input
-- `onHold` ⏸ - Temporarily paused
-- `needsUpdate` 🔄 - Requires revision
-- `completed` ✅ - Finished work
-- `archived` 📦 - Long-term storage
-
-#### Minimal Workflow
-
-Essential statuses only:
-
-- `todo` 📌 - Needs attention
-- `inProgress` ⚙️ - Currently working
-- `review` 👀 - Needs review
-- `done` ✓ - Completed
-
-#### Academic Research
-
-Research-focused workflow:
-
-- `research` 🔍 - Information gathering
-- `outline` 📑 - Structure planning
-- `draft` ✏️ - Writing phase
-- `review` 🔬 - Peer review
-- `revision` 📝 - Revisions needed
-- `final` 📚 - Final version
-- `published` 🎓 - Published work
-
-#### Project Management
-
-Development-oriented workflow:
-
-- `planning` 🗓️ - Planning phase
-- `backlog` 📋 - Backlog items
-- `ready` 🚦 - Ready to start
-- `inDevelopment` 👨‍💻 - Development phase
-- `testing` 🧪 - Testing phase
-- `review` 👁️ - Code review
-- `approved` 👍 - Approved
-- `live` 🚀 - Production
-
-### Custom Statuses
-
-Create your own statuses:
-
-1. **Settings → Custom statuses**
-2. **Click "Add Status"**
-3. **Configure**:
-    - Name: Unique identifier
-    - Icon: Emoji or symbol
-    - Color: Visual theme color
-    - Description: Tooltip text
-
-**Validation Rules**:
-
-- Names must be unique
-- Icons recommended (fallback: ❓)
-- Colors use CSS format (#hex, var(), etc.)
-
-## Search and Organization
-
-### Status Pane Search
-
-- **Real-time filtering** by filename
-- **Case-insensitive** matching
-- **Preserves grouping** by status
-- **Clears with X button**
-
-### Global Search Integration
+## Global Search Integration
 
 Use Obsidian's global search with status queries:
 
@@ -295,12 +201,6 @@ Use Obsidian's global search with status queries:
 [obsidian-note-status:"active"]
 [obsidian-note-status:"inProgress" OR "review"]
 ```
-
-### File Organization
-
-- **Status-based folders**: Manually organize
-- **Smart collections**: Use search operators
-- **Tag combinations**: Mix with regular tags
 
 ## Keyboard Shortcuts
 
@@ -318,67 +218,3 @@ None assigned by default - customize in Obsidian settings.
 ### Quick Status Commands
 
 Configure in settings to enable hotkeys for frequently used statuses.
-
-## Integration Points
-
-### File System
-
-- **Frontmatter storage**: Industry standard YAML
-- **Cross-platform**: Works with any markdown editor
-- **Git-friendly**: Text-based, version controllable
-
-### Obsidian Features
-
-- **Global search**: Status-based queries
-- **Templates**: Include status in note templates
-- **Dataview**: Query notes by status
-- **Graph view**: Future integration planned
-
-### External Tools
-
-- **Export capabilities**: JSON configuration export
-- **Backup strategies**: Include in vault backups
-- **Migration**: Frontmatter-based for portability
-
-## Troubleshooting
-
-### Common Issues
-
-#### Status not showing
-
-1. Verify file has `.md` extension
-2. Check frontmatter format in source mode
-3. Ensure plugin is enabled
-
-#### Performance slow with large vault
-
-1. Enable "Exclude unassigned notes"
-2. Reduce pagination size
-3. Hide unknown status in explorer
-
-#### Dropdown not appearing
-
-1. Check for toolbar button (❓ icon)
-2. Try right-click context menu
-3. Use Command Palette fallback
-
-#### Multiple statuses not working
-
-1. Enable in settings
-2. Check strict validation setting
-3. Verify status exists in templates
-
-### Performance Optimization
-
-#### Large Vault Tips (5000+ notes)
-
-- Enable exclusion of unknown status
-- Use pagination in status pane
-- Disable explorer icons if needed
-- Regular cleanup of unused statuses
-
-#### Memory Management
-
-- Plugin automatically cleans up
-- Restart Obsidian if memory grows
-- Report persistent issues on GitHub

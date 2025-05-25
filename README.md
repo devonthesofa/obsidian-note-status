@@ -60,16 +60,16 @@ Track the status of your notes with a powerful, customizable status management s
 - **[[Quick Start Guide|📚 Quick Start Guide]]** - Get running in 5 minutes
 - **[[User Manual|📖 User Manual]]** - Complete feature documentation
 - **[[Configuration Guide|⚙️ Configuration Guide]]** - Settings and customization
-- **[[🚀 Performance Tuning]]** - Optimize for large vaults
+- **[[Performance Tuning|🚀 Performance Tuning]]** - Optimize for large vaults
 
 ### For Developers
 
 - **[[Architecture Overview|🏗️ Architecture Overview]]** - Plugin structure and design
-- **[[🔧 Development Setup]]** - Contributing guide
+- **[[Development Setup|🔧 Development Setup]]** - Contributing guide
 
 ### Reference
 
-- **[📝 Frontmatter Format](../../wiki/Frontmatter-Format)** - Technical specification
+- **[[Frontmatter Format|📝 Frontmatter Format]]** - Technical specification
 
 ## Data Format
 

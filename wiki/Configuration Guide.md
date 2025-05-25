@@ -19,7 +19,7 @@ Controls which predefined status sets are available.
 ☐ Project management (8 development statuses)
 ```
 
-**Impact**: Enabled templates add their statuses to dropdown and quick commands.
+**Impact**: Enabled templates add their statuses to dropdown.
 
 #### Template Details
 
@@ -41,7 +41,7 @@ Controls which predefined status sets are available.
 
 ```
 📌 todo (#F44336)        - Needs attention
-⚙️ inProgress (#2196F3)  - Currently working
+⚙️ inProgress (#2196F3)   - Currently working
 👀 review (#9C27B0)      - Needs review
 ✓ done (#4CAF50)         - Completed
 ```
@@ -51,7 +51,7 @@ Controls which predefined status sets are available.
 ```
 🔍 research (#2196F3)    - Information gathering
 📑 outline (#9E9E9E)     - Structure planning
-✏️ draft (#FFC107)       - Writing phase
+✏️ draft (#FFC107)        - Writing phase
 🔬 review (#9C27B0)      - Peer review stage
 📝 revision (#FF5722)    - Revisions needed
 📚 final (#4CAF50)       - Final version
@@ -61,15 +61,17 @@ Controls which predefined status sets are available.
 **Project Management** - Development workflow:
 
 ```
-🗓️ planning (#9E9E9E)     - Planning phase
-📋 backlog (#E0E0E0)     - Backlog items
-🚦 ready (#8BC34A)       - Ready to start
+🗓️ planning (#9E9E9E)      - Planning phase
+📋 backlog (#E0E0E0)       - Backlog items
+🚦 ready (#8BC34A)         - Ready to start
 👨‍💻 inDevelopment (#2196F3) - Development phase
-🧪 testing (#9C27B0)     - Testing phase
-👁️ review (#FFC107)      - Code review
-👍 approved (#4CAF50)    - Approved
-🚀 live (#3F51B5)        - Production/live
+🧪 testing (#9C27B0)       - Testing phase
+👁️ review (#FFC107)        - Code review
+👍 approved (#4CAF50)      - Approved
+🚀 live (#3F51B5)          - Production/live
 ```
+
+![File Explorer Screenshot](images/status-templates.png)
 
 ### User Interface Settings
 
@@ -119,11 +121,9 @@ Controls which predefined status sets are available.
 **When Enabled**:
 
 - Clicking status toggles it on/off
-- Notes can have combinations like ["active", "inProgress"]
+- Notes can have combinations like ("active", "inProgress",....)
 - Status bar shows all assigned statuses
-
-**When Disabled**:
-
+  **When Disabled**:
 - Clicking status replaces current status
 - Notes have single status only
 - Simpler workflow for basic usage
@@ -141,11 +141,14 @@ Status tag prefix: "obsidian-note-status"
 ```yaml
 # Default
 ---
-obsidian-note-status: ["active"]
+obsidian-note-status:
+    - active
 ---
 # Custom prefix
 ---
-project-status: ["inProgress", "testing"]
+project-status:
+    - inProgress
+    - testing
 ---
 ```
 
@@ -190,7 +193,7 @@ Description: [optional tooltip text]
 
 - Must be unique across all statuses
 - Case-sensitive
-- No spaces (use camelCase: `inProgress`)
+- No spaces
 - Used in frontmatter and commands
 
 **Icon Field**:
@@ -288,43 +291,6 @@ Ctrl+Shift+S  →  Change status of current note
 
 ## Advanced Configuration
 
-### CSS Customization
-
-#### Status Colors
-
-Plugin generates CSS variables for each status:
-
-```css
-.status-active {
-	color: var(--text-success) !important;
-}
-.status-completed {
-	color: var(--text-accent) !important;
-}
-```
-
-#### Custom CSS Overrides
-
-Add to `snippets/note-status-custom.css`:
-
-```css
-/* Larger status icons */
-.note-status-icon {
-	font-size: 18px !important;
-}
-
-/* Custom status colors */
-.status-urgent {
-	color: #ff0000 !important;
-	font-weight: bold !important;
-}
-
-/* Hide status bar completely */
-.note-status-bar {
-	display: none !important;
-}
-```
-
 ### Performance Tuning
 
 #### Large Vault Settings (5000+ notes)
@@ -344,69 +310,16 @@ Items per page: 50 (reduce from default 100)
 
 ### Import/Export Configuration
 
+WIP
+
 #### Export Settings
 
-```javascript
-// Console command to export settings
-console.log(
-	JSON.stringify(app.plugins.plugins["note-status"].settings, null, 2),
-);
-```
+WIP
 
 #### Import Process
 
-1. **Copy exported JSON**
-2. **Settings → Note Status → Import button** (if available)
-3. **Or manually edit `data.json` in plugin folder**
+WIP
 
 #### Migration Between Vaults
 
-```json
-{
-  "customStatuses": [...],
-  "enabledTemplates": [...],
-  "statusColors": {...},
-  "quickStatusCommands": [...]
-}
-```
-
-### Team/Shared Configuration
-
-#### Standardized Setup
-
-```json
-{
-	"enabledTemplates": ["project"],
-	"useCustomStatusesOnly": false,
-	"strictStatuses": true,
-	"useMultipleStatuses": true,
-	"quickStatusCommands": ["inDevelopment", "review", "approved"]
-}
-```
-
-#### Deployment Strategy
-
-1. **Configure on template vault**
-2. **Export settings JSON**
-3. **Import on team member vaults**
-4. **Document workflow in team wiki**
-
-### Troubleshooting Configuration
-
-#### Settings Not Persisting
-
-- Check file permissions on `.obsidian` folder
-- Verify Obsidian has write access
-- Restart Obsidian after major changes
-
-#### Performance Issues
-
-- Disable file explorer icons temporarily
-- Reduce pagination size
-- Enable unknown status exclusion
-
-#### Status Colors Not Showing
-
-- Check CSS snippet conflicts
-- Verify color format in custom statuses
-- Clear Obsidian cache and restart
+WIP
