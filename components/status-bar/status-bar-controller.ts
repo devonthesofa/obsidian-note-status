@@ -1,12 +1,14 @@
+import React from "react";
 import { NoteStatusSettings } from "../../models/types";
 import { StatusService } from "../../services/status-service";
-import { StatusBarView } from "./status-bar-view";
+import { StatusBarComponent } from "./StatusBarComponent";
+import { ReactUtils } from "../../utils/react-utils";
 
 /**
- * Controller for the status bar
+ * Controller for the status bar using React
  */
 export class StatusBarController {
-	private view: StatusBarView;
+	private container: HTMLElement;
 	private settings: NoteStatusSettings;
 	private statusService: StatusService;
 	private currentStatuses: string[] = ["unknown"];
@@ -16,7 +18,7 @@ export class StatusBarController {
 		settings: NoteStatusSettings,
 		statusService: StatusService,
 	) {
-		this.view = new StatusBarView(statusBarContainer);
+		this.container = statusBarContainer;
 		this.settings = settings;
 		this.statusService = statusService;
 
@@ -32,30 +34,19 @@ export class StatusBarController {
 	}
 
 	/**
-	 * Render the status bar
+	 * Render the status bar using React
 	 */
 	private render(): void {
-		this.view.reset();
-
 		if (!this.settings.showStatusBar) {
-			this.view.hide();
+			ReactUtils.unmount(this.container);
 			return;
 		}
 
-		if (!this.settings.useMultipleStatuses) {
-			this.renderStatuses([this.currentStatuses[0]]);
-		} else {
-			this.renderStatuses(this.currentStatuses);
-		}
+		const statusesToShow = this.settings.useMultipleStatuses
+			? this.currentStatuses
+			: [this.currentStatuses[0]];
 
-		this.handleAutoHide();
-	}
-
-	/**
-	 * Render statuses - handles both single and multiple status cases
-	 */
-	private renderStatuses(statuses: string[]): void {
-		const statusDetails = statuses.map((status) => {
+		const statusDetails = statusesToShow.map((status) => {
 			const statusObj = this.statusService
 				.getAllStatuses()
 				.find((s) => s.name === status);
@@ -68,22 +59,30 @@ export class StatusBarController {
 			};
 		});
 
-		this.view.renderStatuses(statusDetails);
+		const shouldShow = this.shouldShowStatusBar();
+
+		ReactUtils.render(
+			React.createElement(StatusBarComponent, {
+				statuses: statusDetails,
+				isVisible: shouldShow,
+			}),
+			this.container,
+		);
 	}
 
 	/**
-	 * Handle auto-hide behavior
+	 * Determine if status bar should be visible
 	 */
-	private handleAutoHide(): void {
+	private shouldShowStatusBar(): boolean {
 		const onlyUnknown =
 			this.currentStatuses.length === 1 &&
 			this.currentStatuses[0] === "unknown";
 
 		if (this.settings.autoHideStatusBar && onlyUnknown) {
-			this.view.hide();
-		} else {
-			this.view.show();
+			return false;
 		}
+
+		return true;
 	}
 
 	/**
@@ -98,6 +97,6 @@ export class StatusBarController {
 	 * Clean up when plugin is unloaded
 	 */
 	public unload(): void {
-		this.view.destroy();
+		ReactUtils.unmount(this.container);
 	}
 }

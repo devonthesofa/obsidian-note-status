@@ -3,6 +3,7 @@ import { DEFAULT_SETTINGS } from "./constants/defaults";
 import { NoteStatusSettings } from "./models/types";
 import { StatusService } from "services/status-service";
 import { StyleService } from "services/style-service";
+import { ReactUtils } from "./utils/react-utils";
 
 // Importar integraciones
 import { ExplorerIntegration } from "./integrations/explorer";
@@ -14,11 +15,11 @@ import { NoteStatusSettingTab } from "integrations/settings/settings-tab";
 import { CommandIntegration } from "integrations/commands/command-integration";
 
 // Importar vistas
-import { StatusPaneViewController } from "./views/status-pane-view";
+import { StatusPaneViewController } from "./views/status-pane-view/StatusPaneViewController";
 
 // Importar componentes UI
 import { StatusBar } from "components/status-bar";
-import { StatusDropdown } from "components/status-dropdown";
+import { StatusDropdownManager } from "components/status-dropdown/StatusDropdownManager";
 import { StatusContextMenu } from "integrations/context-menu/status-context-menu";
 
 export default class NoteStatus extends Plugin {
@@ -30,7 +31,7 @@ export default class NoteStatus extends Plugin {
 
 	// Componentes UI
 	statusBar: StatusBar;
-	statusDropdown: StatusDropdown;
+	statusDropdown: StatusDropdownManager;
 
 	// Integraciones
 	explorerIntegration: ExplorerIntegration;
@@ -163,7 +164,7 @@ export default class NoteStatus extends Plugin {
 	}
 
 	private initializeUI() {
-		this.statusDropdown = new StatusDropdown(
+		this.statusDropdown = new StatusDropdownManager(
 			this.app,
 			this.settings,
 			this.statusService,
@@ -263,5 +264,8 @@ export default class NoteStatus extends Plugin {
 		// Clean up UI components
 		this.statusBar?.unload();
 		this.statusDropdown?.unload();
+
+		// Clean up all React roots
+		ReactUtils.cleanup();
 	}
 }

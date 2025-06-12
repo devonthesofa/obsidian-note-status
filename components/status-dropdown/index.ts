@@ -1,6 +1,6 @@
-import { DropdownManager } from "./dropdown-manager";
+import { StatusDropdownManager } from "./StatusDropdownManager";
 import { DropdownOptions } from "./types";
 
 export type { DropdownOptions };
-export { DropdownManager as StatusDropdown };
-export default DropdownManager;
+export { StatusDropdownManager as StatusDropdown };
+export default StatusDropdownManager;
