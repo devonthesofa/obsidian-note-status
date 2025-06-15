@@ -1,5 +1,5 @@
 import { MarkdownView, Editor, Notice, TFile, App } from "obsidian";
-import { DropdownUI } from "./dropdown-ui";
+import { DropdownUIManager } from "./DropdownUI";
 import { DropdownOptions, DropdownDependencies } from "./types";
 import { createDummyTarget } from "./dropdown-position";
 import { StatusService } from "services/status-service";
@@ -14,7 +14,7 @@ export class DropdownManager {
 	private statusService: StatusService;
 	private currentStatuses: string[] = ["unknown"];
 	private toolbarButton?: HTMLElement;
-	private dropdownUI: DropdownUI;
+	private dropdownUI: DropdownUIManager;
 
 	constructor(
 		app: App,
@@ -26,7 +26,7 @@ export class DropdownManager {
 		this.statusService = statusService;
 
 		const deps: DropdownDependencies = { app, settings, statusService };
-		this.dropdownUI = new DropdownUI(deps);
+		this.dropdownUI = new DropdownUIManager(deps);
 		this.setupDropdownCallbacks();
 	}
 

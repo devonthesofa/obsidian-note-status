@@ -1,7 +1,7 @@
 import React from "react";
 import { NoteStatusSettings } from "../../models/types";
 import { StatusService } from "../../services/status-service";
-import { StatusBarComponent } from "./StatusBarComponent";
+import { StatusBarView } from "./StatusBarView";
 import { ReactUtils } from "../../utils/react-utils";
 
 /**
@@ -62,7 +62,7 @@ export class StatusBarController {
 		const shouldShow = this.shouldShowStatusBar();
 
 		ReactUtils.render(
-			React.createElement(StatusBarComponent, {
+			React.createElement(StatusBarView, {
 				statuses: statusDetails,
 				isVisible: shouldShow,
 			}),

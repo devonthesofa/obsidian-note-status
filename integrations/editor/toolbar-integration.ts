@@ -2,7 +2,7 @@ import { App, MarkdownView } from "obsidian";
 import { NoteStatusSettings } from "../../models/types";
 import { StatusService } from "../../services/status-service";
 import { StatusDropdown } from "../../components/status-dropdown";
-import { ToolbarButton } from "components/toolbar-button";
+import { ToolbarButtonManager } from "components/ToolbarButton";
 
 /**
  * Gestiona la integración con la barra de herramientas del editor
@@ -12,7 +12,7 @@ export class ToolbarIntegration {
 	private settings: NoteStatusSettings;
 	private statusService: StatusService;
 	private statusDropdown: StatusDropdown;
-	private buttonView: ToolbarButton;
+	private buttonView: ToolbarButtonManager;
 	private buttonElement: HTMLElement | null = null;
 	private currentLeafId: string | null = null;
 
@@ -26,7 +26,7 @@ export class ToolbarIntegration {
 		this.settings = settings;
 		this.statusService = statusService;
 		this.statusDropdown = statusDropdown;
-		this.buttonView = new ToolbarButton(settings, statusService);
+		this.buttonView = new ToolbarButtonManager(settings, statusService);
 	}
 
 	public updateSettings(settings: NoteStatusSettings): void {

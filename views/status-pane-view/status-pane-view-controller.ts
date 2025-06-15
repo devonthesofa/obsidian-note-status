@@ -1,11 +1,12 @@
+import React from "react";
 import { TFile, WorkspaceLeaf, View, Notice, App } from "obsidian";
 import { NoteStatusSettings } from "../../models/types";
 import { StatusService } from "../../services/status-service";
 import NoteStatus from "main";
-import { StatusPaneView } from "./status-pane-view";
+import { StatusPaneView, StatusPaneOptions } from "./StatusPaneView";
+import { ReactUtils } from "../../utils/react-utils";
 
 export class StatusPaneViewController extends View {
-	private renderer: StatusPaneView;
 	private settings: NoteStatusSettings;
 	private statusService: StatusService;
 	private plugin: NoteStatus;
@@ -14,6 +15,7 @@ export class StatusPaneViewController extends View {
 		itemsPerPage: 100,
 		currentPage: {} as Record<string, number>,
 	};
+	private collapsedStatuses: Record<string, boolean> = {};
 
 	static async open(app: App): Promise<void> {
 		const existing = app.workspace.getLeavesOfType("status-pane")[0];
@@ -33,7 +35,6 @@ export class StatusPaneViewController extends View {
 		this.plugin = plugin;
 		this.settings = plugin.settings;
 		this.statusService = plugin.statusService;
-		this.renderer = new StatusPaneView(this.statusService);
 	}
 
 	getViewType(): string {
@@ -53,7 +54,7 @@ export class StatusPaneViewController extends View {
 	}
 
 	onClose(): Promise<void> {
-		this.containerEl.empty();
+		ReactUtils.unmount(this.containerEl);
 		return Promise.resolve();
 	}
 
@@ -66,132 +67,87 @@ export class StatusPaneViewController extends View {
 			this.settings.compactView,
 		);
 
-		this.renderer.createHeader(containerEl, this.settings.compactView, {
-			onSearch: (query) => {
+		await this.renderPane();
+	}
+
+	private async renderPane(): Promise<void> {
+		const statusGroups = this.statusService.groupFilesByStatus(
+			this.searchQuery,
+		);
+
+		const options: StatusPaneOptions = {
+			excludeUnknown: this.settings.excludeUnknownStatus || false,
+			isCompactView: this.settings.compactView || false,
+			collapsedStatuses: this.collapsedStatuses,
+			pagination: this.paginationState,
+			callbacks: {
+				onFileClick: (file: TFile) => {
+					this.app.workspace.getLeaf().openFile(file);
+				},
+				onStatusToggle: (status: string, collapsed: boolean) => {
+					this.collapsedStatuses[status] = collapsed;
+				},
+				onContextMenu: (e: MouseEvent, file: TFile) => {
+					// Handle context menu for file
+					console.log("Context menu for file:", file.path);
+				},
+				onPageChange: (status: string, page: number) => {
+					this.paginationState.currentPage[status] = page;
+					this.renderPane();
+				},
+			},
+		};
+
+		const headerCallbacks = {
+			onSearch: (query: string) => {
 				this.paginationState = {
 					itemsPerPage: 100,
 					currentPage: {} as Record<string, number>,
 				};
 				this.searchQuery = query;
-				this.renderGroups(query);
+				this.renderPane();
 			},
 			onToggleView: () => {
 				this.settings.compactView = !this.settings.compactView;
-				containerEl.toggleClass(
+				this.containerEl.toggleClass(
 					"note-status-compact-view",
 					this.settings.compactView,
 				);
 				window.dispatchEvent(
 					new CustomEvent("note-status:settings-changed"),
 				);
-				this.renderGroups(this.searchQuery);
+				this.renderPane();
 			},
 			onRefresh: async () => {
-				await this.renderGroups(this.searchQuery);
+				await this.renderPane();
 				new Notice("Status pane refreshed");
 			},
-		});
+		};
 
-		const groupsContainer = containerEl.createDiv({
-			cls: "note-status-groups-container",
-		});
-		const loadingIndicator =
-			this.renderer.createLoadingIndicator(groupsContainer);
+		const onShowUnassigned = () => {
+			this.settings.excludeUnknownStatus = false;
+			this.renderPane();
+		};
 
-		setTimeout(async () => {
-			await this.renderGroups("");
-			loadingIndicator.remove();
-		}, 10);
-	}
-
-	private async renderGroups(searchQuery = ""): Promise<void> {
-		const groupsContainerEl = this.containerEl.querySelector(
-			".note-status-groups-container",
-		) as HTMLElement;
-		if (!groupsContainerEl) return;
-
-		if (searchQuery) {
-			groupsContainerEl.empty();
-			this.renderer.createLoadingIndicator(
-				groupsContainerEl,
-				`Searching for "${searchQuery}"...`,
-			);
-			await new Promise((resolve) => setTimeout(resolve, 0));
-		} else {
-			groupsContainerEl.empty();
-		}
-
-		const statusGroups = this.getFilteredStatusGroups(searchQuery);
-		groupsContainerEl.empty();
-
-		const hasGroups = this.renderer.renderStatusGroups(
-			groupsContainerEl,
-			statusGroups,
-			{
-				excludeUnknown: this.settings.excludeUnknownStatus,
-				isCompactView: this.settings.compactView,
-				collapsedStatuses: this.settings.collapsedStatuses,
-				pagination: this.paginationState,
-				callbacks: {
-					onFileClick: (file) => {
-						this.app.workspace.openLinkText(
-							file.path,
-							file.path,
-							true,
-						);
-					},
-					onStatusToggle: (status, collapsed) => {
-						this.settings.collapsedStatuses[status] = collapsed;
-					},
-					onContextMenu: () => {},
-					onPageChange: (status, page) => {
-						this.paginationState.currentPage[status] = page;
-						this.renderGroups(this.searchQuery);
-					},
-				},
-			},
+		ReactUtils.render(
+			React.createElement(StatusPaneView, {
+				statusGroups,
+				options,
+				statusService: this.statusService,
+				searchQuery: this.searchQuery,
+				headerCallbacks,
+				onShowUnassigned,
+			}),
+			this.containerEl,
 		);
-
-		if (!hasGroups) {
-			this.renderer.renderEmptyState(
-				groupsContainerEl,
-				searchQuery,
-				this.settings.excludeUnknownStatus,
-				async () => {
-					this.settings.excludeUnknownStatus = false;
-					await this.plugin.saveSettings();
-					this.renderGroups(searchQuery);
-				},
-			);
-		}
 	}
 
-	private getFilteredStatusGroups(searchQuery = ""): Record<string, TFile[]> {
-		const rawGroups = this.statusService.groupFilesByStatus(searchQuery);
-		const filteredGroups: Record<string, TFile[]> = {};
-
-		Object.entries(rawGroups).forEach(([status, files]) => {
-			if (files.length > 0) {
-				filteredGroups[status] = files;
-			}
-		});
-
-		return filteredGroups;
+	public async update(): Promise<void> {
+		await this.renderPane();
 	}
 
-	updateSettings(settings: NoteStatusSettings): void {
+	public updateSettings(settings: NoteStatusSettings): void {
 		this.settings = settings;
-		this.containerEl.toggleClass(
-			"note-status-compact-view",
-			settings.compactView,
-		);
-		this.renderGroups(this.searchQuery);
-	}
-
-	public update(): void {
-		// TODO: needs to be improved/fixed, every change
-		// this.renderGroups(this.searchQuery).then(() => {
-		//
-		// });
+		this.renderPane();
 	}
 }

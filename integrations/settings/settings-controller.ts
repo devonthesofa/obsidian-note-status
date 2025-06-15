@@ -2,7 +2,7 @@ import { App } from "obsidian";
 import { Status } from "../../models/types";
 import NoteStatus from "main";
 import { StatusService } from "services/status-service";
-import { NoteStatusSettingsUI } from "./settings-ui";
+import { NoteStatusSettingsUIManager } from "./SettingsUI";
 import { SettingsUICallbacks } from "./types";
 
 /**
@@ -12,13 +12,13 @@ export class NoteStatusSettingsController implements SettingsUICallbacks {
 	private app: App;
 	private plugin: NoteStatus;
 	private statusService: StatusService;
-	private ui: NoteStatusSettingsUI;
+	private ui: NoteStatusSettingsUIManager;
 
 	constructor(app: App, plugin: NoteStatus, statusService: StatusService) {
 		this.app = app;
 		this.plugin = plugin;
 		this.statusService = statusService;
-		this.ui = new NoteStatusSettingsUI(this);
+		this.ui = new NoteStatusSettingsUIManager(this);
 	}
 
 	/**
@@ -103,12 +103,11 @@ export class NoteStatusSettingsController implements SettingsUICallbacks {
 
 		await this.plugin.saveSettings();
 
-		// Re-render the custom statuses section
-		const statusList = document.querySelector(
-			".custom-status-list",
-		) as HTMLElement;
-		if (statusList) {
-			this.ui.renderCustomStatuses(statusList, this.plugin.settings);
+		// Re-render the entire settings interface
+		const container = document.querySelector(".note-status-settings")
+			?.parentElement as HTMLElement;
+		if (container) {
+			this.display(container);
 		}
 	};
 
@@ -127,12 +126,11 @@ export class NoteStatusSettingsController implements SettingsUICallbacks {
 
 		await this.plugin.saveSettings();
 
-		// Re-render the custom statuses section
-		const statusList = document.querySelector(
-			".custom-status-list",
-		) as HTMLElement;
-		if (statusList) {
-			this.ui.renderCustomStatuses(statusList, this.plugin.settings);
+		// Re-render the entire settings interface
+		const container = document.querySelector(".note-status-settings")
+			?.parentElement as HTMLElement;
+		if (container) {
+			this.display(container);
 		}
 	};
 }

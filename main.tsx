@@ -1,3 +1,6 @@
+// React import needed for JSX compilation
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import React from "react";
 import { Plugin, Notice } from "obsidian";
 import { DEFAULT_SETTINGS } from "./constants/defaults";
 import { NoteStatusSettings } from "./models/types";
