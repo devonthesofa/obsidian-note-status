@@ -201,7 +201,7 @@ export class NoteStatusService extends BaseNoteStatusService {
 				const noteStatusFrontmatter =
 					(frontmatter?.[frontmatterTagName] as string[]) || [];
 				if (!settingsService.settings.useMultipleStatuses) {
-					frontmatter[frontmatterTagName] = statusIdentifier;
+					frontmatter[frontmatterTagName] = [statusIdentifier];
 					added = true;
 				} else {
 					const i = noteStatusFrontmatter.findIndex(

@@ -196,7 +196,7 @@ export class CommandsService {
 					statusService.populateStatuses();
 					navigator.clipboard.readText().then((text) => {
 						const statuses = text.split(", ");
-						this.setFileStatuses(file, statuses);
+
 						statusService
 							.overrideStatuses(
 								settingsService.settings.tagPrefix,
@@ -277,39 +277,28 @@ export class CommandsService {
 				checkCallback: (checking: boolean) => {
 					const file = this.app.workspace.getActiveFile();
 					if (!file) return false;
+					if (settingsService.settings.useMultipleStatuses) {
+						return false;
+					}
 
-					if (!checking) {
-						this.setFileStatuses(file, [statusName]);
-						new Notice(`Status set to ${statusName}`);
+					if (
+						!checking &&
+						!settingsService.settings.useMultipleStatuses
+					) {
+						const statusService = this.createStatusService(file);
+						statusService
+							.overrideStatuses(
+								settingsService.settings.tagPrefix,
+								[statusName],
+							)
+							.then(() => {
+								new Notice(`Status set to ${statusName}`);
+							});
 					}
 					return true;
 				},
 			});
 			this.registeredCommands.add(`set-status-${statusName}`);
-
-			// Add toggle command for multiple status mode
-			if (settingsService.settings.useMultipleStatuses) {
-				this.plugin.addCommand({
-					id: `toggle-status-${statusName}`,
-					name: `Toggle status ${statusName}`,
-					checkCallback: (checking: boolean) => {
-						const file = this.app.workspace.getActiveFile();
-						if (!file) return false;
-
-						if (!checking) {
-							this.toggleFileStatus(file, statusName);
-							const currentStatuses = this.getFileStatuses(file);
-							const hasStatus =
-								currentStatuses.includes(statusName);
-							new Notice(
-								`Status ${statusName} ${hasStatus ? "added" : "removed"}`,
-							);
-						}
-						return true;
-					},
-				});
-				this.registeredCommands.add(`toggle-status-${statusName}`);
-			}
 		});
 	}
 
@@ -319,47 +308,6 @@ export class CommandsService {
 		const tagPrefix = settingsService.settings.tagPrefix;
 		const statuses = statusService.statuses[tagPrefix] || [];
 		return statuses.length > 0 ? statuses.map((s) => s.name) : ["unknown"];
-	}
-
-	private async setFileStatuses(
-		file: TFile,
-		statusNames: string[],
-	): Promise<void> {
-		const tagPrefix = settingsService.settings.tagPrefix;
-		await this.app.fileManager.processFrontMatter(file, (frontmatter) => {
-			if (
-				statusNames.length === 0 ||
-				(statusNames.length === 1 && statusNames[0] === "unknown")
-			) {
-				delete frontmatter[tagPrefix];
-			} else if (statusNames.length === 1) {
-				frontmatter[tagPrefix] = statusNames[0];
-			} else {
-				frontmatter[tagPrefix] = statusNames;
-			}
-		});
-		eventBus.publish("frontmatter-manually-changed", { file });
-	}
-
-	private async toggleFileStatus(
-		file: TFile,
-		statusName: string,
-	): Promise<void> {
-		const currentStatuses = this.getFileStatuses(file);
-		let newStatuses: string[];
-
-		if (currentStatuses.includes(statusName)) {
-			// Remove the status
-			newStatuses = currentStatuses.filter((s) => s !== statusName);
-		} else {
-			// Add the status
-			newStatuses = [
-				...currentStatuses.filter((s) => s !== "unknown"),
-				statusName,
-			];
-		}
-
-		await this.setFileStatuses(file, newStatuses);
 	}
 
 	public unload(): void {
