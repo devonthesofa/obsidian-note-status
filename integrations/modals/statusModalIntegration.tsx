@@ -1,9 +1,9 @@
 import { App, Modal, Notice } from "obsidian";
 import { createRoot, Root } from "react-dom/client";
 import {
-	ChangeStatusModalContent,
+	ChangeStatusModal,
 	Props,
-} from "@/components/StatusModal/ChangeStatusModalContent";
+} from "@/components/ChangeStatusModal/ChangeStatusModal";
 import SelectorService from "@/core/selectorService";
 import {
 	MultipleNoteStatusService,
@@ -87,10 +87,7 @@ export class StatusModalIntegration extends Modal {
 	}
 
 	private render() {
-		const { contentEl, titleEl } = this;
-
-		titleEl.setText("Note Status");
-		// this.modalEl.addClass("note-status-modal");
+		const { contentEl } = this;
 
 		if (!this.root) {
 			this.root = createRoot(contentEl);
@@ -105,7 +102,7 @@ export class StatusModalIntegration extends Modal {
 				this.selectorService.noteStatusService.selectedFilesQTY();
 		}
 		this.root.render(
-			<ChangeStatusModalContent
+			<ChangeStatusModal
 				availableStatuses={NoteStatusService.getAllAvailableStatuses()}
 				currentStatuses={
 					this.selectorService.noteStatusService.statuses ?? {}

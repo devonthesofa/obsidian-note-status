@@ -19,7 +19,7 @@ export interface Props {
 	) => Promise<void>;
 }
 
-export const ChangeStatusModalContent: React.FC<Props> = ({
+export const ChangeStatusModal: React.FC<Props> = ({
 	currentStatuses: initialStatuses,
 	filesQuantity,
 	availableStatuses,
@@ -42,6 +42,8 @@ export const ChangeStatusModalContent: React.FC<Props> = ({
 
 	return (
 		<>
+			<h1>Change note status {filesQuantity}</h1>
+
 			{currentStatuses.map(([frontmatterTagName, statusList]) => (
 				<StatusSelectorGroupedByTag
 					key={frontmatterTagName}
