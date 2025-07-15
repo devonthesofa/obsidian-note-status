@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { NoteStatus } from "@/types/noteStatus";
 import { SearchFilter } from "../atoms/SearchFilter";
 import { StatusChip } from "../atoms/StatusChip";
@@ -23,6 +23,9 @@ export const StatusSelectorGroupedByTag: React.FC<Props> = ({
 	onSelectedState,
 }) => {
 	const [searchFilter, setSearchFilter] = useState("");
+	const [focusedIndex, setFocusedIndex] = useState(-1);
+	const containerRef = useRef<HTMLDivElement>(null);
+	const searchRef = useRef<HTMLInputElement>(null);
 
 	const filteredStatuses = searchFilter
 		? availableStatuses.filter((status) =>
@@ -38,9 +41,105 @@ export const StatusSelectorGroupedByTag: React.FC<Props> = ({
 		onSelectedState(frontmatterTagName, status, "select");
 	};
 
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		switch (e.key) {
+			case "ArrowDown":
+				e.preventDefault();
+				if (filteredStatuses.length > 0) {
+					setFocusedIndex((prev) =>
+						prev < filteredStatuses.length - 1 ? prev + 1 : 0,
+					);
+				}
+				break;
+			case "ArrowUp":
+				e.preventDefault();
+				if (filteredStatuses.length > 0) {
+					setFocusedIndex((prev) =>
+						prev > 0 ? prev - 1 : filteredStatuses.length - 1,
+					);
+				}
+				break;
+			case "Tab":
+				if (!e.shiftKey) {
+					e.preventDefault();
+					if (filteredStatuses.length > 0) {
+						setFocusedIndex((prev) =>
+							prev < filteredStatuses.length - 1 ? prev + 1 : 0,
+						);
+					}
+				} else {
+					e.preventDefault();
+					if (filteredStatuses.length > 0) {
+						setFocusedIndex((prev) =>
+							prev > 0 ? prev - 1 : filteredStatuses.length - 1,
+						);
+					}
+				}
+				break;
+			case "Enter":
+				if (
+					focusedIndex >= 0 &&
+					focusedIndex < filteredStatuses.length
+				) {
+					e.preventDefault();
+					const status = filteredStatuses[focusedIndex];
+					const isSelected = currentStatuses.some(
+						(s) => s.name === status.name,
+					);
+					if (isSelected) {
+						handleRemoveStatus(status);
+					} else {
+						handleSelectStatus(status);
+					}
+				}
+				break;
+			case "Backspace":
+				e.preventDefault();
+				setSearchFilter((prev) => prev.slice(0, -1));
+				if (searchRef.current) {
+					searchRef.current.focus();
+				}
+				break;
+			case "Escape":
+				e.preventDefault();
+				setSearchFilter("");
+				break;
+			default:
+				if (
+					e.key.length === 1 &&
+					!e.ctrlKey &&
+					!e.metaKey &&
+					!e.altKey
+				) {
+					e.preventDefault();
+					setSearchFilter((prev) => prev + e.key);
+					if (searchRef.current) {
+						searchRef.current.focus();
+					}
+				}
+				break;
+		}
+	};
+
+	useEffect(() => {
+		setFocusedIndex(filteredStatuses.length > 0 ? 0 : -1);
+	}, [searchFilter, filteredStatuses.length]);
+
+	useEffect(() => {
+		if (containerRef.current) {
+			containerRef.current.focus();
+		}
+	}, []);
+
 	return (
-		<div>
+		<div
+			ref={containerRef}
+			tabIndex={0}
+			onKeyDown={handleKeyDown}
+			style={{ outline: "none" }}
+		>
 			<SearchFilter
+				ref={searchRef}
 				value={searchFilter}
 				onFilterChange={(value) => setSearchFilter(value)}
 			/>
@@ -62,6 +161,7 @@ export const StatusSelectorGroupedByTag: React.FC<Props> = ({
 					<StatusSelector
 						availableStatuses={filteredStatuses}
 						currentStatuses={currentStatuses}
+						focusedIndex={focusedIndex}
 						onToggleStatus={(status, selected) =>
 							selected
 								? handleSelectStatus(status)
@@ -70,7 +170,6 @@ export const StatusSelectorGroupedByTag: React.FC<Props> = ({
 					/>
 				)}
 			</SettingItem>
-
 			<SettingItem name="Available statuses" vertical>
 				<div
 					className="note-status-chips"

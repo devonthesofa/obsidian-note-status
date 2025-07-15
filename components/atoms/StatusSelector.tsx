@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { NoteStatus } from "@/types/noteStatus";
+
 interface StatusOptionProps {
 	status: NoteStatus;
 	isSelected: boolean;
+	isFocused: boolean;
 	onSelect: () => void;
 }
 
 export const StatusModalOption: React.FC<StatusOptionProps> = ({
 	status,
 	isSelected,
+	isFocused,
 	onSelect,
 }) => {
 	const [isHovered, setIsHovered] = useState(false);
@@ -39,9 +42,13 @@ export const StatusModalOption: React.FC<StatusOptionProps> = ({
 				borderBottom: "1px solid var(--background-modifier-border)",
 				transition: "background-color 150ms ease",
 				background:
-					isSelected || isHovered
+					isSelected || isHovered || isFocused
 						? "var(--background-modifier-hover)"
 						: "",
+				outline: isFocused
+					? "2px solid var(--interactive-accent)"
+					: "none",
+				outlineOffset: "-2px",
 			}}
 		>
 			<span
@@ -90,12 +97,14 @@ export const StatusModalOption: React.FC<StatusOptionProps> = ({
 export interface Props {
 	currentStatuses: NoteStatus[];
 	availableStatuses: NoteStatus[];
+	focusedIndex?: number;
 	onToggleStatus: (status: NoteStatus, selected: boolean) => void;
 }
 
 export const StatusSelector: React.FC<Props> = ({
 	currentStatuses,
 	availableStatuses,
+	focusedIndex = -1,
 	onToggleStatus,
 }) => {
 	const handleSelectStatus = async (status: NoteStatus) => {
@@ -104,7 +113,6 @@ export const StatusSelector: React.FC<Props> = ({
 		onToggleStatus(status, !selected);
 	};
 
-	// TODO: The StatusSelector must be splitted by its template
 	return (
 		<div
 			className="note-status-options"
@@ -116,7 +124,7 @@ export const StatusSelector: React.FC<Props> = ({
 				background: "var(--background-primary)",
 			}}
 		>
-			{availableStatuses.map((status) => (
+			{availableStatuses.map((status, index) => (
 				<StatusModalOption
 					key={`${status.name}${status.description}${status.color}${status.icon}`}
 					status={status}
@@ -125,6 +133,7 @@ export const StatusSelector: React.FC<Props> = ({
 							(s) => s.name === status.name,
 						) !== -1
 					}
+					isFocused={index === focusedIndex}
 					onSelect={() => handleSelectStatus(status)}
 				/>
 			))}
