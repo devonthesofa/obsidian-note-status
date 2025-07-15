@@ -1,29 +1,21 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NoteStatus } from "@/types/noteStatus";
-import { SearchFilter } from "../atoms/SearchFilter";
-import { StatusChip } from "../atoms/StatusChip";
-import { StatusSelector } from "../atoms/StatusSelector";
-import { SettingItem } from "../SettingsUI.tsx/SettingItem";
 
-export interface Props {
-	frontmatterTagName: string;
-	currentStatuses: NoteStatus[];
+interface UseKeyboardNavigationProps {
 	availableStatuses: NoteStatus[];
-	onSelectedState: (
-		frontmatterTagName: string,
-		status: NoteStatus,
-		action: "select" | "unselected",
-	) => void;
+	currentStatuses: NoteStatus[];
+	onSelectStatus: (status: NoteStatus) => void;
+	onRemoveStatus: (status: NoteStatus) => void;
 }
 
-export const StatusSelectorGroupedByTag: React.FC<Props> = ({
-	currentStatuses,
+export const useKeyboardNavigation = ({
 	availableStatuses,
-	frontmatterTagName,
-	onSelectedState,
-}) => {
-	const [searchFilter, setSearchFilter] = useState("");
+	currentStatuses,
+	onSelectStatus,
+	onRemoveStatus,
+}: UseKeyboardNavigationProps) => {
 	const [focusedIndex, setFocusedIndex] = useState(-1);
+	const [searchFilter, setSearchFilter] = useState("");
 	const containerRef = useRef<HTMLDivElement>(null);
 	const searchRef = useRef<HTMLInputElement>(null);
 
@@ -32,14 +24,6 @@ export const StatusSelectorGroupedByTag: React.FC<Props> = ({
 				status.name.toLowerCase().includes(searchFilter.toLowerCase()),
 			)
 		: availableStatuses;
-
-	const handleRemoveStatus = async (status: NoteStatus) => {
-		onSelectedState(frontmatterTagName, status, "unselected");
-	};
-
-	const handleSelectStatus = async (status: NoteStatus) => {
-		onSelectedState(frontmatterTagName, status, "select");
-	};
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		switch (e.key) {
@@ -87,9 +71,9 @@ export const StatusSelectorGroupedByTag: React.FC<Props> = ({
 						(s) => s.name === status.name,
 					);
 					if (isSelected) {
-						handleRemoveStatus(status);
+						onRemoveStatus(status);
 					} else {
-						handleSelectStatus(status);
+						onSelectStatus(status);
 					}
 				}
 				break;
@@ -131,65 +115,13 @@ export const StatusSelectorGroupedByTag: React.FC<Props> = ({
 		}
 	}, []);
 
-	return (
-		<div
-			ref={containerRef}
-			tabIndex={0}
-			onKeyDown={handleKeyDown}
-			style={{ outline: "none" }}
-		>
-			<SearchFilter
-				ref={searchRef}
-				value={searchFilter}
-				onFilterChange={(value) => setSearchFilter(value)}
-			/>
-			<SettingItem name="Current statuses" vertical>
-				{filteredStatuses.length === 0 ? (
-					<div
-						style={{
-							padding: "16px",
-							textAlign: "center",
-							color: "var(--text-muted)",
-							fontStyle: "italic",
-						}}
-					>
-						{searchFilter
-							? `No statuses match "${searchFilter}"`
-							: "No statuses found"}
-					</div>
-				) : (
-					<StatusSelector
-						availableStatuses={filteredStatuses}
-						currentStatuses={currentStatuses}
-						focusedIndex={focusedIndex}
-						onToggleStatus={(status, selected) =>
-							selected
-								? handleSelectStatus(status)
-								: handleRemoveStatus(status)
-						}
-					/>
-				)}
-			</SettingItem>
-			<SettingItem name="Available statuses" vertical>
-				<div
-					className="note-status-chips"
-					style={{
-						display: "flex",
-						flexWrap: "wrap",
-						gap: "6px",
-						minHeight: "32px",
-						alignItems: "center",
-					}}
-				>
-					{currentStatuses.map((s) => (
-						<StatusChip
-							key={s.name}
-							status={s}
-							onRemove={() => handleRemoveStatus(s)}
-						/>
-					))}
-				</div>
-			</SettingItem>
-		</div>
-	);
+	return {
+		focusedIndex,
+		searchFilter,
+		filteredStatuses,
+		containerRef,
+		searchRef,
+		handleKeyDown,
+		setSearchFilter,
+	};
 };

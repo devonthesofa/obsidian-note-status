@@ -1,46 +1,32 @@
-import { FC, useEffect, useRef, useState } from "react";
+import React from "react";
 
-export type Props = {
+interface Props {
 	value: string;
 	onFilterChange: (value: string) => void;
-};
-export const SearchFilter: FC<Props> = ({ value, onFilterChange }) => {
-	const [searchFilter, setSearchFilter] = useState(value);
-	const searchInputRef = useRef<HTMLInputElement>(null);
+	placeholder?: string;
+}
 
-	useEffect(() => {
-		// TODO:: Focus on render?
-		// if (searchInputRef.current) {
-		// 	setTimeout(() => searchInputRef.current?.focus(), 100);
-		// }
-		//
-		setSearchFilter(value);
-	}, [value]);
+export const SearchFilter = React.forwardRef<HTMLInputElement, Props>(
+	({ value, onFilterChange, placeholder = "Search..." }, ref) => {
+		return (
+			<input
+				ref={ref}
+				type="text"
+				value={value}
+				onChange={(e) => onFilterChange(e.target.value)}
+				placeholder={placeholder}
+				style={{
+					width: "100%",
+					padding: "8px 12px",
+					border: "1px solid var(--background-modifier-border)",
+					borderRadius: "4px",
+					backgroundColor: "var(--background-primary)",
+					color: "var(--text-normal)",
+					fontSize: "14px",
+				}}
+			/>
+		);
+	},
+);
 
-	// TODO: Move the style to its css file
-	return (
-		<div className="setting-item">
-			<div className="setting-item-info">
-				<div className="setting-item-name">Filter statuses</div>
-			</div>
-			<div className="setting-item-control">
-				<input
-					ref={searchInputRef}
-					type="text"
-					placeholder="Search statuses..."
-					className="note-status-search-input"
-					value={searchFilter}
-					onChange={(e) => onFilterChange(e.target.value)}
-					style={{
-						width: "200px",
-						padding: "6px 12px",
-						border: "1px solid var(--background-modifier-border)",
-						borderRadius: "var(--radius-s)",
-						background: "var(--background-primary)",
-						color: "var(--text-normal)",
-					}}
-				/>
-			</div>
-		</div>
-	);
-};
+SearchFilter.displayName = "SearchFilter";

@@ -1,9 +1,9 @@
 import React from "react";
 import { GroupedStatuses, NoteStatus } from "@/types/noteStatus";
 import {
-	StatusSelectorGroupedByTag,
-	Props as SSGByTagProps,
-} from "./StatusSelectorGroupedByTag";
+	StatusSelectorGroup,
+	Props as StatusSelectorGroupProps,
+} from "./StatusSelectorGroup";
 
 export interface Props {
 	currentStatuses: GroupedStatuses;
@@ -28,7 +28,7 @@ export const ChangeStatusModal: React.FC<Props> = ({
 }) => {
 	const currentStatuses = Object.entries(initialStatuses);
 
-	const handleSelectedState: SSGByTagProps["onSelectedState"] = (
+	const handleSelectedState: StatusSelectorGroupProps["onSelectedState"] = (
 		frontmatterTagName,
 		status,
 		action,
@@ -45,7 +45,7 @@ export const ChangeStatusModal: React.FC<Props> = ({
 			<h1>Change note status {filesQuantity}</h1>
 
 			{currentStatuses.map(([frontmatterTagName, statusList]) => (
-				<StatusSelectorGroupedByTag
+				<StatusSelectorGroup
 					key={frontmatterTagName}
 					frontmatterTagName={frontmatterTagName}
 					availableStatuses={availableStatuses}
