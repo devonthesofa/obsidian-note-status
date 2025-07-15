@@ -1,9 +1,9 @@
 import { App, Modal, Notice } from "obsidian";
 import { createRoot, Root } from "react-dom/client";
 import {
-	StatusModal as StatusModalComponent,
+	ChangeStatusModalContent,
 	Props,
-} from "@/components/StatusModal/StatusModal";
+} from "@/components/StatusModal/ChangeStatusModalContent";
 import SelectorService from "@/core/selectorService";
 import {
 	MultipleNoteStatusService,
@@ -105,7 +105,7 @@ export class StatusModalIntegration extends Modal {
 				this.selectorService.noteStatusService.selectedFilesQTY();
 		}
 		this.root.render(
-			<StatusModalComponent
+			<ChangeStatusModalContent
 				availableStatuses={NoteStatusService.getAllAvailableStatuses()}
 				currentStatuses={
 					this.selectorService.noteStatusService.statuses ?? {}
