@@ -107,12 +107,6 @@
 	border-radius: var(--radius-m);
 }
 
-.modal-content {
-	padding: var(--size-4-2) var(--size-4-4) var(--size-4-4) var(--size-4-4);
-	max-height: 320px;
-	overflow-y: auto;
-}
-
 .status-group:not(:last-child) {
 	margin-bottom: var(--size-4-4);
 }
@@ -212,22 +206,4 @@
 	bottom: -5px;
 	border-top: none;
 	border-left: none;
-}
-
-.modal-content::-webkit-scrollbar {
-	width: var(--scrollbar-thin-thumb);
-}
-
-.modal-content::-webkit-scrollbar-track {
-	background: var(--background-modifier-hover);
-	border-radius: var(--radius-s);
-}
-
-.modal-content::-webkit-scrollbar-thumb {
-	background: var(--background-modifier-border);
-	border-radius: var(--radius-s);
-}
-
-.modal-content::-webkit-scrollbar-thumb:hover {
-	background: var(--background-modifier-border-hover);
 }
