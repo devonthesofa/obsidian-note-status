@@ -6,7 +6,7 @@ interface Props {
 	onRemove: () => void;
 }
 
-export const StatusModalChip: FC<Props> = ({ status, onRemove }) => {
+export const StatusChip: FC<Props> = ({ status, onRemove }) => {
 	const [isRemoving, setIsRemoving] = useState(false);
 
 	const handleRemove = (e: React.MouseEvent) => {

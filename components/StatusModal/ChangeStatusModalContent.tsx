@@ -1,6 +1,5 @@
 import React from "react";
 import { GroupedStatuses, NoteStatus } from "@/types/noteStatus";
-import { StatusModalHeader } from "./StatusModalHeader";
 import {
 	StatusSelectorGroupedByTag,
 	Props as SSGByTagProps,
@@ -20,7 +19,7 @@ export interface Props {
 	) => Promise<void>;
 }
 
-export const StatusModal: React.FC<Props> = ({
+export const ChangeStatusModalContent: React.FC<Props> = ({
 	currentStatuses: initialStatuses,
 	filesQuantity,
 	availableStatuses,
@@ -42,8 +41,7 @@ export const StatusModal: React.FC<Props> = ({
 	};
 
 	return (
-		<div className="note-status-modal-content">
-			<StatusModalHeader filesQuantity={filesQuantity} />
+		<>
 			{currentStatuses.map(([frontmatterTagName, statusList]) => (
 				<StatusSelectorGroupedByTag
 					key={frontmatterTagName}
@@ -53,6 +51,6 @@ export const StatusModal: React.FC<Props> = ({
 					onSelectedState={handleSelectedState}
 				/>
 			))}
-		</div>
+		</>
 	);
 };

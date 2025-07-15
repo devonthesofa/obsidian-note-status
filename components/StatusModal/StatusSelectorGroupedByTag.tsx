@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { NoteStatus } from "@/types/noteStatus";
-import { StatusModalChip } from "./StatusModalChip";
 import { SearchFilter } from "../atoms/SearchFilter";
-import { StatusSelector } from "./StatusSelector";
+import { StatusChip } from "../atoms/StatusChip";
+import { StatusSelector } from "../atoms/StatusSelector";
+import { SettingItem } from "../SettingsUI.tsx/SettingItem";
 
 export interface Props {
 	frontmatterTagName: string;
@@ -39,59 +40,57 @@ export const StatusSelectorGroupedByTag: React.FC<Props> = ({
 
 	return (
 		<div>
-			<div className="setting-item">
-				<div className="setting-item-info">
-					<div className="setting-item-name">Current statuses</div>
-				</div>
-				<div className="setting-item-control">
-					<div
-						className="note-status-chips"
-						style={{
-							display: "flex",
-							flexWrap: "wrap",
-							gap: "6px",
-							minHeight: "32px",
-							alignItems: "center",
-						}}
-					>
-						{currentStatuses.map((s) => (
-							<StatusModalChip
-								key={s.name}
-								status={s}
-								onRemove={() => handleRemoveStatus(s)}
-							/>
-						))}
-					</div>
-				</div>
-			</div>
 			<SearchFilter
 				value={searchFilter}
 				onFilterChange={(value) => setSearchFilter(value)}
 			/>
-			{filteredStatuses.length === 0 ? (
+			<SettingItem name="Current statuses" vertical>
+				{filteredStatuses.length === 0 ? (
+					<div
+						style={{
+							padding: "16px",
+							textAlign: "center",
+							color: "var(--text-muted)",
+							fontStyle: "italic",
+						}}
+					>
+						{searchFilter
+							? `No statuses match "${searchFilter}"`
+							: "No statuses found"}
+					</div>
+				) : (
+					<StatusSelector
+						availableStatuses={filteredStatuses}
+						currentStatuses={currentStatuses}
+						onToggleStatus={(status, selected) =>
+							selected
+								? handleSelectStatus(status)
+								: handleRemoveStatus(status)
+						}
+					/>
+				)}
+			</SettingItem>
+
+			<SettingItem name="Available statuses" vertical>
 				<div
+					className="note-status-chips"
 					style={{
-						padding: "16px",
-						textAlign: "center",
-						color: "var(--text-muted)",
-						fontStyle: "italic",
+						display: "flex",
+						flexWrap: "wrap",
+						gap: "6px",
+						minHeight: "32px",
+						alignItems: "center",
 					}}
 				>
-					{searchFilter
-						? `No statuses match "${searchFilter}"`
-						: "No statuses found"}
+					{currentStatuses.map((s) => (
+						<StatusChip
+							key={s.name}
+							status={s}
+							onRemove={() => handleRemoveStatus(s)}
+						/>
+					))}
 				</div>
-			) : (
-				<StatusSelector
-					availableStatuses={filteredStatuses}
-					currentStatuses={currentStatuses}
-					onToggleStatus={(status, selected) =>
-						selected
-							? handleSelectStatus(status)
-							: handleRemoveStatus(status)
-					}
-				/>
-			)}
+			</SettingItem>
 		</div>
 	);
 };

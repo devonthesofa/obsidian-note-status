@@ -1,6 +1,5 @@
+import React, { useState } from "react";
 import { NoteStatus } from "@/types/noteStatus";
-import { useState } from "react";
-
 interface StatusOptionProps {
 	status: NoteStatus;
 	isSelected: boolean;
@@ -84,6 +83,51 @@ export const StatusModalOption: React.FC<StatusOptionProps> = ({
 					</svg>
 				</div>
 			)}
+		</div>
+	);
+};
+
+export interface Props {
+	currentStatuses: NoteStatus[];
+	availableStatuses: NoteStatus[];
+	onToggleStatus: (status: NoteStatus, selected: boolean) => void;
+}
+
+export const StatusSelector: React.FC<Props> = ({
+	currentStatuses,
+	availableStatuses,
+	onToggleStatus,
+}) => {
+	const handleSelectStatus = async (status: NoteStatus) => {
+		const selected =
+			currentStatuses.findIndex((s) => s.name === status.name) !== -1;
+		onToggleStatus(status, !selected);
+	};
+
+	// TODO: The StatusSelector must be splitted by its template
+	return (
+		<div
+			className="note-status-options"
+			style={{
+				maxHeight: "300px",
+				overflowY: "auto",
+				border: "1px solid var(--background-modifier-border)",
+				borderRadius: "var(--radius-s)",
+				background: "var(--background-primary)",
+			}}
+		>
+			{availableStatuses.map((status) => (
+				<StatusModalOption
+					key={`${status.name}${status.description}${status.color}${status.icon}`}
+					status={status}
+					isSelected={
+						currentStatuses.findIndex(
+							(s) => s.name === status.name,
+						) !== -1
+					}
+					onSelect={() => handleSelectStatus(status)}
+				/>
+			))}
 		</div>
 	);
 };
