@@ -1,0 +1,12 @@
+.status-group {
+	margin-bottom: 1.5em;
+}
+
+.status-group-description {
+	font-size: 0.85em;
+	opacity: 0.7;
+}
+
+.status-group-items {
+	margin-left: 1em;
+}

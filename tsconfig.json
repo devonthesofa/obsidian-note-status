@@ -1,6 +1,17 @@
 {
 	"compilerOptions": {
 		"baseUrl": ".",
+		"paths": {
+			"@/components/*": ["./components/*"],
+			"@/constants/*": ["./constants/*"],
+			"@/contexts/*": ["./contexts/*"],
+			"@/core/*": ["./core/*"],
+			"@/hooks/*": ["./hooks/*"],
+			"@/integrations/*": ["./integrations/*"],
+			"@/styles/*": ["./styles/*"],
+			"@/types/*": ["./types/*"],
+			"@/views/*": ["./views/*"]
+		},
 		"inlineSourceMap": true,
 		"inlineSources": true,
 		"module": "ESNext",

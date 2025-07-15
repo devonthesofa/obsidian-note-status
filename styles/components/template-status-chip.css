@@ -1,0 +1,17 @@
+.template-status-chip {
+	display: inline-flex;
+	align-items: center;
+	padding: 2px 8px;
+	border-radius: var(--radius-xl);
+	background: var(--background-secondary);
+	font-size: 0.85em;
+	border: 1px solid var(--color-base-30);
+	gap: 4px;
+}
+.template-status-color-dot {
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background-color: var(--dot-color, --color-base-30);
+}

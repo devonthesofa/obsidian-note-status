@@ -1,274 +1,191 @@
-// React import needed for JSX compilation
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React from "react";
-import { Plugin, Notice } from "obsidian";
-import { DEFAULT_SETTINGS } from "./constants/defaults";
-import { NoteStatusSettings } from "./models/types";
-import { StatusService } from "services/status-service";
-import { StyleService } from "services/style-service";
-import { ReactUtils } from "./utils/react-utils";
+import { Plugin, WorkspaceLeaf } from "obsidian";
+import StatusBarIntegration from "integrations/status-bar/status-bar";
+import eventBus from "core/eventBus";
+import { PluginSettingIntegration } from "./integrations/settings/pluginSettings";
+import settingsService from "./core/settingsService";
+import { BaseNoteStatusService } from "./core/noteStatusService";
+import { StatusModalIntegration } from "./integrations/modals/statusModalIntegration";
+import ContextMenuIntegration from "./integrations/context-menu/contextMenuIntegration";
+import { FileExplorerIntegration } from "./integrations/file-explorer/file-explorer-integration";
+import { CommandsIntegration } from "./integrations/commands/commandsIntegration";
+import {
+	GrouppedStatusView,
+	VIEW_TYPE_EXAMPLE,
+} from "./integrations/views/groupped-status-view";
+import {
+	StatusDashboardView,
+	VIEW_TYPE_STATUS_DASHBOARD,
+} from "./integrations/views/status-dashboard-view";
 
-// Importar integraciones
-import { ExplorerIntegration } from "./integrations/explorer";
-import { EditorIntegration, ToolbarIntegration } from "./integrations/editor";
-import { MetadataIntegration } from "./integrations/metadata-cache";
-import { WorkspaceIntegration } from "./integrations/workspace";
-import { FileContextMenuIntegration } from "integrations/context-menu/file-context-menu-integration";
-import { NoteStatusSettingTab } from "integrations/settings/settings-tab";
-import { CommandIntegration } from "integrations/commands/command-integration";
-
-// Importar vistas
-import { StatusPaneViewController } from "./views/status-pane-view/StatusPaneViewController";
-
-// Importar componentes UI
-import { StatusBar } from "components/status-bar";
-import { StatusDropdownManager } from "components/status-dropdown/StatusDropdownManager";
-import { StatusContextMenu } from "integrations/context-menu/status-context-menu";
-
-export default class NoteStatus extends Plugin {
-	settings: NoteStatusSettings;
-
-	// Servicios
-	statusService: StatusService;
-	styleService: StyleService;
-
-	// Componentes UI
-	statusBar: StatusBar;
-	statusDropdown: StatusDropdownManager;
-
-	// Integraciones
-	explorerIntegration: ExplorerIntegration;
-	fileContextMenuIntegration: FileContextMenuIntegration;
-	editorIntegration: EditorIntegration;
-	toolbarIntegration: ToolbarIntegration;
-	metadataIntegration: MetadataIntegration;
-	workspaceIntegration: WorkspaceIntegration;
-	commandIntegration: CommandIntegration;
-
-	statusPane: StatusPaneViewController;
-
-	private boundHandleStatusChanged: (event: CustomEvent) => void;
+export default class NoteStatusPlugin extends Plugin {
+	private statusBarIntegration: StatusBarIntegration;
+	private pluginSettingsIntegration: PluginSettingIntegration;
+	private contextMenuIntegration: ContextMenuIntegration;
+	private fileExplorerIntegration: FileExplorerIntegration;
+	private commandsIntegration: CommandsIntegration;
 
 	async onload() {
-		try {
-			await this.loadSettings();
-			this.initializeServices();
-			this.registerViews();
-			this.initializeUI();
-			this.initializeIntegrations();
-			this.setupCustomEvents();
-		} catch (error) {
-			console.error("Error loading Note Status plugin:", error);
-			new Notice(
-				"Error loading Note Status plugin. Check console for details.",
-			);
-		}
-	}
+		BaseNoteStatusService.initialize(this.app);
+		await this.loadPluginSettings();
 
-	private async loadSettings() {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			await this.loadData(),
+		// INFO: initialize all integrations
+		Promise.all([
+			this.loadContextMenu(),
+			this.loadStatusBar(),
+			this.loadFileExplorer(),
+			this.loadCommands(),
+			this.loadEventBus(),
+		]);
+
+		this.registerView(
+			VIEW_TYPE_EXAMPLE,
+			(leaf) => new GrouppedStatusView(leaf),
 		);
-	}
 
-	private initializeServices() {
-		this.statusService = new StatusService(this.app, this.settings);
-		this.styleService = new StyleService(this.settings);
-	}
+		this.registerView(
+			VIEW_TYPE_STATUS_DASHBOARD,
+			(leaf) => new StatusDashboardView(leaf),
+		);
 
-	private registerViews() {
-		// Register status pane view
-		this.registerView("status-pane", (leaf) => {
-			this.statusPane = new StatusPaneViewController(leaf, this);
-			return this.statusPane;
+		this.addRibbonIcon("dice", "Activate grouped view", () => {
+			this.activateView();
 		});
 
-		// Add ribbon icon
-		this.addRibbonIcon("tag", "Open status pane", () => {
-			this.openStatusPane();
+		this.addRibbonIcon("bar-chart-2", "Status Dashboard", () => {
+			this.activateDashboard();
 		});
+	}
 
-		// Añadir pestaña de configuración
-		this.addSettingTab(
-			new NoteStatusSettingTab(this.app, this, this.statusService),
+	async onunload() {
+		// Clean up all integrations
+		this.statusBarIntegration?.destroy();
+		this.contextMenuIntegration?.destroy();
+		this.fileExplorerIntegration?.destroy();
+		this.commandsIntegration?.destroy();
+		this.pluginSettingsIntegration?.destroy();
+
+		// Clean up event subscriptions
+		eventBus.unsubscribe(
+			"triggered-open-modal",
+			"main-triggered-open-modal-subscriptor",
 		);
 	}
 
-	private initializeIntegrations() {
-		this.explorerIntegration = new ExplorerIntegration(
-			this.app,
-			this.settings,
-			this.statusService,
-		);
-		this.toolbarIntegration = new ToolbarIntegration(
-			this.app,
-			this.settings,
-			this.statusService,
-			this.statusDropdown,
-		);
-		const statusContextMenu = new StatusContextMenu(
-			this.app,
-			this.settings,
-			this.statusService,
-			this.statusDropdown,
-			this.explorerIntegration,
-		);
-		this.fileContextMenuIntegration = new FileContextMenuIntegration(
-			this.app,
-			this.settings,
-			this.statusService,
-			this.explorerIntegration,
-			statusContextMenu,
-		);
+	async activateView() {
+		const { workspace } = this.app;
 
-		this.editorIntegration = new EditorIntegration(
-			this.app,
-			this.settings,
-			this.statusService,
-			this.statusDropdown,
-		);
-		this.commandIntegration = new CommandIntegration(
-			this.app,
-			this,
-			this.settings,
-			this.statusService,
-			this.statusDropdown,
-		);
-		this.metadataIntegration = new MetadataIntegration(
-			this.app,
-			this.settings,
-			this.statusService,
-			this.explorerIntegration,
-		);
+		let leaf: WorkspaceLeaf | null = null;
+		const leaves = workspace.getLeavesOfType(VIEW_TYPE_EXAMPLE);
 
-		this.workspaceIntegration = new WorkspaceIntegration(
-			this.app,
-			this.settings,
-			this.statusService,
-			this.toolbarIntegration,
-		);
-
-		// Registrar eventos en cada integración
-		this.fileContextMenuIntegration.registerFileContextMenuEvents();
-		this.editorIntegration.registerEditorMenus();
-		this.commandIntegration.registerCommands();
-		this.metadataIntegration.registerMetadataEvents();
-		this.workspaceIntegration.registerWorkspaceEvents();
-	}
-
-	private setupCustomEvents() {
-		this.boundHandleStatusChanged = this.handleStatusChanged.bind(this);
-		window.addEventListener(
-			"note-status:status-changed",
-			this.boundHandleStatusChanged,
-		);
-	}
-
-	private initializeUI() {
-		this.statusDropdown = new StatusDropdownManager(
-			this.app,
-			this.settings,
-			this.statusService,
-		);
-
-		// Inicializar barra de estado
-		this.statusBar = new StatusBar(
-			this.addStatusBarItem(),
-			this.settings,
-			this.statusService,
-		);
-
-		// Inicializar iconos del explorador (con retraso para evitar ralentizar el inicio)
-		if (this.settings.showStatusIconsInExplorer) {
-			setTimeout(() => {
-				this.explorerIntegration.updateAllFileExplorerIcons();
-			}, 2000);
-		}
-	}
-
-	private handleStatusChanged(event: CustomEvent) {
-		const { statuses, file } = event.detail;
-
-		// Actualizar barra de estado
-		this.statusBar.update(statuses);
-		// Actualizar toolbar
-		const activeFile = this.app.workspace.getActiveFile();
-		if (activeFile?.path === file) {
-			this.toolbarIntegration.updateStatusDisplay(statuses);
-		}
-		// Actualizar dropdown
-		this.statusDropdown.update(statuses);
-		// Actualizar status pane si está abierto
-		const statusPaneLeaf =
-			this.app.workspace.getLeavesOfType("status-pane")[0];
-		if (
-			statusPaneLeaf?.view &&
-			statusPaneLeaf.view instanceof StatusPaneViewController
-		) {
-			(statusPaneLeaf.view as StatusPaneViewController).update();
-		}
-		// Actualizar explorador si es necesario
-		if (this.settings.showStatusIconsInExplorer && file) {
-			const fileObj = this.app.vault.getFileByPath(file);
-			if (fileObj) {
-				this.explorerIntegration.updateFileExplorerIcons(fileObj);
+		if (leaves.length > 0) {
+			// A leaf with our view already exists, use that
+			leaf = leaves[0];
+		} else {
+			// Our view could not be found in the workspace, create a new leaf
+			// in the right sidebar for it
+			leaf = workspace.getRightLeaf(false);
+			if (!leaf) {
+				console.error(
+					"getRightLeaf return null, unable to setup the view",
+				);
+			} else {
+				await leaf.setViewState({
+					type: VIEW_TYPE_EXAMPLE,
+					active: true,
+				});
 			}
 		}
+
+		// "Reveal" the leaf in case it is in a collapsed sidebar
+		if (!leaf) {
+			console.error("leaf not found, unable to activate the view");
+		} else {
+			workspace.revealLeaf(leaf);
+		}
 	}
 
-	private async openStatusPane() {
-		await StatusPaneViewController.open(this.app);
-	}
+	async activateDashboard() {
+		const { workspace } = this.app;
 
-	async saveSettings() {
-		await this.saveData(this.settings);
+		let leaf: WorkspaceLeaf | null = null;
+		const leaves = workspace.getLeavesOfType(VIEW_TYPE_STATUS_DASHBOARD);
 
-		// Actualizar servicios
-		this.statusService.updateSettings(this.settings);
-		this.styleService.updateSettings(this.settings);
-
-		// Actualizar integraciones
-		this.explorerIntegration.updateSettings(this.settings);
-		this.fileContextMenuIntegration.updateSettings(this.settings);
-		this.editorIntegration.updateSettings(this.settings);
-		this.metadataIntegration?.updateSettings(this.settings);
-		this.commandIntegration?.updateSettings(this.settings);
-		this.toolbarIntegration.updateSettings(this.settings);
-		this.workspaceIntegration.updateSettings(this.settings);
-		this.statusPane?.updateSettings(this.settings);
-		// Actualizar componentes UI
-		this.statusBar.updateSettings(this.settings);
-		this.statusDropdown.updateSettings(this.settings);
-	}
-
-	onunload() {
-		// Clean up event listeners
-		if (this.boundHandleStatusChanged) {
-			window.removeEventListener(
-				"note-status:status-changed",
-				this.boundHandleStatusChanged,
-			);
+		if (leaves.length > 0) {
+			// A leaf with our view already exists, use that
+			leaf = leaves[0];
+		} else {
+			// Our view could not be found in the workspace, create a new leaf
+			// in the right sidebar for it
+			leaf = workspace.getRightLeaf(false);
+			if (!leaf) {
+				console.error(
+					"getRightLeaf return null, unable to setup the dashboard",
+				);
+			} else {
+				await leaf.setViewState({
+					type: VIEW_TYPE_STATUS_DASHBOARD,
+					active: true,
+				});
+			}
 		}
 
-		// Clean up integrations
-		this.explorerIntegration?.unload();
-		this.toolbarIntegration?.unload();
-		this.fileContextMenuIntegration?.unload();
-		this.workspaceIntegration?.unload();
-		this.metadataIntegration?.unload();
-		this.editorIntegration?.unload();
-		this.commandIntegration?.unload();
+		// "Reveal" the leaf in case it is in a collapsed sidebar
+		if (!leaf) {
+			console.error("leaf not found, unable to activate the dashboard");
+		} else {
+			workspace.revealLeaf(leaf);
+		}
+	}
 
-		// Clean up services
-		this.styleService?.unload();
+	private async loadEventBus() {
+		// Propagate to custom event bus the new active file
+		this.app.workspace.on(
+			"active-leaf-change",
+			(leaf: WorkspaceLeaf | null) => {
+				eventBus.publish("active-file-change", { leaf });
+			},
+		);
 
-		// Clean up UI components
-		this.statusBar?.unload();
-		this.statusDropdown?.unload();
+		// Propagate to custom event bus the manually frontmatter data
+		this.registerEvent(
+			this.app.metadataCache.on("changed", (file) => {
+				eventBus.publish("frontmatter-manually-changed", { file });
+			}),
+		);
 
-		// Clean up all React roots
-		ReactUtils.cleanup();
+		// Register listeners
+		eventBus.subscribe(
+			"triggered-open-modal",
+			({ statusService }) => {
+				StatusModalIntegration.open(this.app, statusService);
+			},
+			"main-triggered-open-modal-subscriptor",
+		);
+	}
+
+	async loadPluginSettings() {
+		// INFO: Loads the settings data
+		await settingsService.initialize(this);
+		// INFO: Integrates the plugin settings section
+		this.pluginSettingsIntegration = new PluginSettingIntegration(this);
+		await this.pluginSettingsIntegration.integrate();
+	}
+
+	private async loadContextMenu() {
+		this.contextMenuIntegration = new ContextMenuIntegration(this);
+		await this.contextMenuIntegration.integrate();
+	}
+	private async loadStatusBar() {
+		this.statusBarIntegration = new StatusBarIntegration(this);
+		await this.statusBarIntegration.integrate();
+	}
+	private async loadFileExplorer() {
+		this.fileExplorerIntegration = new FileExplorerIntegration(this);
+		await this.fileExplorerIntegration.integrate();
+	}
+
+	private async loadCommands() {
+		this.commandsIntegration = new CommandsIntegration(this);
+		await this.commandsIntegration.integrate();
 	}
 }

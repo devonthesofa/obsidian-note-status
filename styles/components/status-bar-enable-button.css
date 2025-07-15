@@ -1,0 +1,8 @@
+.status-bar-enable-button {
+	opacity: var(--icon-opacity);
+}
+
+.status-bar-enable-button:hover {
+	opacity: var(--icon-opacity-hover);
+	background: var(--background-modifier-active);
+}

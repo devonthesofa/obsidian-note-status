@@ -1,0 +1,17 @@
+.status-bar-group-container {
+	display: flex;
+	gap: var(--size-2-1);
+	flex-wrap: wrap;
+	align-items: center;
+}
+
+@keyframes status-slide-in {
+	from {
+		opacity: 0;
+		transform: scale(0.8) translateY(4px);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1) translateY(0);
+	}
+}

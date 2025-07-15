@@ -4,11 +4,19 @@
  *
  * Author: Aleix Soler
  */
-
-@import "base.css";
-@import "utils.css";
+@import "components/setting-item.css";
+@import "components/template-status-chip.css";
+@import "components/template-item.css";
+@import "components/custom-status-item.css";
+@import "components/quick-commands-settings.css";
+@import "components/status-group.css";
+@import "components/status-bar-enable-button.css";
+@import "components/status-badge.css";
+@import "components/status-bar-group.css";
 @import "components/status-bar.css";
-@import "components/status-pane.css";
-@import "components/dropdown.css";
-@import "components/explorer.css";
-@import "components/settings.css";
+@import "components/collapsible-counter.css";
+@import "components/group-label.css";
+@import "components/file-explorer-icon.css";
+@import "components/status-file-info-popup.css";
+@import "components/groupped-status-view.css";
+@import "components/status-dashboard.css";

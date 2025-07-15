@@ -1,0 +1,8 @@
+.setting-item-full {
+	width: 100%;
+}
+.setting-item-vertical {
+	flex-direction: column;
+	align-items: start;
+	gap: 4px;
+}
