@@ -1,5 +1,6 @@
 import React from "react";
 import { SearchFilter } from "@/components/atoms/SearchFilter";
+import { Input } from "@/components/atoms/Input";
 
 interface FilterSectionProps {
 	searchFilter: string;
@@ -23,12 +24,12 @@ export const FilterSection = ({
 					onFilterChange={onSearchFilterChange}
 				/>
 				<div className="grouped-status-note-filter">
-					<input
-						type="text"
+					<Input
+						variant="text"
+						value={noteNameFilter}
+						onChange={onNoteNameFilterChange}
 						placeholder="Filter by note name..."
 						className="grouped-status-note-input"
-						value={noteNameFilter}
-						onChange={(e) => onNoteNameFilterChange(e.target.value)}
 					/>
 				</div>
 			</div>

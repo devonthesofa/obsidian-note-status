@@ -1,4 +1,5 @@
 import React from "react";
+import { Input } from "./Input";
 
 interface Props {
 	value: string;
@@ -9,21 +10,12 @@ interface Props {
 export const SearchFilter = React.forwardRef<HTMLInputElement, Props>(
 	({ value, onFilterChange, placeholder = "Search..." }, ref) => {
 		return (
-			<input
+			<Input
 				ref={ref}
-				type="text"
+				variant="search"
 				value={value}
-				onChange={(e) => onFilterChange(e.target.value)}
+				onChange={onFilterChange}
 				placeholder={placeholder}
-				style={{
-					width: "100%",
-					padding: "8px 12px",
-					border: "1px solid var(--background-modifier-border)",
-					borderRadius: "4px",
-					backgroundColor: "var(--background-primary)",
-					color: "var(--text-normal)",
-					fontSize: "14px",
-				}}
 			/>
 		);
 	},

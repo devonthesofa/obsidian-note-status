@@ -1,6 +1,7 @@
 import { NoteStatus } from "@/types/noteStatus";
 import { PluginSettings } from "@/types/pluginSettings";
 import React from "react";
+import { Input } from "@/components/atoms/Input";
 
 export type Props = {
 	status: NoteStatus;
@@ -26,56 +27,48 @@ export const CustomStatusItem: React.FC<Props> = ({
 				className="custom-status-preview"
 				style={{ borderLeftColor: status.color || "var(--text-muted)" }}
 			>
-				<input
-					className="custom-status-icon-input"
-					type="text"
-					placeholder="🔥"
+				<Input
+					variant="text"
 					value={status.icon}
-					onChange={(e) =>
-						onCustomStatusChange(
-							index,
-							"icon",
-							e.target.value || "❓",
-						)
+					onChange={(value) =>
+						onCustomStatusChange(index, "icon", value || "❓")
 					}
+					placeholder="🔥"
+					className="custom-status-icon-input"
 				/>
 				<div className="custom-status-text-inputs">
-					<input
-						className="custom-status-name-input"
-						type="text"
-						placeholder="Status name"
+					<Input
+						variant="text"
 						value={status.name}
-						onChange={(e) =>
+						onChange={(value) =>
 							onCustomStatusChange(
 								index,
 								"name",
-								e.target.value || "unnamed",
+								value || "unnamed",
 							)
 						}
+						placeholder="Status name"
+						className="custom-status-name-input"
 						style={{ color: status.color || "var(--text-normal)" }}
 					/>
-					<input
-						className="custom-status-description-input"
-						type="text"
-						placeholder="Description (optional)"
+					<Input
+						variant="text"
 						value={status.description || ""}
-						onChange={(e) =>
-							onCustomStatusChange(
-								index,
-								"description",
-								e.target.value,
-							)
+						onChange={(value) =>
+							onCustomStatusChange(index, "description", value)
 						}
+						placeholder="Description (optional)"
+						className="custom-status-description-input"
 					/>
 				</div>
 				<div className="custom-status-controls">
-					<input
-						className="custom-status-color-input"
-						type="color"
+					<Input
+						variant="color"
 						value={status.color || "#ffffff"}
-						onChange={(e) =>
-							onCustomStatusChange(index, "color", e.target.value)
+						onChange={(value) =>
+							onCustomStatusChange(index, "color", value)
 						}
+						className="custom-status-color-input"
 					/>
 					<button
 						className="custom-status-remove-btn clickable-icon mod-warning"
