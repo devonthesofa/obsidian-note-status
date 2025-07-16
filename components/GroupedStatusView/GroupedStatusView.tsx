@@ -22,7 +22,7 @@ export type GroupedByStatus = {
 	[frontmatterTag: string]: FilesByStatus;
 };
 
-export type GrouppedStatusViewProps = {
+export type GroupedStatusViewProps = {
 	getAllFiles: () => FileItem[];
 	processFiles: (files: FileItem[]) => GroupedByStatus;
 	onFileClick: (file: FileItem) => void;
@@ -32,13 +32,13 @@ export type GrouppedStatusViewProps = {
 
 const ITEMS_PER_LOAD = 20;
 
-export const GrouppedStatusView = ({
+export const GroupedStatusView = ({
 	getAllFiles,
 	processFiles,
 	onFileClick,
 	subscribeToEvents,
 	getAvailableStatuses,
-}: GrouppedStatusViewProps) => {
+}: GroupedStatusViewProps) => {
 	const [groupedData, setGroupedData] = useState<GroupedByStatus>({});
 	const [searchFilter, setSearchFilter] = useState("");
 	const [noteNameFilter, setNoteNameFilter] = useState("");
@@ -206,8 +206,8 @@ export const GrouppedStatusView = ({
 
 	if (isLoading) {
 		return (
-			<div className="groupped-status-view">
-				<div className="groupped-status-loading">
+			<div className="">
+				<div className="grouped-status-loading">
 					Loading statuses...
 				</div>
 			</div>
@@ -215,7 +215,7 @@ export const GrouppedStatusView = ({
 	}
 
 	return (
-		<div className="groupped-status-view">
+		<div className="">
 			<FilterSection
 				searchFilter={searchFilter}
 				noteNameFilter={noteNameFilter}
@@ -223,7 +223,7 @@ export const GrouppedStatusView = ({
 				onNoteNameFilterChange={setNoteNameFilter}
 			/>
 
-			<div className="groupped-status-content">
+			<div className="grouped-status-content">
 				{Object.entries(filteredData).map(([tag, statusGroups]) => {
 					const tagKey = `tag-${tag}`;
 					const isTagExpanded = expandedGroups.has(tagKey);
@@ -247,7 +247,7 @@ export const GrouppedStatusView = ({
 				})}
 
 				{Object.keys(filteredData).length === 0 && (
-					<div className="groupped-status-empty">
+					<div className="grouped-status-empty">
 						{searchFilter
 							? "No files match your search."
 							: "No statuses found."}

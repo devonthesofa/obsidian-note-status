@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { GroupLabel } from "@/components/atoms/GroupLabel";
 import { CollapsibleCounter } from "@/components/atoms/CollapsibleCounter";
-import { FilesByStatus, FileItem, StatusItem } from "../GrouppedStatusView";
+import { FilesByStatus, FileItem, StatusItem } from "../GroupedStatusView";
 import { StatusGroup } from "./StatusGroup";
 
 interface TagSectionProps {
@@ -52,8 +52,8 @@ export const TagSection = ({
 	);
 
 	return (
-		<div className="groupped-status-tag-section">
-			<div className="groupped-status-tag-header" onClick={handleToggle}>
+		<div className="grouped-status-tag-section">
+			<div className="grouped-status-tag-header" onClick={handleToggle}>
 				<GroupLabel name={tag} />
 				<CollapsibleCounter
 					count={totalFilesInTag}
@@ -63,7 +63,7 @@ export const TagSection = ({
 			</div>
 
 			{isExpanded && (
-				<div className="groupped-status-tag-content">
+				<div className="grouped-status-tag-content">
 					{Object.entries(statusGroups).map(([statusName, files]) => {
 						if (files.length === 0) return null;
 

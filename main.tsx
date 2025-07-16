@@ -9,9 +9,9 @@ import ContextMenuIntegration from "./integrations/context-menu/contextMenuInteg
 import { FileExplorerIntegration } from "./integrations/file-explorer/file-explorer-integration";
 import { CommandsIntegration } from "./integrations/commands/commandsIntegration";
 import {
-	GrouppedStatusView,
+	GroupedStatusView,
 	VIEW_TYPE_EXAMPLE,
-} from "./integrations/views/groupped-status-view";
+} from "./integrations/views/grouped-status-view";
 import {
 	StatusDashboardView,
 	VIEW_TYPE_STATUS_DASHBOARD,
@@ -39,7 +39,7 @@ export default class NoteStatusPlugin extends Plugin {
 
 		this.registerView(
 			VIEW_TYPE_EXAMPLE,
-			(leaf) => new GrouppedStatusView(leaf),
+			(leaf) => new GroupedStatusView(leaf),
 		);
 
 		this.registerView(

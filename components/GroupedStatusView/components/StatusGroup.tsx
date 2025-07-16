@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { StatusBadge } from "@/components/atoms/StatusBadge";
 import { CollapsibleCounter } from "@/components/atoms/CollapsibleCounter";
-import { FileItem, StatusItem } from "../GrouppedStatusView";
+import { FileItem, StatusItem } from "../GroupedStatusView";
 import { FileList } from "./FileList";
 import { NoteStatus } from "@/types/noteStatus";
 
@@ -41,17 +41,14 @@ export const StatusGroup = ({
 	}, [onToggle]);
 
 	return (
-		<div className="groupped-status-group">
-			<div
-				className="groupped-status-group-header"
-				onClick={handleToggle}
-			>
+		<div className="grouped-status-group">
+			<div className="grouped-status-group-header" onClick={handleToggle}>
 				<StatusBadge
 					status={
 						{ ...status, icon: status.icon || "" } as NoteStatus
 					}
 				/>
-				<div className="groupped-status-group-info">
+				<div className="grouped-status-group-info">
 					<CollapsibleCounter
 						count={files.length}
 						isCollapsed={!isExpanded}

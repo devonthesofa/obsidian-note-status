@@ -1,19 +1,34 @@
 import { ItemView, WorkspaceLeaf, TFile } from "obsidian";
 import { Root, createRoot } from "react-dom/client";
-import {
-	FileItem,
-	GroupedByStatus,
-	GrouppedStatusView as GrouppedStatusViewComponent,
-	StatusItem,
-} from "@/components/GrouppedStatusView/GrouppedStatusView";
+import { GroupedStatusView as GroupedStatusViewComponent } from "@/components/GroupedStatusView/GroupedStatusView";
 import { BaseNoteStatusService } from "@/core/noteStatusService";
 import eventBus from "@/core/eventBus";
 import settingsService from "@/core/settingsService";
 import { NoteStatus } from "@/types/noteStatus";
 
-export const VIEW_TYPE_EXAMPLE = "groupped-status-view";
+export const VIEW_TYPE_GROUPED_DASHBOARD = "grouped-dashboard-view";
 
-export class GrouppedStatusView extends ItemView {
+interface FileItem {
+	id: string;
+	name: string;
+	path: string;
+}
+
+interface StatusItem {
+	name: string;
+	color: string;
+	icon?: string;
+}
+
+interface FilesByStatus {
+	[statusName: string]: FileItem[];
+}
+
+interface GroupedByStatus {
+	[frontmatterTag: string]: FilesByStatus;
+}
+
+export class GroupedDashboardView extends ItemView {
 	root: Root | null = null;
 
 	constructor(leaf: WorkspaceLeaf) {
@@ -21,11 +36,11 @@ export class GrouppedStatusView extends ItemView {
 	}
 
 	getViewType() {
-		return VIEW_TYPE_EXAMPLE;
+		return VIEW_TYPE_GROUPED_DASHBOARD;
 	}
 
 	getDisplayText() {
-		return "Groupped Status View";
+		return "Grouped Status Dashboard";
 	}
 
 	getIcon() {
@@ -40,7 +55,7 @@ export class GrouppedStatusView extends ItemView {
 
 	private convertStatusToStatusItem = (status: NoteStatus): StatusItem => ({
 		name: status.name,
-		color: status.color || "white",
+		color: status.color || "",
 		icon: status.icon,
 	});
 
@@ -115,7 +130,7 @@ export class GrouppedStatusView extends ItemView {
 		eventBus.subscribe(
 			"frontmatter-manually-changed",
 			onDataChange,
-			"groupped-status-view-subscription",
+			"grouped-dashboard-view-subscription",
 		);
 		const unsubscribeActiveFile = BaseNoteStatusService.app.workspace.on(
 			"active-leaf-change",
@@ -125,7 +140,7 @@ export class GrouppedStatusView extends ItemView {
 		return () => {
 			eventBus.unsubscribe(
 				"frontmatter-manually-changed",
-				"groupped-status-view-subscription",
+				"grouped-dashboard-view-subscription",
 			);
 			BaseNoteStatusService.app.workspace.offref(unsubscribeActiveFile);
 		};
@@ -134,11 +149,11 @@ export class GrouppedStatusView extends ItemView {
 	async onOpen() {
 		const container = this.containerEl.children[1];
 		container.empty();
-		container.addClass("groupped-status-view-container");
+		container.addClass("grouped-dashboard-view-container");
 
 		this.root = createRoot(container);
 		this.root.render(
-			<GrouppedStatusViewComponent
+			<GroupedStatusViewComponent
 				getAllFiles={this.getAllFiles}
 				processFiles={this.processFiles}
 				onFileClick={this.handleFileClick}

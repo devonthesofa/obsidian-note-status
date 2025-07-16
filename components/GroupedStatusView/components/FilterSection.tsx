@@ -15,18 +15,18 @@ export const FilterSection = ({
 	onNoteNameFilterChange,
 }: FilterSectionProps) => {
 	return (
-		<div className="groupped-status-header">
-			<h3 className="groupped-status-title">Status Groups</h3>
-			<div className="groupped-status-filters">
+		<div className="grouped-status-header">
+			<h3 className="grouped-status-title">Status Groups</h3>
+			<div className="grouped-status-filters">
 				<SearchFilter
 					value={searchFilter}
 					onFilterChange={onSearchFilterChange}
 				/>
-				<div className="groupped-status-note-filter">
+				<div className="grouped-status-note-filter">
 					<input
 						type="text"
 						placeholder="Filter by note name..."
-						className="groupped-status-note-input"
+						className="grouped-status-note-input"
 						value={noteNameFilter}
 						onChange={(e) => onNoteNameFilterChange(e.target.value)}
 					/>

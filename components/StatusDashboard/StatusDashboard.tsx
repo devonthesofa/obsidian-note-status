@@ -394,7 +394,7 @@ export const StatusDashboard = () => {
 								const leaf =
 									BaseNoteStatusService.app.workspace.getLeaf();
 								leaf.setViewState({
-									type: "groupped-status-view",
+									type: "grouped-status-view",
 									active: true,
 								});
 							}}

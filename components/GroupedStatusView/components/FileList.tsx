@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { FileItem } from "../GrouppedStatusView";
+import { FileItem } from "../GroupedStatusView";
 
 interface FileListProps {
 	files: FileItem[];
@@ -44,27 +44,27 @@ export const FileList = ({
 	);
 
 	return (
-		<div className="groupped-status-files">
-			<div className="groupped-status-files-list" onScroll={handleScroll}>
+		<div className="grouped-status-files">
+			<div className="grouped-status-files-list" onScroll={handleScroll}>
 				{visibleFiles.map((file) => (
 					<div
 						key={file.id}
-						className="groupped-status-file-item"
+						className="grouped-status-file-item"
 						onClick={() => handleFileClick(file)}
 					>
-						<span className="groupped-status-file-name">
+						<span className="grouped-status-file-name">
 							{file.name}
 						</span>
-						<span className="groupped-status-file-path">
+						<span className="grouped-status-file-path">
 							{file.path}
 						</span>
 					</div>
 				))}
 
 				{hasMoreItems && (
-					<div className="groupped-status-load-more">
+					<div className="grouped-status-load-more">
 						<button
-							className="groupped-status-load-btn"
+							className="grouped-status-load-btn"
 							onClick={handleLoadMore}
 						>
 							Load more... ({files.length - loadedCount}{" "}
