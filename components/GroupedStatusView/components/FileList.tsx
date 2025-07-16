@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
 import { FileItem } from "../GroupedStatusView";
+import { SelectableListItem } from "../../atoms/SelectableListItem";
 
 interface FileListProps {
 	files: FileItem[];
@@ -47,18 +48,21 @@ export const FileList = ({
 		<div className="grouped-status-files">
 			<div className="grouped-status-files-list" onScroll={handleScroll}>
 				{visibleFiles.map((file) => (
-					<div
+					<SelectableListItem
 						key={file.id}
-						className="grouped-status-file-item"
 						onClick={() => handleFileClick(file)}
+						className="grouped-status-file-item"
+						title={file.path}
 					>
-						<span className="grouped-status-file-name">
-							{file.name}
-						</span>
-						<span className="grouped-status-file-path">
-							{file.path}
-						</span>
-					</div>
+						<div>
+							<span className="grouped-status-file-name">
+								{file.name}
+							</span>
+							<span className="grouped-status-file-path">
+								{file.path}
+							</span>
+						</div>
+					</SelectableListItem>
 				))}
 
 				{hasMoreItems && (
