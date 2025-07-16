@@ -1,17 +1,25 @@
 /*
  * Note Status Plugin for Obsidian
- * Main CSS file importing all components
+ * Main CSS file with BEM-like naming conventions
  *
  * Author: Aleix Soler
  */
-@import "components/setting-item.css";
+
+/* Import component stylesheets */
+@import "variables.css";
+@import "globals.css";
+@import "components/status-chip.css";
+@import "components/status-badge.css";
+@import "components/status-item.css";
+@import "components/status-button.css";
+@import "components/status-modal.css";
+@import "components/status-group.css";
 @import "components/template-status-chip.css";
 @import "components/template-item.css";
 @import "components/custom-status-item.css";
+@import "components/setting-item.css";
 @import "components/quick-commands-settings.css";
-@import "components/status-group.css";
 @import "components/status-bar-enable-button.css";
-@import "components/status-badge.css";
 @import "components/status-bar-group.css";
 @import "components/status-bar.css";
 @import "components/collapsible-counter.css";

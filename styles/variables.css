@@ -1,0 +1,31 @@
+:root {
+	/* Status color palette */
+	--status-color-primary: var(--interactive-accent);
+	--status-color-success: var(--color-green);
+	--status-color-warning: var(--color-orange);
+	--status-color-error: var(--color-red);
+	--status-color-info: var(--color-blue);
+	--status-color-neutral: var(--color-base-60);
+
+	/* Status spacing */
+	--status-spacing-xs: 2px;
+	--status-spacing-sm: 4px;
+	--status-spacing-md: 8px;
+	--status-spacing-lg: 12px;
+	--status-spacing-xl: 16px;
+
+	/* Status borders */
+	--status-border-radius: var(--radius-s);
+	--status-border-width: 1px;
+	--status-border-color: var(--background-modifier-border);
+
+	/* Status shadows */
+	--status-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+	--status-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.15);
+	--status-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.2);
+
+	/* Status animations */
+	--status-transition-fast: all 0.15s ease;
+	--status-transition-normal: all 0.2s ease;
+	--status-transition-slow: all 0.3s ease;
+}

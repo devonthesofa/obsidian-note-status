@@ -1,27 +1,71 @@
-.status-badge-container {
+/* Status Badge Component - BEM Pattern */
+.status-badge {
 	display: inline-flex;
 	flex-direction: column;
 	align-items: center;
 	border-radius: var(--radius-s);
-	/* backgroundColor and border need dynamic color values - handle with CSS custom properties or JS */
 	transition: all var(--anim-duration-moderate) var(--anim-motion-smooth);
 	overflow: hidden;
 	min-width: auto;
 	max-width: none;
 }
 
-.status-badge-item {
+.status-badge--interactive {
+	cursor: pointer;
+}
+
+.status-badge--interactive:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.status-badge__item {
 	display: flex;
 	align-items: center;
 	gap: var(--size-2-1);
 	padding: var(--size-2-1) var(--size-2-3);
 	transition: all var(--anim-duration-fast) ease;
+	width: 100%;
 }
 
-.status-badge-icon {
+.status-badge__item--active {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+}
+
+.status-badge__item--hover:hover {
+	background: var(--background-modifier-hover);
+}
+
+.status-badge__icon {
 	transition: transform var(--anim-duration-fast) ease;
+	font-size: var(--font-ui-small);
 }
 
-.status-badge-text {
+.status-badge__text {
 	font-weight: var(--font-weight-medium);
+	font-size: var(--font-ui-small);
+	white-space: nowrap;
+}
+
+.status-badge__count {
+	background: var(--primary-color);
+	color: var(--text-on-accent);
+	font-size: var(--font-smaller);
+	font-weight: var(--font-semibold);
+	min-width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-left: 1px;
+	box-shadow: var(--shadow-s);
+	border: 1px solid var(--background-primary);
+}
+
+.status-badge__count--large {
+	min-width: 16px;
+	height: 16px;
+	font-size: var(--font-ui-smaller);
 }
