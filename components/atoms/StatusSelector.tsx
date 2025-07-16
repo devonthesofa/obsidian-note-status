@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react";
+import React, { memo, useState, useCallback } from "react";
 import { NoteStatus } from "@/types/noteStatus";
 
 interface StatusOptionProps {
@@ -104,11 +104,14 @@ export const StatusSelector: React.FC<Props> = ({
 	focusedIndex = -1,
 	onToggleStatus,
 }) => {
-	const handleSelectStatus = async (status: NoteStatus) => {
-		const selected =
-			currentStatuses.findIndex((s) => s.name === status.name) !== -1;
-		onToggleStatus(status, !selected);
-	};
+	const handleSelectStatus = useCallback(
+		async (status: NoteStatus) => {
+			const selected =
+				currentStatuses.findIndex((s) => s.name === status.name) !== -1;
+			onToggleStatus(status, !selected);
+		},
+		[currentStatuses, onToggleStatus],
+	);
 
 	return (
 		<div

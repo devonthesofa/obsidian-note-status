@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { NoteStatus } from "@/types/noteStatus";
 
 interface UseKeyboardNavigationProps {
@@ -31,85 +31,99 @@ export const useKeyboardNavigation = ({
 		[searchFilter, availableStatuses],
 	);
 
-	const handleKeyDown = (e: React.KeyboardEvent) => {
-		switch (e.key) {
-			case "ArrowDown":
-				e.preventDefault();
-				if (filteredStatuses.length > 0) {
-					setFocusedIndex((prev) =>
-						prev < filteredStatuses.length - 1 ? prev + 1 : 0,
-					);
-				}
-				break;
-			case "ArrowUp":
-				e.preventDefault();
-				if (filteredStatuses.length > 0) {
-					setFocusedIndex((prev) =>
-						prev > 0 ? prev - 1 : filteredStatuses.length - 1,
-					);
-				}
-				break;
-			case "Tab":
-				if (!e.shiftKey) {
+	const handleKeyDown = useCallback(
+		(e: React.KeyboardEvent) => {
+			switch (e.key) {
+				case "ArrowDown":
 					e.preventDefault();
 					if (filteredStatuses.length > 0) {
 						setFocusedIndex((prev) =>
 							prev < filteredStatuses.length - 1 ? prev + 1 : 0,
 						);
 					}
-				} else {
+					break;
+				case "ArrowUp":
 					e.preventDefault();
 					if (filteredStatuses.length > 0) {
 						setFocusedIndex((prev) =>
 							prev > 0 ? prev - 1 : filteredStatuses.length - 1,
 						);
 					}
-				}
-				break;
-			case "Enter":
-				if (
-					focusedIndex >= 0 &&
-					focusedIndex < filteredStatuses.length
-				) {
-					e.preventDefault();
-					const status = filteredStatuses[focusedIndex];
-					const isSelected = currentStatuses.some(
-						(s) => s.name === status.name,
-					);
-					if (isSelected) {
-						onRemoveStatus(status);
+					break;
+				case "Tab":
+					if (!e.shiftKey) {
+						e.preventDefault();
+						if (filteredStatuses.length > 0) {
+							setFocusedIndex((prev) =>
+								prev < filteredStatuses.length - 1
+									? prev + 1
+									: 0,
+							);
+						}
 					} else {
-						onSelectStatus(status);
+						e.preventDefault();
+						if (filteredStatuses.length > 0) {
+							setFocusedIndex((prev) =>
+								prev > 0
+									? prev - 1
+									: filteredStatuses.length - 1,
+							);
+						}
 					}
-				}
-				break;
-			case "Backspace":
-				e.preventDefault();
-				setSearchFilter((prev) => prev.slice(0, -1));
-				if (searchRef.current) {
-					searchRef.current.focus();
-				}
-				break;
-			case "Escape":
-				e.preventDefault();
-				setSearchFilter("");
-				break;
-			default:
-				if (
-					e.key.length === 1 &&
-					!e.ctrlKey &&
-					!e.metaKey &&
-					!e.altKey
-				) {
+					break;
+				case "Enter":
+					if (
+						focusedIndex >= 0 &&
+						focusedIndex < filteredStatuses.length
+					) {
+						e.preventDefault();
+						const status = filteredStatuses[focusedIndex];
+						const isSelected = currentStatuses.some(
+							(s) => s.name === status.name,
+						);
+						if (isSelected) {
+							onRemoveStatus(status);
+						} else {
+							onSelectStatus(status);
+						}
+					}
+					break;
+				case "Backspace":
 					e.preventDefault();
-					setSearchFilter((prev) => prev + e.key);
+					setSearchFilter((prev) => prev.slice(0, -1));
 					if (searchRef.current) {
 						searchRef.current.focus();
 					}
-				}
-				break;
-		}
-	};
+					break;
+				case "Escape":
+					e.preventDefault();
+					setSearchFilter("");
+					break;
+				default:
+					if (
+						e.key.length === 1 &&
+						!e.ctrlKey &&
+						!e.metaKey &&
+						!e.altKey
+					) {
+						e.preventDefault();
+						setSearchFilter((prev) => prev + e.key);
+						if (searchRef.current) {
+							searchRef.current.focus();
+						}
+					}
+					break;
+			}
+		},
+		[
+			filteredStatuses,
+			focusedIndex,
+			currentStatuses,
+			onRemoveStatus,
+			onSelectStatus,
+			searchRef,
+		],
+	);
 
 	useEffect(() => {
 		setFocusedIndex(filteredStatuses.length > 0 ? 0 : -1);

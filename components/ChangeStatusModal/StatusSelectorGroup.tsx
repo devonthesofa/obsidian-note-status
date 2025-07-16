@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { NoteStatus } from "@/types/noteStatus";
 import { SearchFilter } from "../atoms/SearchFilter";
 import { StatusSelector } from "../atoms/StatusSelector";
@@ -23,13 +23,19 @@ export const StatusSelectorGroup: React.FC<Props> = ({
 	frontmatterTagName,
 	onSelectedState,
 }) => {
-	const handleRemoveStatus = (status: NoteStatus) => {
-		onSelectedState(frontmatterTagName, status, "unselected");
-	};
+	const handleRemoveStatus = useCallback(
+		(status: NoteStatus) => {
+			onSelectedState(frontmatterTagName, status, "unselected");
+		},
+		[onSelectedState, frontmatterTagName],
+	);
 
-	const handleSelectStatus = (status: NoteStatus) => {
-		onSelectedState(frontmatterTagName, status, "select");
-	};
+	const handleSelectStatus = useCallback(
+		(status: NoteStatus) => {
+			onSelectedState(frontmatterTagName, status, "select");
+		},
+		[onSelectedState, frontmatterTagName],
+	);
 
 	const {
 		focusedIndex,
