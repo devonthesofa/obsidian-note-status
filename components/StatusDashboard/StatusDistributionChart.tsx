@@ -27,8 +27,14 @@ export const StatusDistributionChart = ({
 			.sort((a, b) => b.count - a.count);
 	}, [vaultStats.statusDistribution]);
 
-	const availableStatuses = BaseNoteStatusService.getAllAvailableStatuses();
-	const statusMap = new Map(availableStatuses.map((s) => [s.name, s]));
+	const availableStatuses = useMemo(
+		() => BaseNoteStatusService.getAllAvailableStatuses(),
+		[],
+	);
+	const statusMap = useMemo(
+		() => new Map(availableStatuses.map((s) => [s.name, s])),
+		[availableStatuses],
+	);
 
 	return (
 		<div className="status-dashboard-section">

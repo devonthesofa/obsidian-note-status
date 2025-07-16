@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { NoteStatus } from "@/types/noteStatus";
 
 interface UseKeyboardNavigationProps {
@@ -19,11 +19,17 @@ export const useKeyboardNavigation = ({
 	const containerRef = useRef<HTMLDivElement>(null);
 	const searchRef = useRef<HTMLInputElement>(null);
 
-	const filteredStatuses = searchFilter
-		? availableStatuses.filter((status) =>
-				status.name.toLowerCase().includes(searchFilter.toLowerCase()),
-			)
-		: availableStatuses;
+	const filteredStatuses = useMemo(
+		() =>
+			searchFilter
+				? availableStatuses.filter((status) =>
+						status.name
+							.toLowerCase()
+							.includes(searchFilter.toLowerCase()),
+					)
+				: availableStatuses,
+		[searchFilter, availableStatuses],
+	);
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		switch (e.key) {

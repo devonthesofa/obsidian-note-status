@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { FilterSection } from "./components/FilterSection";
 import { TagSection } from "./components/TagSection";
 import { LoadingSpinner } from "./components/LoadingSpinner";
@@ -57,8 +57,14 @@ const GroupedStatusViewContent = () => {
 		[onFileClick],
 	);
 
-	const availableStatuses = getAvailableStatuses();
-	const statusMap = new Map(availableStatuses.map((s) => [s.name, s]));
+	const availableStatuses = useMemo(
+		() => getAvailableStatuses(),
+		[getAvailableStatuses],
+	);
+	const statusMap = useMemo(
+		() => new Map(availableStatuses.map((s) => [s.name, s])),
+		[availableStatuses],
+	);
 
 	if (isLoading) {
 		return <LoadingSpinner />;
