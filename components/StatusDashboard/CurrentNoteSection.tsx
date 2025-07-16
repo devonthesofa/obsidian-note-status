@@ -1,6 +1,6 @@
 import { TFile } from "obsidian";
 import { NoteStatus } from "@/types/noteStatus";
-import { StatusBadge } from "@/components/atoms/StatusBadge";
+import { StatusDisplay } from "@/components/atoms/StatusDisplay";
 import { GroupLabel } from "@/components/atoms/GroupLabel";
 
 interface CurrentNoteInfo {
@@ -50,9 +50,10 @@ export const CurrentNoteSection = ({
 										<div className="current-note-status-list">
 											{statuses.length > 0 ? (
 												statuses.map((status) => (
-													<StatusBadge
+													<StatusDisplay
 														key={status.name}
 														status={status}
+														variant="badge"
 													/>
 												))
 											) : (

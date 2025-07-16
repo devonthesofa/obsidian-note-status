@@ -1,6 +1,6 @@
 import React from "react";
 import { GroupedStatuses } from "@/types/noteStatus";
-import { StatusBadge } from "../atoms/StatusBadge";
+import { StatusDisplay } from "../atoms/StatusDisplay";
 
 export interface Props {
 	statuses: GroupedStatuses;
@@ -44,7 +44,10 @@ export const StatusFileInfoPopup: React.FC<Props> = ({ statuses }) => {
 									key={`${groupName}-${index}`}
 									className="status-item"
 								>
-									<StatusBadge status={status} />
+									<StatusDisplay
+										status={status}
+										variant="badge"
+									/>
 									{status.description && (
 										<div
 											className="status-description"

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { FilterSection } from "./components/FilterSection";
 import { TagSection } from "./components/TagSection";
 import { LoadingSpinner } from "./components/LoadingSpinner";

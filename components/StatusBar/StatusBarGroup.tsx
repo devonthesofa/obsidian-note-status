@@ -3,7 +3,7 @@ import { NoteStatus } from "@/types/noteStatus";
 import { StatusTemplate } from "@/types/pluginSettings";
 import { GroupLabel } from "../atoms/GroupLabel";
 import { CollapsibleCounter } from "../atoms/CollapsibleCounter";
-import { StatusBadge } from "../atoms/StatusBadge";
+import { StatusDisplay } from "../atoms/StatusDisplay";
 import { useStatusBarContext } from "./StatusBarContext";
 
 export interface StatusBarGroupProps {
@@ -39,8 +39,9 @@ export const StatusBarGroup: FC<StatusBarGroupProps> = ({
 						}}
 						title={status.description}
 					>
-						<StatusBadge
+						<StatusDisplay
 							status={status}
+							variant="badge"
 							onClick={() => {
 								onStatusClick(status);
 							}}

@@ -1,6 +1,6 @@
 import React from "react";
 import { NoteStatus } from "@/types/noteStatus";
-import { StatusChip } from "../atoms/StatusChip";
+import { StatusDisplay } from "../atoms/StatusDisplay";
 import { SettingItem } from "../SettingsUI.tsx/SettingItem";
 
 interface Props {
@@ -25,9 +25,11 @@ export const CurrentStatusChips: React.FC<Props> = ({
 				}}
 			>
 				{currentStatuses.map((status) => (
-					<StatusChip
+					<StatusDisplay
 						key={status.name}
 						status={status}
+						variant="chip"
+						removable
 						onRemove={() => onRemoveStatus(status)}
 					/>
 				))}

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { BaseNoteStatusService } from "@/core/noteStatusService";
-import { StatusBadge } from "@/components/atoms/StatusBadge";
+import { StatusDisplay } from "@/components/atoms/StatusDisplay";
 import { VaultStats } from "./useVaultStats";
 
 interface StatusDistributionChartProps {
@@ -50,7 +50,10 @@ export const StatusDistributionChart = ({
 								<div key={name} className="status-chart-item">
 									<div className="status-chart-info">
 										{status && (
-											<StatusBadge status={status} />
+											<StatusDisplay
+												status={status}
+												variant="badge"
+											/>
 										)}
 										<span className="status-chart-count">
 											{count} notes ({percentage}%)

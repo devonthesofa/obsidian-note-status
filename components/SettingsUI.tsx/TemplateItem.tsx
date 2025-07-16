@@ -1,6 +1,6 @@
 import React from "react";
 import { StatusTemplate } from "@/types/pluginSettings";
-import { TemplateStatusChip } from "./TemplateStatusChip";
+import { StatusDisplay } from "../atoms/StatusDisplay";
 
 interface TemplateItemProps {
 	template: StatusTemplate;
@@ -29,7 +29,7 @@ export const TemplateItem: React.FC<TemplateItemProps> = ({
 		<div className="setting-item-description">{template.description}:</div>
 		<div className="template-statuses">
 			{template.statuses.map((status, index) => (
-				<TemplateStatusChip key={index} status={status} />
+				<StatusDisplay key={index} status={status} variant="template" />
 			))}
 		</div>
 	</div>

@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { StatusBadge } from "@/components/atoms/StatusBadge";
+import { StatusDisplay } from "@/components/atoms/StatusDisplay";
 import { CollapsibleCounter } from "@/components/atoms/CollapsibleCounter";
 import { FileItem, StatusItem } from "../GroupedStatusView";
 import { FileList } from "./FileList";
@@ -43,10 +43,11 @@ export const StatusGroup = ({
 	return (
 		<div className="grouped-status-group">
 			<div className="grouped-status-group-header" onClick={handleToggle}>
-				<StatusBadge
+				<StatusDisplay
 					status={
 						{ ...status, icon: status.icon || "" } as NoteStatus
 					}
+					variant="badge"
 				/>
 				<div className="grouped-status-group-info">
 					<CollapsibleCounter
