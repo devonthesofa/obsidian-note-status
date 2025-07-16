@@ -532,33 +532,33 @@
   hyphens: auto;
 }
 
-/* styles/components/groupped-status-view.css */
-.groupped-status-view-container {
+/* styles/components/grouped-status-view.css */
+.grouped-status-view-container {
   height: 100%;
   overflow: hidden;
 }
-.groupped-status-view {
+.grouped-status-view {
   height: 100%;
   display: flex;
   flex-direction: column;
   background-color: var(--background-primary);
 }
-.groupped-status-header {
+.grouped-status-header {
   padding: var(--size-4-2) var(--size-4-3);
   border-bottom: 1px solid var(--background-modifier-border);
   background-color: var(--background-secondary);
   flex-shrink: 0;
 }
-.groupped-status-filters {
+.grouped-status-filters {
   display: flex;
   flex-direction: column;
   gap: var(--size-4-2);
 }
-.groupped-status-note-filter {
+.grouped-status-note-filter {
   display: flex;
   flex-direction: column;
 }
-.groupped-status-note-input {
+.grouped-status-note-input {
   width: 100%;
   padding: var(--size-2-1) var(--size-2-3);
   border: 1px solid var(--background-modifier-border);
