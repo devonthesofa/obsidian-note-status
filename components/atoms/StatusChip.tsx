@@ -1,12 +1,12 @@
 import { NoteStatus } from "@/types/noteStatus";
-import { FC, useState } from "react";
+import { FC, memo, useState } from "react";
 
 interface Props {
 	status: NoteStatus;
 	onRemove: () => void;
 }
 
-export const StatusChip: FC<Props> = ({ status, onRemove }) => {
+export const StatusChip: FC<Props> = memo(({ status, onRemove }) => {
 	const [isRemoving, setIsRemoving] = useState(false);
 
 	const handleRemove = (e: React.MouseEvent) => {
@@ -71,4 +71,4 @@ export const StatusChip: FC<Props> = ({ status, onRemove }) => {
 			</div>
 		</div>
 	);
-};
+});
