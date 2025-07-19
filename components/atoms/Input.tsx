@@ -9,6 +9,8 @@ interface BaseInputProps {
 	placeholder?: string;
 	className?: string;
 	style?: React.CSSProperties;
+	onFocus?: () => void;
+	onBlur?: () => void;
 }
 
 interface TextInputProps extends BaseInputProps {
@@ -57,7 +59,19 @@ const getInputStyles = (variant: InputVariant): React.CSSProperties => {
 };
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-	({ variant, value, onChange, placeholder, className, style }, ref) => {
+	(
+		{
+			variant,
+			value,
+			onChange,
+			placeholder,
+			className,
+			style,
+			onFocus,
+			onBlur,
+		},
+		ref,
+	) => {
 		const inputStyles = getInputStyles(variant);
 		const combinedStyles = { ...inputStyles, ...style };
 
@@ -70,6 +84,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 				placeholder={placeholder}
 				className={className}
 				style={combinedStyles}
+				onFocus={onFocus}
+				onBlur={onBlur}
 			/>
 		);
 	},

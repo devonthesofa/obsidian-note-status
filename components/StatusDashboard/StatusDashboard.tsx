@@ -4,11 +4,20 @@ import eventBus from "@/core/eventBus";
 import { VaultStatsCard } from "./VaultStatsCard";
 import { CurrentNoteSection } from "./CurrentNoteSection";
 import { StatusDistributionChart } from "./StatusDistributionChart";
-import { QuickActionsPanel } from "./QuickActionsPanel";
+import { QuickActionsPanel, DashboardAction } from "./QuickActionsPanel";
 import { useVaultStats } from "./useVaultStats";
 import { useCurrentNote } from "./useCurrentNote";
+import { PluginSettings } from "@/types/pluginSettings";
 
-export const StatusDashboard = () => {
+interface StatusDashboardProps {
+	onAction: (action: DashboardAction, value?: string) => void;
+	settings: PluginSettings;
+}
+
+export const StatusDashboard = ({
+	onAction,
+	settings,
+}: StatusDashboardProps) => {
 	const [isLoading, setIsLoading] = useState(true);
 	const { vaultStats, updateVaultStats } = useVaultStats();
 	const { currentNote, updateCurrentNote } = useCurrentNote();
@@ -22,6 +31,17 @@ export const StatusDashboard = () => {
 			setIsLoading(false);
 		}
 	}, [updateVaultStats, updateCurrentNote]);
+
+	const handleAction = useCallback(
+		(action: DashboardAction, value?: string) => {
+			if (action === "refresh") {
+				loadData();
+			} else {
+				onAction(action, value);
+			}
+		},
+		[loadData, onAction],
+	);
 
 	useEffect(() => {
 		loadData();
@@ -90,7 +110,18 @@ export const StatusDashboard = () => {
 				<CurrentNoteSection currentNote={currentNote} />
 				<VaultStatsCard vaultStats={vaultStats} />
 				<StatusDistributionChart vaultStats={vaultStats} />
-				<QuickActionsPanel onRefresh={loadData} />
+				<QuickActionsPanel
+					hasCurrentFile={!!currentNote}
+					useMultipleStatuses={settings.useMultipleStatuses}
+					quickStatusCommands={settings.quickStatusCommands.map(
+						(name) => ({
+							name,
+							command: `note-status:set-status-${name}`,
+						}),
+					)}
+					availableStatuses={BaseNoteStatusService.getAllAvailableStatuses()}
+					onAction={handleAction}
+				/>
 			</div>
 		</div>
 	);
