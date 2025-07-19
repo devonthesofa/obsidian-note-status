@@ -161,7 +161,7 @@ export class NoteStatusService extends BaseNoteStatusService {
 			this.file,
 			(frontmatter) => {
 				if (frontmatterTagName in frontmatter) {
-					delete frontmatter[frontmatterTagName];
+					frontmatter[frontmatterTagName] = [];
 				}
 			},
 		);
