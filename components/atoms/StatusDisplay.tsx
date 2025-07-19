@@ -1,5 +1,6 @@
 import { NoteStatus } from "@/types/noteStatus";
 import { FC, memo, useState } from "react";
+import { getStatusTooltip } from "@/utils/statusUtils";
 
 export type StatusDisplayVariant = "chip" | "badge" | "template";
 
@@ -35,11 +36,7 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 			return (
 				<div
 					className="note-status-chip"
-					title={
-						status.description
-							? `${status.name} - ${status.description}`
-							: status.name
-					}
+					title={getStatusTooltip(status)}
 					style={{
 						display: "inline-flex",
 						alignItems: "center",

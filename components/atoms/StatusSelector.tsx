@@ -1,6 +1,7 @@
 import React, { memo, useCallback } from "react";
 import { NoteStatus } from "@/types/noteStatus";
 import { SelectableListItem } from "./SelectableListItem";
+import { getStatusTooltip, isStatusSelected } from "@/utils/statusUtils";
 
 interface StatusOptionProps {
 	status: NoteStatus;
@@ -19,9 +20,7 @@ export const StatusModalOption: React.FC<StatusOptionProps> = memo(
 				onClick={onSelect}
 				className="note-status-option"
 				title={
-					status.description
-						? `${status.name} - ${status.description}`
-						: undefined
+					status.description ? getStatusTooltip(status) : undefined
 				}
 			>
 				{status.name}
@@ -45,8 +44,7 @@ export const StatusSelector: React.FC<Props> = ({
 }) => {
 	const handleSelectStatus = useCallback(
 		async (status: NoteStatus) => {
-			const selected =
-				currentStatuses.findIndex((s) => s.name === status.name) !== -1;
+			const selected = isStatusSelected(status, currentStatuses);
 			onToggleStatus(status, !selected);
 		},
 		[currentStatuses, onToggleStatus],
@@ -67,11 +65,7 @@ export const StatusSelector: React.FC<Props> = ({
 				<StatusModalOption
 					key={`${status.name}${status.description}${status.color}${status.icon}`}
 					status={status}
-					isSelected={
-						currentStatuses.findIndex(
-							(s) => s.name === status.name,
-						) !== -1
-					}
+					isSelected={isStatusSelected(status, currentStatuses)}
 					isFocused={index === focusedIndex}
 					onSelect={() => handleSelectStatus(status)}
 				/>

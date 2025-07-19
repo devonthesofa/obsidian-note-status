@@ -10,6 +10,7 @@
 			"@/integrations/*": ["./integrations/*"],
 			"@/styles/*": ["./styles/*"],
 			"@/types/*": ["./types/*"],
+			"@/utils/*": ["./utils/*"],
 			"@/views/*": ["./views/*"]
 		},
 		"inlineSourceMap": true,
