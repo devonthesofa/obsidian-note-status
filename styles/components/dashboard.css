@@ -1,3 +1,7 @@
+/* ==========================================================================
+   Status Dashboard
+   ========================================================================== */
+
 .status-dashboard-view-container {
 	height: 100%;
 	overflow: hidden;
@@ -7,51 +11,42 @@
 	height: 100%;
 	display: flex;
 	flex-direction: column;
-	background-color: var(--background-primary);
+	background: var(--background-primary);
 }
 
+/* Header */
 .status-dashboard-header {
 	display: flex;
-	align-items: center;
 	justify-content: space-between;
+	align-items: center;
 	padding: var(--size-4-3) var(--size-4-4);
+	background: var(--background-secondary);
 	border-bottom: 1px solid var(--background-modifier-border);
-	background-color: var(--background-secondary);
-	flex-shrink: 0;
 }
 
 .status-dashboard-title {
 	margin: 0;
 	font-size: var(--font-ui-larger);
-	font-weight: var(--font-weight-bold);
-	color: var(--text-normal);
+	font-weight: var(--font-bold);
 }
 
 .status-dashboard-refresh {
 	padding: var(--size-2-2) var(--size-2-3);
 	border: 1px solid var(--background-modifier-border);
 	border-radius: var(--radius-s);
-	background-color: var(--interactive-normal);
+	background: var(--interactive-normal);
 	color: var(--text-normal);
 	cursor: pointer;
-	transition: all var(--anim-duration-fast) var(--anim-motion-smooth);
 	font-size: var(--font-ui-medium);
+	transition: all var(--anim-duration-fast) ease;
 }
 
 .status-dashboard-refresh:hover {
-	background-color: var(--interactive-hover);
+	background: var(--interactive-hover);
 	transform: rotate(90deg);
 }
 
-.status-dashboard-loading {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	height: 100%;
-	font-size: var(--font-ui-medium);
-	color: var(--text-muted);
-}
-
+/* Content */
 .status-dashboard-content {
 	flex: 1;
 	overflow-y: auto;
@@ -59,12 +54,11 @@
 	display: flex;
 	flex-direction: column;
 	gap: var(--size-4-4);
-	max-height: calc(100vh - 80px);
 }
 
-/* Section Styles */
+/* Sections */
 .status-dashboard-section {
-	background-color: var(--background-secondary);
+	background: var(--background-secondary);
 	border: 1px solid var(--background-modifier-border);
 	border-radius: var(--radius-m);
 	overflow: hidden;
@@ -72,18 +66,17 @@
 
 .status-dashboard-section-header {
 	padding: var(--size-4-2) var(--size-4-3);
-	background-color: var(--background-modifier-hover);
+	background: var(--background-modifier-hover);
 	border-bottom: 1px solid var(--background-modifier-border);
 }
 
 .status-dashboard-section-header h3 {
 	margin: 0;
 	font-size: var(--font-ui-large);
-	font-weight: var(--font-weight-semibold);
-	color: var(--text-normal);
+	font-weight: var(--font-semibold);
 }
 
-/* Current Note Section */
+/* Current Note */
 .status-dashboard-current-note {
 	padding: var(--size-4-3);
 }
@@ -91,21 +84,20 @@
 .current-note-info {
 	margin-bottom: var(--size-4-3);
 	padding-bottom: var(--size-4-2);
-	border-bottom: 1px solid var(--background-modifier-border-hover);
+	border-bottom: 1px solid var(--background-modifier-border);
 }
 
 .current-note-name {
 	font-size: var(--font-ui-large);
-	font-weight: var(--font-weight-semibold);
-	color: var(--text-normal);
+	font-weight: var(--font-semibold);
 	margin-bottom: var(--size-2-1);
 }
 
 .current-note-path {
 	font-size: var(--font-ui-small);
 	color: var(--text-muted);
-	margin-bottom: var(--size-2-1);
 	font-family: var(--font-monospace);
+	margin-bottom: var(--size-2-1);
 }
 
 .current-note-modified {
@@ -137,7 +129,7 @@
 	color: var(--text-muted);
 	font-style: italic;
 	padding: var(--size-2-1) var(--size-2-3);
-	background-color: var(--background-modifier-border-hover);
+	background: var(--background-modifier-border);
 	border-radius: var(--radius-s);
 }
 
@@ -148,7 +140,7 @@
 	padding: var(--size-4-4);
 }
 
-/* Vault Overview Section */
+/* Vault Stats */
 .vault-overview {
 	padding: var(--size-4-3);
 }
@@ -162,21 +154,21 @@
 .vault-stat-card {
 	text-align: center;
 	padding: var(--size-4-2);
-	background-color: var(--background-primary);
+	background: var(--background-primary);
 	border: 1px solid var(--background-modifier-border);
 	border-radius: var(--radius-m);
-	transition: all var(--anim-duration-fast) var(--anim-motion-smooth);
+	transition: all var(--anim-duration-fast) ease;
 }
 
 .vault-stat-card:hover {
-	background-color: var(--background-modifier-hover);
+	background: var(--background-modifier-hover);
 	transform: translateY(-2px);
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	box-shadow: var(--shadow-s);
 }
 
 .vault-stat-number {
 	font-size: var(--font-ui-largest);
-	font-weight: var(--font-weight-bold);
+	font-weight: var(--font-bold);
 	color: var(--interactive-accent);
 	margin-bottom: var(--size-2-1);
 }
@@ -184,12 +176,12 @@
 .vault-stat-label {
 	font-size: var(--font-ui-small);
 	color: var(--text-muted);
-	font-weight: var(--font-weight-medium);
+	font-weight: var(--font-medium);
 	text-transform: uppercase;
-	letter-spacing: 0.5px;
+	letter-spacing: 0.05em;
 }
 
-/* Status Distribution Section */
+/* Status Distribution */
 .status-distribution {
 	padding: var(--size-4-3);
 }
@@ -215,21 +207,19 @@
 .status-chart-count {
 	font-size: var(--font-ui-small);
 	color: var(--text-muted);
-	font-weight: var(--font-weight-medium);
+	font-weight: var(--font-medium);
 }
 
 .status-chart-bar {
 	height: 8px;
-	background-color: var(--background-modifier-border);
+	background: var(--background-modifier-border);
 	border-radius: var(--radius-s);
 	overflow: hidden;
-	position: relative;
 }
 
 .status-chart-fill {
 	height: 100%;
-	transition: width var(--anim-duration-moderate) var(--anim-motion-smooth);
-	border-radius: var(--radius-s);
+	transition: width var(--anim-duration-moderate) ease;
 }
 
 .status-distribution-empty {
@@ -239,7 +229,7 @@
 	padding: var(--size-4-4);
 }
 
-/* Quick Actions Section */
+/* Quick Actions */
 .quick-actions {
 	padding: var(--size-4-3);
 	display: flex;
@@ -248,89 +238,39 @@
 }
 
 .quick-action-btn {
+	flex: 1;
+	min-width: 200px;
 	padding: var(--size-2-3) var(--size-4-2);
 	border: 1px solid var(--background-modifier-border);
 	border-radius: var(--radius-m);
-	background-color: var(--interactive-normal);
+	background: var(--interactive-normal);
 	color: var(--text-normal);
 	cursor: pointer;
-	transition: all var(--anim-duration-fast) var(--anim-motion-smooth);
 	font-size: var(--font-ui-medium);
-	font-weight: var(--font-weight-medium);
-	text-decoration: none;
-	flex: 1;
-	min-width: 200px;
+	font-weight: var(--font-medium);
 	text-align: center;
+	transition: all var(--anim-duration-fast) ease;
 }
 
 .quick-action-btn:hover {
-	background-color: var(--interactive-hover);
+	background: var(--interactive-hover);
 	transform: translateY(-1px);
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	box-shadow: var(--shadow-s);
 }
 
-.quick-action-btn:active {
-	background-color: var(--interactive-active);
-	transform: translateY(0);
+/* States */
+.status-dashboard-loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	font-size: var(--font-ui-medium);
+	color: var(--text-muted);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-	.status-dashboard-header {
-		padding: var(--size-4-2) var(--size-4-3);
-	}
-
-	.status-dashboard-content {
-		padding: var(--size-4-2);
-	}
-
-	.status-dashboard-current-note {
-		padding: var(--size-4-2);
-	}
-
-	.vault-overview {
-		padding: var(--size-4-2);
-	}
-
-	.vault-stats-grid {
-		grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-		gap: var(--size-4-1);
-	}
-
-	.quick-actions {
-		flex-direction: column;
-	}
-
-	.quick-action-btn {
-		min-width: auto;
-	}
-}
-
-/* Dark theme adjustments */
-.theme-dark .status-dashboard-section {
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.theme-dark .vault-stat-card:hover {
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-/* Light theme adjustments */
-.theme-light .status-dashboard-section {
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.theme-light .vault-stat-card:hover {
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* Scrollbar styling */
+/* Scrollbar */
 .status-dashboard-content::-webkit-scrollbar {
 	width: var(--scrollbar-width);
-}
-
-.status-dashboard-content::-webkit-scrollbar-track {
-	background: var(--background-secondary);
 }
 
 .status-dashboard-content::-webkit-scrollbar-thumb {
@@ -339,5 +279,5 @@
 }
 
 .status-dashboard-content::-webkit-scrollbar-thumb:hover {
-	background: var(--scrollbar-thumb-bg-hover);
+	background: var(--scrollbar-active-bg);
 }

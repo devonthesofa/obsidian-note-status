@@ -6,25 +6,11 @@
  */
 
 /* Import component stylesheets */
-@import "variables.css";
-@import "globals.css";
-@import "components/status-chip.css";
-@import "components/status-badge.css";
-@import "components/status-item.css";
-@import "components/status-button.css";
-@import "components/status-modal.css";
-@import "components/status-group.css";
-@import "components/template-status-chip.css";
-@import "components/template-item.css";
-@import "components/custom-status-item.css";
-@import "components/setting-item.css";
-@import "components/quick-commands-settings.css";
-@import "components/status-bar-enable-button.css";
-@import "components/status-bar-group.css";
 @import "components/status-bar.css";
-@import "components/collapsible-counter.css";
+@import "components/settings.css";
+@import "components/dashboard.css";
+@import "components/grouped-view.css";
+@import "components/file-explorer.css";
 @import "components/group-label.css";
-@import "components/file-explorer-icon.css";
-@import "components/status-file-info-popup.css";
-@import "components/grouped-status-view.css";
-@import "components/status-dashboard.css";
+@import "components/collapsible-counter.css";
+@import "components/status-display.css";

@@ -1,0 +1,199 @@
+/* ==========================================================================
+   Settings UI Components
+   ========================================================================== */
+
+/* Settings use Obsidian's built-in classes mostly */
+
+/* Custom additions for Note Status settings */
+.setting-item-full {
+	width: 100%;
+}
+
+.setting-item-vertical {
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--size-2-2);
+}
+
+/* Template Item */
+.template-item {
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	margin-bottom: var(--size-4-2);
+	padding: var(--size-4-3);
+	background: var(--background-primary-alt);
+	cursor: pointer;
+	transition: all var(--anim-duration-fast) ease;
+}
+
+.template-item:hover {
+	background: var(--background-modifier-hover);
+}
+
+.template-item.enabled {
+	background: var(--background-modifier-success);
+	border-color: var(--interactive-success);
+}
+
+.template-checkbox {
+	pointer-events: none;
+}
+
+.template-statuses {
+	margin-top: var(--size-2-2);
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--size-2-1);
+}
+
+/* Custom Status Item */
+.custom-status-card {
+	background: var(--background-secondary);
+	border-radius: var(--radius-m);
+	padding: var(--size-4-3);
+	margin-bottom: var(--size-4-2);
+}
+
+.custom-status-preview {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	padding: var(--size-4-2);
+	background: var(--background-primary-alt);
+	border-radius: var(--radius-s);
+	border-left: 4px solid var(--text-muted);
+}
+
+.custom-status-icon-input {
+	width: 40px;
+	text-align: center;
+	font-size: 1.2em;
+	background: transparent !important;
+	border: none !important;
+}
+
+.custom-status-text-inputs {
+	flex: 1;
+}
+
+.custom-status-name-input {
+	background: transparent !important;
+	border: none !important;
+	color: var(--text-normal);
+	font-weight: var(--font-semibold);
+	font-size: var(--font-ui-medium);
+	width: 100% !important;
+	margin-bottom: 2px;
+}
+
+.custom-status-description-input {
+	background: transparent !important;
+	border: none !important;
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	width: 100% !important;
+}
+
+.custom-status-controls {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+}
+
+.custom-status-color-input {
+	width: 32px !important;
+	height: 32px !important;
+	border-radius: var(--radius-s);
+	cursor: pointer;
+}
+
+.custom-status-remove-btn {
+	font-size: 16px;
+}
+
+/* Status Group for Quick Commands */
+.status-group {
+	margin-bottom: var(--size-4-4);
+}
+
+.status-group-header {
+	margin-bottom: var(--size-4-2);
+}
+
+.status-group-title {
+	font-weight: var(--font-semibold);
+}
+
+.status-group-description {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+	margin-top: var(--size-2-1);
+}
+
+.status-group-items {
+	margin-left: var(--size-4-2);
+}
+
+/* Quick Commands Container */
+.quick-commands-container {
+	margin-top: var(--size-4-2);
+}
+
+/* Note Status Selector in Modal */
+.note-status-options {
+	max-height: 300px;
+	overflow-y: auto;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	background: var(--background-primary);
+}
+
+.note-status-option {
+	/* Uses SelectableListItem styles */
+}
+
+.note-status-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--size-2-2);
+	min-height: 32px;
+	align-items: center;
+}
+
+/* Selectable List Item (used by multiple components) */
+.selectable-list-item {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	padding: var(--size-2-3) var(--size-4-2);
+	cursor: pointer;
+	border-bottom: 1px solid var(--background-modifier-border);
+	transition: background var(--anim-duration-fast) ease;
+}
+
+.selectable-list-item:hover {
+	background: var(--background-modifier-hover);
+}
+
+.selectable-list-item[data-focused="true"] {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: -2px;
+}
+
+.selectable-list-item[data-selected="true"] {
+	background: var(--background-modifier-hover);
+}
+
+.selectable-list-item-icon {
+	font-size: 16px;
+	min-width: 20px;
+}
+
+.selectable-list-item-content {
+	flex: 1;
+	font-size: var(--font-ui-small);
+}
+
+.selectable-list-item-check {
+	color: var(--interactive-accent);
+}

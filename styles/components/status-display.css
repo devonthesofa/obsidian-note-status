@@ -1,0 +1,95 @@
+/* ==========================================================================
+   Status Display Component - Handles chip, badge, and template variants
+   ========================================================================== */
+
+/* Base status display */
+.note-status-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-2-2);
+	padding: var(--size-2-1) var(--size-2-3);
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border-radius: var(--radius-s);
+	font-size: var(--font-ui-smaller);
+	cursor: pointer;
+	transition: all var(--anim-duration-fast) ease;
+}
+
+.note-status-chip:hover {
+	opacity: 0.9;
+	transform: translateY(-1px);
+}
+
+.note-status-chip--removing {
+	opacity: 0.5;
+	transform: scale(0.95);
+}
+
+.note-status-chip__icon {
+	font-size: 1em;
+}
+
+.note-status-chip__text {
+	font-weight: var(--font-medium);
+}
+
+.note-status-chip__remove {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.2);
+	cursor: pointer;
+	margin-left: var(--size-2-1);
+}
+
+.note-status-chip__remove:hover {
+	background: rgba(255, 255, 255, 0.3);
+}
+
+/* Badge variant */
+.status-badge-container {
+	display: inline-flex;
+	align-items: center;
+	padding: var(--size-2-1) var(--size-2-3);
+	border-radius: var(--radius-s);
+	transition: all var(--anim-duration-fast) ease;
+	cursor: pointer;
+}
+
+.status-badge-item {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-1);
+}
+
+.status-badge-icon {
+	font-size: var(--font-ui-small);
+}
+
+.status-badge-text {
+	font-weight: var(--font-medium);
+	font-size: var(--font-ui-small);
+}
+
+/* Template variant */
+.template-status-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-2-1);
+	padding: var(--size-2-1) var(--size-2-3);
+	background: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	font-size: var(--font-ui-smaller);
+}
+
+.template-status-color-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background-color: var(--dot-color);
+}

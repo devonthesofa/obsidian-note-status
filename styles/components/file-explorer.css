@@ -1,0 +1,156 @@
+/* ==========================================================================
+   File Explorer Integration
+   ========================================================================== */
+
+.custom-icon {
+	position: absolute;
+	left: 0;
+	display: inline-flex;
+}
+
+.status-wrapper {
+	position: relative;
+	display: inline-block;
+}
+
+.status-minimal {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	margin-left: var(--size-2-2);
+	padding: 2px;
+	border-radius: var(--radius-s);
+	cursor: pointer;
+	opacity: 0.7;
+	transition: all var(--anim-duration-fast) ease;
+}
+
+.status-minimal:hover {
+	opacity: 1;
+	background: var(--background-modifier-hover);
+	transform: scale(1.05);
+}
+
+/* Use data attribute for dynamic colors */
+.status-minimal[data-status-color] .status-minimal__count {
+	background: var(--interactive-accent);
+}
+
+.status-minimal__icon {
+	font-size: 11px;
+	line-height: 1;
+	filter: grayscale(0.2);
+	transition: filter var(--anim-duration-fast) ease;
+}
+
+.status-minimal:hover .status-minimal__icon {
+	filter: grayscale(0);
+}
+
+.status-minimal__count {
+	min-width: 14px;
+	height: 14px;
+	padding: 0 3px;
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-semibold);
+	border-radius: var(--radius-m);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Status Info Popup */
+.status-info-popup {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: var(--layer-popover);
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	box-shadow: var(--shadow-l);
+	min-width: 280px;
+	max-width: 400px;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+.status-popup-header {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-2);
+	padding: var(--size-4-2) var(--size-4-3);
+	background: var(--background-secondary);
+	border-bottom: 1px solid var(--background-modifier-border);
+	font-weight: var(--font-semibold);
+	font-size: var(--font-ui-small);
+}
+
+.status-popup-content {
+	padding: var(--size-4-2);
+}
+
+.status-popup-empty {
+	padding: var(--size-4-4);
+	text-align: center;
+	color: var(--text-muted);
+	font-style: italic;
+}
+
+/* Status Groups in Popup */
+.status-group {
+	margin-bottom: var(--size-4-2);
+}
+
+.status-group:last-child {
+	margin-bottom: 0;
+}
+
+.status-group-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: var(--size-2-2) var(--size-2-3);
+	background: var(--background-secondary-alt);
+	border-radius: var(--radius-s);
+	margin-bottom: var(--size-2-2);
+}
+
+.status-group-name {
+	text-transform: capitalize;
+	font-weight: var(--font-medium);
+	font-size: var(--font-ui-smaller);
+}
+
+.status-group-count {
+	padding: 1px var(--size-2-2);
+	background: var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+}
+
+.status-group-items {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+	gap: var(--size-2-2);
+}
+
+.status-item {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-2-1);
+	padding: var(--size-2-2);
+	background: var(--background-primary-alt);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+}
+
+.status-description {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+	line-height: 1.4;
+}
