@@ -8,6 +8,10 @@ export interface StatusTemplate {
 }
 
 export type PluginSettings = {
+	fileExplorerIconPosition:
+		| "absolute-right"
+		| "file-name-left"
+		| "file-name-right";
 	statusColors: Record<string, string>;
 	showStatusBar: boolean;
 	autoHideStatusBar: boolean;

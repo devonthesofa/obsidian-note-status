@@ -61,6 +61,7 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 ];
 
 export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
+	fileExplorerIconPosition: "absolute-right",
 	statusColors: {
 		active: "var(--text-success)",
 		onHold: "var(--text-warning)",

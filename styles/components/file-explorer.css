@@ -3,9 +3,12 @@
    ========================================================================== */
 
 .custom-icon {
-	position: absolute;
-	left: 0;
 	display: inline-flex;
+}
+
+.custom-icon__absolute-right {
+	position: absolute;
+	right: 0;
 }
 
 .status-wrapper {

@@ -5,6 +5,7 @@ import {
 	IElementProcessor,
 } from "@/core/lazyElementObserver";
 import { NoteStatusService } from "@/core/noteStatusService";
+import settingsService from "@/core/settingsService";
 import { GroupedStatuses } from "@/types/noteStatus";
 import { Plugin, TFile, View } from "obsidian";
 import { createRoot } from "react-dom/client";
@@ -89,7 +90,15 @@ export class FileExplorerIntegration implements IElementProcessor {
 		if (existingIcon) {
 			existingIcon.remove();
 		}
-		const icon = createSpan({ cls: this.ICON_CLASS });
+
+		let positionClassName = "";
+		if (
+			settingsService.settings.fileExplorerIconPosition ===
+			"absolute-right"
+		) {
+			positionClassName = "custom-icon__absolute-right";
+		}
+		const icon = createSpan({ cls: [this.ICON_CLASS, positionClassName] });
 		const root = createRoot(icon);
 		root.render(
 			<FileExplorerIcon
@@ -99,7 +108,14 @@ export class FileExplorerIntegration implements IElementProcessor {
 			/>,
 		);
 
-		element.prepend(icon);
+		if (
+			settingsService.settings.fileExplorerIconPosition ===
+			"file-name-right"
+		) {
+			element.append(icon);
+		} else {
+			element.prepend(icon);
+		}
 	}
 
 	private openModalInfo(statuses: GroupedStatuses) {
