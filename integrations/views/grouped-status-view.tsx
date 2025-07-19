@@ -117,6 +117,23 @@ export class GroupedStatusView extends ItemView {
 			onDataChange,
 			"grouped-status-view-subscription",
 		);
+		eventBus.subscribe(
+			"plugin-settings-changed",
+			({ key }) => {
+				if (
+					key === "tagPrefix" ||
+					key === "enabledTemplates" ||
+					key === "useCustomStatusesOnly" ||
+					key === "customStatuses" ||
+					key === "useMultipleStatuses" ||
+					key === "strictStatuses" ||
+					key === "excludeUnknownStatus"
+				) {
+					onDataChange();
+				}
+			},
+			"grouped-status-view-settings-subscription",
+		);
 		const unsubscribeActiveFile = BaseNoteStatusService.app.workspace.on(
 			"active-leaf-change",
 			onDataChange,
@@ -126,6 +143,10 @@ export class GroupedStatusView extends ItemView {
 			eventBus.unsubscribe(
 				"frontmatter-manually-changed",
 				"grouped-status-view-subscription",
+			);
+			eventBus.unsubscribe(
+				"plugin-settings-changed",
+				"grouped-status-view-settings-subscription",
 			);
 			BaseNoteStatusService.app.workspace.offref(unsubscribeActiveFile);
 		};

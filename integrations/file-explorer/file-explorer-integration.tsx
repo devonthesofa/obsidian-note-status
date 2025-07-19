@@ -49,6 +49,18 @@ export class FileExplorerIntegration implements IElementProcessor {
 				if (key === "fileExplorerIconPosition") {
 					this.destroy();
 					this.integrate().catch((r) => console.error(r));
+				} else if (
+					key === "showStatusIconsInExplorer" ||
+					key === "hideUnknownStatusInExplorer" ||
+					key === "enabledTemplates" ||
+					key === "useCustomStatusesOnly" ||
+					key === "customStatuses" ||
+					key === "useMultipleStatuses" ||
+					key === "tagPrefix" ||
+					key === "strictStatuses"
+				) {
+					this.destroy();
+					this.integrate().catch((r) => console.error(r));
 				}
 			},
 			"fileExplorerIntegrationSubscription2",
@@ -116,6 +128,9 @@ export class FileExplorerIntegration implements IElementProcessor {
 				statuses={statuses}
 				onMouseEnter={(s) => this.openModalInfo(s)}
 				onMouseLeave={this.closeModalInfo}
+				showNoStatusIcon={
+					settingsService.settings.showStatusIconsInExplorer
+				}
 			/>,
 		);
 

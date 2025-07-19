@@ -5,17 +5,38 @@ type Props = {
 	statuses: GroupedStatuses;
 	onMouseEnter: (statuses: GroupedStatuses) => void;
 	onMouseLeave: (statuses: GroupedStatuses) => void;
+	showNoStatusIcon?: boolean;
 };
 
 export const FileExplorerIcon: FC<Props> = memo(
-	({ statuses, onMouseLeave, onMouseEnter }) => {
+	({ statuses, onMouseLeave, onMouseEnter, showNoStatusIcon }) => {
 		const statusEntries = Object.entries(statuses);
 		const totalStatuses = statusEntries.reduce(
 			(acc, [, list]) => acc + list.length,
 			0,
 		);
 
-		if (totalStatuses === 0) return null;
+		if (totalStatuses === 0) {
+			if (!showNoStatusIcon) return null;
+
+			// Show "no status" icon
+			return (
+				<div className="status-wrapper">
+					<div
+						className="status-minimal status-minimal--no-status"
+						onMouseEnter={() => onMouseEnter({})}
+						onMouseLeave={() => onMouseLeave({})}
+						style={
+							{
+								"--primary-color": "var(--text-muted)",
+							} as React.CSSProperties
+						}
+					>
+						<span className="status-icon">❓</span>
+					</div>
+				</div>
+			);
+		}
 
 		const primaryStatus = statusEntries[0]?.[1]?.[0];
 		if (!primaryStatus) return null;

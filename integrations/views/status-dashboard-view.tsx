@@ -304,6 +304,25 @@ export class StatusDashboardView extends ItemView {
 			handleFileChange,
 			"status-dashboard-file-subscription",
 		);
+		eventBus.subscribe(
+			"plugin-settings-changed",
+			({ key }) => {
+				if (
+					key === "tagPrefix" ||
+					key === "enabledTemplates" ||
+					key === "useCustomStatusesOnly" ||
+					key === "customStatuses" ||
+					key === "useMultipleStatuses" ||
+					key === "strictStatuses" ||
+					key === "excludeUnknownStatus" ||
+					key === "compactView"
+				) {
+					handleVaultChange();
+					handleFileChange();
+				}
+			},
+			"status-dashboard-settings-subscription",
+		);
 
 		this.app.workspace.on("active-leaf-change", handleFileChange);
 
@@ -320,6 +339,10 @@ export class StatusDashboardView extends ItemView {
 		eventBus.unsubscribe(
 			"active-file-change",
 			"status-dashboard-file-subscription",
+		);
+		eventBus.unsubscribe(
+			"plugin-settings-changed",
+			"status-dashboard-settings-subscription",
 		);
 
 		this.root?.unmount();
