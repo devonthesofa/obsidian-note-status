@@ -52,7 +52,9 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 					}}
 					onClick={handleClick}
 				>
-					<span className="note-status-chip-icon">{status.icon}</span>
+					<span className="note-status-chip-icon">
+						{status.icon ? status.icon : "📝"}
+					</span>
 					<span className="note-status-chip-text">{status.name}</span>
 					{removable && (
 						<div
@@ -99,7 +101,9 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 					onClick={handleClick}
 				>
 					<div className="status-badge-item">
-						<span className="status-badge-icon">{status.icon}</span>
+						<span className="status-badge-icon">
+							{status.icon ? status.icon : "📝"}
+						</span>
 						<span className="status-badge-text">{status.name}</span>
 					</div>
 				</div>
@@ -118,7 +122,7 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 						}
 					/>
 					<span>
-						{status.icon} {status.name}
+						{status.icon ? status.icon : "📝"} {status.name}
 					</span>
 				</div>
 			);

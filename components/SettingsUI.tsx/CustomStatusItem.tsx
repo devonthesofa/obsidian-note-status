@@ -1,6 +1,6 @@
 import { NoteStatus } from "@/types/noteStatus";
 import { PluginSettings } from "@/types/pluginSettings";
-import React, { useState } from "react";
+import React from "react";
 import { Input } from "@/components/atoms/Input";
 
 export type Props = {
@@ -21,143 +21,110 @@ export const CustomStatusItem: React.FC<Props> = ({
 	onCustomStatusChange,
 	onCustomStatusRemove,
 }) => {
-	const [isHovered, setIsHovered] = useState(false);
-	const [focusedField, setFocusedField] = useState<string | null>(null);
-
 	const isValid = status.name.trim().length > 0;
-	const hasIcon = status.icon.trim().length > 0;
+	const displayIcon = status.icon.trim() || "📝";
 
 	return (
-		<div
-			className={`custom-status-card ${
-				isValid
-					? "custom-status-card--valid"
-					: "custom-status-card--invalid"
-			}`}
-			onMouseEnter={() => setIsHovered(true)}
-			onMouseLeave={() => setIsHovered(false)}
-		>
-			{/* Status Preview Bar */}
-			<div
-				className={`custom-status-preview-bar ${
-					isValid
-						? "custom-status-preview-bar--valid"
-						: "custom-status-preview-bar--invalid"
-				}`}
-				style={{
-					background: status.color || "var(--text-muted)",
-				}}
-			/>
-
-			<div className="custom-status-main-content">
-				{/* Icon Input with Preview Circle */}
-				<div className="custom-status-icon-section">
-					<div
-						className={`custom-status-icon-preview ${
-							focusedField === "icon"
-								? "custom-status-icon-preview--focused"
-								: ""
-						} ${
-							hasIcon
-								? "custom-status-icon-preview--has-icon"
-								: "custom-status-icon-preview--placeholder"
-						}`}
-						style={{
-							background: status.color
-								? `${status.color}20`
-								: "var(--background-modifier-border)",
-							borderColor:
-								status.color ||
-								"var(--background-modifier-border)",
-						}}
-					>
-						{hasIcon ? status.icon : "📝"}
-					</div>
+		<div className="custom-status-item">
+			{/* Simple horizontal layout with all inputs in a row */}
+			<div className="custom-status-row">
+				{/* Icon field - simple text input */}
+				<div className="custom-status-field">
+					<label className="custom-status-label">Icon</label>
 					<Input
 						variant="text"
 						value={status.icon}
 						onChange={(value) =>
 							onCustomStatusChange(index, "icon", value || "")
 						}
-						placeholder="🔥"
-						onFocus={() => setFocusedField("icon")}
-						onBlur={() => setFocusedField(null)}
+						placeholder="📝"
 						className="custom-status-icon-input"
 					/>
 				</div>
 
-				{/* Text Inputs */}
-				<div className="custom-status-text-section">
+				{/* Name field */}
+				<div className="custom-status-field custom-status-field--name">
+					<label className="custom-status-label">
+						Name <span className="custom-status-required">*</span>
+					</label>
 					<Input
 						variant="text"
 						value={status.name}
 						onChange={(value) =>
 							onCustomStatusChange(index, "name", value || "")
 						}
-						placeholder="Status name"
-						onFocus={() => setFocusedField("name")}
-						onBlur={() => setFocusedField(null)}
-						className={`custom-status-input custom-status-input--name ${
-							focusedField === "name"
-								? "custom-status-input--focused"
-								: ""
-						} ${!isValid ? "custom-status-input--invalid" : ""}`}
-						style={{
-							color: status.color || "var(--text-normal)",
-						}}
+						placeholder="e.g. In Progress"
+						className={`custom-status-name-input ${
+							!isValid ? "custom-status-input--invalid" : ""
+						}`}
 					/>
+				</div>
+
+				{/* Description field */}
+				<div className="custom-status-field custom-status-field--description">
+					<label className="custom-status-label">Description</label>
 					<Input
 						variant="text"
 						value={status.description || ""}
 						onChange={(value) =>
 							onCustomStatusChange(index, "description", value)
 						}
-						placeholder="Description (optional)"
-						onFocus={() => setFocusedField("description")}
-						onBlur={() => setFocusedField(null)}
-						className={`custom-status-input custom-status-input--description ${
-							focusedField === "description"
-								? "custom-status-input--focused"
-								: ""
-						}`}
+						placeholder="Optional description"
+						className="custom-status-description-input"
 					/>
 				</div>
 
-				{/* Controls */}
-				<div className="custom-status-controls">
-					{/* Color Picker */}
-					<div className="custom-status-color-picker">
-						<Input
-							variant="color"
-							value={status.color || "#ffffff"}
-							onChange={(value) =>
-								onCustomStatusChange(index, "color", value)
-							}
-							onFocus={() => setFocusedField("color")}
-							onBlur={() => setFocusedField(null)}
-							className={`custom-status-color-input ${
-								focusedField === "color"
-									? "custom-status-color-input--focused"
-									: ""
-							}`}
-						/>
-					</div>
+				{/* Color picker */}
+				<div className="custom-status-field custom-status-field--color">
+					<label className="custom-status-label">Color</label>
+					<Input
+						variant="color"
+						value={status.color || "#888888"}
+						onChange={(value) =>
+							onCustomStatusChange(index, "color", value)
+						}
+						className="custom-status-color-input"
+					/>
+				</div>
 
-					{/* Remove Button */}
+				{/* Remove button */}
+				<div className="custom-status-field custom-status-field--actions">
 					<button
 						onClick={() => onCustomStatusRemove(index)}
 						aria-label="Remove status"
 						className="custom-status-remove-btn"
+						title="Remove this status"
 					>
-						{isHovered ? "×" : "🗑️"}
+						×
 					</button>
 				</div>
 			</div>
 
-			{/* Validation Message */}
+			{/* Preview row - shows how the status will look */}
+			<div className="custom-status-preview">
+				<span
+					className="custom-status-preview-icon"
+					style={{ color: status.color }}
+				>
+					{displayIcon}
+				</span>
+				<span
+					className="custom-status-preview-text"
+					style={{ color: status.color }}
+				>
+					{status.name || "Status name"}
+				</span>
+				{status.description && (
+					<span className="custom-status-preview-desc">
+						{status.description}
+					</span>
+				)}
+			</div>
+
+			{/* Validation message */}
 			{!isValid && (
-				<div className="custom-status-validation-message">
-					Status name is required
+				<div className="custom-status-error">
+					Please enter a status name
 				</div>
 			)}
 		</div>

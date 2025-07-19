@@ -47,11 +47,11 @@ export const CustomStatusSettings: React.FC<Props> = ({
 
 	return (
 		<div>
-			<h3>Custom statuses</h3>
+			<h3>Custom Statuses</h3>
 
 			<SettingItem
 				name="Use only custom statuses"
-				description="Ignore template statuses and use only the custom statuses defined below"
+				description="Hide default template statuses and use only your custom statuses"
 			>
 				<input
 					type="checkbox"
@@ -63,30 +63,39 @@ export const CustomStatusSettings: React.FC<Props> = ({
 			</SettingItem>
 
 			<SettingItem
-				name="Custom statuses"
-				description="Manage the custom statuses"
+				name="Your custom statuses"
+				description="Create custom statuses with icons (emoji/text), names, and colors. Each status needs a name to be valid."
 				vertical
 			>
-				<div>
-					{settings.customStatuses.map((status, index) => (
-						<CustomStatusItem
-							key={index}
-							status={status}
-							index={index}
-							settings={settings}
-							onCustomStatusChange={updateCustomStatus}
-							onCustomStatusRemove={removeCustomStatus}
-						/>
-					))}
+				<div className="custom-status-list">
+					{settings.customStatuses.length === 0 ? (
+						<div className="custom-status-empty">
+							<p>
+								No custom statuses yet. Click "Add Status" below
+								to create your first one.
+							</p>
+						</div>
+					) : (
+						settings.customStatuses.map((status, index) => (
+							<CustomStatusItem
+								key={index}
+								status={status}
+								index={index}
+								settings={settings}
+								onCustomStatusChange={updateCustomStatus}
+								onCustomStatusRemove={removeCustomStatus}
+							/>
+						))
+					)}
 				</div>
 			</SettingItem>
 
 			<SettingItem
 				name="Add new status"
-				description="Add an empty custom status to be modified"
+				description="Create a new custom status"
 			>
 				<button className="mod-cta" onClick={addNewCustomStatus}>
-					Add Status
+					+ Add Status
 				</button>
 			</SettingItem>
 		</div>

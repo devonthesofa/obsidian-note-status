@@ -46,71 +46,172 @@
 	gap: var(--size-2-1);
 }
 
-/* Custom Status Item */
-.custom-status-card {
+/* Custom Status Item - KISS Design */
+.custom-status-item {
 	background: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
 	border-radius: var(--radius-m);
 	padding: var(--size-4-3);
 	margin-bottom: var(--size-4-2);
+	transition: all var(--anim-duration-fast) ease;
 }
 
-.custom-status-preview {
+.custom-status-item:hover {
+	border-color: var(--interactive-hover);
+}
+
+/* Main input row - horizontal layout */
+.custom-status-row {
 	display: flex;
-	align-items: center;
+	align-items: end;
 	gap: var(--size-4-2);
-	padding: var(--size-4-2);
-	background: var(--background-primary-alt);
-	border-radius: var(--radius-s);
-	border-left: 4px solid var(--text-muted);
+	margin-bottom: var(--size-4-2);
 }
 
-.custom-status-icon-input {
-	width: 40px;
-	text-align: center;
-	font-size: 1.2em;
-	background: transparent !important;
-	border: none !important;
-}
-
-.custom-status-text-inputs {
-	flex: 1;
+/* Individual field containers */
+.custom-status-field {
 	display: flex;
 	flex-direction: column;
+	gap: var(--size-2-1);
+}
+
+.custom-status-field--name {
+	flex: 2;
+	min-width: 120px;
+}
+
+.custom-status-field--description {
+	flex: 2;
+	min-width: 120px;
+}
+
+.custom-status-field--color {
+	flex: 0 0 auto;
+}
+
+.custom-status-field--actions {
+	flex: 0 0 auto;
+	padding-top: var(--size-4-1);
+}
+
+/* Labels */
+.custom-status-label {
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-medium);
+	color: var(--text-muted);
+	margin-bottom: var(--size-2-1);
+}
+
+.custom-status-required {
+	color: var(--text-error);
+}
+
+/* Input styling */
+.custom-status-icon-input {
+	width: 50px !important;
+	text-align: center;
+	font-size: 1.2em;
 }
 
 .custom-status-name-input {
-	background: transparent !important;
-	border: none !important;
-	color: var(--text-normal);
-	font-weight: var(--font-semibold);
-	font-size: var(--font-ui-medium);
-	width: 100% !important;
-	margin-bottom: 2px;
+	font-weight: var(--font-medium);
+}
+
+.custom-status-name-input.custom-status-input--invalid {
+	border-color: var(--text-error) !important;
+	background: var(--background-modifier-error) !important;
 }
 
 .custom-status-description-input {
-	background: transparent !important;
-	border: none !important;
 	color: var(--text-muted);
-	font-size: var(--font-ui-smaller);
-	width: 100% !important;
-}
-
-.custom-status-controls {
-	display: flex;
-	align-items: center;
-	gap: var(--size-4-2);
 }
 
 .custom-status-color-input {
-	width: 32px !important;
+	width: 40px !important;
 	height: 32px !important;
 	border-radius: var(--radius-s);
 	cursor: pointer;
+	border: 2px solid var(--background-modifier-border) !important;
 }
 
+.custom-status-color-input:hover {
+	border-color: var(--interactive-hover) !important;
+}
+
+/* Remove button */
 .custom-status-remove-btn {
-	font-size: 16px;
+	width: 32px;
+	height: 32px;
+	border-radius: var(--radius-s);
+	background: var(--background-modifier-error);
+	color: var(--text-on-accent);
+	border: none;
+	cursor: pointer;
+	font-size: 18px;
+	font-weight: bold;
+	transition: all var(--anim-duration-fast) ease;
+}
+
+.custom-status-remove-btn:hover {
+	background: var(--text-error);
+	transform: scale(1.05);
+}
+
+/* Preview section */
+.custom-status-preview {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-2);
+	padding: var(--size-2-3) var(--size-4-2);
+	background: var(--background-primary-alt);
+	border-radius: var(--radius-s);
+	border-left: 3px solid var(--background-modifier-border);
+	font-size: var(--font-ui-small);
+}
+
+.custom-status-preview-icon {
+	font-size: 1.1em;
+	min-width: 20px;
+	text-align: center;
+}
+
+.custom-status-preview-text {
+	font-weight: var(--font-medium);
+}
+
+.custom-status-preview-desc {
+	color: var(--text-muted);
+	font-style: italic;
+}
+
+.custom-status-preview-desc::before {
+	content: "— ";
+}
+
+/* Error message */
+.custom-status-error {
+	color: var(--text-error);
+	font-size: var(--font-ui-smaller);
+	margin-top: var(--size-2-1);
+	padding: var(--size-2-1) var(--size-2-2);
+	background: var(--background-modifier-error);
+	border-radius: var(--radius-s);
+	border-left: 3px solid var(--text-error);
+}
+
+/* Empty state */
+.custom-status-empty {
+	text-align: center;
+	padding: var(--size-4-4) var(--size-4-2);
+	color: var(--text-muted);
+	font-style: italic;
+	border: 2px dashed var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	background: var(--background-primary-alt);
+}
+
+.custom-status-empty p {
+	margin: 0;
 }
 
 /* Status Group for Quick Commands */
