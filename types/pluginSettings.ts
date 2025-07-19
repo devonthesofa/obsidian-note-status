@@ -18,8 +18,6 @@ export type PluginSettings = {
 	customStatuses: NoteStatus[];
 	showStatusIconsInExplorer: boolean;
 	hideUnknownStatusInExplorer: boolean;
-	collapsedStatuses: Record<string, boolean>;
-	compactView: boolean;
 	enabledTemplates: string[]; // IDs of enabled templates
 	useCustomStatusesOnly: boolean; // Whether to use only custom statuses or include templates
 	useMultipleStatuses: boolean; // Whether to allow multiple statuses per note

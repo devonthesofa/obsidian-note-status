@@ -81,17 +81,6 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 			</SettingItem>
 
 			<SettingItem
-				name="Default to compact view"
-				description="Start the status pane in compact view by default"
-			>
-				<input
-					type="checkbox"
-					checked={settings.compactView || false}
-					onChange={handleChange("compactView")}
-				/>
-			</SettingItem>
-
-			<SettingItem
 				name="Exclude unassigned notes from status pane"
 				description="Improves performance by excluding notes with no assigned status from the status pane. Recommended for large vaults."
 			>

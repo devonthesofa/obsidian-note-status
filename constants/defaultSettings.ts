@@ -73,9 +73,7 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	autoHideStatusBar: false,
 	customStatuses: [],
 	showStatusIconsInExplorer: true,
-	hideUnknownStatusInExplorer: true, // Default to show unknown status
-	collapsedStatuses: {},
-	compactView: false,
+	hideUnknownStatusInExplorer: true, // Default to hide unknown status
 	enabledTemplates: [PREDEFINED_TEMPLATES[0].id],
 	useCustomStatusesOnly: false,
 	useMultipleStatuses: true,

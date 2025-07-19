@@ -26,7 +26,6 @@ Pagination: 50-100 items per page
 	"showStatusIconsInExplorer": false,
 	"excludeUnknownStatus": true,
 	"hideUnknownStatusInExplorer": true,
-	"compactView": true,
 	"enabledTemplates": ["minimal"]
 }
 ```
