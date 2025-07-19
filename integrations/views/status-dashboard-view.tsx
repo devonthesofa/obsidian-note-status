@@ -216,6 +216,11 @@ export class StatusDashboardView extends ItemView {
 					}
 				}
 				break;
+			case "search-by-specific-status":
+				if (value) {
+					this.searchBySpecificStatus(value);
+				}
+				break;
 		}
 	};
 
@@ -233,11 +238,34 @@ export class StatusDashboardView extends ItemView {
 				!frontmatter || !frontmatter[settingsService.settings.tagPrefix]
 			);
 		});
-		new Notice(`Found ${filesWithoutStatus.length} notes without status`);
-		console.log(
-			"Notes without status:",
-			filesWithoutStatus.map((f) => f.path),
+
+		if (filesWithoutStatus.length === 0) {
+			new Notice("All notes have status assigned!");
+			return;
+		}
+
+		new Notice(
+			`Found ${filesWithoutStatus.length} notes without status. Opening search...`,
 		);
+
+		// Create a search query to find files without the status tag
+		const tagPrefix = settingsService.settings.tagPrefix;
+		const query = `-[${tagPrefix}:]`;
+
+		// @ts-ignore
+		this.app.internalPlugins.plugins[
+			"global-search"
+		].instance.openGlobalSearch(query);
+	}
+
+	private searchBySpecificStatus(statusName: string) {
+		const tagPrefix = settingsService.settings.tagPrefix;
+		const query = `[${tagPrefix}:"${statusName}"]`;
+
+		// @ts-ignore
+		this.app.internalPlugins.plugins[
+			"global-search"
+		].instance.openGlobalSearch(query);
 	}
 
 	private renderDashboard() {

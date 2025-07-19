@@ -9,11 +9,13 @@ export type DashboardAction =
 	| "copy-status"
 	| "paste-status"
 	| "search-by-status"
+	| "search-by-specific-status"
 	| "toggle-multiple-mode"
 	| "set-quick-status";
 
 interface QuickActionsPanelProps {
 	hasCurrentFile: boolean;
+	hasCurrentNoteStatuses: boolean;
 	useMultipleStatuses: boolean;
 	quickStatusCommands: string[];
 	onAction: (action: DashboardAction, value?: string) => void;
@@ -21,6 +23,7 @@ interface QuickActionsPanelProps {
 
 export const QuickActionsPanel = ({
 	hasCurrentFile,
+	hasCurrentNoteStatuses,
 	useMultipleStatuses,
 	quickStatusCommands,
 	onAction,
@@ -140,7 +143,7 @@ export const QuickActionsPanel = ({
 					<button
 						className="quick-action-btn"
 						onClick={() => onAction("search-by-status")}
-						disabled={!hasCurrentFile}
+						disabled={!hasCurrentFile || !hasCurrentNoteStatuses}
 						title="Search for notes with same status"
 					>
 						⚙️ Search by Status

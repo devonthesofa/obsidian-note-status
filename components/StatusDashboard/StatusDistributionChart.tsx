@@ -6,11 +6,13 @@ import { NoteStatus } from "@/types/noteStatus";
 interface StatusDistributionChartProps {
 	vaultStats: VaultStats;
 	availableStatuses: NoteStatus[];
+	onStatusClick?: (statusName: string) => void;
 }
 
 export const StatusDistributionChart = ({
 	vaultStats,
 	availableStatuses,
+	onStatusClick,
 }: StatusDistributionChartProps) => {
 	const statusChart = useMemo(() => {
 		const total = Object.values(vaultStats.statusDistribution).reduce(
@@ -45,7 +47,16 @@ export const StatusDistributionChart = ({
 						{statusChart.map(({ name, count, percentage }) => {
 							const status = statusMap.get(name);
 							return (
-								<div key={name} className="status-chart-item">
+								<div
+									key={name}
+									className={`status-chart-item ${onStatusClick ? "status-chart-item--clickable" : ""}`}
+									onClick={() => onStatusClick?.(name)}
+									title={
+										onStatusClick
+											? `Click to search for notes with status: ${name}`
+											: undefined
+									}
+								>
 									<div className="status-chart-info">
 										{status && (
 											<StatusDisplay

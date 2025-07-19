@@ -195,6 +195,18 @@
 	gap: var(--size-2-1);
 }
 
+.status-chart-item--clickable {
+	cursor: pointer;
+	transition: all var(--anim-duration-fast) ease;
+	padding: var(--size-2-2);
+	border-radius: var(--radius-s);
+}
+
+.status-chart-item--clickable:hover {
+	background: var(--background-modifier-hover);
+	transform: translateY(-1px);
+}
+
 .status-chart-info {
 	display: flex;
 	align-items: center;

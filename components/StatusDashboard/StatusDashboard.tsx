@@ -40,6 +40,13 @@ export const StatusDashboard = ({
 		);
 	}
 
+	// Check if current note has any statuses
+	const hasCurrentNoteStatuses =
+		currentNote.file &&
+		Object.values(currentNote.statuses).some(
+			(statuses) => statuses.length > 0,
+		);
+
 	return (
 		<div className="status-dashboard">
 			<div className="status-dashboard-header">
@@ -59,9 +66,13 @@ export const StatusDashboard = ({
 				<StatusDistributionChart
 					vaultStats={vaultStats}
 					availableStatuses={availableStatuses}
+					onStatusClick={(statusName) =>
+						onAction("search-by-specific-status", statusName)
+					}
 				/>
 				<QuickActionsPanel
 					hasCurrentFile={!!currentNote.file}
+					hasCurrentNoteStatuses={!!hasCurrentNoteStatuses}
 					useMultipleStatuses={settings.useMultipleStatuses}
 					quickStatusCommands={settings.quickStatusCommands}
 					onAction={onAction}

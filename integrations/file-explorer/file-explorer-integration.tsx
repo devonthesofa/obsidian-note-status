@@ -47,7 +47,6 @@ export class FileExplorerIntegration implements IElementProcessor {
 			"plugin-settings-changed",
 			({ key }) => {
 				if (key === "fileExplorerIconPosition") {
-					console.log("renreder");
 					this.destroy();
 					this.integrate().catch((r) => console.error(r));
 				}
