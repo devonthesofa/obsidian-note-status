@@ -310,17 +310,13 @@ export class CommandsService {
 		return statuses.length > 0 ? statuses.map((s) => s.name) : ["unknown"];
 	}
 
-	public unload(): void {
-		// Remove existing commands
-		this.removeQuickStatusCommands();
-	}
-
 	/**
 	 * Remove all quick status commands
 	 */
 	private removeQuickStatusCommands(): void {
 		const allStatuses = BaseNoteStatusService.getAllAvailableStatuses();
 
+		//TODO: If there is an update the
 		allStatuses.forEach((status) => {
 			// @ts-ignore
 			this.app.commands.removeCommand(
@@ -333,9 +329,9 @@ export class CommandsService {
 		});
 	}
 
-	destroy(): void {
-		// Commands are automatically cleaned up when the plugin is disabled
-		// But we can track them for debugging purposes
+	public destroy(): void {
+		// Remove existing commands
+		this.removeQuickStatusCommands();
 		this.registeredCommands.clear();
 	}
 }

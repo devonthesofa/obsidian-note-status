@@ -18,6 +18,7 @@ class SettingsService {
 		if (!(key in this.settings)) {
 			throw new Error(`The "${key}" setting is not a known setting key`);
 		}
+		// const oldValue = this.settings[key]; // TODO: Send the old value
 		this.settings[key] = value;
 		this.saveSettings().catch(console.error);
 		// INFO: Send the propgation event
