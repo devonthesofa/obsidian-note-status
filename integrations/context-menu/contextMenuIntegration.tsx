@@ -40,8 +40,8 @@ export class ContextMenuIntegration {
 					leaf?: WorkspaceLeaf,
 				) => {
 					menu.addItem((item) => {
-						item.setTitle("Print file path 👈")
-							.setIcon("document")
+						item.setTitle("Change note state")
+							.setIcon("rotate-ccw") // Lucide icon
 							.onClick(async () => {
 								const tFiles = files.filter(
 									(f): f is TFile => f instanceof TFile,
@@ -61,8 +61,8 @@ export class ContextMenuIntegration {
 		this.plugin.registerEvent(
 			this.plugin.app.workspace.on("file-menu", (menu, file, f, f2) => {
 				menu.addItem((item) => {
-					item.setTitle("Print file path 👈")
-						.setIcon("document")
+					item.setTitle("Change note state")
+						.setIcon("rotate-ccw") // Lucide icon
 						.onClick(async () => {
 							if (file instanceof TFile) {
 								this.openSingleFileStatusesModal(file);
@@ -81,8 +81,8 @@ export class ContextMenuIntegration {
 				"editor-menu",
 				(menu, editor, view) => {
 					menu.addItem((item) => {
-						item.setTitle("Print file path 👈")
-							.setIcon("document")
+						item.setTitle("Change note state")
+							.setIcon("rotate-ccw") // Lucide icon
 							.onClick(async () => {
 								if (view.file) {
 									if (view.file instanceof TFile) {
