@@ -1,3 +1,5 @@
+import { NoteStatus } from "@/types/noteStatus";
+
 export type DashboardAction =
 	| "refresh"
 	| "open-grouped-view"
@@ -16,7 +18,7 @@ interface QuickActionsPanelProps {
 	hasCurrentFile: boolean;
 	useMultipleStatuses: boolean;
 	quickStatusCommands: Array<{ name: string; command: string }>;
-	availableStatuses: Array<{ name: string }>;
+	availableStatuses: NoteStatus[];
 	onAction: (action: DashboardAction, value?: string) => void;
 }
 

@@ -1,9 +1,15 @@
-import { ItemView, WorkspaceLeaf, Notice, App } from "obsidian";
+import { ItemView, WorkspaceLeaf, Notice, App, TFile } from "obsidian";
 import { Root, createRoot } from "react-dom/client";
 import { StatusDashboard } from "@/components/StatusDashboard/StatusDashboard";
 import { DashboardAction } from "@/components/StatusDashboard/QuickActionsPanel";
-import { BaseNoteStatusService } from "@/core/noteStatusService";
+import {
+	BaseNoteStatusService,
+	NoteStatusService,
+} from "@/core/noteStatusService";
 import settingsService from "@/core/settingsService";
+import eventBus from "@/core/eventBus";
+import { VaultStats } from "@/components/StatusDashboard/useVaultStats";
+import { NoteStatus } from "@/types/noteStatus";
 
 interface AppWithCommands extends App {
 	commands: {
@@ -11,10 +17,29 @@ interface AppWithCommands extends App {
 	};
 }
 
+interface CurrentNoteInfo {
+	file: TFile | null;
+	statuses: Record<string, NoteStatus[]>;
+	lastModified: number;
+}
+
 export const VIEW_TYPE_STATUS_DASHBOARD = "status-dashboard-view";
 
 export class StatusDashboardView extends ItemView {
 	root: Root | null = null;
+	private vaultStats: VaultStats = {
+		totalNotes: 0,
+		notesWithStatus: 0,
+		statusDistribution: {},
+		tagDistribution: {},
+		recentChanges: [],
+	};
+	private currentNote: CurrentNoteInfo = {
+		file: null,
+		statuses: {},
+		lastModified: 0,
+	};
+	private isLoading: boolean = true;
 
 	constructor(leaf: WorkspaceLeaf) {
 		super(leaf);
@@ -32,10 +57,107 @@ export class StatusDashboardView extends ItemView {
 		return "bar-chart-2";
 	}
 
+	private calculateVaultStats = (): VaultStats => {
+		const files = this.app.vault.getMarkdownFiles();
+		const availableStatuses =
+			BaseNoteStatusService.getAllAvailableStatuses();
+		const statusMetadataKeys = [settingsService.settings.tagPrefix];
+
+		let notesWithStatus = 0;
+		const statusDistribution: Record<string, number> = {};
+		const tagDistribution: Record<string, number> = {};
+
+		availableStatuses.forEach((status) => {
+			statusDistribution[status.name] = 0;
+		});
+
+		statusMetadataKeys.forEach((tag) => {
+			tagDistribution[tag] = 0;
+		});
+
+		files.forEach((file) => {
+			const cachedMetadata = this.app.metadataCache.getFileCache(file);
+			const frontmatter = cachedMetadata?.frontmatter;
+
+			if (!frontmatter) return;
+
+			let hasAnyStatus = false;
+
+			statusMetadataKeys.forEach((key) => {
+				const value = frontmatter[key];
+				if (value) {
+					hasAnyStatus = true;
+					tagDistribution[key]++;
+
+					const statusNames = Array.isArray(value) ? value : [value];
+					statusNames.forEach((statusName) => {
+						const statusStr = statusName.toString();
+						if (statusDistribution.hasOwnProperty(statusStr)) {
+							statusDistribution[statusStr]++;
+						}
+					});
+				}
+			});
+
+			if (hasAnyStatus) {
+				notesWithStatus++;
+			}
+		});
+
+		return {
+			totalNotes: files.length,
+			notesWithStatus,
+			statusDistribution,
+			tagDistribution,
+			recentChanges: [],
+		};
+	};
+
+	private updateCurrentNote = () => {
+		const activeFile = this.app.workspace.getActiveFile();
+
+		if (!activeFile) {
+			this.currentNote = { file: null, statuses: {}, lastModified: 0 };
+			this.renderDashboard();
+			return;
+		}
+
+		const noteStatusService = new NoteStatusService(activeFile);
+		noteStatusService.populateStatuses();
+
+		this.currentNote = {
+			file: activeFile,
+			statuses: noteStatusService.statuses,
+			lastModified: activeFile.stat.mtime,
+		};
+		this.renderDashboard();
+	};
+
+	private updateVaultStats = () => {
+		this.vaultStats = this.calculateVaultStats();
+		this.renderDashboard();
+	};
+
+	private loadData = () => {
+		this.isLoading = true;
+		this.renderDashboard();
+
+		try {
+			this.vaultStats = this.calculateVaultStats();
+			this.updateCurrentNote();
+		} finally {
+			this.isLoading = false;
+			this.renderDashboard();
+		}
+	};
+
 	private handleAction = (action: DashboardAction, value?: string) => {
 		const appWithCommands = this.app as AppWithCommands;
 
 		switch (action) {
+			case "refresh":
+				this.loadData();
+				break;
 			case "open-grouped-view":
 				this.openGroupedView();
 				break;
@@ -98,15 +220,14 @@ export class StatusDashboardView extends ItemView {
 	};
 
 	private openGroupedView() {
-		const leaf = BaseNoteStatusService.app.workspace.getLeaf();
+		const leaf = this.app.workspace.getLeaf();
 		leaf.setViewState({ type: "grouped-status-view", active: true });
 	}
 
 	private findUnassignedNotes() {
-		const files = BaseNoteStatusService.app.vault.getMarkdownFiles();
+		const files = this.app.vault.getMarkdownFiles();
 		const filesWithoutStatus = files.filter((file) => {
-			const cachedMetadata =
-				BaseNoteStatusService.app.metadataCache.getFileCache(file);
+			const cachedMetadata = this.app.metadataCache.getFileCache(file);
 			const frontmatter = cachedMetadata?.frontmatter;
 			return (
 				!frontmatter || !frontmatter[settingsService.settings.tagPrefix]
@@ -119,21 +240,65 @@ export class StatusDashboardView extends ItemView {
 		);
 	}
 
+	private renderDashboard() {
+		if (!this.root) return;
+
+		this.root.render(
+			<StatusDashboard
+				onAction={this.handleAction}
+				settings={settingsService.settings}
+				vaultStats={this.vaultStats}
+				currentNote={this.currentNote}
+				isLoading={this.isLoading}
+				availableStatuses={BaseNoteStatusService.getAllAvailableStatuses()}
+			/>,
+		);
+	}
+
 	async onOpen() {
 		const container = this.containerEl.children[1];
 		container.empty();
 		container.addClass("status-dashboard-view-container");
 
 		this.root = createRoot(container);
-		this.root.render(
-			<StatusDashboard
-				onAction={this.handleAction}
-				settings={settingsService.settings}
-			/>,
+
+		// Set up event listeners
+		const handleFileChange = () => {
+			this.updateCurrentNote();
+		};
+
+		const handleVaultChange = () => {
+			this.loadData();
+		};
+
+		eventBus.subscribe(
+			"frontmatter-manually-changed",
+			handleVaultChange,
+			"status-dashboard-vault-subscription",
 		);
+		eventBus.subscribe(
+			"active-file-change",
+			handleFileChange,
+			"status-dashboard-file-subscription",
+		);
+
+		this.app.workspace.on("active-leaf-change", handleFileChange);
+
+		// Initial load
+		this.loadData();
 	}
 
 	async onClose() {
+		// Clean up event listeners
+		eventBus.unsubscribe(
+			"frontmatter-manually-changed",
+			"status-dashboard-vault-subscription",
+		);
+		eventBus.unsubscribe(
+			"active-file-change",
+			"status-dashboard-file-subscription",
+		);
+
 		this.root?.unmount();
 		this.root = null;
 	}

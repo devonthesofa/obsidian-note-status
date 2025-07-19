@@ -1,14 +1,16 @@
 import { useMemo } from "react";
-import { BaseNoteStatusService } from "@/core/noteStatusService";
 import { StatusDisplay } from "@/components/atoms/StatusDisplay";
 import { VaultStats } from "./useVaultStats";
+import { NoteStatus } from "@/types/noteStatus";
 
 interface StatusDistributionChartProps {
 	vaultStats: VaultStats;
+	availableStatuses: NoteStatus[];
 }
 
 export const StatusDistributionChart = ({
 	vaultStats,
+	availableStatuses,
 }: StatusDistributionChartProps) => {
 	const statusChart = useMemo(() => {
 		const total = Object.values(vaultStats.statusDistribution).reduce(
@@ -27,10 +29,6 @@ export const StatusDistributionChart = ({
 			.sort((a, b) => b.count - a.count);
 	}, [vaultStats.statusDistribution]);
 
-	const availableStatuses = useMemo(
-		() => BaseNoteStatusService.getAllAvailableStatuses(),
-		[],
-	);
 	const statusMap = useMemo(
 		() => new Map(availableStatuses.map((s) => [s.name, s])),
 		[availableStatuses],

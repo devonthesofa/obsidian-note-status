@@ -1,88 +1,35 @@
-import { useState, useEffect, useCallback } from "react";
-import { BaseNoteStatusService } from "@/core/noteStatusService";
-import eventBus from "@/core/eventBus";
 import { VaultStatsCard } from "./VaultStatsCard";
 import { CurrentNoteSection } from "./CurrentNoteSection";
 import { StatusDistributionChart } from "./StatusDistributionChart";
 import { QuickActionsPanel, DashboardAction } from "./QuickActionsPanel";
-import { useVaultStats } from "./useVaultStats";
-import { useCurrentNote } from "./useCurrentNote";
+import { VaultStats } from "./useVaultStats";
 import { PluginSettings } from "@/types/pluginSettings";
+import { TFile } from "obsidian";
+import { NoteStatus } from "@/types/noteStatus";
+
+interface CurrentNoteInfo {
+	file: TFile | null;
+	statuses: Record<string, NoteStatus[]>;
+	lastModified: number;
+}
 
 interface StatusDashboardProps {
 	onAction: (action: DashboardAction, value?: string) => void;
 	settings: PluginSettings;
+	vaultStats: VaultStats;
+	currentNote: CurrentNoteInfo;
+	isLoading: boolean;
+	availableStatuses: NoteStatus[];
 }
 
 export const StatusDashboard = ({
 	onAction,
 	settings,
+	vaultStats,
+	currentNote,
+	isLoading,
+	availableStatuses,
 }: StatusDashboardProps) => {
-	const [isLoading, setIsLoading] = useState(true);
-	const { vaultStats, updateVaultStats } = useVaultStats();
-	const { currentNote, updateCurrentNote } = useCurrentNote();
-
-	const loadData = useCallback(() => {
-		setIsLoading(true);
-		try {
-			updateVaultStats();
-			updateCurrentNote();
-		} finally {
-			setIsLoading(false);
-		}
-	}, [updateVaultStats, updateCurrentNote]);
-
-	const handleAction = useCallback(
-		(action: DashboardAction, value?: string) => {
-			if (action === "refresh") {
-				loadData();
-			} else {
-				onAction(action, value);
-			}
-		},
-		[loadData, onAction],
-	);
-
-	useEffect(() => {
-		loadData();
-
-		const handleFileChange = () => {
-			updateCurrentNote();
-		};
-
-		const handleVaultChange = () => {
-			loadData();
-		};
-
-		eventBus.subscribe(
-			"frontmatter-manually-changed",
-			handleVaultChange,
-			"status-dashboard-vault-subscription",
-		);
-		eventBus.subscribe(
-			"active-file-change",
-			handleFileChange,
-			"status-dashboard-file-subscription",
-		);
-
-		const unsubscribeActiveFile = BaseNoteStatusService.app.workspace.on(
-			"active-leaf-change",
-			handleFileChange,
-		);
-
-		return () => {
-			eventBus.unsubscribe(
-				"frontmatter-manually-changed",
-				"status-dashboard-vault-subscription",
-			);
-			eventBus.unsubscribe(
-				"active-file-change",
-				"status-dashboard-file-subscription",
-			);
-			BaseNoteStatusService.app.workspace.offref(unsubscribeActiveFile);
-		};
-	}, [loadData, updateCurrentNote]);
-
 	if (isLoading) {
 		return (
 			<div className="status-dashboard">
@@ -99,7 +46,7 @@ export const StatusDashboard = ({
 				<h2 className="status-dashboard-title">Status Dashboard</h2>
 				<button
 					className="status-dashboard-refresh"
-					onClick={loadData}
+					onClick={() => onAction("refresh")}
 					title="Refresh Dashboard"
 				>
 					🔄
@@ -109,9 +56,12 @@ export const StatusDashboard = ({
 			<div className="status-dashboard-content">
 				<CurrentNoteSection currentNote={currentNote} />
 				<VaultStatsCard vaultStats={vaultStats} />
-				<StatusDistributionChart vaultStats={vaultStats} />
+				<StatusDistributionChart
+					vaultStats={vaultStats}
+					availableStatuses={availableStatuses}
+				/>
 				<QuickActionsPanel
-					hasCurrentFile={!!currentNote}
+					hasCurrentFile={!!currentNote.file}
 					useMultipleStatuses={settings.useMultipleStatuses}
 					quickStatusCommands={settings.quickStatusCommands.map(
 						(name) => ({
@@ -119,8 +69,8 @@ export const StatusDashboard = ({
 							command: `note-status:set-status-${name}`,
 						}),
 					)}
-					availableStatuses={BaseNoteStatusService.getAllAvailableStatuses()}
-					onAction={handleAction}
+					availableStatuses={availableStatuses}
+					onAction={onAction}
 				/>
 			</div>
 		</div>
