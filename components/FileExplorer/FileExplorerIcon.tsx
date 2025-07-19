@@ -5,11 +5,11 @@ type Props = {
 	statuses: GroupedStatuses;
 	onMouseEnter: (statuses: GroupedStatuses) => void;
 	onMouseLeave: (statuses: GroupedStatuses) => void;
-	showNoStatusIcon?: boolean;
+	hideUnknownStatus?: boolean;
 };
 
 export const FileExplorerIcon: FC<Props> = memo(
-	({ statuses, onMouseLeave, onMouseEnter, showNoStatusIcon }) => {
+	({ statuses, onMouseLeave, onMouseEnter, hideUnknownStatus }) => {
 		const statusEntries = Object.entries(statuses);
 		const totalStatuses = statusEntries.reduce(
 			(acc, [, list]) => acc + list.length,
@@ -17,7 +17,8 @@ export const FileExplorerIcon: FC<Props> = memo(
 		);
 
 		if (totalStatuses === 0) {
-			if (!showNoStatusIcon) return null;
+			// If hideUnknownStatus is enabled, don't show anything for files without status
+			if (hideUnknownStatus) return null;
 
 			// Show "no status" icon
 			return (

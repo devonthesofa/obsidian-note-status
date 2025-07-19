@@ -46,10 +46,7 @@ export class FileExplorerIntegration implements IElementProcessor {
 		eventBus.subscribe(
 			"plugin-settings-changed",
 			({ key }) => {
-				if (key === "fileExplorerIconPosition") {
-					this.destroy();
-					this.integrate().catch((r) => console.error(r));
-				} else if (
+				if (
 					key === "showStatusIconsInExplorer" ||
 					key === "hideUnknownStatusInExplorer" ||
 					key === "enabledTemplates" ||
@@ -57,7 +54,8 @@ export class FileExplorerIntegration implements IElementProcessor {
 					key === "customStatuses" ||
 					key === "useMultipleStatuses" ||
 					key === "tagPrefix" ||
-					key === "strictStatuses"
+					key === "strictStatuses" ||
+					key === "fileExplorerIconPosition"
 				) {
 					this.destroy();
 					this.integrate().catch((r) => console.error(r));
@@ -114,6 +112,10 @@ export class FileExplorerIntegration implements IElementProcessor {
 			existingIcon.remove();
 		}
 
+		if (!settingsService.settings.showStatusIconsInExplorer) {
+			return;
+		}
+
 		let positionClassName = "";
 		if (
 			settingsService.settings.fileExplorerIconPosition ===
@@ -128,8 +130,8 @@ export class FileExplorerIntegration implements IElementProcessor {
 				statuses={statuses}
 				onMouseEnter={(s) => this.openModalInfo(s)}
 				onMouseLeave={this.closeModalInfo}
-				showNoStatusIcon={
-					settingsService.settings.showStatusIconsInExplorer
+				hideUnknownStatus={
+					settingsService.settings.hideUnknownStatusInExplorer
 				}
 			/>,
 		);

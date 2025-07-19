@@ -39,7 +39,7 @@ export class StatusBarIntegration {
 
 		eventBus.subscribe(
 			"plugin-settings-changed",
-			({ value, key }) => {
+			({ key }) => {
 				if (key === "showStatusBar") {
 					this.render(); // INFO: Force a render to set disabled or enabled
 				}

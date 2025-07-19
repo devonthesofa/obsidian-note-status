@@ -28,7 +28,7 @@ export class CommandsIntegration {
 
 		eventBus.subscribe(
 			"plugin-settings-changed",
-			({ value, key }) => {
+			({ key }) => {
 				if (
 					key === "quickStatusCommands" ||
 					key === "useMultipleStatuses"
@@ -38,11 +38,15 @@ export class CommandsIntegration {
 					this.commandsService.registerAllCommands(); // INFO: Reset the registered commands
 				}
 			},
-			"statusBarIntegrationSubscription2",
+			"commandsIntegrationSubscription2",
 		);
 	}
 
 	destroy(): void {
+		eventBus.unsubscribe(
+			"plugin-settings-changed",
+			"commandsIntegrationSubscription2",
+		);
 		if (this.commandsService) {
 			this.commandsService.destroy();
 		}
