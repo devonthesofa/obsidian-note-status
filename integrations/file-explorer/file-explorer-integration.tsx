@@ -42,6 +42,18 @@ export class FileExplorerIntegration implements IElementProcessor {
 			},
 			this.EVENT_SUBSCRIPTION_ID,
 		);
+
+		eventBus.subscribe(
+			"plugin-settings-changed",
+			({ key }) => {
+				if (key === "fileExplorerIconPosition") {
+					console.log("renreder");
+					this.destroy();
+					this.integrate().catch((r) => console.error(r));
+				}
+			},
+			"fileExplorerIntegrationSubscription2",
+		);
 	}
 
 	private getFileNoteStatusService(
@@ -136,6 +148,10 @@ export class FileExplorerIntegration implements IElementProcessor {
 		eventBus.unsubscribe(
 			"frontmatter-manually-changed",
 			this.EVENT_SUBSCRIPTION_ID,
+		);
+		eventBus.unsubscribe(
+			"frontmatter-manually-changed",
+			"fileExplorerIntegrationSubscription2",
 		);
 	}
 

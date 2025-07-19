@@ -1,5 +1,6 @@
 import { PluginSettings } from "@/types/pluginSettings";
 import React from "react";
+import { Select } from "../atoms/Select";
 import { SettingItem } from "./SettingItem";
 
 export type Props = {
@@ -48,6 +49,23 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 					type="checkbox"
 					checked={settings.showStatusIconsInExplorer}
 					onChange={handleChange("showStatusIconsInExplorer")}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Status icon in file explorer position"
+				description="Change the position of the icon"
+			>
+				<Select
+					options={[
+						{ display: "Filename left", value: "file-name-left" },
+						{ display: "Filename right", value: "file-name-right" },
+						{ display: "Absolute right", value: "absolute-right" },
+					]}
+					defaultValue={settings.fileExplorerIconPosition}
+					onChange={(value) =>
+						onChange("fileExplorerIconPosition", value)
+					}
 				/>
 			</SettingItem>
 
