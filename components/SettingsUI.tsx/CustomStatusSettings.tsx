@@ -69,7 +69,7 @@ export const CustomStatusSettings: React.FC<Props> = ({
 			>
 				<div className="custom-status-list">
 					{settings.customStatuses.length === 0 ? (
-						<div className="custom-status-empty">
+						<div className="custom-status-list__empty">
 							<p>
 								No custom statuses yet. Click "Add Status" below
 								to create your first one.

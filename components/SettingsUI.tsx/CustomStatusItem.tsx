@@ -27,10 +27,10 @@ export const CustomStatusItem: React.FC<Props> = ({
 	return (
 		<div className="custom-status-item">
 			{/* Simple horizontal layout with all inputs in a row */}
-			<div className="custom-status-row">
+			<div className="custom-status-item__row">
 				{/* Icon field - simple text input */}
-				<div className="custom-status-field">
-					<label className="custom-status-label">Icon</label>
+				<div className="custom-status-item__field">
+					<label className="custom-status-item__label">Icon</label>
 					<Input
 						variant="text"
 						value={status.icon}
@@ -38,14 +38,17 @@ export const CustomStatusItem: React.FC<Props> = ({
 							onCustomStatusChange(index, "icon", value || "")
 						}
 						placeholder="📝"
-						className="custom-status-icon-input"
+						className="custom-status-item__input custom-status-item__input--icon"
 					/>
 				</div>
 
 				{/* Name field */}
-				<div className="custom-status-field custom-status-field--name">
-					<label className="custom-status-label">
-						Name <span className="custom-status-required">*</span>
+				<div className="custom-status-item__field custom-status-item__field--name">
+					<label className="custom-status-item__label">
+						Name{" "}
+						<span className="custom-status-item__label--required">
+							*
+						</span>
 					</label>
 					<Input
 						variant="text"
@@ -54,15 +57,17 @@ export const CustomStatusItem: React.FC<Props> = ({
 							onCustomStatusChange(index, "name", value || "")
 						}
 						placeholder="e.g. In Progress"
-						className={`custom-status-name-input ${
-							!isValid ? "custom-status-input--invalid" : ""
+						className={`custom-status-item__input custom-status-item__input--name ${
+							!isValid ? "custom-status-item__input--invalid" : ""
 						}`}
 					/>
 				</div>
 
 				{/* Description field */}
-				<div className="custom-status-field custom-status-field--description">
-					<label className="custom-status-label">Description</label>
+				<div className="custom-status-item__field custom-status-item__field--description">
+					<label className="custom-status-item__label">
+						Description
+					</label>
 					<Input
 						variant="text"
 						value={status.description || ""}
@@ -70,29 +75,29 @@ export const CustomStatusItem: React.FC<Props> = ({
 							onCustomStatusChange(index, "description", value)
 						}
 						placeholder="Optional description"
-						className="custom-status-description-input"
+						className="custom-status-item__input custom-status-item__input--description"
 					/>
 				</div>
 
 				{/* Color picker */}
-				<div className="custom-status-field custom-status-field--color">
-					<label className="custom-status-label">Color</label>
+				<div className="custom-status-item__field custom-status-item__field--color">
+					<label className="custom-status-item__label">Color</label>
 					<Input
 						variant="color"
 						value={status.color || "#888888"}
 						onChange={(value) =>
 							onCustomStatusChange(index, "color", value)
 						}
-						className="custom-status-color-input"
+						className="custom-status-item__input custom-status-item__input--color"
 					/>
 				</div>
 
 				{/* Remove button */}
-				<div className="custom-status-field custom-status-field--actions">
+				<div className="custom-status-item__field custom-status-item__field--actions">
 					<button
 						onClick={() => onCustomStatusRemove(index)}
 						aria-label="Remove status"
-						className="custom-status-remove-btn"
+						className="custom-status-item__remove-btn"
 						title="Remove this status"
 					>
 						×
@@ -101,21 +106,21 @@ export const CustomStatusItem: React.FC<Props> = ({
 			</div>
 
 			{/* Preview row - shows how the status will look */}
-			<div className="custom-status-preview">
+			<div className="custom-status-item__preview">
 				<span
-					className="custom-status-preview-icon"
+					className="custom-status-item__preview-icon"
 					style={{ color: status.color }}
 				>
 					{displayIcon}
 				</span>
 				<span
-					className="custom-status-preview-text"
+					className="custom-status-item__preview-text"
 					style={{ color: status.color }}
 				>
 					{status.name || "Status name"}
 				</span>
 				{status.description && (
-					<span className="custom-status-preview-desc">
+					<span className="custom-status-item__preview-desc">
 						{status.description}
 					</span>
 				)}
@@ -123,7 +128,7 @@ export const CustomStatusItem: React.FC<Props> = ({
 
 			{/* Validation message */}
 			{!isValid && (
-				<div className="custom-status-error">
+				<div className="custom-status-item__error">
 					Please enter a status name
 				</div>
 			)}

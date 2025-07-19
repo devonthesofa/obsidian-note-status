@@ -46,7 +46,7 @@
 	gap: var(--size-2-1);
 }
 
-/* Custom Status Item - KISS Design */
+/* Custom Status Item - BEM Methodology */
 .custom-status-item {
 	background: var(--background-secondary);
 	border: 1px solid var(--background-modifier-border);
@@ -60,73 +60,73 @@
 	border-color: var(--interactive-hover);
 }
 
-/* Main input row - horizontal layout */
-.custom-status-row {
+.custom-status-item__row {
 	display: flex;
 	align-items: end;
 	gap: var(--size-4-2);
 	margin-bottom: var(--size-4-2);
 }
 
-/* Individual field containers */
-.custom-status-field {
+.custom-status-item__field {
 	display: flex;
 	flex-direction: column;
 	gap: var(--size-2-1);
 }
 
-.custom-status-field--name {
+.custom-status-item__field--name {
 	flex: 2;
 	min-width: 120px;
 }
 
-.custom-status-field--description {
+.custom-status-item__field--description {
 	flex: 2;
 	min-width: 120px;
 }
 
-.custom-status-field--color {
+.custom-status-item__field--color {
 	flex: 0 0 auto;
 }
 
-.custom-status-field--actions {
+.custom-status-item__field--actions {
 	flex: 0 0 auto;
 	padding-top: var(--size-4-1);
 }
 
-/* Labels */
-.custom-status-label {
+.custom-status-item__label {
 	font-size: var(--font-ui-smaller);
 	font-weight: var(--font-medium);
 	color: var(--text-muted);
 	margin-bottom: var(--size-2-1);
 }
 
-.custom-status-required {
+.custom-status-item__label--required {
 	color: var(--text-error);
 }
 
-/* Input styling */
-.custom-status-icon-input {
+.custom-status-item__input {
+	/* Base input styles handled by Input component */
+}
+
+.custom-status-item__input--icon {
 	width: 50px !important;
 	text-align: center;
 	font-size: 1.2em;
 }
 
-.custom-status-name-input {
+.custom-status-item__input--name {
 	font-weight: var(--font-medium);
 }
 
-.custom-status-name-input.custom-status-input--invalid {
+.custom-status-item__input--name.custom-status-item__input--invalid {
 	border-color: var(--text-error) !important;
 	background: var(--background-modifier-error) !important;
 }
 
-.custom-status-description-input {
+.custom-status-item__input--description {
 	color: var(--text-muted);
 }
 
-.custom-status-color-input {
+.custom-status-item__input--color {
 	width: 40px !important;
 	height: 32px !important;
 	border-radius: var(--radius-s);
@@ -134,12 +134,11 @@
 	border: 2px solid var(--background-modifier-border) !important;
 }
 
-.custom-status-color-input:hover {
+.custom-status-item__input--color:hover {
 	border-color: var(--interactive-hover) !important;
 }
 
-/* Remove button */
-.custom-status-remove-btn {
+.custom-status-item__remove-btn {
 	width: 32px;
 	height: 32px;
 	border-radius: var(--radius-s);
@@ -152,13 +151,12 @@
 	transition: all var(--anim-duration-fast) ease;
 }
 
-.custom-status-remove-btn:hover {
+.custom-status-item__remove-btn:hover {
 	background: var(--text-error);
 	transform: scale(1.05);
 }
 
-/* Preview section */
-.custom-status-preview {
+.custom-status-item__preview {
 	display: flex;
 	align-items: center;
 	gap: var(--size-2-2);
@@ -169,27 +167,26 @@
 	font-size: var(--font-ui-small);
 }
 
-.custom-status-preview-icon {
+.custom-status-item__preview-icon {
 	font-size: 1.1em;
 	min-width: 20px;
 	text-align: center;
 }
 
-.custom-status-preview-text {
+.custom-status-item__preview-text {
 	font-weight: var(--font-medium);
 }
 
-.custom-status-preview-desc {
+.custom-status-item__preview-desc {
 	color: var(--text-muted);
 	font-style: italic;
 }
 
-.custom-status-preview-desc::before {
+.custom-status-item__preview-desc::before {
 	content: "— ";
 }
 
-/* Error message */
-.custom-status-error {
+.custom-status-item__error {
 	color: var(--text-error);
 	font-size: var(--font-ui-smaller);
 	margin-top: var(--size-2-1);
@@ -199,8 +196,12 @@
 	border-left: 3px solid var(--text-error);
 }
 
-/* Empty state */
-.custom-status-empty {
+/* Custom Status List - BEM */
+.custom-status-list {
+	/* Container for multiple custom status items */
+}
+
+.custom-status-list__empty {
 	text-align: center;
 	padding: var(--size-4-4) var(--size-4-2);
 	color: var(--text-muted);
@@ -210,7 +211,7 @@
 	background: var(--background-primary-alt);
 }
 
-.custom-status-empty p {
+.custom-status-list__empty p {
 	margin: 0;
 }
 
