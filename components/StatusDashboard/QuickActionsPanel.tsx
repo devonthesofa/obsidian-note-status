@@ -1,5 +1,3 @@
-import { NoteStatus } from "@/types/noteStatus";
-
 export type DashboardAction =
 	| "refresh"
 	| "open-grouped-view"
@@ -17,8 +15,7 @@ export type DashboardAction =
 interface QuickActionsPanelProps {
 	hasCurrentFile: boolean;
 	useMultipleStatuses: boolean;
-	quickStatusCommands: Array<{ name: string; command: string }>;
-	availableStatuses: NoteStatus[];
+	quickStatusCommands: string[];
 	onAction: (action: DashboardAction, value?: string) => void;
 }
 
@@ -26,7 +23,6 @@ export const QuickActionsPanel = ({
 	hasCurrentFile,
 	useMultipleStatuses,
 	quickStatusCommands,
-	availableStatuses,
 	onAction,
 }: QuickActionsPanelProps) => {
 	return (
@@ -60,17 +56,17 @@ export const QuickActionsPanel = ({
 						<div className="quick-actions-group-title">
 							⚡ Quick Status
 						</div>
-						{quickStatusCommands.map((status) => (
+						{quickStatusCommands.map((statusName) => (
 							<button
-								key={status.name}
+								key={statusName}
 								className="quick-action-btn"
 								onClick={() =>
-									onAction("set-quick-status", status.name)
+									onAction("set-quick-status", statusName)
 								}
 								disabled={!hasCurrentFile}
-								title={`Set status to ${status.name}`}
+								title={`Set status to ${statusName}`}
 							>
-								⚡ {status.name}
+								⚡ {statusName}
 							</button>
 						))}
 					</div>

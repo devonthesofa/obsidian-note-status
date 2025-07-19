@@ -63,13 +63,7 @@ export const StatusDashboard = ({
 				<QuickActionsPanel
 					hasCurrentFile={!!currentNote.file}
 					useMultipleStatuses={settings.useMultipleStatuses}
-					quickStatusCommands={settings.quickStatusCommands.map(
-						(name) => ({
-							name,
-							command: `note-status:set-status-${name}`,
-						}),
-					)}
-					availableStatuses={availableStatuses}
+					quickStatusCommands={settings.quickStatusCommands}
 					onAction={onAction}
 				/>
 			</div>
