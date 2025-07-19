@@ -1,4 +1,4 @@
-import { Plugin, Notice, Editor, MarkdownView, TFile, App } from "obsidian";
+import { Plugin, Notice, TFile, App } from "obsidian";
 import { NoteStatusService, BaseNoteStatusService } from "./noteStatusService";
 import settingsService from "./settingsService";
 import eventBus from "./eventBus";
@@ -39,42 +39,6 @@ export class CommandsService {
 			},
 		});
 		this.registeredCommands.add("change-status");
-
-		// Insert status metadata
-		this.plugin.addCommand({
-			id: "insert-status-metadata",
-			name: "Insert status metadata",
-			editorCheckCallback: (
-				checking: boolean,
-				editor: Editor,
-				view: MarkdownView,
-			) => {
-				if (!view.file) return false;
-
-				const cache = this.plugin.app.metadataCache.getFileCache(
-					view.file,
-				);
-				const frontmatter = cache?.frontmatter;
-
-				// Check if any frontmatter property starts with tagPrefix
-				let hasFronttmatter = false;
-				if (frontmatter) {
-					hasFronttmatter = Object.keys(frontmatter).some((key) =>
-						key.startsWith(settingsService.settings.tagPrefix),
-					);
-				}
-
-				if (!checking && !hasFronttmatter) {
-					BaseNoteStatusService.insertStatusMetadataInEditor(
-						view.file,
-					).then(() => {
-						new Notice("Status metadata inserted");
-					});
-				}
-				return !hasFronttmatter;
-			},
-		});
-		this.registeredCommands.add("insert-status-metadata");
 
 		// Cycle through statuses
 		this.plugin.addCommand({

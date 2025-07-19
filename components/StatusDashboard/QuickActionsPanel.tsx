@@ -3,7 +3,6 @@ export type DashboardAction =
 	| "open-grouped-view"
 	| "find-unassigned"
 	| "change-status"
-	| "insert-metadata"
 	| "cycle-status"
 	| "clear-status"
 	| "copy-status"
@@ -87,14 +86,6 @@ export const QuickActionsPanel = ({
 						title="Change status of current note"
 					>
 						📝 Change Status
-					</button>
-					<button
-						className="quick-action-btn"
-						onClick={() => onAction("insert-metadata")}
-						disabled={!hasCurrentFile}
-						title="Insert status metadata in editor"
-					>
-						📝 Insert Metadata
 					</button>
 					<button
 						className="quick-action-btn"

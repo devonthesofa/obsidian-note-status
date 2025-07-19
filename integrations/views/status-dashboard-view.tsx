@@ -169,11 +169,6 @@ export class StatusDashboardView extends ItemView {
 					"note-status:change-status",
 				);
 				break;
-			case "insert-metadata":
-				appWithCommands.commands.executeCommandById(
-					"note-status:insert-status-metadata",
-				);
-				break;
 			case "cycle-status":
 				appWithCommands.commands.executeCommandById(
 					"note-status:cycle-status",

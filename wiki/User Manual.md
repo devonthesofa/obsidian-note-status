@@ -177,7 +177,6 @@ All commands available via Command Palette:
 - `Open status pane` - Show status sidebar
 - `Change status of current note` - Open dropdown
 - `Add status to current note` - Add mode dropdown
-- `Insert status metadata` - Add frontmatter
 - `Cycle to next status` - Rotate through statuses
 - `Clear status` - Set to unknown
 

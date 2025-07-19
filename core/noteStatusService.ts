@@ -38,20 +38,20 @@ export abstract class BaseNoteStatusService {
 		return availableStatuses;
 	}
 
-	static async insertStatusMetadataInEditor(file: TFile): Promise<void> {
-		const tagPrefix = settingsService.settings.tagPrefix;
-
-		await BaseNoteStatusService.app.fileManager.processFrontMatter(
-			file,
-			(frontmatter) => {
-				const noteStatusFrontmatter =
-					(frontmatter?.[tagPrefix] as string[]) || [];
-				if (!noteStatusFrontmatter.length) {
-					frontmatter[tagPrefix] = [];
-				}
-			},
-		);
-	}
+	// static async insertStatusMetadataInEditor(file: TFile): Promise<void> {
+	// 	const tagPrefix = settingsService.settings.tagPrefix;
+	//
+	// 	await BaseNoteStatusService.app.fileManager.processFrontMatter(
+	// 		file,
+	// 		(frontmatter) => {
+	// 			const noteStatusFrontmatter =
+	// 				(frontmatter?.[tagPrefix] as string[]) || [];
+	// 			if (!noteStatusFrontmatter.length) {
+	// 				frontmatter[tagPrefix] = [];
+	// 			}
+	// 		},
+	// 	);
+	// }
 
 	protected statusNameToObject(statusName: NoteStatusType["name"]) {
 		const availableStatuses =
@@ -204,6 +204,14 @@ export class NoteStatusService extends BaseNoteStatusService {
 					frontmatter[frontmatterTagName] = [statusIdentifier];
 					added = true;
 				} else {
+					// Ensure frontmatter property exists as an array
+					if (
+						!frontmatter[frontmatterTagName] ||
+						!Array.isArray(frontmatter[frontmatterTagName])
+					) {
+						frontmatter[frontmatterTagName] = [];
+					}
+
 					const i = noteStatusFrontmatter.findIndex(
 						(statusName: string) => statusName === statusIdentifier,
 					);

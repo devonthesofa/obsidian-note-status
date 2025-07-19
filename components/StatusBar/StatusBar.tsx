@@ -23,7 +23,15 @@ export const StatusBar: FC<Props> = ({
 
 	if (!hasStatuses) {
 		if (hideIfNotStatuses) return null;
-		return <span className="status-bar-item">❓</span>;
+		return (
+			<span
+				className="status-bar-item mod-clickable"
+				onClick={() => onStatusClick({ name: "", icon: "" })}
+				style={{ cursor: "pointer" }}
+			>
+				No status
+			</span>
+		);
 	}
 
 	return (
