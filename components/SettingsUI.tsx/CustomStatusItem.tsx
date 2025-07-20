@@ -13,6 +13,10 @@ export type Props = {
 		value: string,
 	) => void;
 	onCustomStatusRemove: (index: number) => void;
+	onMoveUp?: (index: number) => void;
+	onMoveDown?: (index: number) => void;
+	canMoveUp?: boolean;
+	canMoveDown?: boolean;
 };
 
 export const CustomStatusItem: React.FC<Props> = ({
@@ -20,6 +24,10 @@ export const CustomStatusItem: React.FC<Props> = ({
 	index,
 	onCustomStatusChange,
 	onCustomStatusRemove,
+	onMoveUp,
+	onMoveDown,
+	canMoveUp = false,
+	canMoveDown = false,
 }) => {
 	const isValid = status.name.trim().length > 0;
 	const displayIcon = status.icon.trim() || "📝";
@@ -91,6 +99,32 @@ export const CustomStatusItem: React.FC<Props> = ({
 						className="custom-status-item__input custom-status-item__input--color"
 					/>
 				</div>
+
+				{/* Reorder buttons */}
+				{(onMoveUp || onMoveDown) && (
+					<div className="custom-status-item__field custom-status-item__field--reorder">
+						<div className="custom-status-item__reorder-buttons">
+							<button
+								onClick={() => onMoveUp && onMoveUp(index)}
+								aria-label="Move status up"
+								className="custom-status-item__reorder-btn"
+								title="Move status up"
+								disabled={!canMoveUp}
+							>
+								↑
+							</button>
+							<button
+								onClick={() => onMoveDown && onMoveDown(index)}
+								aria-label="Move status down"
+								className="custom-status-item__reorder-btn"
+								title="Move status down"
+								disabled={!canMoveDown}
+							>
+								↓
+							</button>
+						</div>
+					</div>
+				)}
 
 				{/* Remove button */}
 				<div className="custom-status-item__field custom-status-item__field--actions">

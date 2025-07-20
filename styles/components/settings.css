@@ -87,6 +87,11 @@
 	flex: 0 0 auto;
 }
 
+.custom-status-item__field--reorder {
+	flex: 0 0 auto;
+	padding-top: var(--size-4-1);
+}
+
 .custom-status-item__field--actions {
 	flex: 0 0 auto;
 	padding-top: var(--size-4-1);
@@ -154,6 +159,39 @@
 .custom-status-item__remove-btn:hover {
 	background: var(--text-error);
 	transform: scale(1.05);
+}
+
+.custom-status-item__reorder-buttons {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.custom-status-item__reorder-btn {
+	width: 24px;
+	height: 24px;
+	border-radius: var(--radius-s);
+	background: var(--background-modifier-border);
+	color: var(--text-normal);
+	border: none;
+	cursor: pointer;
+	font-size: 12px;
+	font-weight: bold;
+	transition: all var(--anim-duration-fast) ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+
+.custom-status-item__reorder-btn:hover:not(:disabled) {
+	background: var(--interactive-hover);
+	transform: scale(1.05);
+}
+
+.custom-status-item__reorder-btn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
 }
 
 .custom-status-item__preview {
