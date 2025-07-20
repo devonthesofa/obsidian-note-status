@@ -50,7 +50,7 @@ export class StatusDashboardView extends ItemView {
 	}
 
 	getDisplayText() {
-		return "Status Dashboard";
+		return "Dashboard";
 	}
 
 	getIcon() {

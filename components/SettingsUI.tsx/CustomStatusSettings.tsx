@@ -63,8 +63,8 @@ export const CustomStatusSettings: React.FC<Props> = ({
 			</SettingItem>
 
 			<SettingItem
-				name="Your custom statuses"
-				description="Create custom statuses with icons (emoji/text), names, and colors. Each status needs a name to be valid."
+				name="Custom statuses"
+				description="Create custom statuses with icons, names, and colors. All statuses require a name."
 				vertical
 			>
 				<div className="custom-status-list">
@@ -90,10 +90,7 @@ export const CustomStatusSettings: React.FC<Props> = ({
 				</div>
 			</SettingItem>
 
-			<SettingItem
-				name="Add new status"
-				description="Create a new custom status"
-			>
+			<SettingItem name="Add status" description="Create a new status">
 				<button className="mod-cta" onClick={addNewCustomStatus}>
 					+ Add Status
 				</button>

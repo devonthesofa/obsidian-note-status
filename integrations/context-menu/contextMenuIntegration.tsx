@@ -40,7 +40,7 @@ export class ContextMenuIntegration {
 					leaf?: WorkspaceLeaf,
 				) => {
 					menu.addItem((item) => {
-						item.setTitle("Change note state")
+						item.setTitle("Change note status")
 							.setIcon("rotate-ccw") // Lucide icon
 							.onClick(async () => {
 								const tFiles = files.filter(
@@ -81,7 +81,7 @@ export class ContextMenuIntegration {
 				"editor-menu",
 				(menu, editor, view) => {
 					menu.addItem((item) => {
-						item.setTitle("Change note state")
+						item.setTitle("Change note status")
 							.setIcon("rotate-ccw") // Lucide icon
 							.onClick(async () => {
 								if (view.file) {
