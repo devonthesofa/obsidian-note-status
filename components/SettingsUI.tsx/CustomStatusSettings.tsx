@@ -45,6 +45,26 @@ export const CustomStatusSettings: React.FC<Props> = ({
 		}
 	};
 
+	const moveCustomStatusUp = (index: number) => {
+		if (index <= 0) return;
+		const currentStatuses = [...settings.customStatuses];
+		[currentStatuses[index - 1], currentStatuses[index]] = [
+			currentStatuses[index],
+			currentStatuses[index - 1],
+		];
+		onChange("customStatuses", currentStatuses);
+	};
+
+	const moveCustomStatusDown = (index: number) => {
+		if (index >= settings.customStatuses.length - 1) return;
+		const currentStatuses = [...settings.customStatuses];
+		[currentStatuses[index], currentStatuses[index + 1]] = [
+			currentStatuses[index + 1],
+			currentStatuses[index],
+		];
+		onChange("customStatuses", currentStatuses);
+	};
+
 	return (
 		<div>
 			<h3>Custom Statuses</h3>
@@ -84,6 +104,12 @@ export const CustomStatusSettings: React.FC<Props> = ({
 								settings={settings}
 								onCustomStatusChange={updateCustomStatus}
 								onCustomStatusRemove={removeCustomStatus}
+								onMoveUp={moveCustomStatusUp}
+								onMoveDown={moveCustomStatusDown}
+								canMoveUp={index > 0}
+								canMoveDown={
+									index < settings.customStatuses.length - 1
+								}
 							/>
 						))
 					)}
