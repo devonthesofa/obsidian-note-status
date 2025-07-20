@@ -1,0 +1,25 @@
+/* ==========================================================================
+   Group Label Component
+   ========================================================================== */
+
+.group-label-container {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-2);
+	font-size: var(--font-ui-small);
+	font-weight: var(--font-semibold);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--text-muted);
+	transition: color var(--anim-duration-fast) ease;
+}
+
+.group-label-container--highlighted {
+	color: var(--text-normal);
+}
+
+.group-label-container svg {
+	width: 16px;
+	height: 16px;
+	opacity: 0.8;
+}

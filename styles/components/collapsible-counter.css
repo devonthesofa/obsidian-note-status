@@ -1,0 +1,22 @@
+/* ==========================================================================
+   Collapsible Counter Component
+   ========================================================================== */
+
+.collapsible-counter-container {
+	padding: var(--size-2-1) var(--size-2-3);
+	border-radius: var(--radius-s);
+	background: var(--background-modifier-border);
+	border: 1px solid var(--background-modifier-border-hover);
+	color: var(--text-muted);
+	font-weight: var(--font-medium);
+	font-size: var(--font-ui-smaller);
+	cursor: pointer;
+	transition: all var(--anim-duration-fast) ease;
+	min-width: 28px;
+	text-align: center;
+}
+
+.collapsible-counter-container:hover {
+	background: var(--background-modifier-border-hover);
+	color: var(--text-normal);
+}

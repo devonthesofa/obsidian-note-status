@@ -1,0 +1,260 @@
+/* ==========================================================================
+   Grouped Status View
+   ========================================================================== */
+
+.grouped-status-view-container {
+	height: 100%;
+	overflow: hidden;
+}
+
+/* Header */
+.grouped-status-header {
+	padding: var(--size-4-2) var(--size-4-3);
+	background: var(--background-secondary);
+	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.grouped-status-title {
+	margin: 0 0 var(--size-4-2) 0;
+	font-size: var(--font-ui-large);
+	font-weight: var(--font-semibold);
+}
+
+/* Filters */
+.grouped-status-filters {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-2);
+}
+
+.grouped-status-note-input {
+	width: 100%;
+	padding: var(--size-2-2) var(--size-2-3);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	background: var(--background-primary);
+	color: var(--text-normal);
+	font-size: var(--font-ui-medium);
+}
+
+.grouped-status-note-input:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
+	box-shadow: 0 0 0 2px var(--background-modifier-accent);
+}
+
+/* Content */
+.grouped-status-content {
+	flex: 1;
+	overflow-y: auto;
+	padding: var(--size-4-2);
+}
+
+/* Tag Section */
+.grouped-status-tag-section {
+	margin-bottom: var(--size-4-3);
+}
+
+.grouped-status-tag-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: var(--size-4-2) var(--size-4-3);
+	background: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	cursor: pointer;
+	transition: all var(--anim-duration-fast) ease;
+	margin-bottom: var(--size-4-2);
+}
+
+.grouped-status-tag-header:hover {
+	background: var(--background-modifier-hover);
+}
+
+.grouped-status-tag-content {
+	padding-left: var(--size-4-2);
+}
+
+/* Status Group */
+.grouped-status-group {
+	margin-bottom: var(--size-4-2);
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	overflow: hidden;
+}
+
+.grouped-status-group-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: var(--size-4-2) var(--size-4-3);
+	cursor: pointer;
+	transition: background var(--anim-duration-fast) ease;
+}
+
+.grouped-status-group-header:hover {
+	background: var(--background-modifier-hover);
+}
+
+.grouped-status-group-info {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-2);
+}
+
+/* Files List */
+.grouped-status-files {
+	background: var(--background-secondary);
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.grouped-status-files-list {
+	max-height: 300px;
+	overflow-y: auto;
+}
+
+.grouped-status-file-item {
+	padding: var(--size-2-3) var(--size-4-3);
+	cursor: pointer;
+	transition: background var(--anim-duration-fast) ease;
+	border-bottom: 1px solid var(--background-modifier-border-hover);
+}
+
+.grouped-status-file-item:hover {
+	background: var(--background-modifier-hover);
+}
+
+.grouped-status-file-item:last-child {
+	border-bottom: none;
+}
+
+.grouped-status-file-name {
+	font-weight: var(--font-medium);
+	color: var(--text-normal);
+	margin-bottom: 2px;
+}
+
+.grouped-status-file-path {
+	font-size: var(--font-ui-small);
+	color: var(--text-muted);
+	opacity: 0.8;
+}
+
+/* Load More */
+.grouped-status-load-more {
+	display: flex;
+	justify-content: center;
+	padding: var(--size-4-2);
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.grouped-status-load-btn {
+	padding: var(--size-2-2) var(--size-4-2);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	background: var(--interactive-normal);
+	color: var(--text-normal);
+	cursor: pointer;
+	font-size: var(--font-ui-small);
+	font-weight: var(--font-medium);
+	transition: all var(--anim-duration-fast) ease;
+}
+
+.grouped-status-load-btn:hover {
+	background: var(--interactive-hover);
+	transform: translateY(-1px);
+}
+
+/* States */
+.grouped-status-loading,
+.grouped-status-empty {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--size-4-6);
+	color: var(--text-muted);
+	font-size: var(--font-ui-medium);
+}
+
+/* Scrollbar */
+.grouped-status-content::-webkit-scrollbar,
+.grouped-status-files-list::-webkit-scrollbar {
+	width: var(--scrollbar-width);
+}
+
+.grouped-status-content::-webkit-scrollbar-thumb,
+.grouped-status-files-list::-webkit-scrollbar-thumb {
+	background: var(--scrollbar-thumb-bg);
+	border-radius: var(--radius-s);
+}
+
+.grouped-status-content::-webkit-scrollbar-thumb:hover,
+.grouped-status-files-list::-webkit-scrollbar-thumb:hover {
+	background: var(--scrollbar-active-bg);
+}
+
+/* Template Filter (BEM) */
+.grouped-status-filters__template {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-2-1);
+}
+
+.grouped-status-filters__template-select {
+	width: 100%;
+	padding: var(--size-2-2) var(--size-2-3);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	background: var(--background-primary);
+	color: var(--text-normal);
+	font-size: var(--font-ui-small);
+	cursor: pointer;
+}
+
+.grouped-status-filters__template-select:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
+	box-shadow: 0 0 0 2px var(--background-modifier-accent);
+}
+
+.grouped-status-filters__note {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-2-1);
+}
+
+.grouped-status-filters__note-input {
+	width: 100%;
+	padding: var(--size-2-2) var(--size-2-3);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	background: var(--background-primary);
+	color: var(--text-normal);
+	font-size: var(--font-ui-small);
+}
+
+.grouped-status-filters__note-input:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
+	box-shadow: 0 0 0 2px var(--background-modifier-accent);
+}
+
+/* Template Badge (BEM) */
+.grouped-status-group__status {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-2);
+}
+
+.grouped-status-group__template-badge {
+	background: var(--background-modifier-border);
+	color: var(--text-muted);
+	padding: var(--size-2-1) var(--size-2-2);
+	border-radius: var(--radius-s);
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-medium);
+	text-transform: capitalize;
+	white-space: nowrap;
+}

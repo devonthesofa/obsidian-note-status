@@ -1,6 +1,18 @@
 {
 	"compilerOptions": {
 		"baseUrl": ".",
+		"paths": {
+			"@/components/*": ["./components/*"],
+			"@/constants/*": ["./constants/*"],
+			"@/contexts/*": ["./contexts/*"],
+			"@/core/*": ["./core/*"],
+			"@/hooks/*": ["./hooks/*"],
+			"@/integrations/*": ["./integrations/*"],
+			"@/styles/*": ["./styles/*"],
+			"@/types/*": ["./types/*"],
+			"@/utils/*": ["./utils/*"],
+			"@/views/*": ["./views/*"]
+		},
 		"inlineSourceMap": true,
 		"inlineSources": true,
 		"module": "ESNext",
@@ -11,7 +23,10 @@
 		"importHelpers": true,
 		"isolatedModules": true,
 		"strictNullChecks": true,
-		"lib": ["DOM", "ES5", "ES6", "ES7"]
+		"lib": ["DOM", "ES5", "ES6", "ES7"],
+		"jsx": "react-jsx",
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true
 	},
-	"include": ["**/*.ts"]
+	"include": ["**/*.ts", "**/*.tsx"]
 }

@@ -26,7 +26,7 @@ const context = await esbuild.context({
 	banner: {
 		js: banner,
 	},
-	entryPoints: ["main.ts"],
+	entryPoints: ["main.tsx"],
 	bundle: true,
 	external: [
 		"obsidian",
@@ -51,6 +51,9 @@ const context = await esbuild.context({
 	treeShaking: true,
 	outfile: "main.js",
 	minify: prod,
+	jsx: "transform",
+	jsxFactory: "React.createElement",
+	jsxFragment: "React.Fragment",
 });
 
 // CSS context for watch mode
