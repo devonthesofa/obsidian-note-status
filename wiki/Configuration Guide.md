@@ -84,6 +84,11 @@ Controls which predefined status sets are available.
 ☐ Auto-hide status bar
    Hides when status is "unknown"
    Useful for clean interface when no status assigned
+
+Custom Unknown Status:
+   ✅ Show custom icon for unknown status
+   📝 Custom unknown icon: [❓]
+   Customize the icon displayed for notes without status
 ```
 
 #### File Explorer Integration
@@ -95,6 +100,11 @@ Controls which predefined status sets are available.
 ☐ Hide unknown status in file explorer
    Improves visual clarity by hiding ❓ icons
    Recommended for large vaults
+
+Icon Position: [Before name | After name]
+   Configure where status icons appear in the file tree
+   Before name: Shows status before filename
+   After name: Shows status after filename (default)
 ```
 
 #### Status Pane Options
@@ -308,18 +318,36 @@ Items per page: 50 (reduce from default 100)
 ☐ Auto-hide status bar (reduce DOM updates)
 ```
 
+### Template-Based Status Scoping
+
+#### Overview
+
+```
+✅ Enable template-based filtering
+   Scope statuses to specific note templates
+   Organize status groups by note type
+```
+
+#### Template Configuration
+
+1. **Define note templates** in your vault
+2. **Associate statuses with templates** in settings
+3. **Filter status pane** by template type
+
+**Example workflow**:
+
+```
+Daily Notes Template → [active, completed, onHold]
+Project Template → [planning, inProgress, testing, live]
+Meeting Template → [scheduled, completed, followUp]
+```
+
+#### Status Pane Filtering
+
+- **Template dropdown** filters notes by template type
+- **Combined filtering** works with status and search filters
+- **Grouped view** organizes by template and status
+
 ### Import/Export Configuration
 
-WIP
-
-#### Export Settings
-
-WIP
-
-#### Import Process
-
-WIP
-
-#### Migration Between Vaults
-
-WIP
+_This feature is planned for future releases._
