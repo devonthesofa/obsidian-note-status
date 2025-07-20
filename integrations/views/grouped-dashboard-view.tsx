@@ -69,12 +69,24 @@ export class GroupedDashboardView extends ItemView {
 		const statusMetadataKeys = [settingsService.settings.tagPrefix];
 		const availableStatuses =
 			BaseNoteStatusService.getAllAvailableStatuses();
-		const statusMap = new Map(availableStatuses.map((s) => [s.name, s]));
+		// Create maps for both scoped and legacy status lookup
+		const statusMap = new Map(
+			availableStatuses.map((s) => {
+				const key = s.templateId ? `${s.templateId}:${s.name}` : s.name;
+				return [key, s];
+			}),
+		);
+		const legacyStatusMap = new Map(
+			availableStatuses.map((s) => [s.name, s]),
+		);
 
 		statusMetadataKeys.forEach((key) => {
 			result[key] = {};
 			availableStatuses.forEach((status) => {
-				result[key][status.name] = [];
+				const statusKey = status.templateId
+					? `${status.templateId}:${status.name}`
+					: status.name;
+				result[key][statusKey] = [];
 			});
 		});
 
@@ -97,11 +109,20 @@ export class GroupedDashboardView extends ItemView {
 					const statusNames = Array.isArray(value) ? value : [value];
 					statusNames.forEach((statusName) => {
 						const statusStr = statusName.toString();
-						if (statusMap.has(statusStr)) {
-							if (!result[key][statusStr]) {
-								result[key][statusStr] = [];
+						// Try to find status by exact match first, then by legacy name
+						let resolvedStatus = statusMap.get(statusStr);
+						if (!resolvedStatus) {
+							resolvedStatus = legacyStatusMap.get(statusStr);
+						}
+
+						if (resolvedStatus) {
+							const statusKey = resolvedStatus.templateId
+								? `${resolvedStatus.templateId}:${resolvedStatus.name}`
+								: resolvedStatus.name;
+							if (!result[key][statusKey]) {
+								result[key][statusKey] = [];
 							}
-							result[key][statusStr].push(file);
+							result[key][statusKey].push(file);
 						}
 					});
 				}

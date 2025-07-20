@@ -186,9 +186,18 @@ export class NoteStatusService extends BaseNoteStatusService {
 				if (!noteStatusFrontmatter.length) return;
 
 				if (Array.isArray(noteStatusFrontmatter)) {
-					const i = noteStatusFrontmatter.findIndex(
+					// First try to find exact match (scoped or legacy)
+					let i = noteStatusFrontmatter.findIndex(
 						(statusName: string) => statusName === targetIdentifier,
 					);
+
+					// If not found and we're looking for a scoped status, try legacy format
+					if (i === -1 && status.templateId) {
+						i = noteStatusFrontmatter.findIndex(
+							(statusName: string) => statusName === status.name,
+						);
+					}
+
 					if (i !== -1) {
 						noteStatusFrontmatter.splice(i, 1);
 						removed = true;
@@ -275,15 +284,37 @@ export class NoteStatusService extends BaseNoteStatusService {
 						frontmatter[frontmatterTagName] = [];
 					}
 
-					const i = noteStatusFrontmatter.findIndex(
+					// Check if we already have this status (exact match)
+					const exactMatch = noteStatusFrontmatter.findIndex(
 						(statusName: string) =>
 							statusName === formattedIdentifier,
 					);
-					if (i === -1) {
-						frontmatter[frontmatterTagName].push(
-							formattedIdentifier,
-						);
-						added = true;
+
+					if (exactMatch === -1) {
+						// Check if we have a legacy version of this scoped status
+						let legacyIndex = -1;
+						if (
+							typeof statusIdentifier !== "string" &&
+							statusIdentifier.templateId
+						) {
+							legacyIndex = noteStatusFrontmatter.findIndex(
+								(statusName: string) =>
+									statusName === statusIdentifier.name,
+							);
+						}
+
+						if (legacyIndex !== -1) {
+							// Replace legacy with scoped version
+							noteStatusFrontmatter[legacyIndex] =
+								formattedIdentifier;
+							added = true;
+						} else {
+							// Add new status
+							frontmatter[frontmatterTagName].push(
+								formattedIdentifier,
+							);
+							added = true;
+						}
 					}
 				}
 			},
@@ -373,15 +404,29 @@ export class MultipleNoteStatusService extends BaseNoteStatusService {
 					if (!noteStatusFrontmatter) return;
 
 					if (Array.isArray(noteStatusFrontmatter)) {
-						const index = noteStatusFrontmatter.findIndex(
+						// First try to find exact match (scoped or legacy)
+						let index = noteStatusFrontmatter.findIndex(
 							(statusName: string) =>
 								statusName === targetIdentifier,
 						);
+
+						// If not found and we're looking for a scoped status, try legacy format
+						if (index === -1 && status.templateId) {
+							index = noteStatusFrontmatter.findIndex(
+								(statusName: string) =>
+									statusName === status.name,
+							);
+						}
+
 						if (index !== -1) {
 							noteStatusFrontmatter.splice(index, 1);
 							removed = true;
 						}
-					} else if (noteStatusFrontmatter === targetIdentifier) {
+					} else if (
+						noteStatusFrontmatter === targetIdentifier ||
+						(status.templateId &&
+							noteStatusFrontmatter === status.name)
+					) {
 						delete frontmatter[frontmatterTagName];
 						removed = true;
 					}
@@ -479,9 +524,17 @@ export class MultipleNoteStatusService extends BaseNoteStatusService {
 			if (!value) return false;
 
 			if (Array.isArray(value)) {
-				return value.includes(targetIdentifier);
+				// Check for exact match first, then legacy format if scoped
+				return (
+					value.includes(targetIdentifier) ||
+					(status.templateId && value.includes(status.name))
+				);
 			}
-			return value === targetIdentifier;
+			// Check for exact match first, then legacy format if scoped
+			return (
+				value === targetIdentifier ||
+				(status.templateId && value === status.name)
+			);
 		});
 	}
 }

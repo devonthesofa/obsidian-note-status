@@ -67,8 +67,12 @@ export class StatusDashboardView extends ItemView {
 		const statusDistribution: Record<string, number> = {};
 		const tagDistribution: Record<string, number> = {};
 
+		// Initialize distribution using full scoped identifiers
 		availableStatuses.forEach((status) => {
-			statusDistribution[status.name] = 0;
+			const scopedIdentifier = status.templateId
+				? `${status.templateId}:${status.name}`
+				: status.name;
+			statusDistribution[scopedIdentifier] = 0;
 		});
 
 		statusMetadataKeys.forEach((tag) => {
@@ -92,9 +96,31 @@ export class StatusDashboardView extends ItemView {
 					const statusNames = Array.isArray(value) ? value : [value];
 					statusNames.forEach((statusName) => {
 						const statusStr = statusName.toString();
-						if (statusDistribution.hasOwnProperty(statusStr)) {
-							statusDistribution[statusStr]++;
+
+						// Determine the scoped identifier to use
+						let scopedIdentifier: string;
+
+						if (statusStr.includes(":")) {
+							// Already scoped
+							scopedIdentifier = statusStr;
+						} else {
+							// Legacy status - find first template that has this status
+							const firstTemplateWithStatus =
+								availableStatuses.find(
+									(s) => s.name === statusStr && s.templateId,
+								);
+							scopedIdentifier = firstTemplateWithStatus
+								? `${firstTemplateWithStatus.templateId}:${statusStr}`
+								: statusStr; // Fallback to unscoped if no template found
 						}
+
+						// Initialize status if not already present
+						if (
+							!statusDistribution.hasOwnProperty(scopedIdentifier)
+						) {
+							statusDistribution[scopedIdentifier] = 0;
+						}
+						statusDistribution[scopedIdentifier]++;
 					});
 				}
 			});
