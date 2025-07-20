@@ -15,6 +15,18 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 			onChange(key, e.target.checked);
 		};
 
+	const handleInputChange =
+		(key: keyof PluginSettings) =>
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			onChange(key, e.target.value);
+		};
+
+	const handleTextInputChange =
+		(key: keyof PluginSettings) =>
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			onChange(key, e.target.value);
+		};
+
 	return (
 		<div className="ui-settings">
 			<h3>User interface</h3>
@@ -88,6 +100,67 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 					type="checkbox"
 					checked={settings.excludeUnknownStatus || false}
 					onChange={handleChange("excludeUnknownStatus")}
+				/>
+			</SettingItem>
+
+			<h4>Unknown Status Customization</h4>
+
+			<SettingItem
+				name="Unknown status icon"
+				description="Custom icon to display for files with unknown status"
+			>
+				<input
+					type="text"
+					value={settings.unknownStatusIcon || "❓"}
+					onChange={handleInputChange("unknownStatusIcon")}
+					style={{ width: "60px", textAlign: "center" }}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Unknown status color"
+				description="Custom hex color for unknown status (e.g., #8b949e)"
+			>
+				<input
+					type="color"
+					value={settings.unknownStatusColor || "#8b949e"}
+					onChange={handleInputChange("unknownStatusColor")}
+					style={{ width: "50px", height: "30px" }}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Status bar 'no status' text"
+				description="Custom text to display in status bar when there is no status"
+			>
+				<input
+					type="text"
+					value={settings.statusBarNoStatusText}
+					onChange={handleTextInputChange("statusBarNoStatusText")}
+					style={{ width: "150px" }}
+					placeholder="No status"
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Show icon in status bar for 'no status'"
+				description="Display the unknown status icon alongside the text in the status bar"
+			>
+				<input
+					type="checkbox"
+					checked={settings.statusBarShowNoStatusIcon || false}
+					onChange={handleChange("statusBarShowNoStatusIcon")}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Show text in status bar for 'no status'"
+				description="Display the custom text in the status bar when there is no status"
+			>
+				<input
+					type="checkbox"
+					checked={settings.statusBarShowNoStatusText ?? true}
+					onChange={handleChange("statusBarShowNoStatusText")}
 				/>
 			</SettingItem>
 		</div>

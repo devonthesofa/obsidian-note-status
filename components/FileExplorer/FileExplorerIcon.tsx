@@ -6,10 +6,20 @@ type Props = {
 	onMouseEnter: (statuses: GroupedStatuses) => void;
 	onMouseLeave: (statuses: GroupedStatuses) => void;
 	hideUnknownStatus?: boolean;
+	unknownStatusConfig?: {
+		icon: string;
+		color: string;
+	};
 };
 
 export const FileExplorerIcon: FC<Props> = memo(
-	({ statuses, onMouseLeave, onMouseEnter, hideUnknownStatus }) => {
+	({
+		statuses,
+		onMouseLeave,
+		onMouseEnter,
+		hideUnknownStatus,
+		unknownStatusConfig,
+	}) => {
 		const statusEntries = Object.entries(statuses);
 		const totalStatuses = statusEntries.reduce(
 			(acc, [, list]) => acc + list.length,
@@ -20,7 +30,10 @@ export const FileExplorerIcon: FC<Props> = memo(
 			// If hideUnknownStatus is enabled, don't show anything for files without status
 			if (hideUnknownStatus) return null;
 
-			// Show "no status" icon
+			// Use config passed from integration, with fallbacks
+			const icon = unknownStatusConfig?.icon || "❓";
+			const color = unknownStatusConfig?.color || "#8b949e";
+
 			return (
 				<div className="status-wrapper">
 					<div
@@ -29,11 +42,11 @@ export const FileExplorerIcon: FC<Props> = memo(
 						onMouseLeave={() => onMouseLeave({})}
 						style={
 							{
-								"--primary-color": "var(--text-muted)",
+								"--primary-color": color,
 							} as React.CSSProperties
 						}
 					>
-						<span className="status-icon">❓</span>
+						<span className="status-icon">{icon}</span>
 					</div>
 				</div>
 			);
