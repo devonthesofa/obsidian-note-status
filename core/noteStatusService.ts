@@ -3,10 +3,12 @@ import {
 	GroupedStatuses,
 	NoteStatus,
 	NoteStatus as NoteStatusType,
+	StatusIdentifier,
+	ScopedStatusName,
 } from "@/types/noteStatus";
-import { PREDEFINED_TEMPLATES } from "@/constants/defaultSettings";
 import settingsService from "@/core/settingsService";
 import eventBus from "./eventBus";
+import { PREDEFINED_TEMPLATES } from "@/constants/predefinedTemplates";
 
 export abstract class BaseNoteStatusService {
 	static app: App;
@@ -18,6 +20,44 @@ export abstract class BaseNoteStatusService {
 
 	static initialize(app: App) {
 		BaseNoteStatusService.app = app;
+	}
+
+	static parseStatusIdentifier(
+		identifier: StatusIdentifier,
+	): ScopedStatusName {
+		if (typeof identifier === "string") {
+			if (identifier.includes(":")) {
+				const [templateId, name] = identifier.split(":", 2);
+				return { templateId, name };
+			}
+			return { name: identifier };
+		}
+		return identifier;
+	}
+
+	static formatStatusIdentifier(scopedName: ScopedStatusName): string {
+		if (scopedName.templateId) {
+			return `${scopedName.templateId}:${scopedName.name}`;
+		}
+		return scopedName.name;
+	}
+
+	static resolveStatusFromIdentifier(
+		identifier: StatusIdentifier,
+	): NoteStatus | undefined {
+		const parsed = BaseNoteStatusService.parseStatusIdentifier(identifier);
+		const availableStatuses =
+			BaseNoteStatusService.getAllAvailableStatuses();
+
+		if (parsed.templateId) {
+			return availableStatuses.find(
+				(s) =>
+					s.name === parsed.name &&
+					s.templateId === parsed.templateId,
+			);
+		}
+
+		return availableStatuses.find((s) => s.name === parsed.name);
 	}
 
 	private static allEnabledTemplatesStatuses(): NoteStatusType[] {
@@ -53,11 +93,13 @@ export abstract class BaseNoteStatusService {
 	// 	);
 	// }
 
-	protected statusNameToObject(statusName: NoteStatusType["name"]) {
-		const availableStatuses =
-			BaseNoteStatusService.getAllAvailableStatuses();
-		const s = availableStatuses.find((f) => f.name === statusName);
-		return s;
+	protected statusNameToObject(statusName: string | StatusIdentifier) {
+		if (typeof statusName === "string") {
+			return BaseNoteStatusService.resolveStatusFromIdentifier(
+				statusName,
+			);
+		}
+		return BaseNoteStatusService.resolveStatusFromIdentifier(statusName);
 	}
 
 	protected getStatusMetadataKeys(): string[] {
@@ -71,7 +113,7 @@ export abstract class BaseNoteStatusService {
 	): Promise<boolean>;
 	abstract addStatus(
 		frontmatterTagName: string,
-		statusIdentifier: NoteStatus["name"],
+		statusIdentifier: StatusIdentifier,
 	): Promise<boolean>;
 }
 
@@ -129,6 +171,13 @@ export class NoteStatusService extends BaseNoteStatusService {
 		status: NoteStatus,
 	): Promise<boolean> {
 		let removed = false;
+		const targetIdentifier = status.templateId
+			? BaseNoteStatusService.formatStatusIdentifier({
+					templateId: status.templateId,
+					name: status.name,
+				})
+			: status.name;
+
 		await BaseNoteStatusService.app.fileManager.processFrontMatter(
 			this.file,
 			(frontmatter) => {
@@ -137,9 +186,18 @@ export class NoteStatusService extends BaseNoteStatusService {
 				if (!noteStatusFrontmatter.length) return;
 
 				if (Array.isArray(noteStatusFrontmatter)) {
-					const i = noteStatusFrontmatter.findIndex(
-						(statusName: string) => statusName === status.name,
+					// First try to find exact match (scoped or legacy)
+					let i = noteStatusFrontmatter.findIndex(
+						(statusName: string) => statusName === targetIdentifier,
 					);
+
+					// If not found and we're looking for a scoped status, try legacy format
+					if (i === -1 && status.templateId) {
+						i = noteStatusFrontmatter.findIndex(
+							(statusName: string) => statusName === status.name,
+						);
+					}
+
 					if (i !== -1) {
 						noteStatusFrontmatter.splice(i, 1);
 						removed = true;
@@ -171,8 +229,13 @@ export class NoteStatusService extends BaseNoteStatusService {
 
 	async overrideStatuses(
 		frontmatterTagName: string,
-		statusIdentifiers: NoteStatus["name"][],
+		statusIdentifiers: StatusIdentifier[],
 	): Promise<boolean> {
+		const formattedIdentifiers = statusIdentifiers.map((id) =>
+			typeof id === "string"
+				? id
+				: BaseNoteStatusService.formatStatusIdentifier(id),
+		);
 		await BaseNoteStatusService.app.fileManager.processFrontMatter(
 			this.file,
 			(frontmatter) => {
@@ -181,9 +244,11 @@ export class NoteStatusService extends BaseNoteStatusService {
 					Array.isArray(frontmatter[frontmatterTagName])
 				) {
 					frontmatter[frontmatterTagName].splice(0);
-					frontmatter[frontmatterTagName].push(...statusIdentifiers);
+					frontmatter[frontmatterTagName].push(
+						...formattedIdentifiers,
+					);
 				}
-				frontmatter[frontmatterTagName] = [...statusIdentifiers];
+				frontmatter[frontmatterTagName] = [...formattedIdentifiers];
 			},
 		);
 		eventBus.publish("frontmatter-manually-changed", { file: this.file });
@@ -192,16 +257,23 @@ export class NoteStatusService extends BaseNoteStatusService {
 
 	async addStatus(
 		frontmatterTagName: string,
-		statusIdentifier: NoteStatus["name"],
+		statusIdentifier: StatusIdentifier,
 	): Promise<boolean> {
 		let added = false;
+		const formattedIdentifier =
+			typeof statusIdentifier === "string"
+				? statusIdentifier
+				: BaseNoteStatusService.formatStatusIdentifier(
+						statusIdentifier,
+					);
+
 		await BaseNoteStatusService.app.fileManager.processFrontMatter(
 			this.file,
 			(frontmatter) => {
 				const noteStatusFrontmatter =
 					(frontmatter?.[frontmatterTagName] as string[]) || [];
 				if (!settingsService.settings.useMultipleStatuses) {
-					frontmatter[frontmatterTagName] = [statusIdentifier];
+					frontmatter[frontmatterTagName] = [formattedIdentifier];
 					added = true;
 				} else {
 					// Ensure frontmatter property exists as an array
@@ -212,12 +284,37 @@ export class NoteStatusService extends BaseNoteStatusService {
 						frontmatter[frontmatterTagName] = [];
 					}
 
-					const i = noteStatusFrontmatter.findIndex(
-						(statusName: string) => statusName === statusIdentifier,
+					// Check if we already have this status (exact match)
+					const exactMatch = noteStatusFrontmatter.findIndex(
+						(statusName: string) =>
+							statusName === formattedIdentifier,
 					);
-					if (i === -1) {
-						frontmatter[frontmatterTagName].push(statusIdentifier);
-						added = true;
+
+					if (exactMatch === -1) {
+						// Check if we have a legacy version of this scoped status
+						let legacyIndex = -1;
+						if (
+							typeof statusIdentifier !== "string" &&
+							statusIdentifier.templateId
+						) {
+							legacyIndex = noteStatusFrontmatter.findIndex(
+								(statusName: string) =>
+									statusName === statusIdentifier.name,
+							);
+						}
+
+						if (legacyIndex !== -1) {
+							// Replace legacy with scoped version
+							noteStatusFrontmatter[legacyIndex] =
+								formattedIdentifier;
+							added = true;
+						} else {
+							// Add new status
+							frontmatter[frontmatterTagName].push(
+								formattedIdentifier,
+							);
+							added = true;
+						}
 					}
 				}
 			},
@@ -290,6 +387,12 @@ export class MultipleNoteStatusService extends BaseNoteStatusService {
 		status: NoteStatus,
 	): Promise<boolean> {
 		let removedFromAny = false;
+		const targetIdentifier = status.templateId
+			? BaseNoteStatusService.formatStatusIdentifier({
+					templateId: status.templateId,
+					name: status.name,
+				})
+			: status.name;
 
 		const promises = this.files.map(async (file) => {
 			let removed = false;
@@ -301,14 +404,29 @@ export class MultipleNoteStatusService extends BaseNoteStatusService {
 					if (!noteStatusFrontmatter) return;
 
 					if (Array.isArray(noteStatusFrontmatter)) {
-						const index = noteStatusFrontmatter.findIndex(
-							(statusName: string) => statusName === status.name,
+						// First try to find exact match (scoped or legacy)
+						let index = noteStatusFrontmatter.findIndex(
+							(statusName: string) =>
+								statusName === targetIdentifier,
 						);
+
+						// If not found and we're looking for a scoped status, try legacy format
+						if (index === -1 && status.templateId) {
+							index = noteStatusFrontmatter.findIndex(
+								(statusName: string) =>
+									statusName === status.name,
+							);
+						}
+
 						if (index !== -1) {
 							noteStatusFrontmatter.splice(index, 1);
 							removed = true;
 						}
-					} else if (noteStatusFrontmatter === status.name) {
+					} else if (
+						noteStatusFrontmatter === targetIdentifier ||
+						(status.templateId &&
+							noteStatusFrontmatter === status.name)
+					) {
 						delete frontmatter[frontmatterTagName];
 						removed = true;
 					}
@@ -331,9 +449,15 @@ export class MultipleNoteStatusService extends BaseNoteStatusService {
 
 	async addStatus(
 		frontmatterTagName: string,
-		statusIdentifier: NoteStatus["name"],
+		statusIdentifier: StatusIdentifier,
 	): Promise<boolean> {
 		let addedToAny = false;
+		const formattedIdentifier =
+			typeof statusIdentifier === "string"
+				? statusIdentifier
+				: BaseNoteStatusService.formatStatusIdentifier(
+						statusIdentifier,
+					);
 
 		const promises = this.files.map(async (file) => {
 			let added = false;
@@ -344,18 +468,20 @@ export class MultipleNoteStatusService extends BaseNoteStatusService {
 						frontmatter[frontmatterTagName];
 
 					if (!noteStatusFrontmatter) {
-						frontmatter[frontmatterTagName] = [statusIdentifier];
+						frontmatter[frontmatterTagName] = [formattedIdentifier];
 						added = true;
 					} else if (Array.isArray(noteStatusFrontmatter)) {
-						if (!noteStatusFrontmatter.includes(statusIdentifier)) {
-							noteStatusFrontmatter.push(statusIdentifier);
+						if (
+							!noteStatusFrontmatter.includes(formattedIdentifier)
+						) {
+							noteStatusFrontmatter.push(formattedIdentifier);
 							added = true;
 						}
 					} else {
-						if (noteStatusFrontmatter !== statusIdentifier) {
+						if (noteStatusFrontmatter !== formattedIdentifier) {
 							frontmatter[frontmatterTagName] = [
 								noteStatusFrontmatter,
-								statusIdentifier,
+								formattedIdentifier,
 							];
 							added = true;
 						}
@@ -381,6 +507,13 @@ export class MultipleNoteStatusService extends BaseNoteStatusService {
 		frontmatterTagName: string,
 		status: NoteStatus,
 	): TFile[] {
+		const targetIdentifier = status.templateId
+			? BaseNoteStatusService.formatStatusIdentifier({
+					templateId: status.templateId,
+					name: status.name,
+				})
+			: status.name;
+
 		return this.files.filter((file) => {
 			const cachedMetadata =
 				BaseNoteStatusService.app.metadataCache.getFileCache(file);
@@ -391,9 +524,17 @@ export class MultipleNoteStatusService extends BaseNoteStatusService {
 			if (!value) return false;
 
 			if (Array.isArray(value)) {
-				return value.includes(status.name);
+				// Check for exact match first, then legacy format if scoped
+				return (
+					value.includes(targetIdentifier) ||
+					(status.templateId && value.includes(status.name))
+				);
 			}
-			return value === status.name;
+			// Check for exact match first, then legacy format if scoped
+			return (
+				value === targetIdentifier ||
+				(status.templateId && value === status.name)
+			);
 		});
 	}
 }

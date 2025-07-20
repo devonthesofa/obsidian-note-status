@@ -27,7 +27,7 @@ export const StatusGroup: React.FC<StatusGroupProps> = ({
 		<div className="status-group-items">
 			{statuses.map((status) => (
 				<SettingItem
-					key={status.name}
+					key={`${status.templateId || "custom"}:${status.name}`}
 					name={`${status.icon} ${status.name}`}
 					description={status.description || ""}
 				>

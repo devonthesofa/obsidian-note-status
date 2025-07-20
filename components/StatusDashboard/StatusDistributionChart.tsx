@@ -31,10 +31,38 @@ export const StatusDistributionChart = ({
 			.sort((a, b) => b.count - a.count);
 	}, [vaultStats.statusDistribution]);
 
-	const statusMap = useMemo(
-		() => new Map(availableStatuses.map((s) => [s.name, s])),
-		[availableStatuses],
-	);
+	const statusMap = useMemo(() => {
+		const map = new Map();
+		availableStatuses.forEach((s) => {
+			const scopedIdentifier = s.templateId
+				? `${s.templateId}:${s.name}`
+				: s.name;
+			map.set(scopedIdentifier, s);
+		});
+
+		// Also handle the case where we need to map legacy statuses to their first template
+		Object.keys(vaultStats.statusDistribution).forEach(
+			(statusIdentifier) => {
+				if (!map.has(statusIdentifier)) {
+					// This might be a legacy status that got assigned to a template
+					if (statusIdentifier.includes(":")) {
+						const [templateId, statusName] =
+							statusIdentifier.split(":");
+						const templateStatus = availableStatuses.find(
+							(s) =>
+								s.templateId === templateId &&
+								s.name === statusName,
+						);
+						if (templateStatus) {
+							map.set(statusIdentifier, templateStatus);
+						}
+					}
+				}
+			},
+		);
+
+		return map;
+	}, [availableStatuses, vaultStats.statusDistribution]);
 
 	return (
 		<div className="status-dashboard-section">
@@ -58,11 +86,15 @@ export const StatusDistributionChart = ({
 									}
 								>
 									<div className="status-chart-info">
-										{status && (
+										{status ? (
 											<StatusDisplay
 												status={status}
 												variant="badge"
 											/>
+										) : (
+											<span className="status-unknown-badge">
+												{name}
+											</span>
 										)}
 										<span className="status-chart-count">
 											{count} notes ({percentage}%)

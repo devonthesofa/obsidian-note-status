@@ -1,5 +1,6 @@
 import React, { createContext, useContext, ReactNode } from "react";
 import { FileItem, GroupedByStatus, StatusItem } from "../GroupedStatusView";
+import { NoteStatus } from "@/types/noteStatus";
 import { useGroupedData } from "../hooks/useGroupedData";
 import { usePagination } from "../hooks/usePagination";
 import { useExpandedState } from "../hooks/useExpandedState";
@@ -29,6 +30,7 @@ type GroupedDataContextType = {
 	// Props
 	onFileClick: (file: FileItem) => void;
 	getAvailableStatuses: () => StatusItem[];
+	getAvailableStatusesWithTemplateInfo: () => NoteStatus[];
 };
 
 const GroupedDataContext = createContext<GroupedDataContextType | undefined>(
@@ -52,8 +54,10 @@ type GroupedDataProviderProps = {
 	onFileClick: (file: FileItem) => void;
 	subscribeToEvents: (onDataChange: () => void) => () => void;
 	getAvailableStatuses: () => StatusItem[];
+	getAvailableStatusesWithTemplateInfo: () => NoteStatus[];
 	searchFilter: string;
 	noteNameFilter: string;
+	templateFilter: string;
 };
 
 export const GroupedDataProvider = ({
@@ -63,8 +67,10 @@ export const GroupedDataProvider = ({
 	onFileClick,
 	subscribeToEvents,
 	getAvailableStatuses,
+	getAvailableStatusesWithTemplateInfo,
 	searchFilter,
 	noteNameFilter,
+	templateFilter,
 }: GroupedDataProviderProps) => {
 	const { groupedData, filteredData, isLoading, loadData } = useGroupedData({
 		getAllFiles,
@@ -72,6 +78,7 @@ export const GroupedDataProvider = ({
 		subscribeToEvents,
 		searchFilter,
 		noteNameFilter,
+		templateFilter,
 	});
 
 	const { getLoadedCount, loadMoreItems, handleScroll } = usePagination();
@@ -93,6 +100,7 @@ export const GroupedDataProvider = ({
 		toggleFiles,
 		onFileClick,
 		getAvailableStatuses,
+		getAvailableStatusesWithTemplateInfo,
 	};
 
 	return (

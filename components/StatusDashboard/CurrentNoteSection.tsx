@@ -51,7 +51,7 @@ export const CurrentNoteSection = ({
 											{statuses.length > 0 ? (
 												statuses.map((status) => (
 													<StatusDisplay
-														key={status.name}
+														key={`${status.templateId || "custom"}:${status.name}`}
 														status={status}
 														variant="badge"
 													/>

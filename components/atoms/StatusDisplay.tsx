@@ -16,6 +16,12 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 	({ status, variant, removable = false, onRemove, onClick }) => {
 		const [isRemoving, setIsRemoving] = useState(false);
 
+		const getDisplayName = () => {
+			return status.templateId
+				? `${status.name} (${status.templateId})`
+				: status.name;
+		};
+
 		const handleRemove = (e: React.MouseEvent) => {
 			e.stopPropagation();
 			if (onRemove) {
@@ -55,7 +61,9 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 					<span className="note-status-chip-icon">
 						{status.icon ? status.icon : "📝"}
 					</span>
-					<span className="note-status-chip-text">{status.name}</span>
+					<span className="note-status-chip-text">
+						{getDisplayName()}
+					</span>
 					{removable && (
 						<div
 							className="note-status-chip-remove"
@@ -104,7 +112,9 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 						<span className="status-badge-icon">
 							{status.icon ? status.icon : "📝"}
 						</span>
-						<span className="status-badge-text">{status.name}</span>
+						<span className="status-badge-text">
+							{getDisplayName()}
+						</span>
 					</div>
 				</div>
 			);
@@ -122,7 +132,7 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 						}
 					/>
 					<span>
-						{status.icon ? status.icon : "📝"} {status.name}
+						{status.icon ? status.icon : "📝"} {getDisplayName()}
 					</span>
 				</div>
 			);

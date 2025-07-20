@@ -36,6 +36,11 @@ export const StatusGroup = ({
 }: StatusGroupProps) => {
 	const groupKey = `${tag}-${statusName}`;
 
+	// Extract template ID from scoped identifier
+	const templateId = statusName.includes(":")
+		? statusName.split(":", 2)[0]
+		: null;
+
 	const handleToggle = useCallback(() => {
 		onToggle();
 	}, [onToggle]);
@@ -43,12 +48,19 @@ export const StatusGroup = ({
 	return (
 		<div className="grouped-status-group">
 			<div className="grouped-status-group-header" onClick={handleToggle}>
-				<StatusDisplay
-					status={
-						{ ...status, icon: status.icon || "" } as NoteStatus
-					}
-					variant="badge"
-				/>
+				<div className="grouped-status-group__status">
+					<StatusDisplay
+						status={
+							{ ...status, icon: status.icon || "" } as NoteStatus
+						}
+						variant="badge"
+					/>
+					{templateId && (
+						<span className="grouped-status-group__template-badge">
+							{templateId}
+						</span>
+					)}
+				</div>
 				<div className="grouped-status-group-info">
 					<CollapsibleCounter
 						count={files.length}

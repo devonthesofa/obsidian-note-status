@@ -22,11 +22,16 @@ export const useKeyboardNavigation = ({
 	const filteredStatuses = useMemo(
 		() =>
 			searchFilter
-				? availableStatuses.filter((status) =>
-						status.name
-							.toLowerCase()
-							.includes(searchFilter.toLowerCase()),
-					)
+				? availableStatuses.filter((status) => {
+						const searchTerm = searchFilter.toLowerCase();
+						return (
+							status.name.toLowerCase().includes(searchTerm) ||
+							(status.templateId &&
+								status.templateId
+									.toLowerCase()
+									.includes(searchTerm))
+						);
+					})
 				: availableStatuses,
 		[searchFilter, availableStatuses],
 	);
@@ -79,7 +84,9 @@ export const useKeyboardNavigation = ({
 						e.preventDefault();
 						const status = filteredStatuses[focusedIndex];
 						const isSelected = currentStatuses.some(
-							(s) => s.name === status.name,
+							(s) =>
+								s.name === status.name &&
+								s.templateId === status.templateId,
 						);
 						if (isSelected) {
 							onRemoveStatus(status);
