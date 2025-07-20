@@ -84,7 +84,9 @@ export const useKeyboardNavigation = ({
 						e.preventDefault();
 						const status = filteredStatuses[focusedIndex];
 						const isSelected = currentStatuses.some(
-							(s) => s.name === status.name,
+							(s) =>
+								s.name === status.name &&
+								s.templateId === status.templateId,
 						);
 						if (isSelected) {
 							onRemoveStatus(status);
