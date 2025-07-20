@@ -1,7 +1,8 @@
-import { Plugin, Notice, TFile, App } from "obsidian";
+import { Plugin, Notice, TFile, App, WorkspaceLeaf } from "obsidian";
 import { NoteStatusService, BaseNoteStatusService } from "./noteStatusService";
 import settingsService from "./settingsService";
 import eventBus from "./eventBus";
+import { VIEW_TYPE_EXAMPLE } from "../integrations/views/grouped-status-view";
 
 export class CommandsService {
 	private plugin: Plugin;
@@ -227,6 +228,50 @@ export class CommandsService {
 			},
 		});
 		this.registeredCommands.add("search-by-status");
+
+		// Open Status Pane command
+		this.plugin.addCommand({
+			id: "open-status-pane",
+			name: "Open Status Pane",
+			callback: async () => {
+				await this.openStatusPane();
+			},
+		});
+		this.registeredCommands.add("open-status-pane");
+	}
+
+	private async openStatusPane(): Promise<void> {
+		const { workspace } = this.app;
+
+		let leaf: WorkspaceLeaf | null = null;
+		const leaves = workspace.getLeavesOfType(VIEW_TYPE_EXAMPLE);
+
+		if (leaves.length > 0) {
+			// A leaf with our view already exists, use that
+			leaf = leaves[0];
+		} else {
+			// Our view could not be found in the workspace, create a new leaf
+			// in the right sidebar for it
+			leaf = workspace.getRightLeaf(false);
+			if (!leaf) {
+				console.error(
+					"getRightLeaf return null, unable to setup the view",
+				);
+				return;
+			} else {
+				await leaf.setViewState({
+					type: VIEW_TYPE_EXAMPLE,
+					active: true,
+				});
+			}
+		}
+
+		// "Reveal" the leaf in case it is in a collapsed sidebar
+		if (!leaf) {
+			console.error("leaf not found, unable to activate the view");
+		} else {
+			workspace.revealLeaf(leaf);
+		}
 	}
 
 	/**
