@@ -159,11 +159,6 @@ export class StatusDashboardView extends ItemView {
 		this.renderDashboard();
 	};
 
-	private updateVaultStats = () => {
-		this.vaultStats = this.calculateVaultStats();
-		this.renderDashboard();
-	};
-
 	private loadData = () => {
 		this.isLoading = true;
 		this.renderDashboard();
