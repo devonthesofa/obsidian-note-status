@@ -25,7 +25,7 @@ export class GroupedStatusView extends ItemView {
 	}
 
 	getDisplayText() {
-		return "Grouped Status View";
+		return "Grouped Status";
 	}
 
 	getIcon() {

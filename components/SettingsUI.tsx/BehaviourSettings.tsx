@@ -27,7 +27,7 @@ export const BehaviourSettings: React.FC<Props> = ({ settings, onChange }) => {
 
 			<SettingItem
 				name="Status tag prefix"
-				description="The YAML frontmatter tag name used for status (default: obsidian-note-status)"
+				description="YAML frontmatter tag name for status (default: obsidian-note-status)"
 			>
 				<input
 					type="text"

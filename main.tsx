@@ -47,11 +47,11 @@ export default class NoteStatusPlugin extends Plugin {
 			(leaf) => new StatusDashboardView(leaf),
 		);
 
-		this.addRibbonIcon("dice", "Activate grouped view", () => {
+		this.addRibbonIcon("dice", "Open grouped status view", () => {
 			this.activateView();
 		});
 
-		this.addRibbonIcon("bar-chart-2", "Status Dashboard", () => {
+		this.addRibbonIcon("bar-chart-2", "Open status dashboard", () => {
 			this.activateDashboard();
 		});
 	}

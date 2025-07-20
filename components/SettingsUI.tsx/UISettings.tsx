@@ -66,7 +66,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 
 			<SettingItem
 				name="Status icon in file explorer position"
-				description="Change the position of the icon"
+				description="Choose icon position in file explorer"
 			>
 				<Select
 					options={[
@@ -83,7 +83,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 
 			<SettingItem
 				name="Hide unknown status in file explorer"
-				description="Hide status icons for files with unknown status in the file explorer"
+				description="Hide status icons for files with unknown status"
 			>
 				<input
 					type="checkbox"
@@ -94,7 +94,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 
 			<SettingItem
 				name="Exclude unassigned notes from status pane"
-				description="Improves performance by excluding notes with no assigned status from the status pane. Recommended for large vaults."
+				description="Excludes unassigned notes from status pane for better performance. Recommended for large vaults."
 			>
 				<input
 					type="checkbox"
@@ -107,7 +107,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 
 			<SettingItem
 				name="Unknown status icon"
-				description="Custom icon to display for files with unknown status"
+				description="Icon displayed for files with unknown status"
 			>
 				<input
 					type="text"
@@ -119,7 +119,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 
 			<SettingItem
 				name="Unknown status color"
-				description="Custom hex color for unknown status (e.g., #8b949e)"
+				description="Hex color for unknown status (e.g., #8b949e)"
 			>
 				<input
 					type="color"
@@ -131,7 +131,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 
 			<SettingItem
 				name="Status bar 'no status' text"
-				description="Custom text to display in status bar when there is no status"
+				description="Text displayed in status bar when there is no status"
 			>
 				<input
 					type="text"
@@ -144,7 +144,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 
 			<SettingItem
 				name="Show icon in status bar for 'no status'"
-				description="Display the unknown status icon alongside the text in the status bar"
+				description="Show unknown status icon in status bar alongside text"
 			>
 				<input
 					type="checkbox"

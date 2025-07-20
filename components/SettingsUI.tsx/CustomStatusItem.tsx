@@ -98,7 +98,7 @@ export const CustomStatusItem: React.FC<Props> = ({
 						onClick={() => onCustomStatusRemove(index)}
 						aria-label="Remove status"
 						className="custom-status-item__remove-btn"
-						title="Remove this status"
+						title="Remove status"
 					>
 						×
 					</button>

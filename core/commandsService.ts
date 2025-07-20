@@ -24,7 +24,7 @@ export class CommandsService {
 		// Change status of current note
 		this.plugin.addCommand({
 			id: "change-status",
-			name: "Change status of current note",
+			name: "Change current note status",
 			checkCallback: (checking: boolean) => {
 				const file = this.app.workspace.getActiveFile();
 				if (!file) return false;
@@ -44,7 +44,7 @@ export class CommandsService {
 		// Cycle through statuses
 		this.plugin.addCommand({
 			id: "cycle-status",
-			name: "Cycle to next status",
+			name: "Cycle through statuses",
 			checkCallback: (checking: boolean) => {
 				if (settingsService.settings.useMultipleStatuses) {
 					// For now the cycle status is for single statuses
@@ -138,7 +138,7 @@ export class CommandsService {
 		// Copy status from current note
 		this.plugin.addCommand({
 			id: "copy-status",
-			name: "Copy status from current note",
+			name: "Copy current note status",
 			checkCallback: (checking: boolean) => {
 				const file = this.app.workspace.getActiveFile();
 				if (!file) return false;
@@ -232,7 +232,7 @@ export class CommandsService {
 		// Open Status Pane command
 		this.plugin.addCommand({
 			id: "open-status-pane",
-			name: "Open Status Pane",
+			name: "Open status pane",
 			callback: async () => {
 				await this.openStatusPane();
 			},

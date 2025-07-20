@@ -48,7 +48,7 @@ export const QuickActionsPanel = ({
 						onClick={() => onAction("find-unassigned")}
 						title="Find notes without status"
 					>
-						🔍 Find Unassigned Notes
+						🔍 Find Unassigned
 					</button>
 				</div>
 
