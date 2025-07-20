@@ -25,5 +25,11 @@ export type PluginSettings = {
 	strictStatuses: boolean; // Whether to only show known statuses
 	excludeUnknownStatus: boolean; // Whether to exclude files with unknown status from the status pane
 	quickStatusCommands: string[];
+	// Unknown status customization
+	unknownStatusIcon: string; // Custom icon for unknown status
+	unknownStatusColor: string; // Custom hex color for unknown status
+	statusBarNoStatusText: string; // Custom text for status bar when no status
+	statusBarShowNoStatusIcon: boolean; // Whether to show icon in status bar for no status
+	statusBarShowNoStatusText: boolean; // Whether to show text in status bar for no status
 	[key: string]: unknown;
 };

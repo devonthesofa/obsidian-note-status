@@ -61,6 +61,15 @@ export class StatusBarIntegration {
 				if (key === "customStatuses") {
 					this.handleActiveFileChange().catch(console.error); // INFO: Force a re-read of the statuses and render
 				}
+				if (
+					key === "unknownStatusIcon" ||
+					key === "unknownStatusColor" ||
+					key === "statusBarNoStatusText" ||
+					key === "statusBarShowNoStatusIcon" ||
+					key === "statusBarShowNoStatusText"
+				) {
+					this.render(); // INFO: Force a render for unknown status customization
+				}
 			},
 			"statusBarIntegrationSubscription2",
 		);
@@ -108,6 +117,17 @@ export class StatusBarIntegration {
 		});
 	}
 
+	private getNoStatusConfig() {
+		const settings = settingsService.settings;
+		return {
+			text: settings.statusBarNoStatusText || "No status",
+			showIcon: settings.statusBarShowNoStatusIcon || false,
+			showText: settings.statusBarShowNoStatusText ?? true,
+			icon: settings.unknownStatusIcon || "❓",
+			color: settings.unknownStatusColor || "#8b949e",
+		};
+	}
+
 	private render() {
 		if (!this.root) {
 			this.root = createRoot(this.statusBarContainer);
@@ -129,6 +149,7 @@ export class StatusBarIntegration {
 						settingsService.settings.autoHideStatusBar
 					}
 					onStatusClick={() => this.openStatusModal()}
+					noStatusConfig={this.getNoStatusConfig()}
 				/>,
 			);
 		}

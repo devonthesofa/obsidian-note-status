@@ -55,7 +55,9 @@ export class FileExplorerIntegration implements IElementProcessor {
 					key === "useMultipleStatuses" ||
 					key === "tagPrefix" ||
 					key === "strictStatuses" ||
-					key === "fileExplorerIconPosition"
+					key === "fileExplorerIconPosition" ||
+					key === "unknownStatusIcon" ||
+					key === "unknownStatusColor"
 				) {
 					this.destroy();
 					this.integrate().catch((r) => console.error(r));
@@ -108,6 +110,14 @@ export class FileExplorerIntegration implements IElementProcessor {
 		}
 	}
 
+	private getUnknownStatusConfig() {
+		const settings = settingsService.settings;
+		return {
+			icon: settings.unknownStatusIcon || "❓",
+			color: settings.unknownStatusColor || "#8b949e",
+		};
+	}
+
 	render(element: Element, statuses: GroupedStatuses): void {
 		// Remove existing icon
 		const existingIcon = element.querySelector(`.${this.ICON_CLASS}`);
@@ -136,6 +146,7 @@ export class FileExplorerIntegration implements IElementProcessor {
 				hideUnknownStatus={
 					settingsService.settings.hideUnknownStatusInExplorer
 				}
+				unknownStatusConfig={this.getUnknownStatusConfig()}
 			/>,
 		);
 
