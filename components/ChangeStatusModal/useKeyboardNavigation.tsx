@@ -22,11 +22,16 @@ export const useKeyboardNavigation = ({
 	const filteredStatuses = useMemo(
 		() =>
 			searchFilter
-				? availableStatuses.filter((status) =>
-						status.name
-							.toLowerCase()
-							.includes(searchFilter.toLowerCase()),
-					)
+				? availableStatuses.filter((status) => {
+						const searchTerm = searchFilter.toLowerCase();
+						return (
+							status.name.toLowerCase().includes(searchTerm) ||
+							(status.templateId &&
+								status.templateId
+									.toLowerCase()
+									.includes(searchTerm))
+						);
+					})
 				: availableStatuses,
 		[searchFilter, availableStatuses],
 	);

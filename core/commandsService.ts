@@ -59,9 +59,7 @@ export class CommandsService {
 					!settingsService.settings.useMultipleStatuses
 				) {
 					const allStatuses =
-						BaseNoteStatusService.getAllAvailableStatuses().map(
-							(s) => s.name,
-						);
+						BaseNoteStatusService.getAllAvailableStatuses();
 
 					if (allStatuses.length === 0) {
 						new Notice("No statuses available");
@@ -80,7 +78,9 @@ export class CommandsService {
 						: undefined;
 					let nextIndex = 0;
 					if (currentStatus) {
-						const currentIndex = allStatuses.indexOf(currentStatus);
+						const currentIndex = allStatuses.findIndex(
+							(s) => s.name === currentStatus,
+						);
 						if (currentIndex !== -1) {
 							nextIndex =
 								currentIndex === -1
@@ -89,15 +89,21 @@ export class CommandsService {
 						}
 					}
 
+					const nextStatus = allStatuses[nextIndex];
+					const scopedIdentifier = nextStatus.templateId
+						? BaseNoteStatusService.formatStatusIdentifier({
+								templateId: nextStatus.templateId,
+								name: nextStatus.name,
+							})
+						: nextStatus.name;
+
 					statusService
 						.addStatus(
 							settingsService.settings.tagPrefix,
-							allStatuses[nextIndex],
+							scopedIdentifier,
 						)
 						.then((resolve) => {
-							new Notice(
-								`Status changed to ${allStatuses[nextIndex]}`,
-							);
+							new Notice(`Status changed to ${nextStatus.name}`);
 						});
 				}
 				return true;
@@ -250,10 +256,17 @@ export class CommandsService {
 						!settingsService.settings.useMultipleStatuses
 					) {
 						const statusService = this.createStatusService(file);
+						const scopedIdentifier = status.templateId
+							? BaseNoteStatusService.formatStatusIdentifier({
+									templateId: status.templateId,
+									name: status.name,
+								})
+							: status.name;
+
 						statusService
 							.overrideStatuses(
 								settingsService.settings.tagPrefix,
-								[statusName],
+								[scopedIdentifier],
 							)
 							.then(() => {
 								new Notice(`Status set to ${statusName}`);

@@ -8,7 +8,9 @@ export const isStatusSelected = (
 	status: NoteStatus,
 	currentStatuses: NoteStatus[],
 ): boolean => {
-	return currentStatuses.some((s) => s.name === status.name);
+	return currentStatuses.some(
+		(s) => s.name === status.name && s.templateId === status.templateId,
+	);
 };
 
 /**
@@ -49,13 +51,16 @@ export const getStatusDisplayName = (
 };
 
 /**
- * Compares two statuses for equality by name
+ * Compares two statuses for equality by name and templateId
  */
 export const isStatusEqual = (
 	status1: NoteStatus,
 	status2: NoteStatus,
 ): boolean => {
-	return status1.name === status2.name;
+	return (
+		status1.name === status2.name &&
+		status1.templateId === status2.templateId
+	);
 };
 
 /**

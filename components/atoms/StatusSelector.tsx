@@ -12,6 +12,10 @@ interface StatusOptionProps {
 
 export const StatusModalOption: React.FC<StatusOptionProps> = memo(
 	({ status, isSelected, isFocused, onSelect }) => {
+		const displayName = status.templateId
+			? `${status.name} (${status.templateId})`
+			: status.name;
+
 		return (
 			<SelectableListItem
 				selected={isSelected}
@@ -23,7 +27,7 @@ export const StatusModalOption: React.FC<StatusOptionProps> = memo(
 					status.description ? getStatusTooltip(status) : undefined
 				}
 			>
-				{status.name}
+				{displayName}
 			</SelectableListItem>
 		);
 	},
@@ -63,7 +67,7 @@ export const StatusSelector: React.FC<Props> = ({
 		>
 			{availableStatuses.map((status, index) => (
 				<StatusModalOption
-					key={`${status.name}${status.description}${status.color}${status.icon}`}
+					key={`${status.templateId || "custom"}:${status.name}:${status.description}:${status.color}:${status.icon}`}
 					status={status}
 					isSelected={isStatusSelected(status, currentStatuses)}
 					isFocused={index === focusedIndex}

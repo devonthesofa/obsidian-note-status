@@ -8,6 +8,7 @@ import SelectorService from "@/core/selectorService";
 import {
 	MultipleNoteStatusService,
 	NoteStatusService,
+	BaseNoteStatusService,
 } from "@/core/noteStatusService";
 import eventBus from "@/core/eventBus";
 
@@ -69,9 +70,16 @@ export class StatusModalIntegration extends Modal {
 		frontmatterTagName,
 		status,
 	) => {
+		const scopedIdentifier = status.templateId
+			? BaseNoteStatusService.formatStatusIdentifier({
+					templateId: status.templateId,
+					name: status.name,
+				})
+			: status.name;
+
 		const added = await this.selectorService.noteStatusService.addStatus(
 			frontmatterTagName,
-			status.name,
+			scopedIdentifier,
 		);
 		if (added) {
 			new Notice(`Status ${status.name} added successfully to the note`);

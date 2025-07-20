@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { PluginSettings } from "@/types/pluginSettings";
 import { UISettings } from "./UISettings";
-import { PREDEFINED_TEMPLATES } from "@/constants/defaultSettings";
 import { TemplateSettings } from "./TemplateSettings";
 import { BehaviourSettings } from "./BehaviourSettings";
 import { CustomStatusSettings } from "./CustomStatusSettings";
 import { QuickCommandsSettings } from "./QuickCommandsSettings";
+import { PREDEFINED_TEMPLATES } from "@/constants/predefinedTemplates";
 
 export type Props = {
 	settings: PluginSettings;

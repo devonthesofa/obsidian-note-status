@@ -26,7 +26,7 @@ export const CurrentStatusChips: React.FC<Props> = ({
 			>
 				{currentStatuses.map((status) => (
 					<StatusDisplay
-						key={status.name}
+						key={`${status.templateId || "custom"}:${status.name}`}
 						status={status}
 						variant="chip"
 						removable
