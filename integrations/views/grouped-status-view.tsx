@@ -122,6 +122,10 @@ export class GroupedStatusView extends ItemView {
 		return statuses.map(this.convertStatusToStatusItem);
 	};
 
+	private getAvailableStatusesWithTemplateInfo = () => {
+		return BaseNoteStatusService.getAllAvailableStatuses();
+	};
+
 	private handleFileClick = (file: FileItem) => {
 		const tFile = BaseNoteStatusService.app.vault.getAbstractFileByPath(
 			file.path,
@@ -186,6 +190,9 @@ export class GroupedStatusView extends ItemView {
 				onFileClick={this.handleFileClick}
 				subscribeToEvents={this.subscribeToEvents}
 				getAvailableStatuses={this.getAvailableStatuses}
+				getAvailableStatusesWithTemplateInfo={
+					this.getAvailableStatusesWithTemplateInfo
+				}
 			/>,
 		);
 	}

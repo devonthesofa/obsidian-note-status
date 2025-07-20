@@ -6,6 +6,7 @@ import {
 	GroupedDataProvider,
 	useGroupedDataContext,
 } from "./context/GroupedDataProvider";
+import { NoteStatus } from "@/types/noteStatus";
 
 export type FileItem = {
 	id: string;
@@ -33,6 +34,7 @@ export type GroupedStatusViewProps = {
 	onFileClick: (file: FileItem) => void;
 	subscribeToEvents: (onDataChange: () => void) => () => void;
 	getAvailableStatuses: () => StatusItem[];
+	getAvailableStatusesWithTemplateInfo: () => NoteStatus[];
 };
 
 const GroupedStatusViewContent = () => {
@@ -44,7 +46,7 @@ const GroupedStatusViewContent = () => {
 		toggleGroup,
 		toggleFiles,
 		onFileClick,
-		getAvailableStatuses,
+		getAvailableStatusesWithTemplateInfo,
 		getLoadedCount,
 		loadMoreItems,
 		handleScroll,
@@ -57,14 +59,26 @@ const GroupedStatusViewContent = () => {
 		[onFileClick],
 	);
 
-	const availableStatuses = useMemo(
-		() => getAvailableStatuses(),
-		[getAvailableStatuses],
-	);
-	const statusMap = useMemo(
-		() => new Map(availableStatuses.map((s) => [s.name, s])),
-		[availableStatuses],
-	);
+	const statusMap = useMemo(() => {
+		const map = new Map();
+		const noteStatuses = getAvailableStatusesWithTemplateInfo();
+
+		// Build map using scoped identifiers as keys
+		noteStatuses.forEach((noteStatus) => {
+			const statusItem: StatusItem = {
+				name: noteStatus.name,
+				color: noteStatus.color || "white",
+				icon: noteStatus.icon,
+			};
+
+			const scopedIdentifier = noteStatus.templateId
+				? `${noteStatus.templateId}:${noteStatus.name}`
+				: noteStatus.name;
+			map.set(scopedIdentifier, statusItem);
+		});
+
+		return map;
+	}, [getAvailableStatusesWithTemplateInfo]);
 
 	if (isLoading) {
 		return <LoadingSpinner />;
@@ -107,9 +121,22 @@ export const GroupedStatusView = ({
 	onFileClick,
 	subscribeToEvents,
 	getAvailableStatuses,
+	getAvailableStatusesWithTemplateInfo,
 }: GroupedStatusViewProps) => {
 	const [searchFilter, setSearchFilter] = useState("");
 	const [noteNameFilter, setNoteNameFilter] = useState("");
+	const [templateFilter, setTemplateFilter] = useState("");
+
+	// Get available templates from the statuses
+	const availableTemplates = useMemo(() => {
+		const templates = new Set<string>();
+		getAvailableStatusesWithTemplateInfo().forEach((status) => {
+			if (status.templateId) {
+				templates.add(status.templateId);
+			}
+		});
+		return Array.from(templates).sort();
+	}, [getAvailableStatusesWithTemplateInfo]);
 
 	return (
 		<GroupedDataProvider
@@ -118,15 +145,22 @@ export const GroupedStatusView = ({
 			onFileClick={onFileClick}
 			subscribeToEvents={subscribeToEvents}
 			getAvailableStatuses={getAvailableStatuses}
+			getAvailableStatusesWithTemplateInfo={
+				getAvailableStatusesWithTemplateInfo
+			}
 			searchFilter={searchFilter}
 			noteNameFilter={noteNameFilter}
+			templateFilter={templateFilter}
 		>
 			<div className="">
 				<FilterSection
 					searchFilter={searchFilter}
 					noteNameFilter={noteNameFilter}
+					templateFilter={templateFilter}
+					availableTemplates={availableTemplates}
 					onSearchFilterChange={setSearchFilter}
 					onNoteNameFilterChange={setNoteNameFilter}
+					onTemplateFilterChange={setTemplateFilter}
 				/>
 				<GroupedStatusViewContent />
 			</div>

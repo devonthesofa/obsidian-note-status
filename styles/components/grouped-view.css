@@ -194,3 +194,67 @@
 .grouped-status-files-list::-webkit-scrollbar-thumb:hover {
 	background: var(--scrollbar-active-bg);
 }
+
+/* Template Filter (BEM) */
+.grouped-status-filters__template {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-2-1);
+}
+
+.grouped-status-filters__template-select {
+	width: 100%;
+	padding: var(--size-2-2) var(--size-2-3);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	background: var(--background-primary);
+	color: var(--text-normal);
+	font-size: var(--font-ui-small);
+	cursor: pointer;
+}
+
+.grouped-status-filters__template-select:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
+	box-shadow: 0 0 0 2px var(--background-modifier-accent);
+}
+
+.grouped-status-filters__note {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-2-1);
+}
+
+.grouped-status-filters__note-input {
+	width: 100%;
+	padding: var(--size-2-2) var(--size-2-3);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	background: var(--background-primary);
+	color: var(--text-normal);
+	font-size: var(--font-ui-small);
+}
+
+.grouped-status-filters__note-input:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
+	box-shadow: 0 0 0 2px var(--background-modifier-accent);
+}
+
+/* Template Badge (BEM) */
+.grouped-status-group__status {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-2);
+}
+
+.grouped-status-group__template-badge {
+	background: var(--background-modifier-border);
+	color: var(--text-muted);
+	padding: var(--size-2-1) var(--size-2-2);
+	border-radius: var(--radius-s);
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-medium);
+	text-transform: capitalize;
+	white-space: nowrap;
+}
