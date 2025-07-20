@@ -101,7 +101,10 @@ export class FileExplorerIntegration implements IElementProcessor {
 
 			const noteStatusService = this.getFileNoteStatusService(dataPath);
 
-			this.render(textEl, noteStatusService?.statuses ?? {});
+			// Only render icons for markdown files
+			if (noteStatusService) {
+				this.render(textEl, noteStatusService.statuses);
+			}
 		}
 	}
 
