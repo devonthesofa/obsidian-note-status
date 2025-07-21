@@ -47,7 +47,10 @@ export const StatusGroup = ({
 
 	return (
 		<div className="grouped-status-group">
-			<div className="grouped-status-group-header" onClick={handleToggle}>
+			<div
+				className="grouped-status-group__header"
+				onClick={handleToggle}
+			>
 				<div className="grouped-status-group__status">
 					<StatusDisplay
 						status={
@@ -61,7 +64,7 @@ export const StatusGroup = ({
 						</span>
 					)}
 				</div>
-				<div className="grouped-status-group-info">
+				<div className="grouped-status-group__info">
 					<CollapsibleCounter
 						count={files.length}
 						isCollapsed={!isExpanded}

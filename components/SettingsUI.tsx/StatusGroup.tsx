@@ -18,13 +18,13 @@ export const StatusGroup: React.FC<StatusGroupProps> = ({
 	onToggle,
 }) => (
 	<div className="status-group">
-		<div className="status-group-header">
-			<div className="status-group-title">{title}</div>
+		<div className="status-group__header">
+			<div className="status-group__title">{title}</div>
 			{description && (
-				<div className="status-group-description">{description}</div>
+				<div className="status-group__description">{description}</div>
 			)}
 		</div>
-		<div className="status-group-items">
+		<div className="status-group__items">
 			{statuses.map((status) => (
 				<SettingItem
 					key={`${status.templateId || "custom"}:${status.name}`}
