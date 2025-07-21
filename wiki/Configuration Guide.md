@@ -107,17 +107,6 @@ Icon Position: [Before name | After name]
    After name: Shows status after filename (default)
 ```
 
-#### Status Pane Options
-
-```
-☐ Default to compact view
-   Starts status pane in dense layout mode
-
-✅ Exclude unassigned notes from status pane
-   Skips files with "unknown" status
-   CRITICAL for performance with large vaults (>5000 notes)
-```
-
 ### Status Behavior
 
 #### Multiple Status Support
@@ -302,14 +291,6 @@ Ctrl+Shift+S  →  Change status of current note
 ## Advanced Configuration
 
 ### Performance Tuning
-
-#### Large Vault Settings (5000+ notes)
-
-```
-✅ Exclude unassigned notes from status pane
-✅ Hide unknown status in file explorer
-Items per page: 50 (reduce from default 100)
-```
 
 #### Memory Optimization
 

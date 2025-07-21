@@ -92,17 +92,6 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				/>
 			</SettingItem>
 
-			<SettingItem
-				name="Exclude unassigned notes from status pane"
-				description="Excludes unassigned notes from status pane for better performance. Recommended for large vaults."
-			>
-				<input
-					type="checkbox"
-					checked={settings.excludeUnknownStatus || false}
-					onChange={handleChange("excludeUnknownStatus")}
-				/>
-			</SettingItem>
-
 			<h4>Unknown Status Customization</h4>
 
 			<SettingItem

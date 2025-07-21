@@ -151,8 +151,7 @@ export class GroupedStatusView extends ItemView {
 					key === "useCustomStatusesOnly" ||
 					key === "customStatuses" ||
 					key === "useMultipleStatuses" ||
-					key === "strictStatuses" ||
-					key === "excludeUnknownStatus"
+					key === "strictStatuses"
 				) {
 					onDataChange();
 				}

@@ -20,7 +20,6 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	useMultipleStatuses: true,
 	tagPrefix: "obsidian-note-status",
 	strictStatuses: false, // Default to show all statuses from frontmatter
-	excludeUnknownStatus: true, // Default to exclude unknown status files for better performance
 	quickStatusCommands: ["active", "completed"], // Add default quick commands
 	// Unknown status customization
 	unknownStatusIcon: "❓",
