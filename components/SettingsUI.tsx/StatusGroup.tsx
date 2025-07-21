@@ -1,6 +1,5 @@
 import React from "react";
 import { PluginSettings } from "@/types/pluginSettings";
-import { SettingItem } from "./SettingItem";
 
 export type StatusGroupProps = {
 	statuses: PluginSettings["customStatuses"];
@@ -30,22 +29,38 @@ export const StatusGroup: React.FC<StatusGroupProps> = ({
 					? `${status.templateId}:${status.name}`
 					: status.name;
 
+				const isSelected =
+					currentQuickCommands.includes(scopedStatusName);
+
 				return (
-					<SettingItem
+					<label
 						key={`${status.templateId || "custom"}:${status.name}`}
-						name={`${status.icon} ${status.name}`}
-						description={status.description || ""}
+						className={`status-selector ${isSelected ? "status-selector--selected" : ""}`}
 					>
+						<div className="status-selector__content">
+							<div className="status-selector__status">
+								<span className="status-selector__icon">
+									{status.icon}
+								</span>
+								<span className="status-selector__name">
+									{status.name}
+								</span>
+							</div>
+							{status.description && (
+								<div className="status-selector__description">
+									{status.description}
+								</div>
+							)}
+						</div>
 						<input
 							type="checkbox"
-							checked={currentQuickCommands.includes(
-								scopedStatusName,
-							)}
+							className="status-selector__checkbox"
+							checked={isSelected}
 							onChange={(e) =>
 								onToggle(scopedStatusName, e.target.checked)
 							}
 						/>
-					</SettingItem>
+					</label>
 				);
 			})}
 		</div>

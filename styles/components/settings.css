@@ -287,6 +287,70 @@
 	gap: var(--size-2-2);
 }
 
+/* Status Selector for Quick Commands */
+.status-selector {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: var(--size-2-3) var(--size-4-2);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	background: var(--background-primary);
+	cursor: pointer;
+	transition: all var(--anim-duration-fast) ease;
+	position: relative;
+}
+
+.status-selector:hover {
+	background: var(--background-modifier-hover);
+	border-color: var(--background-modifier-border-hover);
+}
+
+.status-selector--selected {
+	background: var(--background-modifier-success);
+	border-color: var(--interactive-success);
+}
+
+.status-selector--selected:hover {
+	background: var(--background-modifier-success-hover);
+}
+
+.status-selector__content {
+	flex: 1;
+	min-width: 0;
+}
+
+.status-selector__status {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-2);
+	margin-bottom: var(--size-2-1);
+}
+
+.status-selector__icon {
+	font-size: var(--font-ui-medium);
+	width: var(--size-4-3);
+	text-align: center;
+	flex-shrink: 0;
+}
+
+.status-selector__name {
+	font-weight: var(--font-medium);
+	color: var(--text-normal);
+}
+
+.status-selector__description {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+	line-height: var(--line-height-tight);
+}
+
+.status-selector__checkbox {
+	margin-left: var(--size-4-2);
+	pointer-events: none;
+	flex-shrink: 0;
+}
+
 /* Quick Commands Container */
 .quick-commands-container {
 	margin-top: var(--size-4-2);
