@@ -282,13 +282,24 @@ export class CommandsService {
 			settingsService.settings.quickStatusCommands || [];
 		const allStatuses = BaseNoteStatusService.getAllAvailableStatuses();
 
-		quickCommands.forEach((statusName) => {
-			const status = allStatuses.find((s) => s.name === statusName);
+		quickCommands.forEach((statusIdentifier) => {
+			const parsedStatus =
+				BaseNoteStatusService.parseStatusIdentifier(statusIdentifier);
+			const status = allStatuses.find(
+				(s) =>
+					s.name === parsedStatus.name &&
+					(s.templateId || null) ===
+						(parsedStatus.templateId || null),
+			);
 			if (!status) return;
 
+			const displayName = parsedStatus.templateId
+				? `${parsedStatus.name} (${parsedStatus.templateId})`
+				: parsedStatus.name;
+
 			this.plugin.addCommand({
-				id: `set-status-${statusName}`,
-				name: `Set status to ${statusName}`,
+				id: `set-status-${statusIdentifier.replace(":", "-")}`,
+				name: `Set status to ${displayName}`,
 				checkCallback: (checking: boolean) => {
 					const file = this.app.workspace.getActiveFile();
 					if (!file) return false;
@@ -314,13 +325,15 @@ export class CommandsService {
 								[scopedIdentifier],
 							)
 							.then(() => {
-								new Notice(`Status set to ${statusName}`);
+								new Notice(`Status set to ${displayName}`);
 							});
 					}
 					return true;
 				},
 			});
-			this.registeredCommands.add(`set-status-${statusName}`);
+			this.registeredCommands.add(
+				`set-status-${statusIdentifier.replace(":", "-")}`,
+			);
 		});
 	}
 

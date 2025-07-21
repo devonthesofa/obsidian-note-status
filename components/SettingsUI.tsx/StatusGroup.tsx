@@ -25,21 +25,29 @@ export const StatusGroup: React.FC<StatusGroupProps> = ({
 			)}
 		</div>
 		<div className="status-group__items">
-			{statuses.map((status) => (
-				<SettingItem
-					key={`${status.templateId || "custom"}:${status.name}`}
-					name={`${status.icon} ${status.name}`}
-					description={status.description || ""}
-				>
-					<input
-						type="checkbox"
-						checked={currentQuickCommands.includes(status.name)}
-						onChange={(e) =>
-							onToggle(status.name, e.target.checked)
-						}
-					/>
-				</SettingItem>
-			))}
+			{statuses.map((status) => {
+				const scopedStatusName = status.templateId
+					? `${status.templateId}:${status.name}`
+					: status.name;
+
+				return (
+					<SettingItem
+						key={`${status.templateId || "custom"}:${status.name}`}
+						name={`${status.icon} ${status.name}`}
+						description={status.description || ""}
+					>
+						<input
+							type="checkbox"
+							checked={currentQuickCommands.includes(
+								scopedStatusName,
+							)}
+							onChange={(e) =>
+								onToggle(scopedStatusName, e.target.checked)
+							}
+						/>
+					</SettingItem>
+				);
+			})}
 		</div>
 	</div>
 );
