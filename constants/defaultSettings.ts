@@ -27,4 +27,5 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	statusBarNoStatusText: "No status",
 	statusBarShowNoStatusIcon: false,
 	statusBarShowNoStatusText: true,
+	vaultSizeLimit: 15000, // Disable dashboard and grouped view for vaults with more notes than this limit
 };

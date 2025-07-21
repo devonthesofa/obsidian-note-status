@@ -52,6 +52,21 @@ export const BehaviourSettings: React.FC<Props> = ({ settings, onChange }) => {
 					}
 				/>
 			</SettingItem>
+
+			<SettingItem
+				name="Vault size limit"
+				description="Disable dashboard and grouped view for vaults with more notes than this limit to improve performance. Set to 0 to disable this feature."
+			>
+				<input
+					type="number"
+					min="0"
+					value={settings.vaultSizeLimit || 15000}
+					onChange={(e) => {
+						const value = parseInt(e.target.value) || 15000;
+						onChange("vaultSizeLimit", value);
+					}}
+				/>
+			</SettingItem>
 		</div>
 	);
 };

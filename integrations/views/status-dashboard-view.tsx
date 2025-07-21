@@ -304,6 +304,19 @@ export class StatusDashboardView extends ItemView {
 		container.empty();
 		container.addClass("status-dashboard-view-container");
 
+		// Check if vault exceeds the size limit
+		const files = this.app.vault.getMarkdownFiles();
+		const vaultSizeLimit = settingsService.settings.vaultSizeLimit || 15000;
+
+		if (vaultSizeLimit > 0 && files.length > vaultSizeLimit) {
+			// Show disabled message
+			container.createEl("div", {
+				cls: "status-dashboard-disabled",
+				text: `Dashboard disabled: Vault has ${files.length} notes (limit: ${vaultSizeLimit}). You can adjust this limit in plugin settings.`,
+			});
+			return;
+		}
+
 		this.root = createRoot(container);
 
 		// Set up event listeners
@@ -334,7 +347,8 @@ export class StatusDashboardView extends ItemView {
 					key === "useCustomStatusesOnly" ||
 					key === "customStatuses" ||
 					key === "useMultipleStatuses" ||
-					key === "strictStatuses"
+					key === "strictStatuses" ||
+					key === "vaultSizeLimit"
 				) {
 					handleVaultChange();
 					handleFileChange();
