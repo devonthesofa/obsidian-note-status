@@ -346,27 +346,18 @@ export class CommandsService {
 	}
 
 	/**
-	 * Remove all quick status commands
+	 * Remove all registered commands
 	 */
-	private removeQuickStatusCommands(): void {
-		const allStatuses = BaseNoteStatusService.getAllAvailableStatuses();
-
-		//TODO: If there is an update the
-		allStatuses.forEach((status) => {
+	private removeRegisteredCommands(): void {
+		this.registeredCommands.forEach((commandId) => {
 			// @ts-ignore
-			this.app.commands.removeCommand(
-				`note-status:set-status-${status.name}`,
-			);
-			// @ts-ignore
-			this.app.commands.removeCommand(
-				`note-status:toggle-status-${status.name}`,
-			);
+			this.app.commands.removeCommand(`note-status:${commandId}`);
 		});
+		this.registeredCommands.clear();
 	}
 
 	public destroy(): void {
-		// Remove existing commands
-		this.removeQuickStatusCommands();
-		this.registeredCommands.clear();
+		// Remove all registered commands properly
+		this.removeRegisteredCommands();
 	}
 }
