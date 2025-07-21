@@ -83,25 +83,57 @@
 	border: 1px solid var(--background-modifier-border);
 	border-radius: var(--radius-m);
 	overflow: hidden;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	transition: box-shadow var(--anim-duration-fast) ease;
 }
 
-.grouped-status-group-header {
+.grouped-status-group:hover {
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.grouped-status-group__header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	padding: var(--size-4-2) var(--size-4-3);
 	cursor: pointer;
 	transition: background var(--anim-duration-fast) ease;
+	position: relative;
 }
 
-.grouped-status-group-header:hover {
+.grouped-status-group__header:hover {
 	background: var(--background-modifier-hover);
 }
 
-.grouped-status-group-info {
+.grouped-status-group__header:focus {
+	outline: 2px solid var(--color-accent);
+	outline-offset: -2px;
+}
+
+.grouped-status-group__status {
 	display: flex;
 	align-items: center;
 	gap: var(--size-2-2);
+	min-width: 0;
+	flex: 1;
+}
+
+.grouped-status-group__template-badge {
+	display: inline-flex;
+	align-items: center;
+	padding: var(--size-2-1) var(--size-2-2);
+	background: var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+	font-weight: var(--font-medium);
+}
+
+.grouped-status-group__info {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-2);
+	margin-left: auto;
 }
 
 /* Files List */

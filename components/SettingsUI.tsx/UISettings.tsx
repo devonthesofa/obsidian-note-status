@@ -1,5 +1,6 @@
 import { PluginSettings } from "@/types/pluginSettings";
 import React from "react";
+import { Input } from "../atoms/Input";
 import { Select } from "../atoms/Select";
 import { SettingItem } from "./SettingItem";
 
@@ -13,18 +14,6 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 		(key: keyof PluginSettings) =>
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			onChange(key, e.target.checked);
-		};
-
-	const handleInputChange =
-		(key: keyof PluginSettings) =>
-		(e: React.ChangeEvent<HTMLInputElement>) => {
-			onChange(key, e.target.value);
-		};
-
-	const handleTextInputChange =
-		(key: keyof PluginSettings) =>
-		(e: React.ChangeEvent<HTMLInputElement>) => {
-			onChange(key, e.target.value);
 		};
 
 	return (
@@ -92,28 +81,18 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				/>
 			</SettingItem>
 
-			<SettingItem
-				name="Exclude unassigned notes from status pane"
-				description="Excludes unassigned notes from status pane for better performance. Recommended for large vaults."
-			>
-				<input
-					type="checkbox"
-					checked={settings.excludeUnknownStatus || false}
-					onChange={handleChange("excludeUnknownStatus")}
-				/>
-			</SettingItem>
-
 			<h4>Unknown Status Customization</h4>
 
 			<SettingItem
 				name="Unknown status icon"
 				description="Icon displayed for files with unknown status"
 			>
-				<input
-					type="text"
-					value={settings.unknownStatusIcon || "❓"}
-					onChange={handleInputChange("unknownStatusIcon")}
-					style={{ width: "60px", textAlign: "center" }}
+				<Input
+					variant="text"
+					value={settings.unknownStatusIcon}
+					onChange={(value) => onChange("unknownStatusIcon", value)}
+					placeholder="❓"
+					style={{ maxWidth: "150px" }}
 				/>
 			</SettingItem>
 
@@ -121,11 +100,11 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				name="Unknown status color"
 				description="Hex color for unknown status (e.g., #8b949e)"
 			>
-				<input
-					type="color"
+				<Input
+					variant="color"
 					value={settings.unknownStatusColor || "#8b949e"}
-					onChange={handleInputChange("unknownStatusColor")}
-					style={{ width: "50px", height: "30px" }}
+					onChange={(value) => onChange("unknownStatusColor", value)}
+					placeholder="No status"
 				/>
 			</SettingItem>
 
@@ -133,11 +112,13 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				name="Status bar 'no status' text"
 				description="Text displayed in status bar when there is no status"
 			>
-				<input
-					type="text"
+				<Input
+					variant="text"
 					value={settings.statusBarNoStatusText}
-					onChange={handleTextInputChange("statusBarNoStatusText")}
-					style={{ width: "150px" }}
+					onChange={(value) =>
+						onChange("statusBarNoStatusText", value)
+					}
+					style={{ maxWidth: "150px" }}
 					placeholder="No status"
 				/>
 			</SettingItem>

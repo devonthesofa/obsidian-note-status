@@ -4,14 +4,6 @@ Optimize Note Status for large vaults (tested up to 40k notes).
 
 ## Quick Wins
 
-### Essential Settings for 5k+ Notes
-
-```
-✅ Exclude unassigned notes from status pane
-✅ Hide unknown status in file explorer
-Pagination: 50-100 items per page
-```
-
 ### Disable Heavy Features
 
 ```
@@ -24,7 +16,6 @@ Pagination: 50-100 items per page
 ```json
 {
 	"showStatusIconsInExplorer": false,
-	"excludeUnknownStatus": true,
 	"hideUnknownStatusInExplorer": true,
 	"enabledTemplates": ["minimal"]
 }

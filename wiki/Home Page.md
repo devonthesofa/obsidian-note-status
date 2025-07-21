@@ -26,12 +26,13 @@ Welcome to the comprehensive documentation for the Note Status plugin for Obsidi
 
 - ✅ Status assignment (active, on hold, completed, dropped)
 - ✅ Multiple statuses per note
-- ✅ File explorer integration
-- ✅ Status bar display
+- ✅ File explorer integration with configurable icon positioning
+- ✅ Status bar display with custom unknown status icons
 - ✅ Dropdown status selector
-- ✅ Dedicated status pane
+- ✅ Dedicated status pane with command palette access
 - ✅ Batch operations
-- ✅ Custom statuses and templates
+- ✅ Custom statuses with reorder controls and templates
+- ✅ Template-based status scoping and filtering
 
 ### Advanced Features
 
@@ -84,4 +85,4 @@ We welcome contributions! See the [[Development Setup]] guide to get started.
 
 ---
 
-_Last updated: [Current Date]_ _Plugin version: 1.0.12_
+_Last updated: July 20, 2025_ _Plugin version: 1.0.14_

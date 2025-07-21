@@ -82,15 +82,6 @@ Enable a template for instant statuses:
 - Select multiple files for batch updates - ![Status Pane Screenshot](images/batch-updates.png)
   ![File Explorer Screenshot](images/file-explorer.png)
 
-## Performance Setup (Large Vaults)
-
-If you have 1000+ notes, set the settings:
-
-```
-✅ Exclude unassigned notes from status pane
-✅ Hide unknown status in file explorer
-```
-
 ## Frontmatter Format
 
 The plugin stores statuses in YAML frontmatter:

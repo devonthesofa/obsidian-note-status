@@ -334,8 +334,7 @@ export class StatusDashboardView extends ItemView {
 					key === "useCustomStatusesOnly" ||
 					key === "customStatuses" ||
 					key === "useMultipleStatuses" ||
-					key === "strictStatuses" ||
-					key === "excludeUnknownStatus"
+					key === "strictStatuses"
 				) {
 					handleVaultChange();
 					handleFileChange();

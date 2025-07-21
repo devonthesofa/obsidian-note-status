@@ -8,13 +8,13 @@ Track the status of your notes with a powerful, customizable status management s
 
 - **📋 Status Assignment**: Mark notes with workflow statuses
 - **🎯 Multi-Status Support**: Assign multiple statuses per note
-- **📁 File Explorer Icons**: Visual indicators in the file tree
-- **🧭 Status Bar Integration**: View current status at a glance
+- **📁 File Explorer Icons**: Visual indicators in the file tree with configurable positioning
+- **🧭 Status Bar Integration**: View current status at a glance with custom unknown status icons
 - **⬇️ Toolbar Dropdown**: Change statuses quickly from the editor
-- **📊 Status Pane**: Dedicated view organizing notes by status
+- **📊 Status Pane**: Dedicated view organizing notes by status with command palette access
 - **⚡ Batch Operations**: Update multiple files simultaneously
-- **🎨 Custom Statuses**: Define your own statuses
-- **🧩 Templates Library**: Use built-in templates
+- **🎨 Custom Statuses**: Define and reorder your own statuses with arrow controls
+- **🧩 Template-Based Filtering**: Scope statuses by note templates for better organization
 - **🔧 Full Customization**: Control how and where statuses appear
 - **🚀 Performance**: Optimized for large vaults (40k+ notes tested)
   ![Hello World Screenshot](images/hello-world.png)

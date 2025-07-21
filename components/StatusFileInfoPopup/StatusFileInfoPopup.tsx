@@ -29,16 +29,16 @@ export const StatusFileInfoPopup: React.FC<Props> = ({ statuses }) => {
 			<div className="status-popup-content">
 				{statusEntries.map(([groupName, statusList]) => (
 					<div key={groupName} className="status-group">
-						<div className="status-group-header">
-							<span className="status-group-name">
+						<div className="status-group__header">
+							<span className="status-group__name">
 								{groupName.toLowerCase()}
 							</span>
-							<span className="status-group-count">
+							<span className="status-group__count">
 								{statusList.length}
 							</span>
 						</div>
 
-						<div className="status-group-items">
+						<div className="status-group__items">
 							{statusList.map((status, index) => (
 								<div
 									key={`${groupName}-${index}`}
