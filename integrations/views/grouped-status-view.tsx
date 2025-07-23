@@ -151,7 +151,8 @@ export class GroupedStatusView extends ItemView {
 					key === "useCustomStatusesOnly" ||
 					key === "customStatuses" ||
 					key === "useMultipleStatuses" ||
-					key === "strictStatuses"
+					key === "strictStatuses" ||
+					key === "vaultSizeLimit"
 				) {
 					onDataChange();
 				}
@@ -180,6 +181,19 @@ export class GroupedStatusView extends ItemView {
 		const container = this.containerEl.children[1];
 		container.empty();
 		container.addClass("grouped-status-view-container");
+
+		// Check if vault exceeds the size limit
+		const files = BaseNoteStatusService.app.vault.getMarkdownFiles();
+		const vaultSizeLimit = settingsService.settings.vaultSizeLimit || 15000;
+
+		if (vaultSizeLimit > 0 && files.length > vaultSizeLimit) {
+			// Show disabled message
+			container.createEl("div", {
+				cls: "grouped-status-view-disabled",
+				text: `Grouped Status View disabled: Vault has ${files.length} notes (limit: ${vaultSizeLimit}). You can adjust this limit in plugin settings.`,
+			});
+			return;
+		}
 
 		this.root = createRoot(container);
 		this.root.render(

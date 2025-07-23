@@ -30,5 +30,6 @@ export type PluginSettings = {
 	statusBarNoStatusText: string; // Custom text for status bar when no status
 	statusBarShowNoStatusIcon: boolean; // Whether to show icon in status bar for no status
 	statusBarShowNoStatusText: boolean; // Whether to show text in status bar for no status
+	vaultSizeLimit: number; // Disable dashboard and grouped view for vaults with more notes than this limit
 	[key: string]: unknown;
 };

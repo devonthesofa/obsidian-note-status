@@ -310,6 +310,21 @@
 	color: var(--text-muted);
 }
 
+.status-dashboard-disabled {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	padding: var(--size-4-4);
+	text-align: center;
+	font-size: var(--font-ui-medium);
+	color: var(--text-muted);
+	background: var(--background-secondary);
+	border: 2px dashed var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	margin: var(--size-4-4);
+}
+
 /* Scrollbar */
 .status-dashboard-content::-webkit-scrollbar {
 	width: var(--scrollbar-width);

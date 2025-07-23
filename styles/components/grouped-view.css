@@ -210,6 +210,21 @@
 	font-size: var(--font-ui-medium);
 }
 
+.grouped-status-view-disabled {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	padding: var(--size-4-4);
+	text-align: center;
+	font-size: var(--font-ui-medium);
+	color: var(--text-muted);
+	background: var(--background-secondary);
+	border: 2px dashed var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	margin: var(--size-4-4);
+}
+
 /* Scrollbar */
 .grouped-status-content::-webkit-scrollbar,
 .grouped-status-files-list::-webkit-scrollbar {
