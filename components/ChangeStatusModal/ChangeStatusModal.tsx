@@ -42,7 +42,10 @@ export const ChangeStatusModal: React.FC<Props> = ({
 
 	return (
 		<>
-			<h1>Change note status {filesQuantity}</h1>
+			<h1>
+				Change note status ({filesQuantity} file
+				{filesQuantity !== 1 ? "s" : ""})
+			</h1>
 
 			{currentStatuses.map(([frontmatterTagName, statusList]) => (
 				<StatusSelectorGroup
