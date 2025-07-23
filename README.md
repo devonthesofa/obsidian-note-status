@@ -9,6 +9,7 @@
 Track the status of your notes with a powerful, customizable status management system. Mark notes as active, completed, on hold, or create your own custom workflows.
 
 ![Status assignment workflow demonstration](images/status-assignment-demo.png)
+
 _Alt: Demonstration of assigning status to a note using the toolbar dropdown_
 
 ## 🎯 Features
@@ -26,13 +27,17 @@ _Alt: Demonstration of assigning status to a note using the toolbar dropdown_
 - **🚀 Performance Optimized** - Works with large vaults (40k+ notes tested)
 
 ![File explorer with status icons](images/file-explorer-status-icons.png)
+
 _Alt: File explorer showing multiple notes with different status icons positioned next to note names and the tooltip with status overview_
 
 ![Status dashboard with vault statistics](images/status-dashboard-overview1.png)
+
 _Alt: Status dashboard showing current note information, vault statistics with total notes and coverage percentages_
 ![Status dashboard with vault statistics](images/status-dashboard-overview2.png)
+
 _Alt: Status distribution chart showing different statuses with colored bars and note counts for each status type_
 ![Status dashboard with vault statistics](images/status-dashboard-overview3.png)
+
 _Alt: Quick actions panel with organized sections for views, current note operations, clipboard actions, and tools_
 
 ## 💻 Technology Stack
@@ -63,19 +68,32 @@ Built with modern web technologies for performance and reliability:
 ### Quick Start
 
 1. **Assign Status**:
+
     1. Click the "No status" in toolbar
-       ![Status toolbar](images/no-status-toolbar.png)
-       _Alt: Editor toolbar showing "No status" button for status assignment_
+
+        ![Status toolbar](images/no-status-toolbar.png)
+
+        _Alt: Editor toolbar showing "No status" button for status assignment_
+
     2. → Select a status
+
 2. **View in Explorer**: Status icons appear next to note names
-   ![File explorer item](images/file-explorer-item.png)
-   _Alt: Single file explorer item showing a note with status icon positioned next to the filename_
+
+    ![File explorer item](images/file-explorer-item.png)
+
+    _Alt: Single file explorer item showing a note with status icon positioned next to the filename_
+
 3. **Browse by Status or open the Dashboard**: Open from left sidebar
-   ![Open status view](images/open-view-buttons.png)
-   _Alt: Left sidebar showing ribbon buttons for opening grouped status view and status dashboard_
+
+    ![Open status view](images/open-view-buttons.png)
+
+    _Alt: Left sidebar showing ribbon buttons for opening grouped status view and status dashboard_
+
 4. **Batch Update**: Select multiple files → Right-click → Change status
-   ![Multiple status context](images/change-multiple-statuses.png)
-   _Alt: Context menu appearing when right-clicking multiple selected files, showing "Change note status" option_
+
+    ![Multiple status context](images/change-multiple-statuses.png)
+
+    _Alt: Context menu appearing when right-clicking multiple selected files, showing "Change note status" option_
 
 ### Example Workflows
 
@@ -98,6 +116,7 @@ Built with modern web technologies for performance and reliability:
 ```
 
 ![Grouped status view with filtering](images/grouped-status-filtering.png)
+
 _Alt: Grouped status view showing notes organized by status with template filtering and search functionality_
 
 ### Custom Statuses
@@ -119,6 +138,7 @@ Description: Requires immediate attention
 ```
 
 ![Custom statuses](images/custom-status-change.png)
+
 _Alt: Status selection modal showing custom and template statuses with icons, names, and selection interface_
 
 ## 📋 Data Format
