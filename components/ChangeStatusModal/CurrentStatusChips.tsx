@@ -13,7 +13,7 @@ export const CurrentStatusChips: React.FC<Props> = ({
 	onRemoveStatus,
 }) => {
 	return (
-		<SettingItem name="Available statuses" vertical>
+		<SettingItem name="Current statuses" vertical>
 			<div
 				className="note-status-chips"
 				style={{
