@@ -5,18 +5,19 @@ import { GroupLabel } from "../atoms/GroupLabel";
 import { CollapsibleCounter } from "../atoms/CollapsibleCounter";
 import { StatusDisplay } from "../atoms/StatusDisplay";
 import { useStatusBarContext } from "./StatusBarContext";
-import settingsService from "@/core/settingsService";
 
 export interface StatusBarGroupProps {
 	statuses: NoteStatus[];
 	template: StatusTemplate;
 	maxVisible?: number;
+	templateNameMode?: "always" | "never" | "auto";
 }
 
 export const StatusBarGroup: FC<StatusBarGroupProps> = ({
 	statuses,
 	template,
 	maxVisible = 3,
+	templateNameMode = "auto",
 }) => {
 	const [isUncollapsed, setIsUncollapsed] = useState(false);
 	const visibleStatuses = isUncollapsed
@@ -25,9 +26,9 @@ export const StatusBarGroup: FC<StatusBarGroupProps> = ({
 	const hiddenCount = Math.max(0, statuses.length - maxVisible);
 
 	const statusNames = statuses.map((s) => s.name);
-	const hasConflicts = statusNames.some(
-		(name, index) => statusNames.indexOf(name) !== index,
-	);
+	const getHasConflicts = (status: NoteStatus) => {
+		return statusNames.filter((name) => name === status.name).length > 1;
+	};
 	const { onStatusClick } = useStatusBarContext();
 
 	return (
@@ -48,11 +49,8 @@ export const StatusBarGroup: FC<StatusBarGroupProps> = ({
 						<StatusDisplay
 							status={status}
 							variant="badge"
-							templateNameMode={
-								settingsService.settings
-									.statusBarShowTemplateName
-							}
-							hasNameConflicts={hasConflicts}
+							templateNameMode={templateNameMode}
+							hasNameConflicts={getHasConflicts(status)}
 							onClick={() => {
 								onStatusClick(status);
 							}}

@@ -151,6 +151,9 @@ export class StatusBarIntegration {
 					hideIfNotStatuses={
 						settingsService.settings.autoHideStatusBar
 					}
+					templateNameMode={
+						settingsService.settings.statusBarShowTemplateName
+					}
 					onStatusClick={() => this.openStatusModal()}
 					noStatusConfig={this.getNoStatusConfig()}
 				/>,

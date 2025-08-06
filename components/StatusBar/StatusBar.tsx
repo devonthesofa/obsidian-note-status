@@ -11,6 +11,7 @@ export type Props = {
 	templates?: { [key: string]: { description: string } };
 	hideIfNotStatuses?: boolean;
 	onStatusClick: StatusBarContextProps["onStatusClick"];
+	templateNameMode?: "always" | "never" | "auto";
 	noStatusConfig?: {
 		text: string;
 		showIcon: boolean;
@@ -24,6 +25,7 @@ export const StatusBar: FC<Props> = ({
 	statuses,
 	hideIfNotStatuses,
 	onStatusClick,
+	templateNameMode = "auto",
 	noStatusConfig,
 }) => {
 	const statusEntries = Object.entries(statuses);
@@ -69,6 +71,7 @@ export const StatusBar: FC<Props> = ({
 					<StatusBarGroup
 						key={frontmatterTagName}
 						statuses={statusList}
+						templateNameMode={templateNameMode}
 						template={{
 							description: "Note status",
 							name: "",
