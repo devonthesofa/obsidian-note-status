@@ -5,6 +5,7 @@ import { GroupLabel } from "../atoms/GroupLabel";
 import { CollapsibleCounter } from "../atoms/CollapsibleCounter";
 import { StatusDisplay } from "../atoms/StatusDisplay";
 import { useStatusBarContext } from "./StatusBarContext";
+import settingsService from "@/core/settingsService";
 
 export interface StatusBarGroupProps {
 	statuses: NoteStatus[];
@@ -22,6 +23,11 @@ export const StatusBarGroup: FC<StatusBarGroupProps> = ({
 		? statuses
 		: statuses.slice(0, maxVisible);
 	const hiddenCount = Math.max(0, statuses.length - maxVisible);
+
+	const statusNames = statuses.map((s) => s.name);
+	const hasConflicts = statusNames.some(
+		(name, index) => statusNames.indexOf(name) !== index,
+	);
 	const { onStatusClick } = useStatusBarContext();
 
 	return (
@@ -42,6 +48,11 @@ export const StatusBarGroup: FC<StatusBarGroupProps> = ({
 						<StatusDisplay
 							status={status}
 							variant="badge"
+							templateNameMode={
+								settingsService.settings
+									.statusBarShowTemplateName
+							}
+							hasNameConflicts={hasConflicts}
 							onClick={() => {
 								onStatusClick(status);
 							}}

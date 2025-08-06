@@ -17,6 +17,7 @@ export type PluginSettings = {
 	autoHideStatusBar: boolean;
 	templates: StatusTemplate[];
 	customStatuses: NoteStatus[];
+	statusBarShowTemplateName: "always" | "never" | "auto"; // How to show template names in status bar
 	showStatusIconsInExplorer: boolean;
 	hideUnknownStatusInExplorer: boolean;
 	enabledTemplates: string[]; // IDs of enabled templates

@@ -22,6 +22,7 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	enabledTemplates: DEFAULT_ENABLED_TEMPLATES,
 	useCustomStatusesOnly: false,
 	useMultipleStatuses: true,
+	statusBarShowTemplateName: "auto", // Default to show template names only when needed
 	tagPrefix: "obsidian-note-status",
 	strictStatuses: false, // Default to show all statuses from frontmatter
 	quickStatusCommands: ["active", "completed"], // Add default quick commands
