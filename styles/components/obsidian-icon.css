@@ -1,0 +1,10 @@
+.obsidian-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.obsidian-icon svg {
+	width: 100%;
+	height: 100%;
+}

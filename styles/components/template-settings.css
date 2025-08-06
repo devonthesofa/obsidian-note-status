@@ -131,11 +131,6 @@
 	letter-spacing: 0.05em;
 }
 
-.template-custom-badge .lucide {
-	width: 12px;
-	height: 12px;
-}
-
 /* Template Item Actions */
 .template-item-actions {
 	display: flex;
@@ -147,49 +142,6 @@
 	min-width: 44px;
 	align-items: center;
 	justify-content: center;
-}
-
-.template-action-btn {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 28px;
-	height: 28px;
-	border: none;
-	border-radius: var(--radius-s);
-	cursor: pointer;
-	transition: all var(--anim-duration-fast) ease;
-	color: var(--text-muted);
-	background: transparent;
-}
-
-.template-action-btn:hover {
-	transform: scale(1.1);
-}
-
-.template-action-btn--edit {
-	background: var(--interactive-normal);
-	color: var(--text-normal);
-}
-
-.template-action-btn--edit:hover {
-	background: var(--interactive-accent);
-	color: var(--text-on-accent);
-}
-
-.template-action-btn--delete {
-	background: var(--interactive-normal);
-	color: var(--text-error);
-}
-
-.template-action-btn--delete:hover {
-	background: var(--text-error);
-	color: var(--text-on-accent);
-}
-
-.template-action-btn .lucide {
-	width: 16px;
-	height: 16px;
 }
 
 /* Template Editor Modal */
