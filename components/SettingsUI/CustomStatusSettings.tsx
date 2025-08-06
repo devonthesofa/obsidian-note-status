@@ -101,7 +101,6 @@ export const CustomStatusSettings: React.FC<Props> = ({
 								key={index}
 								status={status}
 								index={index}
-								settings={settings}
 								onCustomStatusChange={updateCustomStatus}
 								onCustomStatusRemove={removeCustomStatus}
 								onMoveUp={moveCustomStatusUp}
