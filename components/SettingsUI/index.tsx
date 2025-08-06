@@ -5,7 +5,6 @@ import { TemplateSettings } from "./TemplateSettings";
 import { BehaviourSettings } from "./BehaviourSettings";
 import { CustomStatusSettings } from "./CustomStatusSettings";
 import { QuickCommandsSettings } from "./QuickCommandsSettings";
-import { PREDEFINED_TEMPLATES } from "@/constants/predefinedTemplates";
 
 export type Props = {
 	settings: PluginSettings;
@@ -26,18 +25,13 @@ const SettingsUI: React.FC<Props> = ({ settings, onChange }) => {
 
 	return (
 		<div className="note-status-settings">
-			<TemplateSettings
-				settings={settings}
-				onChange={handleChange}
-				templates={PREDEFINED_TEMPLATES}
-			/>
+			<TemplateSettings settings={settings} onChange={handleChange} />
 			<UISettings settings={localSettings} onChange={handleChange} />
 			<BehaviourSettings settings={settings} onChange={handleChange} />
 			<CustomStatusSettings settings={settings} onChange={handleChange} />
 			<QuickCommandsSettings
 				settings={settings}
 				onChange={handleChange}
-				templates={PREDEFINED_TEMPLATES}
 			/>
 		</div>
 	);

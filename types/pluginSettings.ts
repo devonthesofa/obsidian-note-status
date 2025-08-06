@@ -15,6 +15,7 @@ export type PluginSettings = {
 	statusColors: Record<string, string>;
 	showStatusBar: boolean;
 	autoHideStatusBar: boolean;
+	templates: StatusTemplate[];
 	customStatuses: NoteStatus[];
 	showStatusIconsInExplorer: boolean;
 	hideUnknownStatusInExplorer: boolean;

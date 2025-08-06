@@ -1,17 +1,15 @@
 import React, { useCallback } from "react";
-import { PluginSettings, StatusTemplate } from "@/types/pluginSettings";
+import { PluginSettings } from "@/types/pluginSettings";
 import { TemplateItem } from "./TemplateItem";
 
 interface TemplateSettingsProps {
 	settings: PluginSettings;
 	onChange: (key: keyof PluginSettings, value: unknown) => void;
-	templates: StatusTemplate[];
 }
 
 export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 	settings,
 	onChange,
-	templates,
 }) => {
 	const handleTemplateToggle = useCallback(
 		(templateId: string, enabled: boolean) => {
@@ -38,7 +36,7 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 				workflows
 			</p>
 			<div>
-				{templates.map((template) => (
+				{settings.templates.map((template) => (
 					<TemplateItem
 						key={template.id}
 						template={template}
