@@ -9,16 +9,39 @@ interface StatusDisplayProps {
 	status: NoteStatus;
 	variant: StatusDisplayVariant;
 	removable?: boolean;
+	hasNameConflicts?: boolean;
+	templateNameMode?: "always" | "never" | "auto";
 	onRemove?: () => void;
 	onClick?: () => void;
 }
 
 export const StatusDisplay: FC<StatusDisplayProps> = memo(
-	({ status, variant, removable = false, onRemove, onClick }) => {
+	({
+		status,
+		variant,
+		removable = false,
+		hasNameConflicts = false,
+		templateNameMode = "auto",
+		onRemove,
+		onClick,
+	}) => {
 		const [isRemoving, setIsRemoving] = useState(false);
 
 		const getDisplayName = () => {
-			return status.templateId
+			const shouldShowTemplate = (() => {
+				switch (templateNameMode) {
+					case "always":
+						return true;
+					case "never":
+						return false;
+					case "auto":
+						return hasNameConflicts && status.templateId;
+					default:
+						return false;
+				}
+			})();
+
+			return shouldShowTemplate && status.templateId
 				? `${status.name} (${status.templateId})`
 				: status.name;
 		};

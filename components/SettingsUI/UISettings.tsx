@@ -144,6 +144,31 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 					onChange={handleChange("statusBarShowNoStatusText")}
 				/>
 			</SettingItem>
+			<SettingItem
+				name="Show template names in status bar"
+				description="Control how template names are displayed alongside status names"
+			>
+				<Select
+					options={[
+						{
+							value: "never",
+							display: "Never show template names",
+						},
+						{
+							value: "auto",
+							display: "Show only when status names conflict",
+						},
+						{
+							value: "always",
+							display: "Always show template names",
+						},
+					]}
+					defaultValue={settings.statusBarShowTemplateName || "auto"}
+					onChange={(value) =>
+						onChange("statusBarShowTemplateName", value)
+					}
+				/>
+			</SettingItem>
 		</div>
 	);
 };

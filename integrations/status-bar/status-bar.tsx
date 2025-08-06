@@ -43,6 +43,9 @@ export class StatusBarIntegration {
 				if (key === "showStatusBar") {
 					this.render(); // INFO: Force a render to set disabled or enabled
 				}
+				if (key === "statusBarShowTemplateName") {
+					this.render(); // INFO: Force a render to set disabled or enabled
+				}
 				if (key === "enabledTemplates" || key === "templates") {
 					this.handleActiveFileChange().catch(console.error); // INFO: Force a re-read of the statuses and render
 				}
@@ -147,6 +150,9 @@ export class StatusBarIntegration {
 					statuses={this.noteStatusService?.statuses || {}}
 					hideIfNotStatuses={
 						settingsService.settings.autoHideStatusBar
+					}
+					templateNameMode={
+						settingsService.settings.statusBarShowTemplateName
 					}
 					onStatusClick={() => this.openStatusModal()}
 					noStatusConfig={this.getNoStatusConfig()}
