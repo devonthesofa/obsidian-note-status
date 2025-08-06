@@ -12,7 +12,7 @@ export class EditorToolbarIntegration {
 	private buttonElement: HTMLElement | null = null;
 	private noteStatusService: NoteStatusService | null = null;
 	private currentLeaf: WorkspaceLeaf | null = null;
-	private readonly BUTTON_CLASS = "note-status-editor-toolbar-button";
+	private readonly BUTTON_CLASS = "note-status-editor-toolbar-badge";
 
 	constructor(plugin: Plugin) {
 		if (EditorToolbarIntegration.instance) {

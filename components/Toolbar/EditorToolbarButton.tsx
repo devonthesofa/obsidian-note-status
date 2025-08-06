@@ -1,5 +1,7 @@
 import React, { FC, memo, useEffect, useState } from "react";
 import { GroupedStatuses } from "@/types/noteStatus";
+import { StatusesInfoPopup } from "@/integrations/popups/statusesInfoPopupIntegration";
+
 interface EditorToolbarButtonProps {
 	statuses: GroupedStatuses;
 	onClick: () => void;
@@ -8,6 +10,7 @@ interface EditorToolbarButtonProps {
 		color: string;
 	};
 }
+
 export const EditorToolbarButton: FC<EditorToolbarButtonProps> = memo(
 	({ statuses, onClick, unknownStatusConfig }) => {
 		const [statusChanged, setStatusChanged] = useState(false);
@@ -16,6 +19,7 @@ export const EditorToolbarButton: FC<EditorToolbarButtonProps> = memo(
 			([_, statusList]) => statusList,
 		);
 		const totalStatuses = allStatuses.length;
+
 		// Animate when status changes
 		useEffect(() => {
 			setStatusChanged(true);
@@ -23,77 +27,51 @@ export const EditorToolbarButton: FC<EditorToolbarButtonProps> = memo(
 			return () => clearTimeout(timer);
 		}, [statusEntries.length, allStatuses.map((s) => s.name).join(",")]);
 
-		const getTooltipText = () => {
-			if (totalStatuses === 0) {
-				return "No status assigned - click to set status";
-			}
-			if (totalStatuses === 1) {
-				return `Status: ${allStatuses[0].name} - click to change`;
-			}
-			const statusNames = allStatuses.map((s) => s.name).join(", ");
-			return `Statuses: ${statusNames} - click to change`;
+		const handleMouseEnter = () => {
+			StatusesInfoPopup.open(statuses);
 		};
 
-		const buttonClasses = [
-			"editor-toolbar-btn",
+		const handleMouseLeave = () => {
+			StatusesInfoPopup.close();
+		};
+
+		const getDisplayText = () => {
+			if (totalStatuses === 0) return "No Status";
+			if (totalStatuses === 1) return allStatuses[0].name;
+			return `${totalStatuses} Statuses`;
+		};
+
+		const getPrimaryColor = () => {
+			if (totalStatuses === 0) return unknownStatusConfig.color;
+			return allStatuses[0]?.color || "var(--interactive-accent)";
+		};
+
+		const badgeClasses = [
+			"editor-toolbar-badge",
 			totalStatuses === 0
-				? "editor-toolbar-btn--no-status"
-				: "editor-toolbar-btn--has-status",
-			statusChanged ? "editor-toolbar-btn--status-changed" : "",
+				? "editor-toolbar-badge--no-status"
+				: "editor-toolbar-badge--has-status",
+			statusChanged ? "editor-toolbar-badge--status-changed" : "",
 		]
 			.filter(Boolean)
 			.join(" ");
 
-		if (totalStatuses === 0) {
-			return (
-				<button
-					className={buttonClasses}
-					onClick={onClick}
-					title={getTooltipText()}
-					aria-label={getTooltipText()}
-					style={
-						{
-							"--status-color": unknownStatusConfig.color,
-						} as React.CSSProperties
-					}
-				>
-					<span
-						className="editor-toolbar-btn__icon"
-						aria-hidden="true"
-					>
-						{unknownStatusConfig.icon}
-					</span>
-				</button>
-			);
-		}
-
-		const primaryStatus = allStatuses[0];
-
 		return (
-			<button
-				className={buttonClasses}
+			<div
+				className={badgeClasses}
 				onClick={onClick}
-				title={getTooltipText()}
-				aria-label={getTooltipText()}
+				onMouseEnter={handleMouseEnter}
+				onMouseLeave={handleMouseLeave}
 				style={
 					{
-						"--status-color":
-							primaryStatus.color || "var(--interactive-accent)",
+						"--status-color": getPrimaryColor(),
 					} as React.CSSProperties
 				}
 			>
-				<span className="editor-toolbar-btn__icon" aria-hidden="true">
-					{primaryStatus.icon || "📝"}
+				<span className="editor-toolbar-badge__text">
+					{getDisplayText()}
 				</span>
-				{totalStatuses > 1 && (
-					<span
-						className="editor-toolbar-btn__count"
-						aria-label={`${totalStatuses} statuses`}
-					>
-						{totalStatuses}
-					</span>
-				)}
-			</button>
+			</div>
 		);
 	},
 );

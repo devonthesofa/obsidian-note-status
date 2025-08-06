@@ -1,84 +1,53 @@
-/* Editor Toolbar Button - Status indicator for notes */
-.editor-toolbar-btn {
+/* Editor Toolbar Badge - Status indicator as badge */
+.editor-toolbar-badge {
 	display: inline-flex;
 	align-items: center;
-	justify-content: center;
-	width: var(--header-height);
-	height: var(--header-height);
-	padding: 0;
-	border: none;
-	border-radius: var(--clickable-icon-radius);
-	background: transparent;
-	color: var(--icon-color);
-	cursor: pointer;
-	opacity: var(--icon-opacity);
-	position: relative;
-	transition: var(--anim-duration-fast) ease;
-}
-
-.editor-toolbar-btn:hover {
-	background: var(--background-modifier-hover);
-	opacity: var(--icon-opacity-hover);
-}
-
-.editor-toolbar-btn:active {
-	background: var(--background-modifier-active);
-}
-
-.editor-toolbar-btn:focus-visible {
-	outline: 2px solid var(--background-modifier-border-focus);
-	outline-offset: -2px;
-}
-
-.editor-toolbar-btn__icon {
-	font-size: var(--icon-size-sm);
-	line-height: 1;
-	transition: inherit;
-}
-
-.editor-toolbar-btn__count {
-	position: absolute;
-	top: -2px;
-	right: -2px;
-	min-width: var(--size-2-3);
-	height: var(--size-2-3);
-	padding: 0 var(--size-2-1);
+	padding: var(--size-2-1) var(--size-2-2);
 	background: var(--status-color, var(--interactive-accent));
 	color: var(--text-on-accent);
+	border-radius: var(--radius-m);
 	font-size: var(--font-ui-smaller);
 	font-weight: var(--font-weight-medium);
-	border-radius: var(--radius-xl);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border: 1px solid var(--background-primary);
+	cursor: pointer;
+	transition: var(--anim-duration-fast) ease;
+	opacity: 0.85;
+	margin-left: var(--size-2-1);
+}
+
+.editor-toolbar-badge:hover {
+	opacity: 1;
+	transform: translateY(-1px);
+	box-shadow: var(--shadow-s);
+}
+
+.editor-toolbar-badge__text {
+	white-space: nowrap;
+	line-height: 1;
 }
 
 /* Status variants */
-.editor-toolbar-btn--no-status .editor-toolbar-btn__icon {
-	color: var(--status-color, var(--text-muted));
-	opacity: 0.7;
+.editor-toolbar-badge--no-status {
+	background: var(--background-modifier-border);
+	color: var(--text-muted);
 }
 
-.editor-toolbar-btn--has-status .editor-toolbar-btn__icon {
-	color: var(--status-color, var(--interactive-accent));
-}
-
-.editor-toolbar-btn--has-status:hover .editor-toolbar-btn__icon {
-	transform: scale(1.05);
+.editor-toolbar-badge--no-status:hover {
+	background: var(--background-modifier-border-hover);
 }
 
 /* Status change animation */
-@keyframes status-pulse {
+@keyframes badge-pulse {
 	0%,
 	100% {
 		transform: scale(1);
+		opacity: 0.85;
 	}
 	50% {
-		transform: scale(1.1);
+		transform: scale(1.05);
+		opacity: 1;
 	}
 }
 
-.editor-toolbar-btn--status-changed .editor-toolbar-btn__icon {
-	animation: status-pulse var(--anim-duration-moderate) ease-out;
+.editor-toolbar-badge--status-changed {
+	animation: badge-pulse var(--anim-duration-moderate) ease-out;
 }
