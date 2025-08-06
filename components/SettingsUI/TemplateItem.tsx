@@ -78,15 +78,18 @@ export const TemplateItem: React.FC<TemplateItemProps> = ({
 						title="Edit template"
 					>
 						<svg
-							width="16"
-							height="16"
+							xmlns="http://www.w3.org/2000/svg"
+							width="24"
+							height="24"
 							viewBox="0 0 24 24"
 							fill="none"
 							stroke="currentColor"
-							strokeWidth="2"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
 						>
-							<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-							<path d="m18.5 2.5 4 4L13 16l-4-4L18.5 2.5z" />
+							<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+							<path d="m15 5 4 4" />
 						</svg>
 					</button>
 				)}
@@ -100,18 +103,21 @@ export const TemplateItem: React.FC<TemplateItemProps> = ({
 						title="Delete template"
 					>
 						<svg
-							width="16"
-							height="16"
+							xmlns="http://www.w3.org/2000/svg"
+							width="24"
+							height="24"
 							viewBox="0 0 24 24"
 							fill="none"
 							stroke="currentColor"
-							strokeWidth="2"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
 						>
-							<polyline points="3,6 5,6 21,6" />
-							<path d="M19,6l-2,14a2,2,0,0,1-2,2H9a2,2,0,0,1-2-2L5,6" />
-							<path d="M10,11V17" />
-							<path d="M14,11V17" />
-							<path d="M9,6V4a2,2,0,0,1,2-2h2a2,2,0,0,1,2,2V6" />
+							<path d="M10 11v6" />
+							<path d="M14 11v6" />
+							<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+							<path d="M3 6h18" />
+							<path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
 						</svg>
 					</button>
 				)}

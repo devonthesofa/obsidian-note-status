@@ -74,8 +74,6 @@ export const TemplateEditor: React.FC<TemplateEditorProps> = ({
 			id: template?.id || "", // Will be generated in integration
 			name: templateName.trim(),
 			description: templateDescription.trim(),
-			isPredefined: template?.isPredefined || false,
-			isEnabled: template?.isEnabled ?? true,
 			statuses: statuses,
 		};
 

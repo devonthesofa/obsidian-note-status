@@ -52,7 +52,6 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 			name: name.trim(),
 			description: description.trim(),
 			statuses: statusesWithTemplateId,
-			isCustom: true,
 		};
 
 		onSave(savedTemplate);

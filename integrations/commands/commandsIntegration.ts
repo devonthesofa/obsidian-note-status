@@ -31,7 +31,8 @@ export class CommandsIntegration {
 			({ key }) => {
 				if (
 					key === "quickStatusCommands" ||
-					key === "useMultipleStatuses"
+					key === "useMultipleStatuses" ||
+					key === "templates"
 				) {
 					this.commandsService.destroy();
 					/// BUG: if removed a command will persist because is not removed, you need the oldStates to send it to be disabled // const oldValue = this.settings[key]; // TODO: Send the old value

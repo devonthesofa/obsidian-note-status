@@ -27,8 +27,8 @@
 	align-items: center;
 	gap: var(--size-2-2);
 	padding: var(--size-2-3) var(--size-4-3);
-	background: var(--background-modifier-border);
-	border: 1px solid var(--background-modifier-border-hover);
+	background: var(--interactive-normal);
+	border: 1px solid var(--background-modifier-border);
 	border-radius: var(--radius-s);
 	color: var(--text-normal);
 	cursor: pointer;
@@ -37,8 +37,8 @@
 }
 
 .template-reset-btn:hover {
-	background: var(--background-modifier-border-hover);
-	color: var(--text-accent);
+	background: var(--interactive-hover);
+	color: var(--text-normal);
 }
 
 /* Template Sections */
@@ -58,8 +58,9 @@
 	border-bottom: 2px solid var(--background-modifier-border);
 }
 
-.template-section-title svg {
+.template-section-title .lucide {
 	opacity: 0.8;
+	color: var(--text-muted);
 }
 
 .template-list {
@@ -82,12 +83,20 @@
 
 .template-item:hover {
 	background: var(--background-modifier-hover);
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	border-color: var(--background-modifier-border-hover);
+	box-shadow: 0 2px 8px var(--shadow-color);
 }
 
 .template-item.enabled {
-	background: var(--background-modifier-success);
-	border-color: var(--interactive-success);
+	background: var(--background-modifier-hover);
+	border-color: var(--interactive-accent);
+	box-shadow: 0 0 0 1px var(--interactive-accent);
+}
+
+.template-item.enabled:hover {
+	box-shadow:
+		0 2px 8px var(--shadow-color),
+		0 0 0 1px var(--interactive-accent);
 }
 
 .template-item-content {
@@ -109,6 +118,9 @@
 }
 
 .template-custom-badge {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-1);
 	padding: var(--size-2-1) var(--size-2-2);
 	background: var(--interactive-accent);
 	color: var(--text-on-accent);
@@ -117,6 +129,11 @@
 	border-radius: var(--radius-s);
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
+}
+
+.template-custom-badge .lucide {
+	width: 12px;
+	height: 12px;
 }
 
 /* Template Item Actions */
@@ -143,6 +160,7 @@
 	cursor: pointer;
 	transition: all var(--anim-duration-fast) ease;
 	color: var(--text-muted);
+	background: transparent;
 }
 
 .template-action-btn:hover {
@@ -150,8 +168,8 @@
 }
 
 .template-action-btn--edit {
-	background: var(--background-modifier-border-hover);
-	color: var(--text-accent);
+	background: var(--interactive-normal);
+	color: var(--text-normal);
 }
 
 .template-action-btn--edit:hover {
@@ -160,13 +178,18 @@
 }
 
 .template-action-btn--delete {
-	background: var(--background-modifier-error);
+	background: var(--interactive-normal);
 	color: var(--text-error);
 }
 
 .template-action-btn--delete:hover {
 	background: var(--text-error);
 	color: var(--text-on-accent);
+}
+
+.template-action-btn .lucide {
+	width: 16px;
+	height: 16px;
 }
 
 /* Template Editor Modal */
@@ -206,8 +229,16 @@
 }
 
 .template-editor-add-status {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-2);
 	align-self: flex-start;
 	margin-top: var(--size-4-2);
+}
+
+.template-editor-add-status .lucide {
+	width: 16px;
+	height: 16px;
 }
 
 .template-editor-modal__actions {
@@ -227,16 +258,16 @@
 	font-weight: var(--font-medium);
 	cursor: pointer;
 	transition: all var(--anim-duration-fast) ease;
+	border: 1px solid var(--background-modifier-border);
 }
 
 .template-editor-modal__actions button:not(.mod-cta) {
-	background: var(--background-modifier-border);
-	border: 1px solid var(--background-modifier-border-hover);
+	background: var(--interactive-normal);
 	color: var(--text-normal);
 }
 
 .template-editor-modal__actions button:not(.mod-cta):hover {
-	background: var(--background-modifier-border-hover);
+	background: var(--interactive-hover);
 }
 
 .template-editor-modal__actions .mod-cta:disabled {

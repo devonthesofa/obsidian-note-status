@@ -6,11 +6,14 @@ import {
 	generateTemplateId,
 	isTemplateNameUnique,
 } from "@/utils/templateUtils";
+import {
+	DEFAULT_ENABLED_TEMPLATES,
+	PREDEFINED_TEMPLATES,
+} from "@/constants/predefinedTemplates";
 
 interface TemplateSettingsProps {
 	settings: PluginSettings;
 	onChange: (key: keyof PluginSettings, value: unknown) => void;
-	templates: StatusTemplate[];
 }
 
 export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
@@ -124,8 +127,8 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 		);
 		if (!confirmed) return;
 
-		onChange("templates", []);
-		onChange("enabledTemplates", ["colorful"]);
+		onChange("templates", [...PREDEFINED_TEMPLATES]);
+		onChange("enabledTemplates", [...DEFAULT_ENABLED_TEMPLATES]);
 	}, [onChange]);
 
 	const handleCancelEditor = useCallback(() => {
