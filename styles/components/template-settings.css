@@ -5,12 +5,9 @@
 /* Template Settings Actions */
 .template-settings-actions {
 	display: flex;
+	justify-content: end;
 	gap: var(--size-4-2);
-	margin-bottom: var(--size-4-4);
-	padding: var(--size-4-2);
-	background: var(--background-secondary);
-	border: 1px solid var(--background-modifier-border);
-	border-radius: var(--radius-m);
+	padding-bottom: var(--size-4-2);
 }
 
 .template-create-btn {

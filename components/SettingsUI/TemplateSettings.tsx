@@ -157,24 +157,24 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 				workflows, or create your own custom templates.
 			</p>
 
-			<div className="template-settings-actions">
-				<button
-					className="mod-cta template-create-btn"
-					onClick={handleCreateTemplate}
-				>
-					+ Create Template
-				</button>
-				<button
-					className="template-reset-btn"
-					onClick={handleResetToDefaults}
-				>
-					🔄 Reset to Defaults
-				</button>
-			</div>
-
 			{/* Custom Templates Section */}
 			<div className="template-section">
 				<h4 className="template-section-title">Custom Templates</h4>
+
+				<div className="template-settings-actions">
+					<button
+						className="mod-cta template-create-btn"
+						onClick={handleCreateTemplate}
+					>
+						+ Create Template
+					</button>
+					<button
+						className="template-reset-btn"
+						onClick={handleResetToDefaults}
+					>
+						🔄 Reset to Defaults
+					</button>
+				</div>
 				<div className="template-list">
 					{settings.templates.map((template) => (
 						<TemplateItem
