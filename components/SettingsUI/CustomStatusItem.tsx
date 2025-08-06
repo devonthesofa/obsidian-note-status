@@ -1,12 +1,10 @@
 import { NoteStatus } from "@/types/noteStatus";
-import { PluginSettings } from "@/types/pluginSettings";
 import React from "react";
 import { Input } from "@/components/atoms/Input";
 
 export type Props = {
 	status: NoteStatus;
 	index: number;
-	settings: PluginSettings;
 	onCustomStatusChange: (
 		index: number,
 		column: "name" | "icon" | "color" | "description",

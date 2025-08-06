@@ -5,7 +5,7 @@ interface SelectableListItemProps {
 	focused?: boolean;
 	icon?: ReactNode;
 	children: ReactNode;
-	onClick?: () => void;
+	onClick?: (e: React.MouseEvent) => void;
 	className?: string;
 	title?: string;
 }
@@ -21,10 +21,10 @@ export const SelectableListItem: React.FC<SelectableListItemProps> = ({
 }) => {
 	const [isHovered, setIsHovered] = useState(false);
 
-	const handleClick = () => {
+	const handleClick = (e: React.MouseEvent) => {
 		if (onClick) {
 			setTimeout(() => {
-				onClick();
+				onClick(e);
 			}, 150);
 		}
 	};

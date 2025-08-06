@@ -8,6 +8,7 @@
 /* Import component stylesheets */
 @import "components/status-bar.css";
 @import "components/settings.css";
+@import "components/template-settings.css";
 @import "components/dashboard.css";
 @import "components/grouped-view.css";
 @import "components/file-explorer.css";

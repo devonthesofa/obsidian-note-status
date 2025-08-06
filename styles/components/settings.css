@@ -15,37 +15,6 @@
 	gap: var(--size-2-2);
 }
 
-/* Template Item */
-.template-item {
-	border: 1px solid var(--background-modifier-border);
-	border-radius: var(--radius-m);
-	margin-bottom: var(--size-4-2);
-	padding: var(--size-4-3);
-	background: var(--background-primary-alt);
-	cursor: pointer;
-	transition: all var(--anim-duration-fast) ease;
-}
-
-.template-item:hover {
-	background: var(--background-modifier-hover);
-}
-
-.template-item.enabled {
-	background: var(--background-modifier-success);
-	border-color: var(--interactive-success);
-}
-
-.template-checkbox {
-	pointer-events: none;
-}
-
-.template-statuses {
-	margin-top: var(--size-2-2);
-	display: flex;
-	flex-wrap: wrap;
-	gap: var(--size-2-1);
-}
-
 /* Custom Status Item - BEM Methodology */
 .custom-status-item {
 	background: var(--background-secondary);
