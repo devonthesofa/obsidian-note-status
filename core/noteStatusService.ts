@@ -8,7 +8,6 @@ import {
 } from "@/types/noteStatus";
 import settingsService from "@/core/settingsService";
 import eventBus from "./eventBus";
-import { PREDEFINED_TEMPLATES } from "@/constants/predefinedTemplates";
 
 export abstract class BaseNoteStatusService {
 	static app: App;
@@ -64,8 +63,9 @@ export abstract class BaseNoteStatusService {
 		if (settingsService.settings.useCustomStatusesOnly) {
 			return [];
 		}
-		const enabledTemplates = PREDEFINED_TEMPLATES.filter((template) =>
-			settingsService.settings.enabledTemplates.includes(template.id),
+		const enabledTemplates = settingsService.settings.templates.filter(
+			(template) =>
+				settingsService.settings.enabledTemplates.includes(template.id),
 		);
 		return enabledTemplates.flatMap((t) => t.statuses);
 	}

@@ -1,5 +1,8 @@
 import { PluginSettings } from "types/pluginSettings";
-import { DEFAULT_ENABLED_TEMPLATES } from "./predefinedTemplates";
+import {
+	DEFAULT_ENABLED_TEMPLATES,
+	PREDEFINED_TEMPLATES,
+} from "./predefinedTemplates";
 
 export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	fileExplorerIconPosition: "absolute-right",
@@ -12,6 +15,7 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	},
 	showStatusBar: true,
 	autoHideStatusBar: false,
+	templates: [...PREDEFINED_TEMPLATES],
 	customStatuses: [],
 	showStatusIconsInExplorer: true,
 	hideUnknownStatusInExplorer: true, // Default to hide unknown status

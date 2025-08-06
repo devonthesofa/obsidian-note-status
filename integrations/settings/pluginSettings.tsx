@@ -1,4 +1,4 @@
-import SettingsUI from "@/components/SettingsUI.tsx";
+import SettingsUI from "@/components/SettingsUI";
 import settingsService from "@/core/settingsService";
 import { Plugin, PluginSettingTab } from "obsidian";
 import { createRoot, Root } from "react-dom/client";

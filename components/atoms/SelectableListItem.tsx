@@ -1,11 +1,12 @@
 import React, { ReactNode, useState } from "react";
+import { ObsidianIcon } from "./ObsidianIcon";
 
 interface SelectableListItemProps {
 	selected?: boolean;
 	focused?: boolean;
 	icon?: ReactNode;
 	children: ReactNode;
-	onClick?: () => void;
+	onClick?: (e: React.MouseEvent) => void;
 	className?: string;
 	title?: string;
 }
@@ -21,10 +22,10 @@ export const SelectableListItem: React.FC<SelectableListItemProps> = ({
 }) => {
 	const [isHovered, setIsHovered] = useState(false);
 
-	const handleClick = () => {
+	const handleClick = (e: React.MouseEvent) => {
 		if (onClick) {
 			setTimeout(() => {
-				onClick();
+				onClick(e);
 			}, 150);
 		}
 	};
@@ -81,18 +82,7 @@ export const SelectableListItem: React.FC<SelectableListItemProps> = ({
 						color: "var(--interactive-accent)",
 					}}
 				>
-					<svg
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="2"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-					>
-						<polyline points="20,6 9,17 4,12" />
-					</svg>
+					<ObsidianIcon name="check" />
 				</div>
 			)}
 		</div>

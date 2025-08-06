@@ -1,6 +1,7 @@
 import { NoteStatus } from "@/types/noteStatus";
 import { FC, memo, useState } from "react";
 import { getStatusTooltip } from "@/utils/statusUtils";
+import { ObsidianIcon } from "./ObsidianIcon";
 
 export type StatusDisplayVariant = "chip" | "badge" | "template";
 
@@ -79,19 +80,7 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 								cursor: "pointer",
 							}}
 						>
-							<svg
-								width="12"
-								height="12"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							>
-								<line x1="18" y1="6" x2="6" y2="18" />
-								<line x1="6" y1="6" x2="18" y2="18" />
-							</svg>
+							<ObsidianIcon name="thrash" size={12} />
 						</div>
 					)}
 				</div>

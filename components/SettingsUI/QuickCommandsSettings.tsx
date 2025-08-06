@@ -6,7 +6,6 @@ import { NoStatusesMessage } from "./NoStatusesMessage";
 export type Props = {
 	settings: PluginSettings;
 	onChange: (key: keyof PluginSettings, value: unknown) => void;
-	templates: StatusTemplate[];
 };
 
 type GroupedStatuses = {
@@ -20,7 +19,6 @@ type GroupedStatuses = {
 export const QuickCommandsSettings: React.FC<Props> = ({
 	settings,
 	onChange,
-	templates,
 }) => {
 	const groupedStatuses = useMemo((): GroupedStatuses => {
 		const customStatuses = settings.customStatuses.filter(
@@ -29,7 +27,9 @@ export const QuickCommandsSettings: React.FC<Props> = ({
 		const templateGroups = [];
 		if (!settings.useCustomStatusesOnly) {
 			for (const templateId of settings.enabledTemplates) {
-				const template = templates.find((t) => t.id === templateId);
+				const template = settings.templates.find(
+					(t) => t.id === templateId,
+				);
 				if (template) {
 					const statuses = template.statuses.filter(
 						(s) => s.name !== "unknown",
@@ -41,7 +41,7 @@ export const QuickCommandsSettings: React.FC<Props> = ({
 			}
 		}
 		return { customStatuses, templateGroups };
-	}, [settings, templates]);
+	}, [settings]);
 
 	const currentQuickCommands = settings.quickStatusCommands || [];
 

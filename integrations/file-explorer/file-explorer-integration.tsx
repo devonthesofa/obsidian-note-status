@@ -57,7 +57,8 @@ export class FileExplorerIntegration implements IElementProcessor {
 					key === "strictStatuses" ||
 					key === "fileExplorerIconPosition" ||
 					key === "unknownStatusIcon" ||
-					key === "unknownStatusColor"
+					key === "unknownStatusColor" ||
+					key === "templates"
 				) {
 					this.destroy();
 					this.integrate().catch((r) => console.error(r));
