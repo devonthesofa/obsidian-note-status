@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { NoteStatus } from "@/types/noteStatus";
 import { SearchFilter } from "../atoms/SearchFilter";
 import { StatusSelector } from "../atoms/StatusSelector";
-import { SettingItem } from "../SettingsUI.tsx/SettingItem";
+import { SettingItem } from "../SettingsUI/SettingItem";
 import { CurrentStatusChips } from "./CurrentStatusChips";
 import { useKeyboardNavigation } from "./useKeyboardNavigation";
 

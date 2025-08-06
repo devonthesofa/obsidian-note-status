@@ -1,7 +1,7 @@
 import React from "react";
 import { NoteStatus } from "@/types/noteStatus";
 import { StatusDisplay } from "../atoms/StatusDisplay";
-import { SettingItem } from "../SettingsUI.tsx/SettingItem";
+import { SettingItem } from "../SettingsUI/SettingItem";
 
 interface Props {
 	currentStatuses: NoteStatus[];
