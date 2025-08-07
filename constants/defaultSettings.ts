@@ -33,4 +33,8 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	statusBarShowNoStatusIcon: false,
 	statusBarShowNoStatusText: true,
 	vaultSizeLimit: 15000, // Disable dashboard and grouped view for vaults with more notes than this limit
+	// Editor toolbar button settings
+	showEditorToolbarButton: true, // Default to show the toolbar button
+	editorToolbarButtonPosition: "right", // Default position on the right
+	editorToolbarButtonDisplay: "all-notes", // Default to show button in all notes
 };

@@ -8,6 +8,7 @@ import { StatusModalIntegration } from "./integrations/modals/statusModalIntegra
 import ContextMenuIntegration from "./integrations/context-menu/contextMenuIntegration";
 import { FileExplorerIntegration } from "./integrations/file-explorer/file-explorer-integration";
 import { CommandsIntegration } from "./integrations/commands/commandsIntegration";
+import EditorToolbarIntegration from "./integrations/toolbar/editorToolbarIntegration";
 import {
 	GroupedStatusView,
 	VIEW_TYPE_EXAMPLE,
@@ -23,6 +24,7 @@ export default class NoteStatusPlugin extends Plugin {
 	private contextMenuIntegration: ContextMenuIntegration;
 	private fileExplorerIntegration: FileExplorerIntegration;
 	private commandsIntegration: CommandsIntegration;
+	private editorToolbarIntegration: EditorToolbarIntegration;
 
 	async onload() {
 		BaseNoteStatusService.initialize(this.app);
@@ -34,6 +36,7 @@ export default class NoteStatusPlugin extends Plugin {
 			this.loadStatusBar(),
 			this.loadFileExplorer(),
 			this.loadCommands(),
+			this.loadEditorToolbar(),
 			this.loadEventBus(),
 		]);
 
@@ -62,6 +65,7 @@ export default class NoteStatusPlugin extends Plugin {
 		this.contextMenuIntegration?.destroy();
 		this.fileExplorerIntegration?.destroy();
 		this.commandsIntegration?.destroy();
+		this.editorToolbarIntegration?.destroy();
 		this.pluginSettingsIntegration?.destroy();
 
 		// Clean up event subscriptions
@@ -187,5 +191,10 @@ export default class NoteStatusPlugin extends Plugin {
 	private async loadCommands() {
 		this.commandsIntegration = new CommandsIntegration(this);
 		await this.commandsIntegration.integrate();
+	}
+
+	private async loadEditorToolbar() {
+		this.editorToolbarIntegration = new EditorToolbarIntegration(this);
+		await this.editorToolbarIntegration.integrate();
 	}
 }
