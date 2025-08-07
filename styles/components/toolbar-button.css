@@ -1,75 +1,46 @@
-/* Editor Toolbar Button - Obsidian-integrated icon button */
-.editor-toolbar-button {
+/* Editor Toolbar Button - Using Obsidian's native clickable-icon styling */
+
+/* Container styling for proper integration */
+.note-status-editor-toolbar-badge {
 	display: inline-flex;
 	align-items: center;
-	justify-content: center;
-	gap: var(--size-2-1);
-	padding: var(--size-2-1);
-	background: transparent;
-	border: 1px solid transparent;
-	border-radius: var(--radius-s);
-	font-size: var(--font-ui-smaller);
-	font-weight: var(--font-medium);
-	color: var(--icon-color, var(--text-muted));
-	cursor: pointer;
-	transition: all var(--anim-duration-fast) ease;
-	position: relative;
-	min-width: 24px;
-	min-height: 24px;
-	opacity: var(--icon-opacity);
-	outline: none;
+	margin: 0 var(--size-2-1);
 }
 
-.editor-toolbar-button:hover {
-	background: transparent;
-	border-color: var(--background-modifier-border);
-	opacity: var(--icon-opacity-hover);
-	color: var(--icon-color-hover, var(--text-normal));
-}
-
-.editor-toolbar-button:active {
-	background: var(--background-modifier-hover);
-	border-color: var(--background-modifier-border-hover);
-	opacity: var(--icon-opacity-active);
-}
-
-.editor-toolbar-button:focus-visible {
-	outline: 2px solid var(--interactive-accent);
-	outline-offset: 1px;
-}
-
-/* Icon styling */
-.editor-toolbar-button__icon {
-	font-size: 14px;
-	line-height: 1;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	min-width: 14px;
-}
-
-/* Text styling - Hidden by default, shown on hover */
-.editor-toolbar-button__text {
+/* Hidden state */
+.note-status-editor-toolbar-badge--hidden {
 	display: none;
-	white-space: nowrap;
-	line-height: 1.2;
-	font-size: var(--font-ui-smaller);
-	font-weight: var(--font-medium);
-	margin-left: var(--size-2-1);
 }
 
-/* Icon stack for multiple statuses */
-.editor-toolbar-button__icon-stack {
+/* BEM-based styles for toolbar button components */
+
+/* Status icon styling */
+.editor-toolbar-button__icon {
+	font-size: 16px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--text-muted);
+}
+
+/* Icon with status color */
+.editor-toolbar-button__icon--has-status {
+	color: var(--interactive-accent);
+}
+
+/* Multiple statuses container */
+.editor-toolbar-button__icon-container {
 	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 }
 
+/* Status counter badge */
 .editor-toolbar-button__counter {
 	position: absolute;
-	top: -2px;
-	right: -2px;
+	top: -4px;
+	right: -6px;
 	min-width: 12px;
 	height: 12px;
 	padding: 0 2px;
@@ -83,61 +54,4 @@
 	justify-content: center;
 	line-height: 1;
 	border: 1px solid var(--background-primary);
-}
-
-/* Status variants */
-.editor-toolbar-button--has-status {
-	color: var(--status-color, var(--interactive-accent));
-}
-
-.editor-toolbar-button--has-status:hover {
-	color: var(--status-color, var(--interactive-accent));
-}
-
-.editor-toolbar-button--no-status {
-	color: var(--text-muted);
-}
-
-.editor-toolbar-button--no-status:hover {
-	color: var(--text-normal);
-}
-
-/* Multiple statuses styling */
-.editor-toolbar-button--multiple {
-	color: var(--status-color, var(--interactive-accent));
-	position: relative;
-}
-
-/* Status change animation */
-@keyframes status-change-pulse {
-	0% {
-		opacity: var(--icon-opacity);
-	}
-	50% {
-		opacity: 1;
-	}
-	100% {
-		opacity: var(--icon-opacity);
-	}
-}
-
-.editor-toolbar-button--status-changed {
-	animation: status-change-pulse 0.6s ease-out;
-}
-
-/* Show text on hover for better UX */
-.editor-toolbar-button:hover .editor-toolbar-button__text {
-	display: inline;
-}
-
-/* Container styling for proper integration */
-.note-status-editor-toolbar-badge {
-	display: inline-flex;
-	align-items: center;
-	margin: 0 var(--size-2-1);
-}
-
-/* Hidden state */
-.note-status-editor-toolbar-badge--hidden {
-	display: none;
 }
