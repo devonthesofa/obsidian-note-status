@@ -169,6 +169,47 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 					}
 				/>
 			</SettingItem>
+
+			<h4>Editor Toolbar Button</h4>
+
+			<SettingItem
+				name="Show editor toolbar button"
+				description="Display status button in the editor toolbar"
+			>
+				<input
+					type="checkbox"
+					checked={settings.showEditorToolbarButton ?? true}
+					onChange={handleChange("showEditorToolbarButton")}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Editor toolbar button position"
+				description="Choose where to position the status button in the editor toolbar"
+			>
+				<Select
+					options={[
+						{
+							value: "left",
+							display: "Left side of toolbar",
+						},
+						{
+							value: "right",
+							display: "Right side (after all buttons)",
+						},
+						{
+							value: "right-before",
+							display: "Right side (before action buttons)",
+						},
+					]}
+					defaultValue={
+						settings.editorToolbarButtonPosition || "right"
+					}
+					onChange={(value) =>
+						onChange("editorToolbarButtonPosition", value)
+					}
+				/>
+			</SettingItem>
 		</div>
 	);
 };

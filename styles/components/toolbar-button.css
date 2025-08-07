@@ -1,4 +1,4 @@
-/* Editor Toolbar Button - Compact icon-style button */
+/* Editor Toolbar Button - Obsidian-integrated icon button */
 .editor-toolbar-button {
 	display: inline-flex;
 	align-items: center;
@@ -6,7 +6,7 @@
 	gap: var(--size-2-1);
 	padding: var(--size-2-1);
 	background: transparent;
-	border: none;
+	border: 1px solid transparent;
 	border-radius: var(--radius-s);
 	font-size: var(--font-ui-smaller);
 	font-weight: var(--font-medium);
@@ -21,13 +21,15 @@
 }
 
 .editor-toolbar-button:hover {
-	background: var(--background-modifier-hover);
+	background: transparent;
+	border-color: var(--background-modifier-border);
 	opacity: var(--icon-opacity-hover);
 	color: var(--icon-color-hover, var(--text-normal));
 }
 
 .editor-toolbar-button:active {
-	background: var(--background-modifier-active);
+	background: var(--background-modifier-hover);
+	border-color: var(--background-modifier-border-hover);
 	opacity: var(--icon-opacity-active);
 }
 
@@ -126,4 +128,16 @@
 /* Show text on hover for better UX */
 .editor-toolbar-button:hover .editor-toolbar-button__text {
 	display: inline;
+}
+
+/* Container styling for proper integration */
+.note-status-editor-toolbar-badge {
+	display: inline-flex;
+	align-items: center;
+	margin: 0 var(--size-2-1);
+}
+
+/* Hidden state */
+.note-status-editor-toolbar-badge--hidden {
+	display: none;
 }

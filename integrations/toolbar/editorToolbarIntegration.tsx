@@ -60,6 +60,12 @@ export class EditorToolbarIntegration {
 				) {
 					this.render();
 				}
+				if (key === "showEditorToolbarButton") {
+					this.handleActiveFileChange().catch(console.error);
+				}
+				if (key === "editorToolbarButtonPosition") {
+					this.handleActiveFileChange().catch(console.error);
+				}
 			},
 			"editorToolbarIntegrationSubscription2",
 		);
@@ -75,8 +81,14 @@ export class EditorToolbarIntegration {
 
 	private async handleActiveFileChange() {
 		this.extractStatusesFromLeaf(this.currentLeaf);
-		this.createButton();
-		this.render();
+
+		// Check if toolbar button should be shown
+		if (settingsService.settings.showEditorToolbarButton) {
+			this.createButton();
+			this.render();
+		} else {
+			this.removeButton();
+		}
 	}
 
 	private extractStatusesFromLeaf(leaf: WorkspaceLeaf | null) {
@@ -102,51 +114,57 @@ export class EditorToolbarIntegration {
 			return;
 		}
 		const markdownView = this.currentLeaf!.view as MarkdownView;
-
-		// Try multiple selectors for different Obsidian versions
-		const possibleSelectors = [
-			".view-header-nav-buttons",
-			".view-actions",
-			".view-header .clickable-icon:last-child",
-		];
-
-		let actionsContainer: Element | null = null;
-
-		for (const selector of possibleSelectors) {
-			actionsContainer = markdownView.containerEl.querySelector(selector);
-			if (actionsContainer) break;
-		}
-
-		// Fallback: create container if none exists
-		if (!actionsContainer) {
-			const viewHeader =
-				markdownView.containerEl.querySelector(".view-header");
-			if (viewHeader) {
-				actionsContainer = document.createElement("div");
-				actionsContainer.className = "view-header-nav-buttons";
-				viewHeader.appendChild(actionsContainer);
-			}
-		}
-
-		if (!actionsContainer) {
-			console.warn(
-				"Could not find or create actions container for editor toolbar button",
-			);
-			return;
-		}
+		const position = settingsService.settings.editorToolbarButtonPosition;
 
 		// Remove existing button if it exists
 		if (this.buttonElement) {
 			this.removeButton();
 		}
 
+		// Find the appropriate container based on position
+		let targetContainer: Element | null = null;
+
+		if (position === "left") {
+			// For left position, use the nav buttons area or title container
+			targetContainer =
+				markdownView.containerEl.querySelector(
+					".view-header-nav-buttons",
+				) ||
+				markdownView.containerEl.querySelector(
+					".view-header-title-container",
+				) ||
+				markdownView.containerEl.querySelector(".view-header-left");
+		} else {
+			// For right positions, use the view-actions container
+			targetContainer =
+				markdownView.containerEl.querySelector(".view-actions");
+		}
+
+		if (!targetContainer) {
+			console.warn(
+				"Could not find target container for editor toolbar button",
+			);
+			return;
+		}
+
 		this.buttonElement = document.createElement("div");
 		this.buttonElement.className = this.BUTTON_CLASS;
 
-		// Insert button at the end of actions container (right side)
-		if (actionsContainer) {
-			actionsContainer.appendChild(this.buttonElement);
+		// Insert button based on position setting
+		if (position === "left") {
+			// For left, insert after existing nav buttons
+			targetContainer.appendChild(this.buttonElement);
+		} else if (position === "right-before") {
+			// For right-before, insert at the beginning of actions
+			targetContainer.insertBefore(
+				this.buttonElement,
+				targetContainer.firstChild,
+			);
+		} else {
+			// For right, insert at the end of actions
+			targetContainer.appendChild(this.buttonElement);
 		}
+
 		this.root = createRoot(this.buttonElement);
 	}
 
