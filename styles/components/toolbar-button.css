@@ -1,53 +1,129 @@
-/* Editor Toolbar Badge - Status indicator as badge */
-.editor-toolbar-badge {
+/* Editor Toolbar Button - Compact icon-style button */
+.editor-toolbar-button {
 	display: inline-flex;
 	align-items: center;
-	padding: var(--size-2-1) var(--size-2-2);
-	background: var(--status-color, var(--interactive-accent));
-	color: var(--text-on-accent);
-	border-radius: var(--radius-m);
+	justify-content: center;
+	gap: var(--size-2-1);
+	padding: var(--size-2-1);
+	background: transparent;
+	border: none;
+	border-radius: var(--radius-s);
 	font-size: var(--font-ui-smaller);
-	font-weight: var(--font-weight-medium);
+	font-weight: var(--font-medium);
+	color: var(--icon-color, var(--text-muted));
 	cursor: pointer;
-	transition: var(--anim-duration-fast) ease;
-	opacity: 0.85;
+	transition: all var(--anim-duration-fast) ease;
+	position: relative;
+	min-width: 24px;
+	min-height: 24px;
+	opacity: var(--icon-opacity);
+	outline: none;
+}
+
+.editor-toolbar-button:hover {
+	background: var(--background-modifier-hover);
+	opacity: var(--icon-opacity-hover);
+	color: var(--icon-color-hover, var(--text-normal));
+}
+
+.editor-toolbar-button:active {
+	background: var(--background-modifier-active);
+	opacity: var(--icon-opacity-active);
+}
+
+.editor-toolbar-button:focus-visible {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: 1px;
+}
+
+/* Icon styling */
+.editor-toolbar-button__icon {
+	font-size: 14px;
+	line-height: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 14px;
+}
+
+/* Text styling - Hidden by default, shown on hover */
+.editor-toolbar-button__text {
+	display: none;
+	white-space: nowrap;
+	line-height: 1.2;
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-medium);
 	margin-left: var(--size-2-1);
 }
 
-.editor-toolbar-badge:hover {
-	opacity: 1;
-	transform: translateY(-1px);
-	box-shadow: var(--shadow-s);
+/* Icon stack for multiple statuses */
+.editor-toolbar-button__icon-stack {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
-.editor-toolbar-badge__text {
-	white-space: nowrap;
+.editor-toolbar-button__counter {
+	position: absolute;
+	top: -2px;
+	right: -2px;
+	min-width: 12px;
+	height: 12px;
+	padding: 0 2px;
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	font-size: 8px;
+	font-weight: var(--font-semibold);
+	border-radius: 6px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	line-height: 1;
+	border: 1px solid var(--background-primary);
 }
 
 /* Status variants */
-.editor-toolbar-badge--no-status {
-	background: var(--background-modifier-border);
+.editor-toolbar-button--has-status {
+	color: var(--status-color, var(--interactive-accent));
+}
+
+.editor-toolbar-button--has-status:hover {
+	color: var(--status-color, var(--interactive-accent));
+}
+
+.editor-toolbar-button--no-status {
 	color: var(--text-muted);
 }
 
-.editor-toolbar-badge--no-status:hover {
-	background: var(--background-modifier-border-hover);
+.editor-toolbar-button--no-status:hover {
+	color: var(--text-normal);
+}
+
+/* Multiple statuses styling */
+.editor-toolbar-button--multiple {
+	color: var(--status-color, var(--interactive-accent));
+	position: relative;
 }
 
 /* Status change animation */
-@keyframes badge-pulse {
-	0%,
-	100% {
-		transform: scale(1);
-		opacity: 0.85;
+@keyframes status-change-pulse {
+	0% {
+		opacity: var(--icon-opacity);
 	}
 	50% {
-		transform: scale(1.05);
 		opacity: 1;
+	}
+	100% {
+		opacity: var(--icon-opacity);
 	}
 }
 
-.editor-toolbar-badge--status-changed {
-	animation: badge-pulse var(--anim-duration-moderate) ease-out;
+.editor-toolbar-button--status-changed {
+	animation: status-change-pulse 0.6s ease-out;
+}
+
+/* Show text on hover for better UX */
+.editor-toolbar-button:hover .editor-toolbar-button__text {
+	display: inline;
 }
