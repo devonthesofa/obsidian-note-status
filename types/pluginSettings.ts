@@ -33,5 +33,9 @@ export type PluginSettings = {
 	statusBarShowNoStatusIcon: boolean; // Whether to show icon in status bar for no status
 	statusBarShowNoStatusText: boolean; // Whether to show text in status bar for no status
 	vaultSizeLimit: number; // Disable dashboard and grouped view for vaults with more notes than this limit
+	// Editor toolbar button settings
+	showEditorToolbarButton: boolean; // Whether to show the toolbar button
+	editorToolbarButtonPosition: "left" | "right" | "right-before"; // Position of the toolbar button
+	editorToolbarButtonDisplay: "all-notes" | "active-only"; // Whether to show button in all notes or only active one
 	[key: string]: unknown;
 };

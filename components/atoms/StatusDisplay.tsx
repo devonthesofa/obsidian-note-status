@@ -103,7 +103,7 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 								cursor: "pointer",
 							}}
 						>
-							<ObsidianIcon name="thrash" size={12} />
+							<ObsidianIcon name="trash" size={12} />
 						</div>
 					)}
 				</div>

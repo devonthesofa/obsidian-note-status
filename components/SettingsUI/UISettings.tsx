@@ -169,6 +169,71 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 					}
 				/>
 			</SettingItem>
+
+			<h4>Editor Toolbar Button</h4>
+
+			<SettingItem
+				name="Show editor toolbar button"
+				description="Display status button in the editor toolbar"
+			>
+				<input
+					type="checkbox"
+					checked={settings.showEditorToolbarButton ?? true}
+					onChange={handleChange("showEditorToolbarButton")}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Editor toolbar button position"
+				description="Choose where to position the status button in the editor toolbar"
+			>
+				<Select
+					options={[
+						{
+							value: "left",
+							display: "Left side of toolbar",
+						},
+						{
+							value: "right",
+							display: "Right side (after all buttons)",
+						},
+						{
+							value: "right-before",
+							display: "Right side (before action buttons)",
+						},
+					]}
+					defaultValue={
+						settings.editorToolbarButtonPosition || "right"
+					}
+					onChange={(value) =>
+						onChange("editorToolbarButtonPosition", value)
+					}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Editor toolbar button display"
+				description="Control which notes show the status button"
+			>
+				<Select
+					options={[
+						{
+							value: "all-notes",
+							display: "All open notes",
+						},
+						{
+							value: "active-only",
+							display: "Active note only",
+						},
+					]}
+					defaultValue={
+						settings.editorToolbarButtonDisplay || "all-notes"
+					}
+					onChange={(value) =>
+						onChange("editorToolbarButtonDisplay", value)
+					}
+				/>
+			</SettingItem>
 		</div>
 	);
 };
