@@ -5,13 +5,18 @@ import settingsService from "@/core/settingsService";
 import { EditorToolbarButton } from "@/components/Toolbar/EditorToolbarButton";
 import { NoteStatusService } from "@/core/noteStatusService";
 
+interface LeafButton {
+	leaf: WorkspaceLeaf;
+	root: Root;
+	buttonElement: HTMLElement;
+	noteStatusService: NoteStatusService;
+}
+
 export class EditorToolbarIntegration {
 	private static instance: EditorToolbarIntegration | null = null;
-	private root: Root | null = null;
 	private plugin: Plugin;
-	private buttonElement: HTMLElement | null = null;
-	private noteStatusService: NoteStatusService | null = null;
-	private currentLeaf: WorkspaceLeaf | null = null;
+	private leafButtons: Map<WorkspaceLeaf, LeafButton> = new Map();
+	private currentActiveLeaf: WorkspaceLeaf | null = null;
 	private readonly BUTTON_CLASS = "note-status-editor-toolbar-badge";
 
 	constructor(plugin: Plugin) {
@@ -23,15 +28,28 @@ export class EditorToolbarIntegration {
 	}
 
 	async integrate() {
+		// Initialize the current active leaf
+		const activeLeaf = this.plugin.app.workspace.activeLeaf;
+		if (activeLeaf && this.isValidMarkdownLeaf(activeLeaf)) {
+			this.currentActiveLeaf = activeLeaf;
+		}
+
+		// Initialize buttons based on display mode
+		this.initializeButtons();
+
+		// Listen for new leaves being created
+		this.plugin.registerEvent(
+			this.plugin.app.workspace.on("layout-change", () => {
+				this.handleLayoutChange();
+			}),
+		);
+
 		eventBus.subscribe(
 			"active-file-change",
 			({ leaf }) => {
-				if (this.isValidMarkdownLeaf(leaf)) {
-					this.currentLeaf = leaf;
-					this.handleActiveFileChange().catch(console.error);
-				} else {
-					this.removeButton();
-				}
+				this.currentActiveLeaf =
+					leaf && this.isValidMarkdownLeaf(leaf) ? leaf : null;
+				this.handleActiveLeafChange();
 			},
 			"editorToolbarIntegrationSubscription1",
 		);
@@ -40,31 +58,34 @@ export class EditorToolbarIntegration {
 			"plugin-settings-changed",
 			({ key }) => {
 				if (key === "enabledTemplates" || key === "templates") {
-					this.handleActiveFileChange().catch(console.error);
+					this.refreshAllButtons();
 				}
 				if (key === "useMultipleStatuses") {
-					this.handleActiveFileChange().catch(console.error);
+					this.refreshAllButtons();
 				}
 				if (key === "tagPrefix") {
-					this.handleActiveFileChange().catch(console.error);
+					this.refreshAllButtons();
 				}
 				if (key === "useCustomStatusesOnly") {
-					this.handleActiveFileChange().catch(console.error);
+					this.refreshAllButtons();
 				}
 				if (key === "customStatuses") {
-					this.handleActiveFileChange().catch(console.error);
+					this.refreshAllButtons();
 				}
 				if (
 					key === "unknownStatusIcon" ||
 					key === "unknownStatusColor"
 				) {
-					this.render();
+					this.renderAllButtons();
 				}
 				if (key === "showEditorToolbarButton") {
-					this.handleActiveFileChange().catch(console.error);
+					this.handleShowHideButtons();
 				}
 				if (key === "editorToolbarButtonPosition") {
-					this.handleActiveFileChange().catch(console.error);
+					this.recreateAllButtons();
+				}
+				if (key === "editorToolbarButtonDisplay") {
+					this.handleDisplayModeChange();
 				}
 			},
 			"editorToolbarIntegrationSubscription2",
@@ -72,54 +93,153 @@ export class EditorToolbarIntegration {
 
 		eventBus.subscribe(
 			"frontmatter-manually-changed",
-			() => {
-				this.handleActiveFileChange().catch(console.error);
+			({ file }) => {
+				// Find the button for the specific file and refresh only that one
+				for (const [leaf, leafButton] of this.leafButtons.entries()) {
+					const markdownView = leaf.view as MarkdownView;
+					if (markdownView.file === file) {
+						leafButton.noteStatusService = new NoteStatusService(
+							file,
+						);
+						leafButton.noteStatusService.populateStatuses();
+						this.renderButtonForLeaf(leafButton);
+						break;
+					}
+				}
 			},
 			"editorToolbarIntegrationSubscription3",
 		);
 	}
 
-	private async handleActiveFileChange() {
-		this.extractStatusesFromLeaf(this.currentLeaf);
-
-		// Check if toolbar button should be shown
-		if (settingsService.settings.showEditorToolbarButton) {
-			this.createButton();
-			this.render();
-		} else {
-			this.removeButton();
+	private initializeButtons() {
+		const targetLeaves = this.getTargetLeaves();
+		for (const leaf of targetLeaves) {
+			this.createButtonForLeaf(leaf);
 		}
 	}
 
-	private extractStatusesFromLeaf(leaf: WorkspaceLeaf | null) {
+	private handleActiveLeafChange() {
+		this.syncButtons();
+	}
+
+	private handleDisplayModeChange() {
+		this.syncButtons();
+	}
+
+	private syncButtons() {
+		const targetLeaves = new Set(this.getTargetLeaves());
+
+		// Remove buttons that shouldn't exist
+		for (const leaf of this.leafButtons.keys()) {
+			if (!targetLeaves.has(leaf)) {
+				this.removeButtonForLeaf(leaf);
+			}
+		}
+
+		// Add buttons that should exist but don't
+		for (const leaf of targetLeaves) {
+			if (!this.leafButtons.has(leaf)) {
+				this.createButtonForLeaf(leaf);
+			}
+		}
+	}
+
+	private handleLayoutChange() {
+		this.syncButtons();
+	}
+
+	private createButtonForLeaf(leaf: WorkspaceLeaf) {
 		if (!this.isValidMarkdownLeaf(leaf)) {
-			return {};
+			return;
 		}
 
-		const markdownView = leaf!.view as MarkdownView;
+		// Remove existing button if it exists
+		if (this.leafButtons.has(leaf)) {
+			this.removeButtonForLeaf(leaf);
+		}
+
+		// Check if toolbar button should be shown
+		if (!settingsService.settings.showEditorToolbarButton) {
+			return;
+		}
+
+		const markdownView = leaf.view as MarkdownView;
 		if (!markdownView.file) {
-			return {};
+			return;
 		}
 
-		this.noteStatusService = new NoteStatusService(markdownView.file);
-		this.noteStatusService.populateStatuses();
+		// Create note status service for this leaf
+		const noteStatusService = new NoteStatusService(markdownView.file);
+		noteStatusService.populateStatuses();
+
+		// Create button element
+		const buttonElement = this.createButtonElement(leaf);
+		if (!buttonElement) {
+			return;
+		}
+
+		// Create React root
+		const root = createRoot(buttonElement);
+
+		// Store the button info
+		const leafButton: LeafButton = {
+			leaf,
+			root,
+			buttonElement,
+			noteStatusService,
+		};
+
+		this.leafButtons.set(leaf, leafButton);
+
+		// Render the button
+		this.renderButtonForLeaf(leafButton);
 	}
 
 	private isValidMarkdownLeaf(leaf: WorkspaceLeaf | null): boolean {
 		return leaf !== null && leaf.view.getViewType() === "markdown";
 	}
 
-	private createButton(): void {
-		if (!this.isValidMarkdownLeaf(this.currentLeaf)) {
-			return;
+	private shouldHaveButton(leaf: WorkspaceLeaf): boolean {
+		if (
+			!settingsService.settings.showEditorToolbarButton ||
+			!this.isValidMarkdownLeaf(leaf)
+		) {
+			return false;
 		}
-		const markdownView = this.currentLeaf!.view as MarkdownView;
-		const position = settingsService.settings.editorToolbarButtonPosition;
 
-		// Remove existing button if it exists
-		if (this.buttonElement) {
-			this.removeButton();
+		return (
+			settingsService.settings.editorToolbarButtonDisplay ===
+				"all-notes" || leaf === this.currentActiveLeaf
+		);
+	}
+
+	private getTargetLeaves(): WorkspaceLeaf[] {
+		const leaves: WorkspaceLeaf[] = [];
+
+		if (
+			settingsService.settings.editorToolbarButtonDisplay ===
+			"active-only"
+		) {
+			if (
+				this.currentActiveLeaf &&
+				this.isValidMarkdownLeaf(this.currentActiveLeaf)
+			) {
+				leaves.push(this.currentActiveLeaf);
+			}
+		} else {
+			this.plugin.app.workspace.iterateAllLeaves((leaf) => {
+				if (this.isValidMarkdownLeaf(leaf)) {
+					leaves.push(leaf);
+				}
+			});
 		}
+
+		return leaves;
+	}
+
+	private createButtonElement(leaf: WorkspaceLeaf): HTMLElement | null {
+		const markdownView = leaf.view as MarkdownView;
+		const position = settingsService.settings.editorToolbarButtonPosition;
 
 		// Find the appropriate container based on position
 		let targetContainer: Element | null = null;
@@ -144,49 +264,90 @@ export class EditorToolbarIntegration {
 			console.warn(
 				"Could not find target container for editor toolbar button",
 			);
-			return;
+			return null;
 		}
 
-		this.buttonElement = document.createElement("div");
-		this.buttonElement.className = this.BUTTON_CLASS;
+		const buttonElement = document.createElement("div");
+		buttonElement.className = this.BUTTON_CLASS;
 
 		// Insert button based on position setting
 		if (position === "left") {
 			// For left, insert after existing nav buttons
-			targetContainer.appendChild(this.buttonElement);
+			targetContainer.appendChild(buttonElement);
 		} else if (position === "right-before") {
 			// For right-before, insert at the beginning of actions
 			targetContainer.insertBefore(
-				this.buttonElement,
+				buttonElement,
 				targetContainer.firstChild,
 			);
 		} else {
 			// For right, insert at the end of actions
-			targetContainer.appendChild(this.buttonElement);
+			targetContainer.appendChild(buttonElement);
 		}
 
-		this.root = createRoot(this.buttonElement);
+		return buttonElement;
 	}
 
-	private removeButton(): void {
-		if (this.root) {
-			this.root.unmount();
-			this.root = null;
-		}
-		if (this.buttonElement) {
-			this.buttonElement.remove();
-			this.buttonElement = null;
+	private removeButtonForLeaf(leaf: WorkspaceLeaf): void {
+		const leafButton = this.leafButtons.get(leaf);
+		if (leafButton) {
+			leafButton.root.unmount();
+			leafButton.buttonElement.remove();
+			this.leafButtons.delete(leaf);
 		}
 	}
 
-	private openStatusModal() {
-		if (!this.noteStatusService) {
+	private renderButtonForLeaf(leafButton: LeafButton): void {
+		leafButton.root.render(
+			<EditorToolbarButton
+				statuses={leafButton.noteStatusService?.statuses || {}}
+				onClick={() =>
+					this.openStatusModal(leafButton.noteStatusService)
+				}
+				unknownStatusConfig={this.getUnknownStatusConfig()}
+			/>,
+		);
+	}
+
+	private refreshAllButtons(): void {
+		for (const [leaf, leafButton] of this.leafButtons.entries()) {
+			const markdownView = leaf.view as MarkdownView;
+			if (markdownView.file) {
+				leafButton.noteStatusService = new NoteStatusService(
+					markdownView.file,
+				);
+				leafButton.noteStatusService.populateStatuses();
+				this.renderButtonForLeaf(leafButton);
+			}
+		}
+	}
+
+	private renderAllButtons(): void {
+		for (const leafButton of this.leafButtons.values()) {
+			this.renderButtonForLeaf(leafButton);
+		}
+	}
+
+	private handleShowHideButtons(): void {
+		this.syncButtons();
+	}
+
+	private recreateAllButtons(): void {
+		// Remove all existing buttons first
+		for (const leaf of this.leafButtons.keys()) {
+			this.removeButtonForLeaf(leaf);
+		}
+		this.syncButtons();
+	}
+
+	private openStatusModal(noteStatusService: NoteStatusService) {
+		if (!noteStatusService) {
 			throw new Error(
 				"open status modal failed because there is no noteStatusService available",
 			);
 		}
 		eventBus.publish("triggered-open-modal", {
-			statusService: this.noteStatusService,
+			statusService: noteStatusService,
 		});
 	}
 
@@ -196,20 +357,6 @@ export class EditorToolbarIntegration {
 			icon: settings.unknownStatusIcon || "❓",
 			color: settings.unknownStatusColor || "#8b949e",
 		};
-	}
-
-	private render() {
-		if (!this.root || !this.buttonElement) {
-			return;
-		}
-
-		this.root.render(
-			<EditorToolbarButton
-				statuses={this.noteStatusService?.statuses || {}}
-				onClick={() => this.openStatusModal()}
-				unknownStatusConfig={this.getUnknownStatusConfig()}
-			/>,
-		);
 	}
 
 	destroy() {
@@ -226,9 +373,12 @@ export class EditorToolbarIntegration {
 			"editorToolbarIntegrationSubscription3",
 		);
 
-		this.removeButton();
-		this.currentLeaf = null;
-		this.noteStatusService = null;
+		// Remove all buttons
+		for (const leaf of this.leafButtons.keys()) {
+			this.removeButtonForLeaf(leaf);
+		}
+
+		this.leafButtons.clear();
 		EditorToolbarIntegration.instance = null;
 	}
 }

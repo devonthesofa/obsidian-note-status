@@ -36,4 +36,5 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	// Editor toolbar button settings
 	showEditorToolbarButton: true, // Default to show the toolbar button
 	editorToolbarButtonPosition: "right", // Default position on the right
+	editorToolbarButtonDisplay: "all-notes", // Default to show button in all notes
 };

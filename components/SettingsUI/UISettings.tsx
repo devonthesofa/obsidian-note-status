@@ -210,6 +210,30 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 					}
 				/>
 			</SettingItem>
+
+			<SettingItem
+				name="Editor toolbar button display"
+				description="Control which notes show the status button"
+			>
+				<Select
+					options={[
+						{
+							value: "all-notes",
+							display: "All open notes",
+						},
+						{
+							value: "active-only",
+							display: "Active note only",
+						},
+					]}
+					defaultValue={
+						settings.editorToolbarButtonDisplay || "all-notes"
+					}
+					onChange={(value) =>
+						onChange("editorToolbarButtonDisplay", value)
+					}
+				/>
+			</SettingItem>
 		</div>
 	);
 };

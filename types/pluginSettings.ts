@@ -36,5 +36,6 @@ export type PluginSettings = {
 	// Editor toolbar button settings
 	showEditorToolbarButton: boolean; // Whether to show the toolbar button
 	editorToolbarButtonPosition: "left" | "right" | "right-before"; // Position of the toolbar button
+	editorToolbarButtonDisplay: "all-notes" | "active-only"; // Whether to show button in all notes or only active one
 	[key: string]: unknown;
 };
