@@ -2,7 +2,6 @@ import { createRoot, Root } from "react-dom/client";
 import eventBus from "core/eventBus";
 import { MarkdownView, Plugin, WorkspaceLeaf } from "obsidian";
 import settingsService from "@/core/settingsService";
-import { StatusBarEnableButton } from "@/components/StatusBar/StatusBarEnableButton";
 import { StatusBar } from "@/components/StatusBar/StatusBar";
 import { NoteStatusService } from "@/core/noteStatusService";
 
@@ -10,7 +9,7 @@ export class StatusBarIntegration {
 	private static instance: StatusBarIntegration | null = null;
 	private root: Root | null = null;
 	private plugin: Plugin;
-	private statusBarContainer: HTMLElement;
+	private statusBarContainer: HTMLElement | null = null;
 	private noteStatusService: NoteStatusService | null = null;
 	private currentLeaf: WorkspaceLeaf | null = null;
 
@@ -23,9 +22,6 @@ export class StatusBarIntegration {
 	}
 
 	async integrate() {
-		this.statusBarContainer = this.plugin.addStatusBarItem();
-		this.statusBarContainer.classList.add("mod-clickable");
-
 		eventBus.subscribe(
 			"active-file-change",
 			({ leaf }) => {
@@ -131,34 +127,46 @@ export class StatusBarIntegration {
 		};
 	}
 
+	private ensureStatusBarItem() {
+		if (this.statusBarContainer) {
+			return;
+		}
+		this.statusBarContainer = this.plugin.addStatusBarItem();
+		this.statusBarContainer.classList.add("mod-clickable");
+		this.statusBarContainer.style.padding = "unset";
+		this.root = createRoot(this.statusBarContainer);
+	}
+
+	private destroyStatusBarItem() {
+		if (this.root) {
+			this.root.unmount();
+			this.root = null;
+		}
+		if (this.statusBarContainer) {
+			this.statusBarContainer.remove();
+			this.statusBarContainer = null;
+		}
+	}
+
 	private render() {
-		if (!this.root) {
-			this.root = createRoot(this.statusBarContainer);
-			this.statusBarContainer.style.padding = "unset";
-		}
 		if (!settingsService.settings.showStatusBar) {
-			this.root.render(
-				<StatusBarEnableButton
-					onEnableClick={() =>
-						settingsService.setValue("showStatusBar", true)
-					}
-				/>,
-			);
-		} else {
-			this.root.render(
-				<StatusBar
-					statuses={this.noteStatusService?.statuses || {}}
-					hideIfNotStatuses={
-						settingsService.settings.autoHideStatusBar
-					}
-					templateNameMode={
-						settingsService.settings.statusBarShowTemplateName
-					}
-					onStatusClick={() => this.openStatusModal()}
-					noStatusConfig={this.getNoStatusConfig()}
-				/>,
-			);
+			this.destroyStatusBarItem();
+			return;
 		}
+
+		this.ensureStatusBarItem();
+
+		this.root!.render(
+			<StatusBar
+				statuses={this.noteStatusService?.statuses || {}}
+				hideIfNotStatuses={settingsService.settings.autoHideStatusBar}
+				templateNameMode={
+					settingsService.settings.statusBarShowTemplateName
+				}
+				onStatusClick={() => this.openStatusModal()}
+				noStatusConfig={this.getNoStatusConfig()}
+			/>,
+		);
 	}
 
 	destroy() {
@@ -175,10 +183,7 @@ export class StatusBarIntegration {
 			"statusBarIntegrationSubscription3",
 		);
 
-		if (this.root) {
-			this.root.unmount();
-			this.root = null;
-		}
+		this.destroyStatusBarItem();
 		this.currentLeaf = null;
 		this.noteStatusService = null;
 		StatusBarIntegration.instance = null;
