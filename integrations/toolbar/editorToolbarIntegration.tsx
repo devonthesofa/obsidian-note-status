@@ -43,6 +43,11 @@ export class EditorToolbarIntegration {
 				this.handleLayoutChange();
 			}),
 		);
+		this.plugin.registerEvent(
+			this.plugin.app.workspace.on("file-open", () => {
+				this.handleFileOpen();
+			}),
+		);
 
 		eventBus.subscribe(
 			"active-file-change",
@@ -120,6 +125,7 @@ export class EditorToolbarIntegration {
 
 	private handleActiveLeafChange() {
 		this.syncButtons();
+		this.refreshAllButtons();
 	}
 
 	private handleDisplayModeChange() {
@@ -130,7 +136,7 @@ export class EditorToolbarIntegration {
 		const targetLeaves = new Set(this.getTargetLeaves());
 
 		// Remove buttons that shouldn't exist
-		for (const leaf of this.leafButtons.keys()) {
+		for (const leaf of Array.from(this.leafButtons.keys())) {
 			if (!targetLeaves.has(leaf)) {
 				this.removeButtonForLeaf(leaf);
 			}
@@ -148,6 +154,10 @@ export class EditorToolbarIntegration {
 		this.syncButtons();
 	}
 
+	private handleFileOpen() {
+		this.refreshAllButtons();
+	}
+
 	private createButtonForLeaf(leaf: WorkspaceLeaf) {
 		if (!this.isValidMarkdownLeaf(leaf)) {
 			return;
@@ -163,14 +173,10 @@ export class EditorToolbarIntegration {
 			return;
 		}
 
-		const markdownView = leaf.view as MarkdownView;
-		if (!markdownView.file) {
+		const noteStatusService = this.buildNoteStatusServiceForLeaf(leaf);
+		if (!noteStatusService) {
 			return;
 		}
-
-		// Create note status service for this leaf
-		const noteStatusService = new NoteStatusService(markdownView.file);
-		noteStatusService.populateStatuses();
 
 		// Create button element
 		const buttonElement = this.createButtonElement(leaf);
@@ -214,6 +220,10 @@ export class EditorToolbarIntegration {
 	}
 
 	private getTargetLeaves(): WorkspaceLeaf[] {
+		if (!settingsService.settings.showEditorToolbarButton) {
+			return [];
+		}
+
 		const leaves: WorkspaceLeaf[] = [];
 
 		if (
@@ -301,9 +311,7 @@ export class EditorToolbarIntegration {
 		leafButton.root.render(
 			<EditorToolbarButton
 				statuses={leafButton.noteStatusService?.statuses || {}}
-				onClick={() =>
-					this.openStatusModal(leafButton.noteStatusService)
-				}
+				onClick={() => this.openStatusModal(leafButton.leaf)}
 				unknownStatusConfig={this.getUnknownStatusConfig()}
 			/>,
 		);
@@ -311,14 +319,12 @@ export class EditorToolbarIntegration {
 
 	private refreshAllButtons(): void {
 		for (const [leaf, leafButton] of this.leafButtons.entries()) {
-			const markdownView = leaf.view as MarkdownView;
-			if (markdownView.file) {
-				leafButton.noteStatusService = new NoteStatusService(
-					markdownView.file,
-				);
-				leafButton.noteStatusService.populateStatuses();
-				this.renderButtonForLeaf(leafButton);
+			const noteStatusService = this.buildNoteStatusServiceForLeaf(leaf);
+			if (!noteStatusService) {
+				continue;
 			}
+			leafButton.noteStatusService = noteStatusService;
+			this.renderButtonForLeaf(leafButton);
 		}
 	}
 
@@ -340,15 +346,32 @@ export class EditorToolbarIntegration {
 		this.syncButtons();
 	}
 
-	private openStatusModal(noteStatusService: NoteStatusService) {
+	private openStatusModal(leaf: WorkspaceLeaf) {
+		const noteStatusService = this.buildNoteStatusServiceForLeaf(leaf);
 		if (!noteStatusService) {
-			throw new Error(
-				"open status modal failed because there is no noteStatusService available",
+			console.error(
+				"open status modal failed because there is no markdown file in the provided leaf",
 			);
+			return;
 		}
 		eventBus.publish("triggered-open-modal", {
 			statusService: noteStatusService,
 		});
+	}
+
+	private buildNoteStatusServiceForLeaf(
+		leaf: WorkspaceLeaf,
+	): NoteStatusService | null {
+		if (!this.isValidMarkdownLeaf(leaf)) {
+			return null;
+		}
+		const markdownView = leaf.view as MarkdownView;
+		if (!markdownView.file) {
+			return null;
+		}
+		const noteStatusService = new NoteStatusService(markdownView.file);
+		noteStatusService.populateStatuses();
+		return noteStatusService;
 	}
 
 	private getUnknownStatusConfig() {
