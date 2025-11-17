@@ -26,13 +26,16 @@ export const FileExplorerIcon: FC<Props> = memo(
 			0,
 		);
 
+		const getStatusColor = (color?: string) =>
+			(color && color.trim()) || "var(--text-accent)";
+
 		if (totalStatuses === 0) {
 			// If hideUnknownStatus is enabled, don't show anything for files without status
 			if (hideUnknownStatus) return null;
 
 			// Use config passed from integration, with fallbacks
 			const icon = unknownStatusConfig?.icon || "❓";
-			const color = unknownStatusConfig?.color || "#8b949e";
+			const color = unknownStatusConfig?.color?.trim() || "#8b949e";
 
 			return (
 				<div className="status-wrapper">
@@ -40,11 +43,7 @@ export const FileExplorerIcon: FC<Props> = memo(
 						className="status-minimal status-minimal--no-status"
 						onMouseEnter={() => onMouseEnter({})}
 						onMouseLeave={() => onMouseLeave({})}
-						style={
-							{
-								"--primary-color": color,
-							} as React.CSSProperties
-						}
+						style={{ color } as React.CSSProperties}
 					>
 						<span className="status-icon">{icon}</span>
 					</div>
@@ -54,6 +53,7 @@ export const FileExplorerIcon: FC<Props> = memo(
 
 		const primaryStatus = statusEntries[0]?.[1]?.[0];
 		if (!primaryStatus) return null;
+		const iconColor = getStatusColor(primaryStatus.color);
 
 		return (
 			<div className="status-wrapper">
@@ -61,12 +61,7 @@ export const FileExplorerIcon: FC<Props> = memo(
 					className="status-minimal"
 					onMouseEnter={() => onMouseEnter(statuses)}
 					onMouseLeave={() => onMouseLeave(statuses)}
-					style={
-						{
-							"--primary-color":
-								primaryStatus.color || "var(--text-accent)",
-						} as React.CSSProperties
-					}
+					style={{ color: iconColor } as React.CSSProperties}
 				>
 					<span className="status-icon">{primaryStatus.icon}</span>
 					{totalStatuses > 1 && (
