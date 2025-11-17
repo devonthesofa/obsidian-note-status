@@ -41,7 +41,12 @@ export const QuickCommandsSettings: React.FC<Props> = ({
 			}
 		}
 		return { customStatuses, templateGroups };
-	}, [settings]);
+	}, [
+		settings.useCustomStatusesOnly,
+		settings.customStatuses,
+		settings.enabledTemplates,
+		settings.templates,
+	]);
 
 	const currentQuickCommands = settings.quickStatusCommands || [];
 

@@ -18,11 +18,11 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 
 	return (
 		<div className="ui-settings">
-			<h3>User interface</h3>
+			<h3>Status Bar</h3>
 
 			<SettingItem
-				name="Show status bar"
-				description="Display the status bar"
+				name="Show status icon in status bar"
+				description="Display a status icon in the status bar with the current note status."
 			>
 				<input
 					type="checkbox"
@@ -32,8 +32,8 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 			</SettingItem>
 
 			<SettingItem
-				name="Auto-hide status bar"
-				description="Hide the status bar when status is unknown"
+				name="Hide icon when note has no status"
+				description="Automatically hide the status icon whenever the current note does not have a status."
 			>
 				<input
 					type="checkbox"
@@ -44,7 +44,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 
 			<SettingItem
 				name="Show status overview popup"
-				description="When enabled, show the popup with statuses when hovering or interacting with the status indicator."
+				description="Show a popup listing statuses when hovering or interacting with the status icon."
 			>
 				<input
 					type="checkbox"
@@ -54,110 +54,8 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 			</SettingItem>
 
 			<SettingItem
-				name="Show status icons in file explorer"
-				description="Display status icons in the file explorer"
-			>
-				<input
-					type="checkbox"
-					checked={settings.showStatusIconsInExplorer}
-					onChange={handleChange("showStatusIconsInExplorer")}
-				/>
-			</SettingItem>
-
-			<SettingItem
-				name="Status icon in file explorer position"
-				description="Choose icon position in file explorer"
-			>
-				<Select
-					options={[
-						{ display: "Filename left", value: "file-name-left" },
-						{ display: "Filename right", value: "file-name-right" },
-						{ display: "Absolute right", value: "absolute-right" },
-					]}
-					defaultValue={settings.fileExplorerIconPosition}
-					onChange={(value) =>
-						onChange("fileExplorerIconPosition", value)
-					}
-				/>
-			</SettingItem>
-
-			<SettingItem
-				name="Hide unknown status in file explorer"
-				description="Hide status icons for files with unknown status"
-			>
-				<input
-					type="checkbox"
-					checked={settings.hideUnknownStatusInExplorer || false}
-					onChange={handleChange("hideUnknownStatusInExplorer")}
-				/>
-			</SettingItem>
-
-			<h4>Unknown Status Customization</h4>
-
-			<SettingItem
-				name="Unknown status icon"
-				description="Icon displayed for files with unknown status"
-			>
-				<Input
-					variant="text"
-					value={settings.unknownStatusIcon}
-					onChange={(value) => onChange("unknownStatusIcon", value)}
-					placeholder="❓"
-					style={{ maxWidth: "150px" }}
-				/>
-			</SettingItem>
-
-			<SettingItem
-				name="Unknown status color"
-				description="Hex color for unknown status (e.g., #8b949e)"
-			>
-				<Input
-					variant="color"
-					value={settings.unknownStatusColor || "#8b949e"}
-					onChange={(value) => onChange("unknownStatusColor", value)}
-					placeholder="No status"
-				/>
-			</SettingItem>
-
-			<SettingItem
-				name="Status bar 'no status' text"
-				description="Text displayed in status bar when there is no status"
-			>
-				<Input
-					variant="text"
-					value={settings.statusBarNoStatusText}
-					onChange={(value) =>
-						onChange("statusBarNoStatusText", value)
-					}
-					style={{ maxWidth: "150px" }}
-					placeholder="No status"
-				/>
-			</SettingItem>
-
-			<SettingItem
-				name="Show icon in status bar for 'no status'"
-				description="Show unknown status icon in status bar alongside text"
-			>
-				<input
-					type="checkbox"
-					checked={settings.statusBarShowNoStatusIcon || false}
-					onChange={handleChange("statusBarShowNoStatusIcon")}
-				/>
-			</SettingItem>
-
-			<SettingItem
-				name="Show text in status bar for 'no status'"
-				description="Display the custom text in the status bar when there is no status"
-			>
-				<input
-					type="checkbox"
-					checked={settings.statusBarShowNoStatusText ?? true}
-					onChange={handleChange("statusBarShowNoStatusText")}
-				/>
-			</SettingItem>
-			<SettingItem
-				name="Show template names in status bar"
-				description="Control how template names are displayed alongside status names"
+				name="Show template names next to status"
+				description="Control how the template name is shown alongside the current status."
 			>
 				<Select
 					options={[
@@ -181,11 +79,50 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				/>
 			</SettingItem>
 
-			<h4>Editor Toolbar Button</h4>
+			<h4>No Status Display</h4>
+
+			<SettingItem
+				name="Custom text when note has no status"
+				description="Pick what text should be shown in the status bar when a note does not have a status."
+			>
+				<Input
+					variant="text"
+					value={settings.statusBarNoStatusText}
+					onChange={(value) =>
+						onChange("statusBarNoStatusText", value)
+					}
+					style={{ maxWidth: "150px" }}
+					placeholder="No status"
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Show icon when note has no status"
+				description="Display the unknown status icon in the status bar next to the custom text."
+			>
+				<input
+					type="checkbox"
+					checked={settings.statusBarShowNoStatusIcon || false}
+					onChange={handleChange("statusBarShowNoStatusIcon")}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Show text when note has no status"
+				description="Display the custom text in the status bar whenever no status is set."
+			>
+				<input
+					type="checkbox"
+					checked={settings.statusBarShowNoStatusText ?? true}
+					onChange={handleChange("statusBarShowNoStatusText")}
+				/>
+			</SettingItem>
+
+			<h3>Editor</h3>
 
 			<SettingItem
 				name="Show editor toolbar button"
-				description="Display status button in the editor toolbar"
+				description="Add a button to the editor toolbar to change the note status."
 			>
 				<input
 					type="checkbox"
@@ -196,7 +133,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 
 			<SettingItem
 				name="Editor toolbar button position"
-				description="Choose where to position the status button in the editor toolbar"
+				description="Choose where the status button should appear in the editor toolbar."
 			>
 				<Select
 					options={[
@@ -223,8 +160,8 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 			</SettingItem>
 
 			<SettingItem
-				name="Editor toolbar button display"
-				description="Control which notes show the status button"
+				name="Show toolbar button for"
+				description="Control which editors should display the toolbar button."
 			>
 				<Select
 					options={[
@@ -243,6 +180,74 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 					onChange={(value) =>
 						onChange("editorToolbarButtonDisplay", value)
 					}
+				/>
+			</SettingItem>
+
+			<h3>File Explorer</h3>
+
+			<SettingItem
+				name="Show status icons in file explorer"
+				description="Display a status icon for each file inside the file explorer."
+			>
+				<input
+					type="checkbox"
+					checked={settings.showStatusIconsInExplorer}
+					onChange={handleChange("showStatusIconsInExplorer")}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Status icon position in file explorer"
+				description="Choose where the icon should be rendered next to the file name."
+			>
+				<Select
+					options={[
+						{ display: "Filename left", value: "file-name-left" },
+						{ display: "Filename right", value: "file-name-right" },
+						{ display: "Absolute right", value: "absolute-right" },
+					]}
+					defaultValue={settings.fileExplorerIconPosition}
+					onChange={(value) =>
+						onChange("fileExplorerIconPosition", value)
+					}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Hide icon when file status is unknown"
+				description="Do not render a status icon in the explorer when a note status cannot be determined."
+			>
+				<input
+					type="checkbox"
+					checked={settings.hideUnknownStatusInExplorer || false}
+					onChange={handleChange("hideUnknownStatusInExplorer")}
+				/>
+			</SettingItem>
+
+			<h3>Behavior & Other</h3>
+
+			<SettingItem
+				name="Icon for unknown status"
+				description="Icon displayed whenever a note does not have a status."
+			>
+				<Input
+					variant="text"
+					value={settings.unknownStatusIcon}
+					onChange={(value) => onChange("unknownStatusIcon", value)}
+					placeholder="❓"
+					style={{ maxWidth: "150px" }}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Color for unknown status"
+				description="Hex color used for unknown statuses (e.g., #8b949e)."
+			>
+				<Input
+					variant="color"
+					value={settings.unknownStatusColor || "#8b949e"}
+					onChange={(value) => onChange("unknownStatusColor", value)}
+					placeholder="No status"
 				/>
 			</SettingItem>
 		</div>
