@@ -224,6 +224,46 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				/>
 			</SettingItem>
 
+			<SettingItem
+				name="Status icon frame"
+				description="Choose whether to display a frame around the status icon inside the file explorer."
+			>
+				<Select
+					options={[
+						{ value: "never", display: "Never show a frame" },
+						{ value: "always", display: "Always show a frame" },
+					]}
+					defaultValue={settings.fileExplorerIconFrame || "never"}
+					onChange={(value) =>
+						onChange("fileExplorerIconFrame", value)
+					}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Status icon color"
+				description="Decide whether icons use their configured status colors or inherit the theme default."
+			>
+				<Select
+					options={[
+						{
+							value: "status",
+							display: "Use custom status colors",
+						},
+						{
+							value: "theme",
+							display: "Use theme default colors",
+						},
+					]}
+					defaultValue={
+						settings.fileExplorerIconColorMode || "status"
+					}
+					onChange={(value) =>
+						onChange("fileExplorerIconColorMode", value)
+					}
+				/>
+			</SettingItem>
+
 			<h3>Behavior & Other</h3>
 
 			<SettingItem
