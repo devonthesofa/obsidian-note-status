@@ -240,6 +240,30 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				/>
 			</SettingItem>
 
+			<SettingItem
+				name="Status icon color"
+				description="Decide whether icons use their configured status colors or inherit the theme default."
+			>
+				<Select
+					options={[
+						{
+							value: "status",
+							display: "Use custom status colors",
+						},
+						{
+							value: "theme",
+							display: "Use theme default colors",
+						},
+					]}
+					defaultValue={
+						settings.fileExplorerIconColorMode || "status"
+					}
+					onChange={(value) =>
+						onChange("fileExplorerIconColorMode", value)
+					}
+				/>
+			</SettingItem>
+
 			<h3>Behavior & Other</h3>
 
 			<SettingItem

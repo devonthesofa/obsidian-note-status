@@ -11,6 +11,7 @@ type Props = {
 		color: string;
 	};
 	iconFrameMode?: "always" | "never";
+	iconColorMode?: "status" | "theme";
 };
 
 export const FileExplorerIcon: FC<Props> = memo(
@@ -21,12 +22,15 @@ export const FileExplorerIcon: FC<Props> = memo(
 		hideUnknownStatus,
 		unknownStatusConfig,
 		iconFrameMode = "never",
+		iconColorMode = "status",
 	}) => {
 		const statusEntries = Object.entries(statuses);
 		const totalStatuses = statusEntries.reduce(
 			(acc, [, list]) => acc + list.length,
 			0,
 		);
+
+		const useStatusColors = iconColorMode === "status";
 
 		const getStatusColor = (color?: string) =>
 			(color && color.trim()) || "var(--text-accent)";
@@ -37,13 +41,19 @@ export const FileExplorerIcon: FC<Props> = memo(
 
 			// Use config passed from integration, with fallbacks
 			const icon = unknownStatusConfig?.icon || "❓";
-			const color = unknownStatusConfig?.color?.trim() || "#8b949e";
+			const color = useStatusColors
+				? unknownStatusConfig?.color?.trim() || "#8b949e"
+				: undefined;
 
 			const shouldFrameUnknown = iconFrameMode === "always";
 
-			const unknownStyles: React.CSSProperties = { color };
+			const unknownStyles: React.CSSProperties = {};
+			if (color) {
+				unknownStyles.color = color;
+			}
 			if (shouldFrameUnknown) {
-				unknownStyles.boxShadow = `0 0 0 1px ${color}`;
+				const frameColor = color || "currentColor";
+				unknownStyles.boxShadow = `0 0 0 1px ${frameColor}`;
 				unknownStyles.borderRadius = "var(--radius-s)";
 			}
 
@@ -63,11 +73,17 @@ export const FileExplorerIcon: FC<Props> = memo(
 
 		const primaryStatus = statusEntries[0]?.[1]?.[0];
 		if (!primaryStatus) return null;
-		const iconColor = getStatusColor(primaryStatus.color);
+		const iconColor = useStatusColors
+			? getStatusColor(primaryStatus.color)
+			: undefined;
 		const shouldShowFrame = iconFrameMode === "always";
-		const iconStyles: React.CSSProperties = { color: iconColor };
+		const iconStyles: React.CSSProperties = {};
+		if (iconColor) {
+			iconStyles.color = iconColor;
+		}
 		if (shouldShowFrame) {
-			iconStyles.boxShadow = `0 0 0 1px ${iconColor}`;
+			const frameColor = iconColor || "currentColor";
+			iconStyles.boxShadow = `0 0 0 1px ${frameColor}`;
 			iconStyles.borderRadius = "var(--radius-s)";
 		}
 
@@ -85,7 +101,11 @@ export const FileExplorerIcon: FC<Props> = memo(
 					{totalStatuses > 1 && (
 						<span
 							className="status-minimal__count"
-							style={{ backgroundColor: iconColor }}
+							style={
+								iconColor
+									? { backgroundColor: iconColor }
+									: undefined
+							}
 						>
 							{totalStatuses}
 						</span>

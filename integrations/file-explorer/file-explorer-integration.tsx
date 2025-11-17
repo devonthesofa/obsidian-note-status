@@ -57,6 +57,7 @@ export class FileExplorerIntegration implements IElementProcessor {
 					key === "strictStatuses" ||
 					key === "fileExplorerIconPosition" ||
 					key === "fileExplorerIconFrame" ||
+					key === "fileExplorerIconColorMode" ||
 					key === "unknownStatusIcon" ||
 					key === "unknownStatusColor" ||
 					key === "templates"
@@ -151,6 +152,10 @@ export class FileExplorerIntegration implements IElementProcessor {
 				unknownStatusConfig={this.getUnknownStatusConfig()}
 				iconFrameMode={
 					settingsService.settings.fileExplorerIconFrame || "never"
+				}
+				iconColorMode={
+					settingsService.settings.fileExplorerIconColorMode ||
+					"status"
 				}
 			/>,
 		);
