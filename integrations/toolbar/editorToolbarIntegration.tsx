@@ -130,7 +130,7 @@ export class EditorToolbarIntegration {
 		const targetLeaves = new Set(this.getTargetLeaves());
 
 		// Remove buttons that shouldn't exist
-		for (const leaf of this.leafButtons.keys()) {
+		for (const leaf of Array.from(this.leafButtons.keys())) {
 			if (!targetLeaves.has(leaf)) {
 				this.removeButtonForLeaf(leaf);
 			}
@@ -214,6 +214,10 @@ export class EditorToolbarIntegration {
 	}
 
 	private getTargetLeaves(): WorkspaceLeaf[] {
+		if (!settingsService.settings.showEditorToolbarButton) {
+			return [];
+		}
+
 		const leaves: WorkspaceLeaf[] = [];
 
 		if (
