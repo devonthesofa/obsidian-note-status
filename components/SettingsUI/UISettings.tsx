@@ -43,6 +43,17 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 			</SettingItem>
 
 			<SettingItem
+				name="Show status overview popup"
+				description="When enabled, show the popup with statuses when hovering or interacting with the status indicator."
+			>
+				<input
+					type="checkbox"
+					checked={settings.enableStatusOverviewPopup ?? true}
+					onChange={handleChange("enableStatusOverviewPopup")}
+				/>
+			</SettingItem>
+
+			<SettingItem
 				name="Show status icons in file explorer"
 				description="Display status icons in the file explorer"
 			>

@@ -15,6 +15,7 @@ export type PluginSettings = {
 	statusColors: Record<string, string>;
 	showStatusBar: boolean;
 	autoHideStatusBar: boolean;
+	enableStatusOverviewPopup: boolean; // Whether to show popup with grouped statuses
 	templates: StatusTemplate[];
 	customStatuses: NoteStatus[];
 	statusBarShowTemplateName: "always" | "never" | "auto"; // How to show template names in status bar
