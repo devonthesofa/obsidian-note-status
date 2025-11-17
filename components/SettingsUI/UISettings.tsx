@@ -224,6 +224,22 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				/>
 			</SettingItem>
 
+			<SettingItem
+				name="Status icon frame"
+				description="Choose whether to display a frame around the status icon inside the file explorer."
+			>
+				<Select
+					options={[
+						{ value: "never", display: "Never show a frame" },
+						{ value: "always", display: "Always show a frame" },
+					]}
+					defaultValue={settings.fileExplorerIconFrame || "never"}
+					onChange={(value) =>
+						onChange("fileExplorerIconFrame", value)
+					}
+				/>
+			</SettingItem>
+
 			<h3>Behavior & Other</h3>
 
 			<SettingItem

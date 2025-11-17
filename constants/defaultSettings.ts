@@ -6,6 +6,7 @@ import {
 
 export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	fileExplorerIconPosition: "absolute-right",
+	fileExplorerIconFrame: "never",
 	statusColors: {
 		active: "var(--text-success)",
 		onHold: "var(--text-warning)",

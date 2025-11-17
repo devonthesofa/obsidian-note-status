@@ -12,6 +12,7 @@ export type PluginSettings = {
 		| "absolute-right"
 		| "file-name-left"
 		| "file-name-right";
+	fileExplorerIconFrame: "always" | "never";
 	statusColors: Record<string, string>;
 	showStatusBar: boolean;
 	autoHideStatusBar: boolean;
