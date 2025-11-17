@@ -17,6 +17,7 @@ import {
 	StatusDashboardView,
 	VIEW_TYPE_STATUS_DASHBOARD,
 } from "./integrations/views/status-dashboard-view";
+import { StatusesInfoPopup } from "./integrations/popups/statusesInfoPopupIntegration";
 
 export default class NoteStatusPlugin extends Plugin {
 	private statusBarIntegration: StatusBarIntegration;
@@ -72,6 +73,10 @@ export default class NoteStatusPlugin extends Plugin {
 		eventBus.unsubscribe(
 			"triggered-open-modal",
 			"main-triggered-open-modal-subscriptor",
+		);
+		eventBus.unsubscribe(
+			"plugin-settings-changed",
+			"main-status-popup-setting-subscriptor",
 		);
 	}
 
@@ -164,6 +169,16 @@ export default class NoteStatusPlugin extends Plugin {
 				StatusModalIntegration.open(this.app, statusService);
 			},
 			"main-triggered-open-modal-subscriptor",
+		);
+
+		eventBus.subscribe(
+			"plugin-settings-changed",
+			({ key, value }) => {
+				if (key === "enableStatusOverviewPopup" && value === false) {
+					StatusesInfoPopup.close();
+				}
+			},
+			"main-status-popup-setting-subscriptor",
 		);
 	}
 

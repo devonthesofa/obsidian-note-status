@@ -1,6 +1,7 @@
 import { createRoot, Root } from "react-dom/client";
 import { GroupedStatuses } from "@/types/noteStatus";
 import { StatusFileInfoPopup } from "@/components/StatusFileInfoPopup/StatusFileInfoPopup";
+import settingsService from "@/core/settingsService";
 
 export class StatusesInfoPopup {
 	private root: Root | null = null;
@@ -11,8 +12,14 @@ export class StatusesInfoPopup {
 	private constructor() {}
 
 	static open(statuses: GroupedStatuses) {
+		// Always ensure previous instance is cleaned up before showing or when disabled
 		StatusesInfoPopup.close();
 
+		const isEnabled =
+			settingsService.settings?.enableStatusOverviewPopup ?? true;
+		if (!isEnabled) {
+			return;
+		}
 		StatusesInfoPopup.instance = new StatusesInfoPopup();
 		StatusesInfoPopup.instance.statuses = statuses;
 		StatusesInfoPopup.instance.show();

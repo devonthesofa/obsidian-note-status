@@ -15,6 +15,7 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	},
 	showStatusBar: true,
 	autoHideStatusBar: false,
+	enableStatusOverviewPopup: true,
 	templates: [...PREDEFINED_TEMPLATES],
 	customStatuses: [],
 	showStatusIconsInExplorer: true,
