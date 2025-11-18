@@ -336,6 +336,50 @@
 
 .note-status-option {
 	/* Uses SelectableListItem styles */
+	align-items: stretch;
+}
+
+.note-status-option .selectable-list-item-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.note-status-option__icon-wrapper {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--size-2-1);
+	border-radius: var(--radius-m);
+	border: 1px solid var(--background-modifier-border);
+	background: var(--background-secondary);
+	min-width: 36px;
+	transition:
+		border-color var(--anim-duration-fast) ease,
+		background var(--anim-duration-fast) ease;
+}
+
+.note-status-option:hover .note-status-option__icon-wrapper,
+.note-status-option.selectable-list-item[data-selected="true"]
+	.note-status-option__icon-wrapper {
+	border-color: var(--interactive-accent);
+	background: var(--background-modifier-hover);
+}
+
+.note-status-option__text {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.note-status-option__name {
+	font-weight: var(--font-medium);
+	color: var(--text-normal);
+}
+
+.note-status-option__description {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
 }
 
 .note-status-chips {
