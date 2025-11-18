@@ -125,6 +125,49 @@ export class NoteStatusService extends BaseNoteStatusService {
 		this.file = file;
 	}
 
+	private shouldStoreStatusesAsArray(): boolean {
+		if (settingsService.settings.useMultipleStatuses) {
+			return true;
+		}
+		const mode = settingsService.settings.singleStatusStorageMode || "list";
+		return mode === "list";
+	}
+
+	private normalizeStoredStatuses(value: unknown): string[] {
+		if (!value) return [];
+		if (Array.isArray(value)) {
+			return value
+				.map((status) =>
+					status === undefined || status === null
+						? undefined
+						: String(status),
+				)
+				.filter((status): status is string => Boolean(status));
+		}
+		return [String(value)];
+	}
+
+	private writeStatusesToFrontmatter(
+		frontmatter: Record<string, unknown>,
+		frontmatterTagName: string,
+		statuses: string[],
+	) {
+		if (!statuses.length) {
+			if (this.shouldStoreStatusesAsArray()) {
+				frontmatter[frontmatterTagName] = [];
+			} else {
+				delete frontmatter[frontmatterTagName];
+			}
+			return;
+		}
+
+		if (this.shouldStoreStatusesAsArray()) {
+			frontmatter[frontmatterTagName] = [...statuses];
+		} else {
+			frontmatter[frontmatterTagName] = statuses[0];
+		}
+	}
+
 	public populateStatuses(): void {
 		const STATUS_METADATA_KEYS = this.getStatusMetadataKeys();
 		this.statuses = Object.fromEntries(
@@ -181,27 +224,31 @@ export class NoteStatusService extends BaseNoteStatusService {
 		await BaseNoteStatusService.app.fileManager.processFrontMatter(
 			this.file,
 			(frontmatter) => {
-				const noteStatusFrontmatter =
-					(frontmatter?.[frontmatterTagName] as string[]) || [];
-				if (!noteStatusFrontmatter.length) return;
+				const storedStatuses = this.normalizeStoredStatuses(
+					frontmatter?.[frontmatterTagName],
+				);
+				if (!storedStatuses.length) return;
 
-				if (Array.isArray(noteStatusFrontmatter)) {
-					// First try to find exact match (scoped or legacy)
-					let i = noteStatusFrontmatter.findIndex(
-						(statusName: string) => statusName === targetIdentifier,
+				// First try to find exact match (scoped or legacy)
+				let i = storedStatuses.findIndex(
+					(statusName: string) => statusName === targetIdentifier,
+				);
+
+				// If not found and we're looking for a scoped status, try legacy format
+				if (i === -1 && status.templateId) {
+					i = storedStatuses.findIndex(
+						(statusName: string) => statusName === status.name,
 					);
+				}
 
-					// If not found and we're looking for a scoped status, try legacy format
-					if (i === -1 && status.templateId) {
-						i = noteStatusFrontmatter.findIndex(
-							(statusName: string) => statusName === status.name,
-						);
-					}
-
-					if (i !== -1) {
-						noteStatusFrontmatter.splice(i, 1);
-						removed = true;
-					}
+				if (i !== -1) {
+					storedStatuses.splice(i, 1);
+					this.writeStatusesToFrontmatter(
+						frontmatter,
+						frontmatterTagName,
+						storedStatuses,
+					);
+					removed = true;
 				}
 			},
 		);
@@ -219,7 +266,11 @@ export class NoteStatusService extends BaseNoteStatusService {
 			this.file,
 			(frontmatter) => {
 				if (frontmatterTagName in frontmatter) {
-					frontmatter[frontmatterTagName] = [];
+					this.writeStatusesToFrontmatter(
+						frontmatter,
+						frontmatterTagName,
+						[],
+					);
 				}
 			},
 		);
@@ -239,16 +290,15 @@ export class NoteStatusService extends BaseNoteStatusService {
 		await BaseNoteStatusService.app.fileManager.processFrontMatter(
 			this.file,
 			(frontmatter) => {
-				if (
-					frontmatterTagName in frontmatter &&
-					Array.isArray(frontmatter[frontmatterTagName])
-				) {
-					frontmatter[frontmatterTagName].splice(0);
-					frontmatter[frontmatterTagName].push(
-						...formattedIdentifiers,
-					);
-				}
-				frontmatter[frontmatterTagName] = [...formattedIdentifiers];
+				const statusesToStore = settingsService.settings
+					.useMultipleStatuses
+					? formattedIdentifiers
+					: formattedIdentifiers.slice(0, 1);
+				this.writeStatusesToFrontmatter(
+					frontmatter,
+					frontmatterTagName,
+					statusesToStore,
+				);
 			},
 		);
 		eventBus.publish("frontmatter-manually-changed", { file: this.file });
@@ -270,20 +320,18 @@ export class NoteStatusService extends BaseNoteStatusService {
 		await BaseNoteStatusService.app.fileManager.processFrontMatter(
 			this.file,
 			(frontmatter) => {
-				const noteStatusFrontmatter =
-					(frontmatter?.[frontmatterTagName] as string[]) || [];
+				const noteStatusFrontmatter = this.normalizeStoredStatuses(
+					frontmatter?.[frontmatterTagName],
+				);
 				if (!settingsService.settings.useMultipleStatuses) {
-					frontmatter[frontmatterTagName] = [formattedIdentifier];
+					const newValue = [formattedIdentifier];
+					this.writeStatusesToFrontmatter(
+						frontmatter,
+						frontmatterTagName,
+						newValue,
+					);
 					added = true;
 				} else {
-					// Ensure frontmatter property exists as an array
-					if (
-						!frontmatter[frontmatterTagName] ||
-						!Array.isArray(frontmatter[frontmatterTagName])
-					) {
-						frontmatter[frontmatterTagName] = [];
-					}
-
 					// Check if we already have this status (exact match)
 					const exactMatch = noteStatusFrontmatter.findIndex(
 						(statusName: string) =>
@@ -310,11 +358,17 @@ export class NoteStatusService extends BaseNoteStatusService {
 							added = true;
 						} else {
 							// Add new status
-							frontmatter[frontmatterTagName].push(
-								formattedIdentifier,
-							);
+							noteStatusFrontmatter.push(formattedIdentifier);
 							added = true;
 						}
+					}
+
+					if (added) {
+						this.writeStatusesToFrontmatter(
+							frontmatter,
+							frontmatterTagName,
+							noteStatusFrontmatter,
+						);
 					}
 				}
 			},

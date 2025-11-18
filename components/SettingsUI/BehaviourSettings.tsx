@@ -26,6 +26,26 @@ export const BehaviourSettings: React.FC<Props> = ({ settings, onChange }) => {
 			</SettingItem>
 
 			<SettingItem
+				name="Single status format"
+				description="Choose how the status frontmatter value is stored when multiple statuses are disabled. String format improves compatibility with plugins like TaskNotes."
+			>
+				<select
+					disabled={settings.useMultipleStatuses}
+					value={settings.singleStatusStorageMode || "list"}
+					onChange={(e) =>
+						onChange(
+							"singleStatusStorageMode",
+							e.target
+								.value as PluginSettings["singleStatusStorageMode"],
+						)
+					}
+				>
+					<option value="list">List (status: [in-progress])</option>
+					<option value="string">String (status: in-progress)</option>
+				</select>
+			</SettingItem>
+
+			<SettingItem
 				name="Apply status recursively to subfolders"
 				description="Show a folder context menu option that also processes notes inside nested folders."
 			>

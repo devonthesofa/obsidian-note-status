@@ -26,6 +26,7 @@ export type PluginSettings = {
 	enabledTemplates: string[]; // IDs of enabled templates
 	useCustomStatusesOnly: boolean; // Whether to use only custom statuses or include templates
 	useMultipleStatuses: boolean; // Whether to allow multiple statuses per note
+	singleStatusStorageMode: "list" | "string"; // How to store single statuses when multiple statuses are disabled
 	tagPrefix: string; // Prefix for the status tag (default: 'status')
 	strictStatuses: boolean; // Whether to only show known statuses
 	quickStatusCommands: string[];
