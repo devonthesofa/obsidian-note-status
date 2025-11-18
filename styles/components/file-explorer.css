@@ -34,6 +34,17 @@
 	transform: scale(1.05);
 }
 
+.status-minimal--compact {
+	margin-left: 0;
+	padding: 0;
+	background: transparent;
+	gap: var(--size-2-1);
+}
+
+.status-minimal--compact .status-minimal__icon {
+	font-size: var(--font-ui-medium);
+}
+
 /* Use data attribute for dynamic colors */
 .status-minimal[data-status-color] .status-minimal__count {
 	background: var(--interactive-accent);

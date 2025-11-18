@@ -118,6 +118,13 @@ export class StatusModalIntegration extends Modal {
 				}
 				filesQuantity={filesQuantity}
 				templates={settingsService.settings.templates}
+				iconFrameMode={
+					settingsService.settings.fileExplorerIconFrame || "never"
+				}
+				iconColorMode={
+					settingsService.settings.fileExplorerIconColorMode ||
+					"status"
+				}
 				onRemoveStatus={this.onRemoveStatus}
 				onSelectStatus={this.onSelectStatus}
 			/>,

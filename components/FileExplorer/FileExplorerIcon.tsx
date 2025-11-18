@@ -1,3 +1,4 @@
+import { StatusIconPreview } from "@/components/atoms/StatusIconPreview";
 import { GroupedStatuses } from "@/types/noteStatus";
 import React, { FC, memo } from "react";
 
@@ -36,38 +37,22 @@ export const FileExplorerIcon: FC<Props> = memo(
 			(color && color.trim()) || "var(--text-accent)";
 
 		if (totalStatuses === 0) {
-			// If hideUnknownStatus is enabled, don't show anything for files without status
 			if (hideUnknownStatus) return null;
 
-			// Use config passed from integration, with fallbacks
 			const icon = unknownStatusConfig?.icon || "❓";
 			const color = useStatusColors
 				? unknownStatusConfig?.color?.trim() || "#8b949e"
 				: undefined;
 
-			const shouldFrameUnknown = iconFrameMode === "always";
-
-			const unknownStyles: React.CSSProperties = {};
-			if (color) {
-				unknownStyles.color = color;
-			}
-			if (shouldFrameUnknown) {
-				const frameColor = color || "currentColor";
-				unknownStyles.boxShadow = `0 0 0 1px ${frameColor}`;
-				unknownStyles.borderRadius = "var(--radius-s)";
-			}
-
 			return (
-				<div className="status-wrapper">
-					<div
-						className="status-minimal status-minimal--no-status"
-						onMouseEnter={() => onMouseEnter({})}
-						onMouseLeave={() => onMouseLeave({})}
-						style={unknownStyles}
-					>
-						<span className="status-minimal__icon">{icon}</span>
-					</div>
-				</div>
+				<StatusIconPreview
+					icon={icon}
+					color={color}
+					iconColorMode={iconColorMode}
+					iconFrameMode={iconFrameMode}
+					onMouseEnter={() => onMouseEnter({})}
+					onMouseLeave={() => onMouseLeave({})}
+				/>
 			);
 		}
 
@@ -76,42 +61,17 @@ export const FileExplorerIcon: FC<Props> = memo(
 		const iconColor = useStatusColors
 			? getStatusColor(primaryStatus.color)
 			: undefined;
-		const shouldShowFrame = iconFrameMode === "always";
-		const iconStyles: React.CSSProperties = {};
-		if (iconColor) {
-			iconStyles.color = iconColor;
-		}
-		if (shouldShowFrame) {
-			const frameColor = iconColor || "currentColor";
-			iconStyles.boxShadow = `0 0 0 1px ${frameColor}`;
-			iconStyles.borderRadius = "var(--radius-s)";
-		}
 
 		return (
-			<div className="status-wrapper">
-				<div
-					className="status-minimal"
-					onMouseEnter={() => onMouseEnter(statuses)}
-					onMouseLeave={() => onMouseLeave(statuses)}
-					style={iconStyles}
-				>
-					<span className="status-minimal__icon">
-						{primaryStatus.icon}
-					</span>
-					{totalStatuses > 1 && (
-						<span
-							className="status-minimal__count"
-							style={
-								iconColor
-									? { backgroundColor: iconColor }
-									: undefined
-							}
-						>
-							{totalStatuses}
-						</span>
-					)}
-				</div>
-			</div>
+			<StatusIconPreview
+				icon={primaryStatus.icon}
+				color={iconColor}
+				count={totalStatuses}
+				iconFrameMode={iconFrameMode}
+				iconColorMode={iconColorMode}
+				onMouseEnter={() => onMouseEnter(statuses)}
+				onMouseLeave={() => onMouseLeave(statuses)}
+			/>
 		);
 	},
 );

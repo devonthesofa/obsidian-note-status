@@ -2,16 +2,26 @@ import React, { memo, useCallback } from "react";
 import { NoteStatus } from "@/types/noteStatus";
 import { SelectableListItem } from "./SelectableListItem";
 import { getStatusTooltip, isStatusSelected } from "@/utils/statusUtils";
+import { StatusIconPreview } from "./StatusIconPreview";
 
 interface StatusOptionProps {
 	status: NoteStatus;
 	isSelected: boolean;
 	isFocused: boolean;
 	onSelect: () => void;
+	iconFrameMode: "always" | "never";
+	iconColorMode: "status" | "theme";
 }
 
 export const StatusModalOption: React.FC<StatusOptionProps> = memo(
-	({ status, isSelected, isFocused, onSelect }) => {
+	({
+		status,
+		isSelected,
+		isFocused,
+		onSelect,
+		iconFrameMode,
+		iconColorMode,
+	}) => {
 		const displayName = status.templateId
 			? `${status.name} (${status.templateId})`
 			: status.name;
@@ -20,14 +30,34 @@ export const StatusModalOption: React.FC<StatusOptionProps> = memo(
 			<SelectableListItem
 				selected={isSelected}
 				focused={isFocused}
-				icon={status.icon}
+				icon={
+					<div className="note-status-option__icon-wrapper">
+						<StatusIconPreview
+							icon={status.icon}
+							color={status.color}
+							iconFrameMode={iconFrameMode}
+							iconColorMode={iconColorMode}
+							withWrapper={false}
+							compact
+						/>
+					</div>
+				}
 				onClick={onSelect}
 				className="note-status-option"
 				title={
 					status.description ? getStatusTooltip(status) : undefined
 				}
 			>
-				{displayName}
+				<div className="note-status-option__text">
+					<span className="note-status-option__name">
+						{displayName}
+					</span>
+					{status.description && (
+						<span className="note-status-option__description">
+							{status.description}
+						</span>
+					)}
+				</div>
 			</SelectableListItem>
 		);
 	},
@@ -38,6 +68,8 @@ export interface Props {
 	availableStatuses: NoteStatus[];
 	focusedIndex?: number;
 	onToggleStatus: (status: NoteStatus, selected: boolean) => void;
+	iconFrameMode?: "always" | "never";
+	iconColorMode?: "status" | "theme";
 }
 
 export const StatusSelector: React.FC<Props> = ({
@@ -45,6 +77,8 @@ export const StatusSelector: React.FC<Props> = ({
 	availableStatuses,
 	focusedIndex = -1,
 	onToggleStatus,
+	iconFrameMode = "never",
+	iconColorMode = "status",
 }) => {
 	const handleSelectStatus = useCallback(
 		async (status: NoteStatus) => {
@@ -72,6 +106,8 @@ export const StatusSelector: React.FC<Props> = ({
 					isSelected={isStatusSelected(status, currentStatuses)}
 					isFocused={index === focusedIndex}
 					onSelect={() => handleSelectStatus(status)}
+					iconFrameMode={iconFrameMode}
+					iconColorMode={iconColorMode}
 				/>
 			))}
 		</div>
