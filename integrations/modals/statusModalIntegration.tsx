@@ -11,6 +11,7 @@ import {
 	BaseNoteStatusService,
 } from "@/core/noteStatusService";
 import eventBus from "@/core/eventBus";
+import settingsService from "@/core/settingsService";
 
 export class StatusModalIntegration extends Modal {
 	private root: Root | null = null;
@@ -116,6 +117,7 @@ export class StatusModalIntegration extends Modal {
 					this.selectorService.noteStatusService.statuses ?? {}
 				}
 				filesQuantity={filesQuantity}
+				templates={settingsService.settings.templates}
 				onRemoveStatus={this.onRemoveStatus}
 				onSelectStatus={this.onSelectStatus}
 			/>,

@@ -4,11 +4,13 @@ import {
 	StatusSelectorGroup,
 	Props as StatusSelectorGroupProps,
 } from "./StatusSelectorGroup";
+import { StatusTemplate } from "@/types/pluginSettings";
 
 export interface Props {
 	currentStatuses: GroupedStatuses;
 	filesQuantity: number;
 	availableStatuses: NoteStatus[];
+	templates: StatusTemplate[];
 	onRemoveStatus: (
 		frontmatterTagName: string,
 		status: NoteStatus,
@@ -23,6 +25,7 @@ export const ChangeStatusModal: React.FC<Props> = ({
 	currentStatuses: initialStatuses,
 	filesQuantity,
 	availableStatuses,
+	templates,
 	onRemoveStatus,
 	onSelectStatus,
 }) => {
@@ -53,6 +56,7 @@ export const ChangeStatusModal: React.FC<Props> = ({
 					frontmatterTagName={frontmatterTagName}
 					availableStatuses={availableStatuses}
 					currentStatuses={statusList}
+					templates={templates}
 					onSelectedState={handleSelectedState}
 				/>
 			))}
