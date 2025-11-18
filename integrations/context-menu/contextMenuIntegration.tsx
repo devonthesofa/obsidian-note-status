@@ -5,12 +5,15 @@ import {
 	Plugin,
 	TAbstractFile,
 	TFile,
+	TFolder,
 	WorkspaceLeaf,
 } from "obsidian";
 import {
+	BaseNoteStatusService,
 	MultipleNoteStatusService,
 	NoteStatusService,
 } from "@/core/noteStatusService";
+import settingsService from "@/core/settingsService";
 
 export class ContextMenuIntegration {
 	private static instance: ContextMenuIntegration | null = null;
@@ -59,20 +62,18 @@ export class ContextMenuIntegration {
 			),
 		);
 		this.plugin.registerEvent(
-			this.plugin.app.workspace.on("file-menu", (menu, file, f, f2) => {
-				menu.addItem((item) => {
-					item.setTitle("Change note state")
-						.setIcon("rotate-ccw") // Lucide icon
-						.onClick(async () => {
-							if (file instanceof TFile) {
+			this.plugin.app.workspace.on("file-menu", (menu, file) => {
+				if (file instanceof TFile) {
+					menu.addItem((item) => {
+						item.setTitle("Change note state")
+							.setIcon("rotate-ccw")
+							.onClick(async () => {
 								this.openSingleFileStatusesModal(file);
-							} else {
-								new Notice(
-									"The selected file is not valid to add status, just .md files can have status in this plugin version",
-								);
-							}
-						});
-				});
+							});
+					});
+				} else if (file instanceof TFolder) {
+					this.addFolderStatusActions(menu, file);
+				}
 			}),
 		);
 
@@ -115,6 +116,97 @@ export class ContextMenuIntegration {
 		eventBus.publish("triggered-open-modal", {
 			statusService: noteStatusService,
 		});
+	}
+
+	private addFolderStatusActions(menu: Menu, folder: TFolder) {
+		const availableStatuses =
+			BaseNoteStatusService.getAllAvailableStatuses();
+
+		if (!availableStatuses.length) {
+			menu.addItem((item) => {
+				item.setTitle("Apply note status (no statuses available)")
+					.setIcon("alert-triangle")
+					.setDisabled(true);
+			});
+			return;
+		}
+
+		menu.addItem((item) => {
+			item.setTitle("Apply note status to folder")
+				.setIcon("folder-sync")
+				.onClick(() => {
+					this.openFolderStatusModal(folder, false);
+				});
+		});
+
+		if (settingsService.settings.applyStatusRecursivelyToSubfolders) {
+			menu.addItem((item) => {
+				item.setTitle("Apply note status to folder and subfolders")
+					.setIcon("git-merge")
+					.onClick(() => {
+						this.openFolderStatusModal(folder, true);
+					});
+			});
+		}
+	}
+
+	private openFolderStatusModal(
+		folder: TFolder,
+		includeSubfolders: boolean,
+	): void {
+		const markdownFiles = this.getMarkdownFilesFromFolder(
+			folder,
+			includeSubfolders,
+		);
+
+		if (!markdownFiles.length) {
+			new Notice("This folder does not contain any Markdown notes.");
+			return;
+		}
+
+		const warningThreshold = 50;
+		if (markdownFiles.length >= warningThreshold) {
+			new Notice(
+				`This folder contains ${markdownFiles.length} notes. Applying status changes may take a while.`,
+				8000,
+			);
+		}
+
+		const multiStatusService = new MultipleNoteStatusService(markdownFiles);
+		multiStatusService.populateStatuses();
+
+		eventBus.publish("triggered-open-modal", {
+			statusService: multiStatusService,
+		});
+	}
+
+	private getMarkdownFilesFromFolder(
+		folder: TFolder,
+		includeSubfolders: boolean,
+	): TFile[] {
+		const files: TFile[] = [];
+		const queue: TFolder[] = [folder];
+
+		while (queue.length) {
+			const current = queue.shift();
+			if (!current) continue;
+
+			current.children.forEach((child) => {
+				if (child instanceof TFile) {
+					if (child.extension === "md") {
+						files.push(child);
+					}
+				} else if (includeSubfolders && child instanceof TFolder) {
+					queue.push(child);
+				}
+			});
+
+			if (!includeSubfolders) {
+				break;
+			}
+		}
+
+		return files;
 	}
 
 	destroy() {

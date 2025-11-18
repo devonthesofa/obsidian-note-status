@@ -40,5 +40,6 @@ export type PluginSettings = {
 	showEditorToolbarButton: boolean; // Whether to show the toolbar button
 	editorToolbarButtonPosition: "left" | "right" | "right-before"; // Position of the toolbar button
 	editorToolbarButtonDisplay: "all-notes" | "active-only"; // Whether to show button in all notes or only active one
+	applyStatusRecursivelyToSubfolders: boolean; // Whether to show recursive folder context option
 	[key: string]: unknown;
 };
