@@ -12,6 +12,8 @@ export interface Props {
 	currentStatuses: NoteStatus[];
 	availableStatuses: NoteStatus[];
 	templates: StatusTemplate[];
+	iconFrameMode: "always" | "never";
+	iconColorMode: "status" | "theme";
 	onSelectedState: (
 		frontmatterTagName: string,
 		status: NoteStatus,
@@ -24,6 +26,8 @@ export const StatusSelectorGroup: React.FC<Props> = ({
 	availableStatuses,
 	templates,
 	frontmatterTagName,
+	iconFrameMode,
+	iconColorMode,
 	onSelectedState,
 }) => {
 	const TEMPLATE_ALL_VIEW = "__all__";
@@ -201,6 +205,8 @@ export const StatusSelectorGroup: React.FC<Props> = ({
 						availableStatuses={filteredStatuses}
 						currentStatuses={currentStatuses}
 						focusedIndex={focusedIndex}
+						iconFrameMode={iconFrameMode}
+						iconColorMode={iconColorMode}
 						onToggleStatus={(status, selected) =>
 							selected
 								? handleSelectStatus(status)

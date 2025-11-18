@@ -11,6 +11,8 @@ export interface Props {
 	filesQuantity: number;
 	availableStatuses: NoteStatus[];
 	templates: StatusTemplate[];
+	iconFrameMode?: "always" | "never";
+	iconColorMode?: "status" | "theme";
 	onRemoveStatus: (
 		frontmatterTagName: string,
 		status: NoteStatus,
@@ -26,6 +28,8 @@ export const ChangeStatusModal: React.FC<Props> = ({
 	filesQuantity,
 	availableStatuses,
 	templates,
+	iconFrameMode = "never",
+	iconColorMode = "status",
 	onRemoveStatus,
 	onSelectStatus,
 }) => {
@@ -57,6 +61,8 @@ export const ChangeStatusModal: React.FC<Props> = ({
 					availableStatuses={availableStatuses}
 					currentStatuses={statusList}
 					templates={templates}
+					iconFrameMode={iconFrameMode}
+					iconColorMode={iconColorMode}
 					onSelectedState={handleSelectedState}
 				/>
 			))}
