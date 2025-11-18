@@ -26,6 +26,24 @@ export const BehaviourSettings: React.FC<Props> = ({ settings, onChange }) => {
 			</SettingItem>
 
 			<SettingItem
+				name="Apply status recursively to subfolders"
+				description="Show a folder context menu option that also processes notes inside nested folders."
+			>
+				<input
+					type="checkbox"
+					checked={
+						settings.applyStatusRecursivelyToSubfolders || false
+					}
+					onChange={(e) =>
+						onChange(
+							"applyStatusRecursivelyToSubfolders",
+							e.target.checked,
+						)
+					}
+				/>
+			</SettingItem>
+
+			<SettingItem
 				name="Status tag prefix"
 				description="YAML frontmatter tag name for status (default: obsidian-note-status)"
 			>
