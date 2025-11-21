@@ -229,15 +229,17 @@ export class CommandsService {
 		});
 		this.registeredCommands.add("search-by-status");
 
-		// Open Status Pane command
-		this.plugin.addCommand({
-			id: "open-status-pane",
-			name: "Open status pane",
-			callback: async () => {
-				await this.openStatusPane();
-			},
-		});
-		this.registeredCommands.add("open-status-pane");
+		// Open Status Pane command (experimental)
+		if (this.shouldEnableGroupedView()) {
+			this.plugin.addCommand({
+				id: "open-status-pane",
+				name: "Open status pane",
+				callback: async () => {
+					await this.openStatusPane();
+				},
+			});
+			this.registeredCommands.add("open-status-pane");
+		}
 	}
 
 	private async openStatusPane(): Promise<void> {
@@ -354,6 +356,14 @@ export class CommandsService {
 			this.app.commands.removeCommand(`note-status:${commandId}`);
 		});
 		this.registeredCommands.clear();
+	}
+
+	private shouldEnableGroupedView(): boolean {
+		const settings = settingsService.settings;
+		return (
+			Boolean(settings.enableExperimentalFeatures) &&
+			Boolean(settings.enableGroupedStatusView)
+		);
 	}
 
 	public destroy(): void {

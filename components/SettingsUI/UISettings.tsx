@@ -322,6 +322,43 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				/>
 			</SettingItem>
 
+			<h3>Experimental features</h3>
+
+			<SettingItem
+				name="Enable experimental features"
+				description="Unlock beta views that are still under development."
+			>
+				<input
+					type="checkbox"
+					checked={settings.enableExperimentalFeatures || false}
+					onChange={handleChange("enableExperimentalFeatures")}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Enable status dashboard"
+				description="Show the ribbon shortcut to open the status dashboard view."
+			>
+				<input
+					type="checkbox"
+					disabled={!settings.enableExperimentalFeatures}
+					checked={settings.enableStatusDashboard || false}
+					onChange={handleChange("enableStatusDashboard")}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Enable grouped status view"
+				description="Show the ribbon shortcut to open the grouped status view."
+			>
+				<input
+					type="checkbox"
+					disabled={!settings.enableExperimentalFeatures}
+					checked={settings.enableGroupedStatusView || false}
+					onChange={handleChange("enableGroupedStatusView")}
+				/>
+			</SettingItem>
+
 			<h3>Behavior & Other</h3>
 
 			<SettingItem
