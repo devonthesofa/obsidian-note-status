@@ -1,6 +1,6 @@
 import { createRoot, Root } from "react-dom/client";
 import eventBus from "core/eventBus";
-import { MarkdownView, Plugin, WorkspaceLeaf } from "obsidian";
+import { MarkdownView, Plugin, WorkspaceLeaf, TFile } from "obsidian";
 import settingsService from "@/core/settingsService";
 import { EditorToolbarButton } from "@/components/Toolbar/EditorToolbarButton";
 import { NoteStatusService } from "@/core/noteStatusService";
@@ -44,8 +44,8 @@ export class EditorToolbarIntegration {
 			}),
 		);
 		this.plugin.registerEvent(
-			this.plugin.app.workspace.on("file-open", () => {
-				this.handleFileOpen();
+			this.plugin.app.workspace.on("file-open", (file) => {
+				this.handleFileOpen(file);
 			}),
 		);
 
@@ -155,8 +155,34 @@ export class EditorToolbarIntegration {
 		this.syncButtons();
 	}
 
-	private handleFileOpen() {
-		this.refreshAllButtons();
+	private handleFileOpen(file: TFile | null) {
+		if (!file) {
+			this.refreshAllButtons();
+			return;
+		}
+
+		let updatedAny = false;
+		for (const [leaf, leafButton] of this.leafButtons.entries()) {
+			const markdownView = leaf.view as MarkdownView;
+			if (markdownView.file?.path !== file.path) {
+				continue;
+			}
+
+			leafButton.noteStatusService =
+				this.buildNoteStatusServiceForFile(file);
+			this.renderButtonForLeaf(leafButton);
+			updatedAny = true;
+		}
+
+		if (!updatedAny) {
+			this.refreshAllButtons();
+		}
+	}
+
+	private buildNoteStatusServiceForFile(file: TFile): NoteStatusService {
+		const noteStatusService = new NoteStatusService(file);
+		noteStatusService.populateStatuses();
+		return noteStatusService;
 	}
 
 	private createButtonForLeaf(leaf: WorkspaceLeaf) {
@@ -370,9 +396,7 @@ export class EditorToolbarIntegration {
 		if (!markdownView.file) {
 			return null;
 		}
-		const noteStatusService = new NoteStatusService(markdownView.file);
-		noteStatusService.populateStatuses();
-		return noteStatusService;
+		return this.buildNoteStatusServiceForFile(markdownView.file);
 	}
 
 	private getUnknownStatusConfig() {
