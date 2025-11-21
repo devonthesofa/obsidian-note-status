@@ -83,28 +83,25 @@ export const resolveFrontmatterKeysForStatus = (
 
 	const scoped = toScopedStatusName(status);
 	const mappings = settings.statusFrontmatterMappings ?? [];
+	const collectedKeys: string[] = [];
 
-	const statusMapping = mappings.find(
-		(mapping) =>
-			mapping.scope === "status" && matchesStatusMapping(mapping, scoped),
-	);
-	if (statusMapping) {
-		const keys = getMappingKeys(statusMapping);
-		if (keys.length) {
-			return keys;
+	mappings.forEach((mapping) => {
+		if (mapping.scope === "status") {
+			if (!matchesStatusMapping(mapping, scoped)) {
+				return;
+			}
+		} else if (mapping.scope === "template") {
+			if (!matchesStatusMapping(mapping, scoped)) {
+				return;
+			}
 		}
-	}
 
-	const templateMapping = mappings.find(
-		(mapping) =>
-			mapping.scope === "template" &&
-			matchesStatusMapping(mapping, scoped),
-	);
-	if (templateMapping) {
-		const keys = getMappingKeys(templateMapping);
-		if (keys.length) {
-			return keys;
-		}
+		const keys = getMappingKeys(mapping);
+		collectedKeys.push(...keys);
+	});
+
+	if (collectedKeys.length) {
+		return normalizeKeys(collectedKeys);
 	}
 
 	return [settings.tagPrefix];
