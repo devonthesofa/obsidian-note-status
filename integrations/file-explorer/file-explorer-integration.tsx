@@ -7,6 +7,11 @@ import {
 import { NoteStatusService } from "@/core/noteStatusService";
 import settingsService from "@/core/settingsService";
 import { GroupedStatuses } from "@/types/noteStatus";
+import {
+	getPrimaryStatus,
+	getUnknownStatusColor,
+	resolveStatusColor,
+} from "@/utils/statusColor";
 import { Plugin, TFile, View } from "obsidian";
 import { createRoot } from "react-dom/client";
 import { StatusesInfoPopup } from "../popups/statusesInfoPopupIntegration";
@@ -20,6 +25,15 @@ export class FileExplorerIntegration implements IElementProcessor {
 		"file-explorer-integration-subscription1";
 	private readonly FILE_EXPLORER_TYPE = "file-explorer";
 	private readonly CONTAINER_SELECTOR = ".nav-files-container";
+	private readonly FILE_NAME_COLORIZED_ATTR = "noteStatusColorized";
+	private readonly FILE_NAME_ORIGINAL_COLOR_ATTR = "noteStatusOriginalColor";
+	private readonly FILE_BLOCK_CLASS = "note-status-colored-block";
+	private readonly FILE_BLOCK_COLOR_VAR = "--note-status-block-color";
+	private readonly FILE_BORDER_CLASS = "note-status-border-left";
+	private readonly FILE_BORDER_COLOR_VAR = "--note-status-border-color";
+	private readonly FILE_UNDERLINE_CLASS = "note-status-underline";
+	private readonly FILE_UNDERLINE_COLOR_VAR = "--note-status-underline-color";
+	private readonly STATUS_DOT_CLASS = "note-status-dot-badge";
 
 	constructor(plugin: Plugin) {
 		this.plugin = plugin;
@@ -58,6 +72,11 @@ export class FileExplorerIntegration implements IElementProcessor {
 					key === "fileExplorerIconPosition" ||
 					key === "fileExplorerIconFrame" ||
 					key === "fileExplorerIconColorMode" ||
+					key === "fileExplorerColorFileName" ||
+					key === "fileExplorerColorBlock" ||
+					key === "fileExplorerLeftBorder" ||
+					key === "fileExplorerStatusDot" ||
+					key === "fileExplorerUnderlineFileName" ||
 					key === "unknownStatusIcon" ||
 					key === "unknownStatusLucideIcon" ||
 					key === "unknownStatusColor" ||
@@ -101,8 +120,22 @@ export class FileExplorerIntegration implements IElementProcessor {
 			}
 
 			const noteStatusService = this.getFileNoteStatusService(dataPath);
+			const statuses = noteStatusService?.statuses ?? null;
+			const primaryStatus = getPrimaryStatus(statuses);
+			const hasStatus = Boolean(primaryStatus);
+			const fallbackColor = getUnknownStatusColor();
+			const statusColor = primaryStatus
+				? resolveStatusColor(primaryStatus, fallbackColor)
+				: undefined;
+			const textElement = textEl as HTMLElement;
+			const navItem = this.getNavItemElement(textElement);
 
-			// Only render icons for markdown files
+			this.applyFileNameColor(textElement, statusColor, hasStatus);
+			this.applyFileNameUnderline(textElement, statusColor, hasStatus);
+			this.applyStatusDot(textElement, statusColor, hasStatus);
+			this.applyFileBlockColor(navItem, statusColor, hasStatus);
+			this.applyLeftBorder(navItem, statusColor, hasStatus);
+
 			if (noteStatusService) {
 				this.render(textEl, noteStatusService.statuses);
 			}
@@ -110,11 +143,10 @@ export class FileExplorerIntegration implements IElementProcessor {
 	}
 
 	private getUnknownStatusConfig() {
-		const settings = settingsService.settings;
 		return {
-			icon: settings.unknownStatusIcon || "❓",
-			lucideIcon: settings.unknownStatusLucideIcon || "",
-			color: settings.unknownStatusColor || "#8b949e",
+			icon: settingsService.settings.unknownStatusIcon || "❓",
+			lucideIcon: settingsService.settings.unknownStatusLucideIcon || "",
+			color: getUnknownStatusColor(),
 		};
 	}
 
@@ -269,5 +301,182 @@ export class FileExplorerIntegration implements IElementProcessor {
 		return fileExplorerView.containerEl.querySelector(
 			this.CONTAINER_SELECTOR,
 		);
+	}
+
+	private applyFileNameColor(
+		element?: HTMLElement | null,
+		color?: string,
+		hasStatus?: boolean,
+	): void {
+		if (!element) {
+			return;
+		}
+
+		if (
+			!settingsService.settings.fileExplorerColorFileName ||
+			!hasStatus ||
+			!color
+		) {
+			this.clearFileNameColor(element);
+			return;
+		}
+
+		if (!element.dataset[this.FILE_NAME_ORIGINAL_COLOR_ATTR]) {
+			element.dataset[this.FILE_NAME_ORIGINAL_COLOR_ATTR] =
+				element.style.color || "";
+		}
+
+		element.dataset[this.FILE_NAME_COLORIZED_ATTR] = "true";
+		element.style.color = color;
+	}
+
+	private applyFileBlockColor(
+		navItem?: HTMLElement | null,
+		color?: string,
+		hasStatus?: boolean,
+	): void {
+		if (!navItem) {
+			return;
+		}
+
+		if (
+			!settingsService.settings.fileExplorerColorBlock ||
+			!hasStatus ||
+			!color
+		) {
+			this.clearFileBlockColor(navItem);
+			return;
+		}
+
+		navItem.classList.add(this.FILE_BLOCK_CLASS);
+		navItem.style.setProperty(this.FILE_BLOCK_COLOR_VAR, color);
+	}
+
+	private applyLeftBorder(
+		navItem?: HTMLElement | null,
+		color?: string,
+		hasStatus?: boolean,
+	): void {
+		if (!navItem) {
+			return;
+		}
+
+		if (
+			!settingsService.settings.fileExplorerLeftBorder ||
+			!hasStatus ||
+			!color
+		) {
+			this.clearFileLeftBorder(navItem);
+			return;
+		}
+
+		navItem.classList.add(this.FILE_BORDER_CLASS);
+		navItem.style.setProperty(this.FILE_BORDER_COLOR_VAR, color);
+	}
+
+	private applyFileNameUnderline(
+		element?: HTMLElement | null,
+		color?: string,
+		hasStatus?: boolean,
+	): void {
+		if (!element) {
+			return;
+		}
+
+		if (
+			!settingsService.settings.fileExplorerUnderlineFileName ||
+			!hasStatus ||
+			!color
+		) {
+			this.clearFileNameUnderline(element);
+			return;
+		}
+
+		element.classList.add(this.FILE_UNDERLINE_CLASS);
+		element.style.setProperty(this.FILE_UNDERLINE_COLOR_VAR, color);
+	}
+
+	private applyStatusDot(
+		element?: HTMLElement | null,
+		color?: string,
+		hasStatus?: boolean,
+	): void {
+		if (!element) {
+			return;
+		}
+
+		const existingDot = element.querySelector(
+			`.${this.STATUS_DOT_CLASS}`,
+		) as HTMLElement | null;
+		if (
+			!settingsService.settings.fileExplorerStatusDot ||
+			!hasStatus ||
+			!color
+		) {
+			if (existingDot) {
+				existingDot.remove();
+			}
+			return;
+		}
+
+		const dot =
+			existingDot ||
+			createSpan({
+				cls: this.STATUS_DOT_CLASS,
+			});
+
+		dot.setAttribute("aria-hidden", "true");
+		dot.style.backgroundColor = color;
+
+		if (!existingDot) {
+			element.appendChild(dot);
+		}
+	}
+
+	private getNavItemElement(
+		element?: HTMLElement | null,
+	): HTMLElement | null {
+		if (!element) {
+			return null;
+		}
+		return element.closest(".nav-file, .nav-folder") as HTMLElement | null;
+	}
+
+	private clearFileNameColor(element: HTMLElement): void {
+		if (!element.dataset[this.FILE_NAME_COLORIZED_ATTR]) {
+			return;
+		}
+
+		const previousColor =
+			element.dataset[this.FILE_NAME_ORIGINAL_COLOR_ATTR] || "";
+		if (previousColor) {
+			element.style.color = previousColor;
+		} else {
+			element.style.removeProperty("color");
+		}
+
+		delete element.dataset[this.FILE_NAME_ORIGINAL_COLOR_ATTR];
+		delete element.dataset[this.FILE_NAME_COLORIZED_ATTR];
+	}
+
+	private clearFileBlockColor(navItem?: HTMLElement | null): void {
+		if (!navItem) {
+			return;
+		}
+		navItem.classList.remove(this.FILE_BLOCK_CLASS);
+		navItem.style.removeProperty(this.FILE_BLOCK_COLOR_VAR);
+	}
+
+	private clearFileLeftBorder(navItem?: HTMLElement | null): void {
+		if (!navItem) {
+			return;
+		}
+		navItem.classList.remove(this.FILE_BORDER_CLASS);
+		navItem.style.removeProperty(this.FILE_BORDER_COLOR_VAR);
+	}
+
+	private clearFileNameUnderline(element: HTMLElement): void {
+		element.classList.remove(this.FILE_UNDERLINE_CLASS);
+		element.style.removeProperty(this.FILE_UNDERLINE_COLOR_VAR);
 	}
 }

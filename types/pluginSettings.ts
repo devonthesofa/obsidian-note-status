@@ -23,6 +23,11 @@ export type PluginSettings = {
 	statusBarShowTemplateName: "always" | "never" | "auto"; // How to show template names in status bar
 	showStatusIconsInExplorer: boolean;
 	hideUnknownStatusInExplorer: boolean;
+	fileExplorerColorFileName: boolean; // Whether to color the file explorer filename text using the current status color
+	fileExplorerColorBlock: boolean; // Whether to tint the entire explorer list item background using the status color
+	fileExplorerLeftBorder: boolean; // Whether to display a colored border on the explorer item
+	fileExplorerStatusDot: boolean; // Whether to append a small colored dot next to the filename
+	fileExplorerUnderlineFileName: boolean; // Whether to underline the filename using the status color
 	enabledTemplates: string[]; // IDs of enabled templates
 	useCustomStatusesOnly: boolean; // Whether to use only custom statuses or include templates
 	useMultipleStatuses: boolean; // Whether to allow multiple statuses per note
