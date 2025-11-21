@@ -226,6 +226,17 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 			</SettingItem>
 
 			<SettingItem
+				name="Color filename text using status color"
+				description="Apply the active status color to the filename text inside the file explorer."
+			>
+				<input
+					type="checkbox"
+					checked={settings.fileExplorerColorFileName || false}
+					onChange={handleChange("fileExplorerColorFileName")}
+				/>
+			</SettingItem>
+
+			<SettingItem
 				name="Status icon frame"
 				description="Choose whether to display a frame around the status icon inside the file explorer."
 			>

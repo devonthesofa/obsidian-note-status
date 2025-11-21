@@ -6,7 +6,7 @@ import {
 } from "@/core/lazyElementObserver";
 import { NoteStatusService } from "@/core/noteStatusService";
 import settingsService from "@/core/settingsService";
-import { GroupedStatuses } from "@/types/noteStatus";
+import { GroupedStatuses, NoteStatus } from "@/types/noteStatus";
 import { Plugin, TFile, View } from "obsidian";
 import { createRoot } from "react-dom/client";
 import { StatusesInfoPopup } from "../popups/statusesInfoPopupIntegration";
@@ -20,6 +20,8 @@ export class FileExplorerIntegration implements IElementProcessor {
 		"file-explorer-integration-subscription1";
 	private readonly FILE_EXPLORER_TYPE = "file-explorer";
 	private readonly CONTAINER_SELECTOR = ".nav-files-container";
+	private readonly FILE_NAME_COLORIZED_ATTR = "noteStatusColorized";
+	private readonly FILE_NAME_ORIGINAL_COLOR_ATTR = "noteStatusOriginalColor";
 
 	constructor(plugin: Plugin) {
 		this.plugin = plugin;
@@ -58,6 +60,7 @@ export class FileExplorerIntegration implements IElementProcessor {
 					key === "fileExplorerIconPosition" ||
 					key === "fileExplorerIconFrame" ||
 					key === "fileExplorerIconColorMode" ||
+					key === "fileExplorerColorFileName" ||
 					key === "unknownStatusIcon" ||
 					key === "unknownStatusLucideIcon" ||
 					key === "unknownStatusColor" ||
@@ -104,7 +107,13 @@ export class FileExplorerIntegration implements IElementProcessor {
 
 			// Only render icons for markdown files
 			if (noteStatusService) {
+				this.applyFileNameColor(
+					textEl as HTMLElement,
+					noteStatusService.statuses,
+				);
 				this.render(textEl, noteStatusService.statuses);
+			} else {
+				this.applyFileNameColor(textEl as HTMLElement, null);
 			}
 		}
 	}
@@ -269,5 +278,77 @@ export class FileExplorerIntegration implements IElementProcessor {
 		return fileExplorerView.containerEl.querySelector(
 			this.CONTAINER_SELECTOR,
 		);
+	}
+
+	private applyFileNameColor(
+		element?: HTMLElement | null,
+		statuses?: GroupedStatuses | null,
+	): void {
+		if (!element) {
+			return;
+		}
+
+		if (!settingsService.settings.fileExplorerColorFileName) {
+			this.clearFileNameColor(element);
+			return;
+		}
+
+		const primaryStatus = this.getPrimaryStatus(statuses);
+		if (!primaryStatus) {
+			this.clearFileNameColor(element);
+			return;
+		}
+
+		const color = primaryStatus.color?.trim() || this.getFallbackColor();
+		if (!color) {
+			this.clearFileNameColor(element);
+			return;
+		}
+
+		if (!element.dataset[this.FILE_NAME_ORIGINAL_COLOR_ATTR]) {
+			element.dataset[this.FILE_NAME_ORIGINAL_COLOR_ATTR] =
+				element.style.color || "";
+		}
+
+		element.dataset[this.FILE_NAME_COLORIZED_ATTR] = "true";
+		element.style.color = color;
+	}
+
+	private getPrimaryStatus(
+		statuses?: GroupedStatuses | null,
+	): NoteStatus | null {
+		if (!statuses) {
+			return null;
+		}
+		for (const list of Object.values(statuses)) {
+			if (list.length) {
+				return list[0];
+			}
+		}
+		return null;
+	}
+
+	private getFallbackColor(): string {
+		return (
+			settingsService.settings.unknownStatusColor?.trim() ||
+			"var(--text-accent)"
+		);
+	}
+
+	private clearFileNameColor(element: HTMLElement): void {
+		if (!element.dataset[this.FILE_NAME_COLORIZED_ATTR]) {
+			return;
+		}
+
+		const previousColor =
+			element.dataset[this.FILE_NAME_ORIGINAL_COLOR_ATTR] || "";
+		if (previousColor) {
+			element.style.color = previousColor;
+		} else {
+			element.style.removeProperty("color");
+		}
+
+		delete element.dataset[this.FILE_NAME_ORIGINAL_COLOR_ATTR];
+		delete element.dataset[this.FILE_NAME_COLORIZED_ATTR];
 	}
 }
