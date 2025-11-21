@@ -166,6 +166,21 @@ export class NoteStatusService extends BaseNoteStatusService {
 		return identifiers;
 	}
 
+	private buildStatusesArray(identifiers: string[]): NoteStatusType[] {
+		if (!identifiers.length) {
+			return [];
+		}
+
+		let statuses = identifiers
+			.map((identifier) => this.statusNameToObject(identifier))
+			.filter((status): status is NoteStatusType => status !== undefined);
+
+		if (statuses.length && !settingsService.settings.useMultipleStatuses) {
+			statuses = statuses.slice(0, 1);
+		}
+		return statuses;
+	}
+
 	private shouldStoreStatusesAsArray(): boolean {
 		if (settingsService.settings.useMultipleStatuses) {
 			return true;
@@ -244,14 +259,16 @@ export class NoteStatusService extends BaseNoteStatusService {
 			return;
 		}
 
-		let statuses = identifiers
-			.map((identifier) => this.statusNameToObject(identifier))
-			.filter((status): status is NoteStatusType => status !== undefined);
+		this.statuses[defaultKey] = this.buildStatusesArray(identifiers);
+	}
 
-		if (statuses.length && !settingsService.settings.useMultipleStatuses) {
-			statuses = statuses.slice(0, 1);
-		}
-		this.statuses[defaultKey] = statuses;
+	public getStatusesForKey(frontmatterTagName: string): NoteStatusType[] {
+		const identifiers = this.statusStore
+			.getStatuses(this.file, frontmatterTagName)
+			.map((identifier) => identifier?.toString())
+			.filter((identifier): identifier is string => Boolean(identifier));
+
+		return this.buildStatusesArray(identifiers);
 	}
 
 	async removeStatus(

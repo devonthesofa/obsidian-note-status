@@ -5,6 +5,8 @@ import {
 	BaseNoteStatusService,
 	NoteStatusService,
 } from "@/core/noteStatusService";
+import settingsService from "@/core/settingsService";
+import { getKnownFrontmatterKeys } from "@/utils/frontmatterMappings";
 
 interface CurrentNoteInfo {
 	file: TFile | null;
@@ -30,9 +32,20 @@ export const useCurrentNote = () => {
 		const noteStatusService = new NoteStatusService(activeFile);
 		noteStatusService.populateStatuses();
 
+		const statusMetadataKeys = getKnownFrontmatterKeys(
+			settingsService.settings,
+		);
+		const statusesByKey: Record<string, NoteStatus[]> = {};
+		statusMetadataKeys.forEach((key) => {
+			const statuses = noteStatusService.getStatusesForKey(key);
+			if (statuses.length) {
+				statusesByKey[key] = statuses;
+			}
+		});
+
 		setCurrentNote({
 			file: activeFile,
-			statuses: noteStatusService.statuses,
+			statuses: statusesByKey,
 			lastModified: activeFile.stat.mtime,
 		});
 	}, []);

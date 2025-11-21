@@ -60,7 +60,7 @@ export const useVaultStats = () => {
 			let hasAnyStatus = false;
 
 			statusMetadataKeys.forEach((key) => {
-				const statuses = noteStatusService.statuses[key] || [];
+				const statuses = noteStatusService.getStatusesForKey(key);
 				if (!statuses.length) return;
 
 				hasAnyStatus = true;

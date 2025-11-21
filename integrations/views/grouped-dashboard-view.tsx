@@ -98,7 +98,7 @@ export class GroupedDashboardView extends ItemView {
 			noteStatusService.populateStatuses();
 
 			statusMetadataKeys.forEach((key) => {
-				const statusesForKey = noteStatusService.statuses[key] || [];
+				const statusesForKey = noteStatusService.getStatusesForKey(key);
 				if (!statusesForKey.length) return;
 
 				statusesForKey.forEach((status) => {

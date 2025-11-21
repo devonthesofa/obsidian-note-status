@@ -88,7 +88,7 @@ export class StatusDashboardView extends ItemView {
 			let hasAnyStatus = false;
 
 			statusMetadataKeys.forEach((key) => {
-				const statuses = noteStatusService.statuses[key] || [];
+				const statuses = noteStatusService.getStatusesForKey(key);
 				if (!statuses.length) return;
 
 				hasAnyStatus = true;
@@ -130,10 +130,21 @@ export class StatusDashboardView extends ItemView {
 
 		const noteStatusService = new NoteStatusService(activeFile);
 		noteStatusService.populateStatuses();
+		const statusMetadataKeys = getKnownFrontmatterKeys(
+			settingsService.settings,
+		);
+		const statusesByKey: Record<string, NoteStatus[]> = {};
+
+		statusMetadataKeys.forEach((key) => {
+			const statuses = noteStatusService.getStatusesForKey(key);
+			if (statuses.length) {
+				statusesByKey[key] = statuses;
+			}
+		});
 
 		this.currentNote = {
 			file: activeFile,
-			statuses: noteStatusService.statuses,
+			statuses: statusesByKey,
 			lastModified: activeFile.stat.mtime,
 		};
 		this.renderDashboard();
