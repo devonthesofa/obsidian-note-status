@@ -1,6 +1,6 @@
 import { createRoot, Root } from "react-dom/client";
 import eventBus from "core/eventBus";
-import { MarkdownView, Plugin, WorkspaceLeaf } from "obsidian";
+import { Plugin } from "obsidian";
 import settingsService from "@/core/settingsService";
 import { StatusBar } from "@/components/StatusBar/StatusBar";
 import { NoteStatusService } from "@/core/noteStatusService";
@@ -11,7 +11,6 @@ export class StatusBarIntegration {
 	private plugin: Plugin;
 	private statusBarContainer: HTMLElement | null = null;
 	private noteStatusService: NoteStatusService | null = null;
-	private currentLeaf: WorkspaceLeaf | null = null;
 
 	constructor(plugin: Plugin) {
 		if (StatusBarIntegration.instance) {
@@ -24,11 +23,8 @@ export class StatusBarIntegration {
 	async integrate() {
 		eventBus.subscribe(
 			"active-file-change",
-			({ leaf }) => {
-				if (this.isValidMarkdownLeaf(leaf)) {
-					this.currentLeaf = leaf;
-					this.handleActiveFileChange().catch(console.error);
-				}
+			() => {
+				this.handleActiveFileChange();
 			},
 			"statusBarIntegrationSubscription1",
 		);
@@ -75,7 +71,7 @@ export class StatusBarIntegration {
 		);
 
 		eventBus.subscribe(
-			"frontmatter-manually-changed",
+			"status-changed",
 			() => {
 				this.handleActiveFileChange().catch(console.error);
 			},
@@ -83,27 +79,17 @@ export class StatusBarIntegration {
 		);
 	}
 
-	private async handleActiveFileChange() {
-		this.extractStatusesFromLeaf(this.currentLeaf);
-		this.render();
-	}
-
-	private extractStatusesFromLeaf(leaf: WorkspaceLeaf | null) {
-		if (!this.isValidMarkdownLeaf(leaf)) {
-			return {};
+	private async handleActiveFileChange(): Promise<void> {
+		const file = this.plugin.app.workspace.getActiveFile();
+		if (!file) {
+			this.noteStatusService = null;
+			this.render();
+			return;
 		}
 
-		const markdownView = leaf!.view as MarkdownView;
-		if (!markdownView.file) {
-			return {};
-		}
-
-		this.noteStatusService = new NoteStatusService(markdownView.file);
+		this.noteStatusService = new NoteStatusService(file);
 		this.noteStatusService.populateStatuses();
-	}
-
-	private isValidMarkdownLeaf(leaf: WorkspaceLeaf | null): boolean {
-		return leaf !== null && leaf.view.getViewType() === "markdown";
+		this.render();
 	}
 
 	private openStatusModal() {
@@ -181,12 +167,11 @@ export class StatusBarIntegration {
 			"statusBarIntegrationSubscription2",
 		);
 		eventBus.unsubscribe(
-			"plugin-settings-changed",
+			"status-changed",
 			"statusBarIntegrationSubscription3",
 		);
 
 		this.destroyStatusBarItem();
-		this.currentLeaf = null;
 		this.noteStatusService = null;
 		StatusBarIntegration.instance = null;
 	}

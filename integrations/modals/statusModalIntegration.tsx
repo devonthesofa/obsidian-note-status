@@ -35,7 +35,7 @@ export class StatusModalIntegration extends Modal {
 		);
 
 		eventBus.subscribe(
-			"frontmatter-manually-changed",
+			"status-changed",
 			() => {
 				// TODO: There are multiple calls to populateStatuses, in this case the noteStatusService is passed by reference, so redundant computations
 				// FIXME: Line 27
@@ -141,7 +141,7 @@ export class StatusModalIntegration extends Modal {
 		StatusModalIntegration.instance = null;
 
 		eventBus.unsubscribe(
-			"frontmatter-manually-changed",
+			"status-changed",
 			"statusModalIntegrationSubscription1",
 		);
 	}

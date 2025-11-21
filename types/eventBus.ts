@@ -16,7 +16,7 @@ export type EventBusEvents = {
 		value: unknown;
 		currentSettings: PluginSettings;
 	}) => void;
-	"frontmatter-manually-changed": ({ file }: { file: TFile }) => void;
+	"status-changed": ({ file }: { file: TFile }) => void;
 	"triggered-open-modal": ({
 		statusService,
 	}: {

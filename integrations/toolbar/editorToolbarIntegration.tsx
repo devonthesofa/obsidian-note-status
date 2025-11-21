@@ -98,7 +98,7 @@ export class EditorToolbarIntegration {
 		);
 
 		eventBus.subscribe(
-			"frontmatter-manually-changed",
+			"status-changed",
 			({ file }) => {
 				// Find the button for the specific file and refresh only that one
 				for (const [leaf, leafButton] of this.leafButtons.entries()) {
@@ -394,7 +394,7 @@ export class EditorToolbarIntegration {
 			"editorToolbarIntegrationSubscription2",
 		);
 		eventBus.unsubscribe(
-			"frontmatter-manually-changed",
+			"status-changed",
 			"editorToolbarIntegrationSubscription3",
 		);
 

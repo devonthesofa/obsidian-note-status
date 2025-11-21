@@ -33,7 +33,7 @@ export class FileExplorerIntegration implements IElementProcessor {
 		this.setupWorkspaceIntegration();
 
 		eventBus.subscribe(
-			"frontmatter-manually-changed",
+			"status-changed",
 			({ file }) => {
 				const element = this.findFileElement(file.path);
 				if (!element) return;
@@ -74,18 +74,13 @@ export class FileExplorerIntegration implements IElementProcessor {
 	private getFileNoteStatusService(
 		dataPath: string,
 	): NoteStatusService | null {
-		if (!dataPath.endsWith(".md")) {
+		const abstractFile =
+			this.plugin.app.vault.getAbstractFileByPath(dataPath);
+		if (!(abstractFile instanceof TFile)) {
 			return null;
 		}
 
-		const file = this.plugin.app.vault.getAbstractFileByPath(
-			dataPath,
-		) as TFile;
-		if (!file) {
-			return null;
-		}
-
-		const noteStatusService = new NoteStatusService(file);
+		const noteStatusService = new NoteStatusService(abstractFile);
 		noteStatusService.populateStatuses();
 		return noteStatusService;
 	}
@@ -187,12 +182,9 @@ export class FileExplorerIntegration implements IElementProcessor {
 	 */
 	destroy(): void {
 		this.observerService.cleanup();
+		eventBus.unsubscribe("status-changed", this.EVENT_SUBSCRIPTION_ID);
 		eventBus.unsubscribe(
-			"frontmatter-manually-changed",
-			this.EVENT_SUBSCRIPTION_ID,
-		);
-		eventBus.unsubscribe(
-			"frontmatter-manually-changed",
+			"status-changed",
 			"fileExplorerIntegrationSubscription2",
 		);
 	}

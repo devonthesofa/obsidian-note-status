@@ -49,13 +49,14 @@ export class ContextMenuIntegration {
 								const tFiles = files.filter(
 									(f): f is TFile => f instanceof TFile,
 								);
-								if (tFiles.length) {
-									this.openMultipleFilesStatusesModal(tFiles);
-								} else {
+								if (!tFiles.length) {
 									new Notice(
-										"The selected files are not valid to add status, just .md files can have status in this plugin version",
+										"Select at least one file to change its status.",
 									);
+									return;
 								}
+
+								this.openMultipleFilesStatusesModal(tFiles);
 							});
 					});
 				},
@@ -85,17 +86,17 @@ export class ContextMenuIntegration {
 						item.setTitle("Change note status")
 							.setIcon("rotate-ccw") // Lucide icon
 							.onClick(async () => {
-								if (view.file) {
-									if (view.file instanceof TFile) {
-										this.openSingleFileStatusesModal(
-											view.file,
-										);
-									} else {
-										new Notice(
-											"The selected file is not valid to add status, just .md files can have status in this plugin version",
-										);
-									}
+								if (
+									!view.file ||
+									!(view.file instanceof TFile)
+								) {
+									new Notice(
+										"The selected item is not a valid file.",
+									);
+									return;
 								}
+
+								this.openSingleFileStatusesModal(view.file);
 							});
 					});
 				},
@@ -154,25 +155,22 @@ export class ContextMenuIntegration {
 		folder: TFolder,
 		includeSubfolders: boolean,
 	): void {
-		const markdownFiles = this.getMarkdownFilesFromFolder(
-			folder,
-			includeSubfolders,
-		);
+		const files = this.getFilesFromFolder(folder, includeSubfolders);
 
-		if (!markdownFiles.length) {
-			new Notice("This folder does not contain any Markdown notes.");
+		if (!files.length) {
+			new Notice("This folder does not contain any files.");
 			return;
 		}
 
 		const warningThreshold = 50;
-		if (markdownFiles.length >= warningThreshold) {
+		if (files.length >= warningThreshold) {
 			new Notice(
-				`This folder contains ${markdownFiles.length} notes. Applying status changes may take a while.`,
+				`This folder contains ${files.length} files. Applying status changes may take a while.`,
 				8000,
 			);
 		}
 
-		const multiStatusService = new MultipleNoteStatusService(markdownFiles);
+		const multiStatusService = new MultipleNoteStatusService(files);
 		multiStatusService.populateStatuses();
 
 		eventBus.publish("triggered-open-modal", {
@@ -180,7 +178,7 @@ export class ContextMenuIntegration {
 		});
 	}
 
-	private getMarkdownFilesFromFolder(
+	private getFilesFromFolder(
 		folder: TFolder,
 		includeSubfolders: boolean,
 	): TFile[] {
@@ -193,9 +191,7 @@ export class ContextMenuIntegration {
 
 			current.children.forEach((child) => {
 				if (child instanceof TFile) {
-					if (child.extension === "md") {
-						files.push(child);
-					}
+					files.push(child);
 				} else if (includeSubfolders && child instanceof TFolder) {
 					queue.push(child);
 				}

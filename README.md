@@ -160,6 +160,8 @@ Works with:
 - **QuickAdd macros**
 - **Global search**
 
+Non-Markdown files (PDF, Canvas, images, etc.) can't host YAML frontmatter. Their statuses live in a lightweight JSON file under `.obsidian/plugins/obsidian-note-status/non-markdown-statuses.json`, and every command/view in the plugin reads from that store transparently. External tools such as Dataview or Templater still only see Markdown/frontmatter data, so keep using Markdown files if you need those integrations.
+
 ## 🛠️ API Reference
 
 For developers building integrations or contributing:
