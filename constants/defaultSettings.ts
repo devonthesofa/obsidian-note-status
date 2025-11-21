@@ -51,4 +51,6 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	editorToolbarButtonPosition: "right", // Default position on the right
 	editorToolbarButtonDisplay: "all-notes", // Default to show button in all notes
 	applyStatusRecursivelyToSubfolders: false,
+	statusFrontmatterMappings: [],
+	writeMappedTagsToDefault: false,
 };

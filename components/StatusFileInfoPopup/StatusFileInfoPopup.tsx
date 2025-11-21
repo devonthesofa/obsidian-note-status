@@ -4,11 +4,17 @@ import { StatusDisplay } from "../atoms/StatusDisplay";
 
 export interface Props {
 	statuses: GroupedStatuses;
+	defaultTagName: string;
 	onClose?: () => void;
 }
 
-export const StatusFileInfoPopup: React.FC<Props> = ({ statuses }) => {
-	const statusEntries = Object.entries(statuses);
+export const StatusFileInfoPopup: React.FC<Props> = ({
+	statuses,
+	defaultTagName,
+}) => {
+	const statusEntries = Object.entries(statuses).filter(
+		([, statusList]) => statusList.length > 0,
+	);
 
 	if (statusEntries.length === 0) {
 		return (
@@ -27,40 +33,39 @@ export const StatusFileInfoPopup: React.FC<Props> = ({ statuses }) => {
 			</div>
 
 			<div className="status-popup-content">
-				{statusEntries.map(([groupName, statusList]) => (
-					<div key={groupName} className="status-group">
-						<div className="status-group__header">
-							<span className="status-group__name">
-								{groupName.toLowerCase()}
-							</span>
-							<span className="status-group__count">
-								{statusList.length}
-							</span>
-						</div>
-
-						<div className="status-group__items">
-							{statusList.map((status, index) => (
-								<div
-									key={`${groupName}-${index}`}
-									className="status-item"
-								>
-									<StatusDisplay
-										status={status}
-										variant="badge"
-									/>
-									{status.description && (
-										<div
-											className="status-description"
-											title={status.description}
-										>
-											{status.description}
-										</div>
-									)}
+				<div className="status-tag-grid">
+					{statusEntries.map(([groupName, statusList]) => {
+						const isDefault = groupName === defaultTagName;
+						return (
+							<div key={groupName} className="status-tag-card">
+								<div className="status-tag-card__header">
+									<div className="status-tag-card__title">
+										<span className="status-tag-card__label">
+											{groupName}
+										</span>
+										{isDefault && (
+											<span className="status-tag-card__badge">
+												Default tag
+											</span>
+										)}
+									</div>
+									<span className="status-tag-card__count">
+										{statusList.length}
+									</span>
 								</div>
-							))}
-						</div>
-					</div>
-				))}
+								<div className="status-tag-card__statuses">
+									{statusList.map((status, index) => (
+										<StatusDisplay
+											key={`${groupName}-${index}`}
+											status={status}
+											variant="badge"
+										/>
+									))}
+								</div>
+							</div>
+						);
+					})}
+				</div>
 			</div>
 		</div>
 	);

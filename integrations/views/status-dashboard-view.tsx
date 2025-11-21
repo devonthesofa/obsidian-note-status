@@ -10,6 +10,7 @@ import settingsService from "@/core/settingsService";
 import eventBus from "@/core/eventBus";
 import { VaultStats } from "@/components/StatusDashboard/useVaultStats";
 import { NoteStatus } from "@/types/noteStatus";
+import { getAllFrontmatterKeys } from "@/core/statusKeyHelpers";
 
 interface AppWithCommands extends App {
 	commands: {
@@ -61,7 +62,7 @@ export class StatusDashboardView extends ItemView {
 		const files = this.app.vault.getFiles();
 		const availableStatuses =
 			BaseNoteStatusService.getAllAvailableStatuses();
-		const statusMetadataKeys = [settingsService.settings.tagPrefix];
+		const statusMetadataKeys = getAllFrontmatterKeys();
 
 		let notesWithStatus = 0;
 		const statusDistribution: Record<string, number> = {};
@@ -85,7 +86,7 @@ export class StatusDashboardView extends ItemView {
 			let hasAnyStatus = false;
 
 			statusMetadataKeys.forEach((key) => {
-				const statuses = noteStatusService.statuses[key] || [];
+				const statuses = noteStatusService.getStatusesForKey(key);
 				if (!statuses.length) return;
 
 				hasAnyStatus = true;
@@ -127,10 +128,19 @@ export class StatusDashboardView extends ItemView {
 
 		const noteStatusService = new NoteStatusService(activeFile);
 		noteStatusService.populateStatuses();
+		const statusMetadataKeys = getAllFrontmatterKeys();
+		const statusesByKey: Record<string, NoteStatus[]> = {};
+
+		statusMetadataKeys.forEach((key) => {
+			const statuses = noteStatusService.getStatusesForKey(key);
+			if (statuses.length) {
+				statusesByKey[key] = statuses;
+			}
+		});
 
 		this.currentNote = {
 			file: activeFile,
-			statuses: noteStatusService.statuses,
+			statuses: statusesByKey,
 			lastModified: activeFile.stat.mtime,
 		};
 		this.renderDashboard();
@@ -224,12 +234,19 @@ export class StatusDashboardView extends ItemView {
 
 	private findUnassignedNotes() {
 		const files = this.app.vault.getMarkdownFiles();
+		const statusKeys = getAllFrontmatterKeys();
 		const filesWithoutStatus = files.filter((file) => {
 			const cachedMetadata = this.app.metadataCache.getFileCache(file);
 			const frontmatter = cachedMetadata?.frontmatter;
-			return (
-				!frontmatter || !frontmatter[settingsService.settings.tagPrefix]
-			);
+			if (!frontmatter) return true;
+
+			return !statusKeys.some((key) => {
+				const value = frontmatter[key];
+				if (Array.isArray(value)) {
+					return value.length > 0;
+				}
+				return Boolean(value);
+			});
 		});
 
 		if (filesWithoutStatus.length === 0) {
@@ -242,8 +259,7 @@ export class StatusDashboardView extends ItemView {
 		);
 
 		// Create a search query to find files without the status tag
-		const tagPrefix = settingsService.settings.tagPrefix;
-		const query = `-[${tagPrefix}:]`;
+		const query = statusKeys.map((key) => `-[${key}:]`).join(" ");
 
 		// @ts-ignore
 		this.app.internalPlugins.plugins[
@@ -252,8 +268,10 @@ export class StatusDashboardView extends ItemView {
 	}
 
 	private searchBySpecificStatus(statusName: string) {
-		const tagPrefix = settingsService.settings.tagPrefix;
-		const query = `[${tagPrefix}:"${statusName}"]`;
+		const keys = getAllFrontmatterKeys();
+		const query = keys
+			.map((key) => `[${key}:"${statusName}"]`)
+			.join(" OR ");
 
 		// @ts-ignore
 		this.app.internalPlugins.plugins[
@@ -325,6 +343,7 @@ export class StatusDashboardView extends ItemView {
 					key === "customStatuses" ||
 					key === "useMultipleStatuses" ||
 					key === "strictStatuses" ||
+					key === "statusFrontmatterMappings" ||
 					key === "vaultSizeLimit"
 				) {
 					handleVaultChange();

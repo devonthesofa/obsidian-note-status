@@ -1,6 +1,7 @@
 import { PluginSettings } from "@/types/pluginSettings";
 import React from "react";
 import { SettingItem } from "./SettingItem";
+import { FrontmatterMappingsSettings } from "./FrontmatterMappingsSettings";
 
 export type Props = {
 	settings: PluginSettings;
@@ -87,6 +88,30 @@ export const BehaviourSettings: React.FC<Props> = ({ settings, onChange }) => {
 					checked={settings.strictStatuses || false}
 					onChange={(e) =>
 						onChange("strictStatuses", e.target.checked)
+					}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Frontmatter mappings"
+				description="Map templates or individual statuses to specific YAML keys. These mappings only apply to Markdown files with frontmatter."
+				vertical
+			>
+				<FrontmatterMappingsSettings
+					settings={settings}
+					onChange={onChange}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Write mapped tags to default status tag"
+				description="When enabled, statuses mapped to custom frontmatter keys are also written to the default status tag."
+			>
+				<input
+					type="checkbox"
+					checked={settings.writeMappedTagsToDefault || false}
+					onChange={(e) =>
+						onChange("writeMappedTagsToDefault", e.target.checked)
 					}
 				/>
 			</SettingItem>

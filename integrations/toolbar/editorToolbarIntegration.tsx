@@ -71,6 +71,9 @@ export class EditorToolbarIntegration {
 				if (key === "tagPrefix") {
 					this.refreshAllButtons();
 				}
+				if (key === "statusFrontmatterMappings") {
+					this.refreshAllButtons();
+				}
 				if (key === "useCustomStatusesOnly") {
 					this.refreshAllButtons();
 				}
@@ -335,9 +338,12 @@ export class EditorToolbarIntegration {
 	}
 
 	private renderButtonForLeaf(leafButton: LeafButton): void {
+		const statuses =
+			leafButton.noteStatusService?.getStatusesByAllKeys() || {};
 		leafButton.root.render(
 			<EditorToolbarButton
-				statuses={leafButton.noteStatusService?.statuses || {}}
+				statuses={statuses}
+				defaultTagName={settingsService.settings.tagPrefix}
 				onClick={() => this.openStatusModal(leafButton.leaf)}
 				unknownStatusConfig={this.getUnknownStatusConfig()}
 			/>,

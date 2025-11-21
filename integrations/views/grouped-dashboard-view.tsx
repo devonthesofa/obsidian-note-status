@@ -6,8 +6,8 @@ import {
 	NoteStatusService,
 } from "@/core/noteStatusService";
 import eventBus from "@/core/eventBus";
-import settingsService from "@/core/settingsService";
 import { NoteStatus } from "@/types/noteStatus";
+import { getAllFrontmatterKeys } from "@/core/statusKeyHelpers";
 
 export const VIEW_TYPE_GROUPED_DASHBOARD = "grouped-dashboard-view";
 
@@ -71,7 +71,7 @@ export class GroupedDashboardView extends ItemView {
 
 	private processFiles = (files: FileItem[]): GroupedByStatus => {
 		const result: GroupedByStatus = {};
-		const statusMetadataKeys = [settingsService.settings.tagPrefix];
+		const statusMetadataKeys = getAllFrontmatterKeys();
 		const availableStatuses =
 			BaseNoteStatusService.getAllAvailableStatuses();
 
@@ -95,7 +95,7 @@ export class GroupedDashboardView extends ItemView {
 			noteStatusService.populateStatuses();
 
 			statusMetadataKeys.forEach((key) => {
-				const statusesForKey = noteStatusService.statuses[key] || [];
+				const statusesForKey = noteStatusService.getStatusesForKey(key);
 				if (!statusesForKey.length) return;
 
 				statusesForKey.forEach((status) => {
@@ -147,6 +147,7 @@ export class GroupedDashboardView extends ItemView {
 					key === "useCustomStatusesOnly" ||
 					key === "customStatuses" ||
 					key === "useMultipleStatuses" ||
+					key === "statusFrontmatterMappings" ||
 					key === "strictStatuses"
 				) {
 					onDataChange();

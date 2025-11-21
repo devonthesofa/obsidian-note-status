@@ -13,6 +13,7 @@ import {
 import eventBus from "@/core/eventBus";
 import settingsService from "@/core/settingsService";
 import { NoteStatus } from "@/types/noteStatus";
+import { getAllFrontmatterKeys } from "@/core/statusKeyHelpers";
 
 export const VIEW_TYPE_EXAMPLE = "grouped-status-view";
 
@@ -55,7 +56,7 @@ export class GroupedStatusView extends ItemView {
 
 	private processFiles = (files: FileItem[]): GroupedByStatus => {
 		const result: GroupedByStatus = {};
-		const statusMetadataKeys = [settingsService.settings.tagPrefix];
+		const statusMetadataKeys = getAllFrontmatterKeys();
 		const availableStatuses =
 			BaseNoteStatusService.getAllAvailableStatuses();
 
@@ -79,7 +80,7 @@ export class GroupedStatusView extends ItemView {
 			noteStatusService.populateStatuses();
 
 			statusMetadataKeys.forEach((key) => {
-				const statusesForKey = noteStatusService.statuses[key] || [];
+				const statusesForKey = noteStatusService.getStatusesForKey(key);
 				if (!statusesForKey.length) return;
 
 				statusesForKey.forEach((status) => {
@@ -131,6 +132,7 @@ export class GroupedStatusView extends ItemView {
 					key === "useCustomStatusesOnly" ||
 					key === "customStatuses" ||
 					key === "useMultipleStatuses" ||
+					key === "statusFrontmatterMappings" ||
 					key === "strictStatuses" ||
 					key === "vaultSizeLimit"
 				) {

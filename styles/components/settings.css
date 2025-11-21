@@ -350,7 +350,6 @@
 	border-radius: var(--radius-s);
 	background: var(--background-primary);
 }
-
 .note-status-option {
 	/* Uses SelectableListItem styles */
 	align-items: stretch;

@@ -68,6 +68,7 @@ export class FileExplorerIntegration implements IElementProcessor {
 					key === "customStatuses" ||
 					key === "useMultipleStatuses" ||
 					key === "tagPrefix" ||
+					key === "statusFrontmatterMappings" ||
 					key === "strictStatuses" ||
 					key === "fileExplorerIconPosition" ||
 					key === "fileExplorerIconFrame" ||
@@ -120,7 +121,7 @@ export class FileExplorerIntegration implements IElementProcessor {
 			}
 
 			const noteStatusService = this.getFileNoteStatusService(dataPath);
-			const statuses = noteStatusService?.statuses ?? null;
+			const statuses = noteStatusService?.getStatusesByAllKeys() ?? {};
 			const primaryStatus = getPrimaryStatus(statuses);
 			const hasStatus = Boolean(primaryStatus);
 			const fallbackColor = getUnknownStatusColor();
@@ -137,7 +138,11 @@ export class FileExplorerIntegration implements IElementProcessor {
 			this.applyLeftBorder(navItem, statusColor, hasStatus);
 
 			if (noteStatusService) {
-				this.render(textEl, noteStatusService.statuses);
+				this.render(
+					textEl,
+					statuses,
+					settingsService.settings.tagPrefix,
+				);
 			}
 		}
 	}
@@ -150,7 +155,11 @@ export class FileExplorerIntegration implements IElementProcessor {
 		};
 	}
 
-	render(element: Element, statuses: GroupedStatuses): void {
+	render(
+		element: Element,
+		statuses: GroupedStatuses,
+		defaultTagName: string,
+	): void {
 		// Remove existing icon
 		const existingIcon = element.querySelector(`.${this.ICON_CLASS}`);
 		if (existingIcon) {
@@ -173,7 +182,8 @@ export class FileExplorerIntegration implements IElementProcessor {
 		root.render(
 			<FileExplorerIcon
 				statuses={statuses}
-				onMouseEnter={(s) => this.openModalInfo(s)}
+				defaultTagName={defaultTagName}
+				onMouseEnter={this.openModalInfo}
 				onMouseLeave={this.closeModalInfo}
 				hideUnknownStatus={
 					settingsService.settings.hideUnknownStatusInExplorer
@@ -199,15 +209,21 @@ export class FileExplorerIntegration implements IElementProcessor {
 		}
 	}
 
-	private openModalInfo(statuses: GroupedStatuses) {
+	private openModalInfo = ({
+		statuses,
+		defaultTagName,
+	}: {
+		statuses: GroupedStatuses;
+		defaultTagName: string;
+	}) => {
 		if (!this.plugin) {
 			return;
 		}
-		StatusesInfoPopup.open(statuses);
-	}
-	private closeModalInfo() {
+		StatusesInfoPopup.open({ statuses, defaultTagName });
+	};
+	private closeModalInfo = () => {
 		StatusesInfoPopup.close();
-	}
+	};
 
 	/**
 	 * Cleanup integration and unsubscribe from events

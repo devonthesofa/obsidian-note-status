@@ -5,7 +5,7 @@ import {
 	BaseNoteStatusService,
 	NoteStatusService,
 } from "@/core/noteStatusService";
-import settingsService from "@/core/settingsService";
+import { getAllFrontmatterKeys } from "@/core/statusKeyHelpers";
 
 export interface VaultStats {
 	totalNotes: number;
@@ -33,7 +33,7 @@ export const useVaultStats = () => {
 		const files = BaseNoteStatusService.app.vault.getFiles();
 		const availableStatuses =
 			BaseNoteStatusService.getAllAvailableStatuses();
-		const statusMetadataKeys = [settingsService.settings.tagPrefix];
+		const statusMetadataKeys = getAllFrontmatterKeys();
 
 		let notesWithStatus = 0;
 		const statusDistribution: Record<string, number> = {};
@@ -57,7 +57,7 @@ export const useVaultStats = () => {
 			let hasAnyStatus = false;
 
 			statusMetadataKeys.forEach((key) => {
-				const statuses = noteStatusService.statuses[key] || [];
+				const statuses = noteStatusService.getStatusesForKey(key);
 				if (!statuses.length) return;
 
 				hasAnyStatus = true;
