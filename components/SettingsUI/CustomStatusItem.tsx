@@ -1,13 +1,15 @@
 import { NoteStatus } from "@/types/noteStatus";
 import React from "react";
 import { Input } from "@/components/atoms/Input";
+import { StatusIcon } from "@/components/atoms/StatusIcon";
+import { IconSelectionField } from "./IconSelectionField";
 
 export type Props = {
 	status: NoteStatus;
 	index: number;
 	onCustomStatusChange: (
 		index: number,
-		column: "name" | "icon" | "color" | "description",
+		column: "name" | "icon" | "color" | "description" | "lucideIcon",
 		value: string,
 	) => void;
 	onCustomStatusRemove: (index: number) => void;
@@ -28,26 +30,28 @@ export const CustomStatusItem: React.FC<Props> = ({
 	canMoveDown = false,
 }) => {
 	const isValid = status.name.trim().length > 0;
-	const displayIcon = status.icon.trim() || "📝";
-
 	return (
 		<div className="custom-status-item">
-			{/* Simple horizontal layout with all inputs in a row */}
-			<div className="custom-status-item__row">
-				{/* Icon field - simple text input */}
-				<div className="custom-status-item__field">
-					<label className="custom-status-item__label">Icon</label>
-					<Input
-						variant="text"
-						value={status.icon}
-						onChange={(value) =>
-							onCustomStatusChange(index, "icon", value || "")
-						}
-						placeholder="📝"
-						className="custom-status-item__input custom-status-item__input--icon"
-					/>
-				</div>
+			<IconSelectionField
+				className="custom-status-item__icon-fields"
+				emojiValue={status.icon}
+				onEmojiChange={(value) =>
+					onCustomStatusChange(index, "icon", value || "")
+				}
+				emojiLabel="Emoji icon"
+				emojiPlaceholder="Example: ✅ or 🚧"
+				emojiHint="Shown anywhere Lucide is not available."
+				lucideValue={status.lucideIcon || ""}
+				onLucideChange={(value) =>
+					onCustomStatusChange(index, "lucideIcon", value)
+				}
+				lucideLabel="Lucide icon (optional)"
+				lucidePlaceholder="Browse Lucide icons"
+				lucideHint="Matches Obsidian's toolbar icons so your status button blends in."
+			/>
 
+			{/* Simple horizontal layout with remaining inputs */}
+			<div className="custom-status-item__row">
 				{/* Name field */}
 				<div className="custom-status-item__field custom-status-item__field--name">
 					<label className="custom-status-item__label">
@@ -139,12 +143,13 @@ export const CustomStatusItem: React.FC<Props> = ({
 
 			{/* Preview row - shows how the status will look */}
 			<div className="custom-status-item__preview">
-				<span
+				<StatusIcon
+					icon={status.icon}
+					lucideIcon={status.lucideIcon}
 					className="custom-status-item__preview-icon"
+					size={18}
 					style={{ color: status.color }}
-				>
-					{displayIcon}
-				</span>
+				/>
 				<span
 					className="custom-status-item__preview-text"
 					style={{ color: status.color }}

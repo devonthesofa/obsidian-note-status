@@ -1,10 +1,10 @@
-import React, { CSSProperties, FC, memo } from "react";
+import React, { CSSProperties, FC, ReactNode, memo } from "react";
 
 type IconFrameMode = "always" | "never";
 type IconColorMode = "status" | "theme";
 
 export interface StatusIconPreviewProps {
-	icon?: string;
+	icon?: ReactNode;
 	color?: string;
 	count?: number;
 	iconFrameMode?: IconFrameMode;
@@ -33,7 +33,6 @@ export const StatusIconPreview: FC<StatusIconPreviewProps> = memo(
 		onMouseEnter,
 		onMouseLeave,
 	}) => {
-		const iconDisplay = icon?.trim().length ? icon : "📝";
 		const useStatusColor = iconColorMode === "status";
 		const appliedColor = useStatusColor && color ? color.trim() : undefined;
 
@@ -58,7 +57,7 @@ export const StatusIconPreview: FC<StatusIconPreviewProps> = memo(
 				onMouseEnter={onMouseEnter}
 				onMouseLeave={onMouseLeave}
 			>
-				<span className="status-minimal__icon">{iconDisplay}</span>
+				<span className="status-minimal__icon">{icon ?? "📝"}</span>
 				{count && count > 1 && (
 					<span
 						className="status-minimal__count"

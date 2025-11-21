@@ -20,6 +20,7 @@ export const CustomStatusSettings: React.FC<Props> = ({
 		currentStatuses.push({
 			name: "",
 			icon: "",
+			lucideIcon: "",
 		});
 		onChange("customStatuses", currentStatuses);
 	};
@@ -84,7 +85,7 @@ export const CustomStatusSettings: React.FC<Props> = ({
 
 			<SettingItem
 				name="Custom statuses"
-				description="Create custom statuses with icons, names, and colors. All statuses require a name."
+				description="Create custom statuses with emoji icons and optional Lucide icon names plus colors. All statuses require a name."
 				vertical
 			>
 				<div className="custom-status-list">

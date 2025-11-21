@@ -42,6 +42,7 @@ export class GroupedStatusView extends ItemView {
 		name: status.name,
 		color: status.color || "white",
 		icon: status.icon,
+		lucideIcon: status.lucideIcon,
 	});
 
 	private getAllFiles = (): FileItem[] => {

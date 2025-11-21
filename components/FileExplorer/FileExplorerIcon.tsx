@@ -1,6 +1,7 @@
 import { StatusIconPreview } from "@/components/atoms/StatusIconPreview";
 import { GroupedStatuses } from "@/types/noteStatus";
 import React, { FC, memo } from "react";
+import { StatusIcon } from "@/components/atoms/StatusIcon";
 
 type Props = {
 	statuses: GroupedStatuses;
@@ -9,6 +10,7 @@ type Props = {
 	hideUnknownStatus?: boolean;
 	unknownStatusConfig?: {
 		icon: string;
+		lucideIcon?: string;
 		color: string;
 	};
 	iconFrameMode?: "always" | "never";
@@ -46,7 +48,13 @@ export const FileExplorerIcon: FC<Props> = memo(
 
 			return (
 				<StatusIconPreview
-					icon={icon}
+					icon={
+						<StatusIcon
+							icon={icon}
+							lucideIcon={unknownStatusConfig?.lucideIcon}
+							size={16}
+						/>
+					}
 					color={color}
 					iconColorMode={iconColorMode}
 					iconFrameMode={iconFrameMode}
@@ -64,7 +72,13 @@ export const FileExplorerIcon: FC<Props> = memo(
 
 		return (
 			<StatusIconPreview
-				icon={primaryStatus.icon}
+				icon={
+					<StatusIcon
+						icon={primaryStatus.icon}
+						lucideIcon={primaryStatus.lucideIcon}
+						size={16}
+					/>
+				}
 				color={iconColor}
 				count={totalStatuses}
 				iconFrameMode={iconFrameMode}

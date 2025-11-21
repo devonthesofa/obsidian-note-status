@@ -23,6 +23,7 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 			{
 				name: "",
 				icon: "",
+				lucideIcon: "",
 				color: "#888888",
 				templateId: template?.id || "",
 			},
@@ -63,6 +64,7 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 			{
 				name: "",
 				icon: "",
+				lucideIcon: "",
 				color: "#888888",
 				templateId: template?.id || "",
 			},
@@ -72,7 +74,7 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 	const handleStatusChange = useCallback(
 		(
 			index: number,
-			column: "name" | "icon" | "color" | "description",
+			column: "name" | "icon" | "color" | "description" | "lucideIcon",
 			value: string,
 		) => {
 			setStatuses((prev) =>
@@ -145,7 +147,7 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 
 				<SettingItem
 					name="Statuses"
-					description="Define the statuses included in this template"
+					description="Define the statuses included in this template, including emojis and optional Lucide icons"
 					vertical
 				>
 					<div className="template-editor-statuses">

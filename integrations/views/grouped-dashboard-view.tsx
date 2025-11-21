@@ -18,6 +18,7 @@ interface StatusItem {
 	name: string;
 	color: string;
 	icon?: string;
+	lucideIcon?: string;
 }
 
 interface FilesByStatus {
@@ -57,6 +58,7 @@ export class GroupedDashboardView extends ItemView {
 		name: status.name,
 		color: status.color || "",
 		icon: status.icon,
+		lucideIcon: status.lucideIcon,
 	});
 
 	private getAllFiles = (): FileItem[] => {

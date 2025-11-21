@@ -32,6 +32,7 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	quickStatusCommands: ["active", "completed"], // Add default quick commands
 	// Unknown status customization
 	unknownStatusIcon: "❓",
+	unknownStatusLucideIcon: "",
 	unknownStatusColor: "#8b949e",
 	statusBarNoStatusText: "No status",
 	statusBarShowNoStatusIcon: false,

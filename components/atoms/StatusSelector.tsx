@@ -3,6 +3,7 @@ import { NoteStatus } from "@/types/noteStatus";
 import { SelectableListItem } from "./SelectableListItem";
 import { getStatusTooltip, isStatusSelected } from "@/utils/statusUtils";
 import { StatusIconPreview } from "./StatusIconPreview";
+import { StatusIcon } from "./StatusIcon";
 
 interface StatusOptionProps {
 	status: NoteStatus;
@@ -33,7 +34,13 @@ export const StatusModalOption: React.FC<StatusOptionProps> = memo(
 				icon={
 					<div className="note-status-option__icon-wrapper">
 						<StatusIconPreview
-							icon={status.icon}
+							icon={
+								<StatusIcon
+									icon={status.icon}
+									lucideIcon={status.lucideIcon}
+									size={13}
+								/>
+							}
 							color={status.color}
 							iconFrameMode={iconFrameMode}
 							iconColorMode={iconColorMode}
@@ -101,7 +108,7 @@ export const StatusSelector: React.FC<Props> = ({
 		>
 			{availableStatuses.map((status, index) => (
 				<StatusModalOption
-					key={`${status.templateId || "custom"}:${status.name}:${status.description}:${status.color}:${status.icon}`}
+					key={`${status.templateId || "custom"}:${status.name}:${status.description}:${status.color}:${status.icon}:${status.lucideIcon ?? ""}`}
 					status={status}
 					isSelected={isStatusSelected(status, currentStatuses)}
 					isFocused={index === focusedIndex}

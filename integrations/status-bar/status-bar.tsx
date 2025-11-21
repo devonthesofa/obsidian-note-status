@@ -62,6 +62,7 @@ export class StatusBarIntegration {
 				}
 				if (
 					key === "unknownStatusIcon" ||
+					key === "unknownStatusLucideIcon" ||
 					key === "unknownStatusColor" ||
 					key === "statusBarNoStatusText" ||
 					key === "statusBarShowNoStatusIcon" ||
@@ -123,6 +124,7 @@ export class StatusBarIntegration {
 			showIcon: settings.statusBarShowNoStatusIcon || false,
 			showText: settings.statusBarShowNoStatusText ?? true,
 			icon: settings.unknownStatusIcon || "❓",
+			lucideIcon: settings.unknownStatusLucideIcon || "",
 			color: settings.unknownStatusColor || "#8b949e",
 		};
 	}

@@ -21,6 +21,9 @@
 	align-items: center;
 	justify-content: center;
 	color: var(--text-muted);
+	width: 18px;
+	height: 18px;
+	line-height: 1;
 }
 
 /* Icon with status color */

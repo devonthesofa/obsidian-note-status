@@ -5,6 +5,7 @@ import {
 	Props as StatusBarContextProps,
 } from "./StatusBarContext";
 import { StatusBarGroup } from "./StatusBarGroup";
+import { StatusIcon } from "@/components/atoms/StatusIcon";
 
 export type Props = {
 	statuses: GroupedStatuses;
@@ -17,6 +18,7 @@ export type Props = {
 		showIcon: boolean;
 		showText: boolean;
 		icon: string;
+		lucideIcon?: string;
 		color: string;
 	};
 };
@@ -51,13 +53,15 @@ export const StatusBar: FC<Props> = ({
 				}}
 			>
 				{noStatusConfig.showIcon && (
-					<span
+					<StatusIcon
+						icon={noStatusConfig.icon}
+						lucideIcon={noStatusConfig.lucideIcon}
+						size={14}
+						className="status-bar-no-status-icon"
 						style={{
 							marginRight: noStatusConfig.showText ? "4px" : "0",
 						}}
-					>
-						{noStatusConfig.icon}
-					</span>
+					/>
 				)}
 				{noStatusConfig.showText && noStatusConfig.text}
 			</span>
