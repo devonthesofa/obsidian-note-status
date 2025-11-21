@@ -282,11 +282,6 @@ export const FrontmatterMappingsSettings: React.FC<Props> = ({
 										)
 									}
 								/>
-								<small>
-									Separate multiple keys with commas. Include
-									the default key if you still want to write
-									to it.
-								</small>
 							</div>
 						</div>
 
