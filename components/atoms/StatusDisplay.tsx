@@ -1,5 +1,5 @@
 import { NoteStatus } from "@/types/noteStatus";
-import { FC, memo, useState } from "react";
+import { FC, ReactNode, memo, useMemo, useState } from "react";
 import { getStatusTooltip } from "@/utils/statusUtils";
 import { ObsidianIcon } from "./ObsidianIcon";
 import { StatusIcon } from "./StatusIcon";
@@ -12,6 +12,7 @@ interface StatusDisplayProps {
 	removable?: boolean;
 	hasNameConflicts?: boolean;
 	templateNameMode?: "always" | "never" | "auto";
+	icon?: ReactNode;
 	onRemove?: () => void;
 	onClick?: () => void;
 }
@@ -23,6 +24,7 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 		removable = false,
 		hasNameConflicts = false,
 		templateNameMode = "auto",
+		icon,
 		onRemove,
 		onClick,
 	}) => {
@@ -63,6 +65,19 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 			}
 		};
 
+		const defaultIcon = useMemo(() => {
+			const baseSize = variant === "chip" ? 16 : 14;
+			return (
+				<StatusIcon
+					icon={status.icon}
+					lucideIcon={status.lucideIcon}
+					size={baseSize}
+				/>
+			);
+		}, [status.icon, status.lucideIcon, variant]);
+
+		const iconNode = icon ?? defaultIcon;
+
 		if (variant === "chip") {
 			return (
 				<div
@@ -83,12 +98,7 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 					}}
 					onClick={handleClick}
 				>
-					<StatusIcon
-						icon={status.icon}
-						lucideIcon={status.lucideIcon}
-						className="note-status-chip-icon"
-						size={16}
-					/>
+					<span className="note-status-chip-icon">{iconNode}</span>
 					<span className="note-status-chip-text">
 						{getDisplayName()}
 					</span>
@@ -125,12 +135,7 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 					onClick={handleClick}
 				>
 					<div className="status-badge-item">
-						<StatusIcon
-							icon={status.icon}
-							lucideIcon={status.lucideIcon}
-							className="status-badge-icon"
-							size={14}
-						/>
+						<span className="status-badge-icon">{iconNode}</span>
 						<span className="status-badge-text">
 							{getDisplayName()}
 						</span>
@@ -151,12 +156,7 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 						}
 					/>
 					<span>
-						<StatusIcon
-							icon={status.icon}
-							lucideIcon={status.lucideIcon}
-							size={14}
-							style={{ marginRight: "4px" }}
-						/>
+						<span style={{ marginRight: "4px" }}>{iconNode}</span>
 						{getDisplayName()}
 					</span>
 				</div>
