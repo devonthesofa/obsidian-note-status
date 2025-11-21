@@ -8,6 +8,7 @@ interface EditorToolbarButtonProps {
 	onClick: () => void;
 	unknownStatusConfig: {
 		icon: string;
+		lucideIcon?: string;
 		color: string;
 	};
 }
@@ -43,6 +44,7 @@ export const EditorToolbarButton: FC<EditorToolbarButtonProps> = memo(
 				>
 					<StatusIcon
 						icon={unknownStatusConfig.icon}
+						lucideIcon={unknownStatusConfig.lucideIcon}
 						size={16}
 						className="editor-toolbar-button__icon"
 						style={{ color: unknownStatusConfig.color }}

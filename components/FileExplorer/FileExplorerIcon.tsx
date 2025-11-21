@@ -9,6 +9,7 @@ type Props = {
 	hideUnknownStatus?: boolean;
 	unknownStatusConfig?: {
 		icon: string;
+		lucideIcon?: string;
 		color: string;
 	};
 	iconFrameMode?: "always" | "never";
@@ -47,6 +48,7 @@ export const FileExplorerIcon: FC<Props> = memo(
 			return (
 				<StatusIconPreview
 					icon={icon}
+					lucideIcon={unknownStatusConfig?.lucideIcon}
 					color={color}
 					iconColorMode={iconColorMode}
 					iconFrameMode={iconFrameMode}

@@ -79,6 +79,7 @@ export class EditorToolbarIntegration {
 				}
 				if (
 					key === "unknownStatusIcon" ||
+					key === "unknownStatusLucideIcon" ||
 					key === "unknownStatusColor"
 				) {
 					this.renderAllButtons();
@@ -378,6 +379,7 @@ export class EditorToolbarIntegration {
 		const settings = settingsService.settings;
 		return {
 			icon: settings.unknownStatusIcon || "❓",
+			lucideIcon: settings.unknownStatusLucideIcon || "",
 			color: settings.unknownStatusColor || "#8b949e",
 		};
 	}

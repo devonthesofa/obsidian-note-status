@@ -59,6 +59,7 @@ export class FileExplorerIntegration implements IElementProcessor {
 					key === "fileExplorerIconFrame" ||
 					key === "fileExplorerIconColorMode" ||
 					key === "unknownStatusIcon" ||
+					key === "unknownStatusLucideIcon" ||
 					key === "unknownStatusColor" ||
 					key === "templates"
 				) {
@@ -117,6 +118,7 @@ export class FileExplorerIntegration implements IElementProcessor {
 		const settings = settingsService.settings;
 		return {
 			icon: settings.unknownStatusIcon || "❓",
+			lucideIcon: settings.unknownStatusLucideIcon || "",
 			color: settings.unknownStatusColor || "#8b949e",
 		};
 	}

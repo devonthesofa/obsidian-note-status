@@ -18,6 +18,7 @@ export type Props = {
 		showIcon: boolean;
 		showText: boolean;
 		icon: string;
+		lucideIcon?: string;
 		color: string;
 	};
 };
@@ -54,6 +55,7 @@ export const StatusBar: FC<Props> = ({
 				{noStatusConfig.showIcon && (
 					<StatusIcon
 						icon={noStatusConfig.icon}
+						lucideIcon={noStatusConfig.lucideIcon}
 						size={14}
 						className="status-bar-no-status-icon"
 						style={{

@@ -279,9 +279,9 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 					}
 					emojiPlaceholder="❓"
 					emojiHint="Type any emoji or text fallback."
-					lucideValue={settings.unknownStatusIcon}
+					lucideValue={settings.unknownStatusLucideIcon || ""}
 					onLucideChange={(value) =>
-						onChange("unknownStatusIcon", value)
+						onChange("unknownStatusLucideIcon", value)
 					}
 					lucidePlaceholder="Choose Lucide icon"
 					lucideHint="Matches the Obsidian toolbar style."

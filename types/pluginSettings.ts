@@ -32,6 +32,7 @@ export type PluginSettings = {
 	quickStatusCommands: string[];
 	// Unknown status customization
 	unknownStatusIcon: string; // Custom icon for unknown status
+	unknownStatusLucideIcon?: string; // Optional Lucide icon for unknown status
 	unknownStatusColor: string; // Custom hex color for unknown status
 	statusBarNoStatusText: string; // Custom text for status bar when no status
 	statusBarShowNoStatusIcon: boolean; // Whether to show icon in status bar for no status
