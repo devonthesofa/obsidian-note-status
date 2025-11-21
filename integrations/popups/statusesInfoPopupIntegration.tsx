@@ -8,10 +8,17 @@ export class StatusesInfoPopup {
 	private static instance: StatusesInfoPopup | null = null;
 	private element: HTMLElement | null = null;
 	private statuses: GroupedStatuses;
+	private defaultTagName: string;
 
 	private constructor() {}
 
-	static open(statuses: GroupedStatuses) {
+	static open({
+		statuses,
+		defaultTagName,
+	}: {
+		statuses: GroupedStatuses;
+		defaultTagName: string;
+	}) {
 		// Always ensure previous instance is cleaned up before showing or when disabled
 		StatusesInfoPopup.close();
 
@@ -22,6 +29,7 @@ export class StatusesInfoPopup {
 		}
 		StatusesInfoPopup.instance = new StatusesInfoPopup();
 		StatusesInfoPopup.instance.statuses = statuses;
+		StatusesInfoPopup.instance.defaultTagName = defaultTagName;
 		StatusesInfoPopup.instance.show();
 	}
 
@@ -38,7 +46,12 @@ export class StatusesInfoPopup {
 		document.body.appendChild(this.element);
 
 		this.root = createRoot(this.element);
-		this.root.render(<StatusFileInfoPopup statuses={this.statuses} />);
+		this.root.render(
+			<StatusFileInfoPopup
+				statuses={this.statuses}
+				defaultTagName={this.defaultTagName}
+			/>,
+		);
 	}
 
 	private destroy() {

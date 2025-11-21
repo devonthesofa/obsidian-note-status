@@ -172,6 +172,54 @@
 	color: var(--text-muted);
 	font-style: italic;
 }
+.status-tag-grid {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-2);
+}
+.status-tag-card {
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	padding: var(--size-4-2);
+	background: var(--background-primary-alt);
+	box-shadow: var(--shadow-xs);
+}
+.status-tag-card__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: var(--size-2-2);
+}
+.status-tag-card__title {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-2-1);
+}
+.status-tag-card__label {
+	font-weight: var(--font-semibold);
+	text-transform: none;
+}
+.status-tag-card__badge {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+	background: var(--background-modifier-border);
+	padding: 2px 6px;
+	border-radius: var(--radius-s);
+	width: fit-content;
+}
+.status-tag-card__count {
+	font-size: var(--font-ui-small);
+	color: var(--text-muted);
+	background: var(--background-modifier-border);
+	padding: 2px 10px;
+	border-radius: var(--radius-s);
+	font-weight: var(--font-medium);
+}
+.status-tag-card__statuses {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--size-2-2);
+}
 
 /* Status Groups in Popup */
 .status-group {

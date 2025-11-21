@@ -10,8 +10,12 @@ import {
 
 type Props = {
 	statuses: GroupedStatuses;
-	onMouseEnter: (statuses: GroupedStatuses) => void;
-	onMouseLeave: (statuses: GroupedStatuses) => void;
+	defaultTagName: string;
+	onMouseEnter: (payload: {
+		statuses: GroupedStatuses;
+		defaultTagName: string;
+	}) => void;
+	onMouseLeave: () => void;
 	hideUnknownStatus?: boolean;
 	unknownStatusConfig?: {
 		icon: string;
@@ -25,6 +29,7 @@ type Props = {
 export const FileExplorerIcon: FC<Props> = memo(
 	({
 		statuses,
+		defaultTagName,
 		onMouseLeave,
 		onMouseEnter,
 		hideUnknownStatus,
@@ -60,8 +65,10 @@ export const FileExplorerIcon: FC<Props> = memo(
 					color={color}
 					iconColorMode={iconColorMode}
 					iconFrameMode={iconFrameMode}
-					onMouseEnter={() => onMouseEnter({})}
-					onMouseLeave={() => onMouseLeave({})}
+					onMouseEnter={() =>
+						onMouseEnter({ statuses: {}, defaultTagName })
+					}
+					onMouseLeave={onMouseLeave}
 				/>
 			);
 		}
@@ -85,8 +92,8 @@ export const FileExplorerIcon: FC<Props> = memo(
 				count={totalStatuses}
 				iconFrameMode={iconFrameMode}
 				iconColorMode={iconColorMode}
-				onMouseEnter={() => onMouseEnter(statuses)}
-				onMouseLeave={() => onMouseLeave(statuses)}
+				onMouseEnter={() => onMouseEnter({ statuses, defaultTagName })}
+				onMouseLeave={onMouseLeave}
 			/>
 		);
 	},

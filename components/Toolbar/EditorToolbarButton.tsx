@@ -5,6 +5,7 @@ import { StatusIcon } from "@/components/atoms/StatusIcon";
 
 interface EditorToolbarButtonProps {
 	statuses: GroupedStatuses;
+	defaultTagName: string;
 	onClick: () => void;
 	unknownStatusConfig: {
 		icon: string;
@@ -14,7 +15,7 @@ interface EditorToolbarButtonProps {
 }
 
 export const EditorToolbarButton: FC<EditorToolbarButtonProps> = memo(
-	({ statuses, onClick, unknownStatusConfig }) => {
+	({ statuses, defaultTagName, onClick, unknownStatusConfig }) => {
 		const statusEntries = Object.entries(statuses);
 		const allStatuses = statusEntries.flatMap(
 			([_, statusList]) => statusList,
@@ -22,7 +23,7 @@ export const EditorToolbarButton: FC<EditorToolbarButtonProps> = memo(
 		const totalStatuses = allStatuses.length;
 
 		const handleMouseEnter = () => {
-			StatusesInfoPopup.open(statuses);
+			StatusesInfoPopup.open({ statuses, defaultTagName });
 		};
 
 		const handleMouseLeave = () => {

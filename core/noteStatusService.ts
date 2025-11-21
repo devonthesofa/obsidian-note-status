@@ -318,6 +318,28 @@ export class NoteStatusService extends BaseNoteStatusService {
 		return this.buildStatusesArray(identifiers);
 	}
 
+	public getStatusesByAllKeys(): GroupedStatuses {
+		const keys = getFrontmatterKeysForFile(this.file);
+		const grouped: GroupedStatuses = {};
+		let hasStatuses = false;
+
+		keys.forEach((key) => {
+			const statuses = this.getStatusesForKey(key);
+			if (!statuses.length) {
+				return;
+			}
+			grouped[key] = statuses;
+			hasStatuses = true;
+		});
+
+		if (!hasStatuses) {
+			grouped[settingsService.settings.tagPrefix] =
+				this.statuses[settingsService.settings.tagPrefix] ?? [];
+		}
+
+		return grouped;
+	}
+
 	async removeStatus(
 		frontmatterTagName: string,
 		status: NoteStatus,
