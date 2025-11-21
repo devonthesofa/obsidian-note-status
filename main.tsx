@@ -19,6 +19,7 @@ import {
 } from "./integrations/views/status-dashboard-view";
 import { StatusesInfoPopup } from "./integrations/popups/statusesInfoPopupIntegration";
 import statusStoreManager from "./core/statusStoreManager";
+import { isExperimentalFeatureEnabled } from "@/utils/experimentalFeatures";
 
 export default class NoteStatusPlugin extends Plugin {
 	private statusBarIntegration: StatusBarIntegration;
@@ -27,8 +28,7 @@ export default class NoteStatusPlugin extends Plugin {
 	private fileExplorerIntegration: FileExplorerIntegration;
 	private commandsIntegration: CommandsIntegration;
 	private editorToolbarIntegration: EditorToolbarIntegration;
-	private groupedViewRibbonEl: HTMLElement | null = null;
-	private dashboardRibbonEl: HTMLElement | null = null;
+	private experimentalRibbonShortcuts: Map<string, HTMLElement> = new Map();
 
 	async onload() {
 		BaseNoteStatusService.initialize(this.app);
@@ -66,10 +66,8 @@ export default class NoteStatusPlugin extends Plugin {
 		this.commandsIntegration?.destroy();
 		this.editorToolbarIntegration?.destroy();
 		this.pluginSettingsIntegration?.destroy();
-		this.groupedViewRibbonEl?.remove();
-		this.groupedViewRibbonEl = null;
-		this.dashboardRibbonEl?.remove();
-		this.dashboardRibbonEl = null;
+		this.experimentalRibbonShortcuts.forEach((el) => el.remove());
+		this.experimentalRibbonShortcuts.clear();
 
 		// Clean up event subscriptions
 		eventBus.unsubscribe(
@@ -148,58 +146,55 @@ export default class NoteStatusPlugin extends Plugin {
 		}
 	}
 
-	private canUseGroupedStatusView(): boolean {
-		const settings = settingsService.settings;
-		return (
-			Boolean(settings.enableExperimentalFeatures) &&
-			Boolean(settings.enableGroupedStatusView)
-		);
-	}
-
-	private canUseStatusDashboard(): boolean {
-		const settings = settingsService.settings;
-		return (
-			Boolean(settings.enableExperimentalFeatures) &&
-			Boolean(settings.enableStatusDashboard)
-		);
-	}
-
 	private syncExperimentalFeatureShortcuts(): void {
-		this.ensureGroupedViewRibbon();
-		this.ensureDashboardRibbon();
+		const shortcuts = this.getExperimentalShortcuts();
+		Object.entries(shortcuts).forEach(([key, config]) => {
+			this.toggleExperimentalRibbon(key, config);
+		});
 	}
 
-	private ensureGroupedViewRibbon(): void {
-		if (this.canUseGroupedStatusView()) {
-			if (!this.groupedViewRibbonEl) {
-				this.groupedViewRibbonEl = this.addRibbonIcon(
-					"list-tree",
-					"Open grouped status view",
-					() => {
-						this.activateView();
-					},
-				);
-			}
-		} else if (this.groupedViewRibbonEl) {
-			this.groupedViewRibbonEl.remove();
-			this.groupedViewRibbonEl = null;
+	private getExperimentalShortcuts() {
+		return {
+			groupedStatusView: {
+				feature: "groupedStatusView" as const,
+				icon: "list-tree",
+				title: "Open grouped status view",
+				handler: () => this.activateView(),
+			},
+			statusDashboard: {
+				feature: "statusDashboard" as const,
+				icon: "activity",
+				title: "Open status dashboard",
+				handler: () => this.activateDashboard(),
+			},
+		};
+	}
+
+	private toggleExperimentalRibbon(
+		key: string,
+		config: {
+			feature: Parameters<typeof isExperimentalFeatureEnabled>[0];
+			icon: string;
+			title: string;
+			handler: () => void;
+		},
+	): void {
+		const isEnabled = isExperimentalFeatureEnabled(config.feature);
+		const existingIcon = this.experimentalRibbonShortcuts.get(key);
+
+		if (isEnabled && !existingIcon) {
+			const ribbonEl = this.addRibbonIcon(
+				config.icon,
+				config.title,
+				config.handler,
+			);
+			this.experimentalRibbonShortcuts.set(key, ribbonEl);
+			return;
 		}
-	}
 
-	private ensureDashboardRibbon(): void {
-		if (this.canUseStatusDashboard()) {
-			if (!this.dashboardRibbonEl) {
-				this.dashboardRibbonEl = this.addRibbonIcon(
-					"activity",
-					"Open status dashboard",
-					() => {
-						this.activateDashboard();
-					},
-				);
-			}
-		} else if (this.dashboardRibbonEl) {
-			this.dashboardRibbonEl.remove();
-			this.dashboardRibbonEl = null;
+		if (!isEnabled && existingIcon) {
+			existingIcon.remove();
+			this.experimentalRibbonShortcuts.delete(key);
 		}
 	}
 

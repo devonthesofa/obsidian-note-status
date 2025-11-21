@@ -3,6 +3,7 @@ import { NoteStatusService, BaseNoteStatusService } from "./noteStatusService";
 import settingsService from "./settingsService";
 import eventBus from "./eventBus";
 import { VIEW_TYPE_EXAMPLE } from "../integrations/views/grouped-status-view";
+import { isExperimentalFeatureEnabled } from "@/utils/experimentalFeatures";
 
 export class CommandsService {
 	private plugin: Plugin;
@@ -359,11 +360,7 @@ export class CommandsService {
 	}
 
 	private shouldEnableGroupedView(): boolean {
-		const settings = settingsService.settings;
-		return (
-			Boolean(settings.enableExperimentalFeatures) &&
-			Boolean(settings.enableGroupedStatusView)
-		);
+		return isExperimentalFeatureEnabled("groupedStatusView");
 	}
 
 	public destroy(): void {
