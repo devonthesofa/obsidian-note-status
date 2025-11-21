@@ -24,6 +24,7 @@ export type PluginSettings = {
 	showStatusIconsInExplorer: boolean;
 	hideUnknownStatusInExplorer: boolean;
 	fileExplorerColorFileName: boolean; // Whether to color the file explorer filename text using the current status color
+	fileExplorerColorBlock: boolean; // Whether to color the entire file explorer block background with the status color
 	enabledTemplates: string[]; // IDs of enabled templates
 	useCustomStatusesOnly: boolean; // Whether to use only custom statuses or include templates
 	useMultipleStatuses: boolean; // Whether to allow multiple statuses per note

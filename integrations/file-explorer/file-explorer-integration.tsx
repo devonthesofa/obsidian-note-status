@@ -27,6 +27,8 @@ export class FileExplorerIntegration implements IElementProcessor {
 	private readonly CONTAINER_SELECTOR = ".nav-files-container";
 	private readonly FILE_NAME_COLORIZED_ATTR = "noteStatusColorized";
 	private readonly FILE_NAME_ORIGINAL_COLOR_ATTR = "noteStatusOriginalColor";
+	private readonly FILE_BLOCK_CLASS = "note-status-colored-block";
+	private readonly FILE_BLOCK_COLOR_VAR = "--note-status-block-color";
 
 	constructor(plugin: Plugin) {
 		this.plugin = plugin;
@@ -66,6 +68,7 @@ export class FileExplorerIntegration implements IElementProcessor {
 					key === "fileExplorerIconFrame" ||
 					key === "fileExplorerIconColorMode" ||
 					key === "fileExplorerColorFileName" ||
+					key === "fileExplorerColorBlock" ||
 					key === "unknownStatusIcon" ||
 					key === "unknownStatusLucideIcon" ||
 					key === "unknownStatusColor" ||
@@ -116,9 +119,14 @@ export class FileExplorerIntegration implements IElementProcessor {
 					textEl as HTMLElement,
 					noteStatusService.statuses,
 				);
+				this.applyFileBlockColor(
+					textEl as HTMLElement,
+					noteStatusService.statuses,
+				);
 				this.render(textEl, noteStatusService.statuses);
 			} else {
 				this.applyFileNameColor(textEl as HTMLElement, null);
+				this.applyFileBlockColor(textEl as HTMLElement, null);
 			}
 		}
 	}
@@ -321,6 +329,48 @@ export class FileExplorerIntegration implements IElementProcessor {
 		element.style.color = color;
 	}
 
+	private applyFileBlockColor(
+		element?: HTMLElement | null,
+		statuses?: GroupedStatuses | null,
+	): void {
+		const navItem = this.getNavItemElement(element);
+		if (!navItem) {
+			return;
+		}
+
+		if (!settingsService.settings.fileExplorerColorBlock) {
+			this.clearFileBlockColor(navItem);
+			return;
+		}
+
+		const primaryStatus = getPrimaryStatus(statuses);
+		if (!primaryStatus) {
+			this.clearFileBlockColor(navItem);
+			return;
+		}
+
+		const color = resolveStatusColor(
+			primaryStatus,
+			getUnknownStatusColor(),
+		);
+		if (!color) {
+			this.clearFileBlockColor(navItem);
+			return;
+		}
+
+		navItem.classList.add(this.FILE_BLOCK_CLASS);
+		navItem.style.setProperty(this.FILE_BLOCK_COLOR_VAR, color);
+	}
+
+	private getNavItemElement(
+		element?: HTMLElement | null,
+	): HTMLElement | null {
+		if (!element) {
+			return null;
+		}
+		return element.closest(".nav-file, .nav-folder") as HTMLElement | null;
+	}
+
 	private clearFileNameColor(element: HTMLElement): void {
 		if (!element.dataset[this.FILE_NAME_COLORIZED_ATTR]) {
 			return;
@@ -336,5 +386,10 @@ export class FileExplorerIntegration implements IElementProcessor {
 
 		delete element.dataset[this.FILE_NAME_ORIGINAL_COLOR_ATTR];
 		delete element.dataset[this.FILE_NAME_COLORIZED_ATTR];
+	}
+
+	private clearFileBlockColor(navItem: HTMLElement): void {
+		navItem.classList.remove(this.FILE_BLOCK_CLASS);
+		navItem.style.removeProperty(this.FILE_BLOCK_COLOR_VAR);
 	}
 }

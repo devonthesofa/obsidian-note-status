@@ -11,6 +11,26 @@
 	right: 0;
 }
 
+.note-status-colored-block {
+	position: relative;
+	border-radius: var(--radius-s);
+	z-index: 0;
+}
+
+.note-status-colored-block::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background-color: var(--note-status-block-color, transparent);
+	opacity: 0.18;
+	pointer-events: none;
+	z-index: -1;
+	transition:
+		background-color var(--anim-duration-fast) ease,
+		opacity var(--anim-duration-fast) ease;
+}
+
 .status-wrapper {
 	position: relative;
 	display: inline-block;

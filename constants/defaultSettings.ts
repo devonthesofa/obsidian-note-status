@@ -23,6 +23,7 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	showStatusIconsInExplorer: true,
 	hideUnknownStatusInExplorer: true, // Default to hide unknown status
 	fileExplorerColorFileName: false,
+	fileExplorerColorBlock: false,
 	enabledTemplates: DEFAULT_ENABLED_TEMPLATES,
 	useCustomStatusesOnly: false,
 	useMultipleStatuses: true,
