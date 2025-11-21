@@ -10,7 +10,7 @@ import settingsService from "@/core/settingsService";
 import eventBus from "@/core/eventBus";
 import { VaultStats } from "@/components/StatusDashboard/useVaultStats";
 import { NoteStatus } from "@/types/noteStatus";
-import { getKnownFrontmatterKeys } from "@/utils/frontmatterMappings";
+import { getAllFrontmatterKeys } from "@/core/statusKeyHelpers";
 
 interface AppWithCommands extends App {
 	commands: {
@@ -62,9 +62,7 @@ export class StatusDashboardView extends ItemView {
 		const files = this.app.vault.getFiles();
 		const availableStatuses =
 			BaseNoteStatusService.getAllAvailableStatuses();
-		const statusMetadataKeys = getKnownFrontmatterKeys(
-			settingsService.settings,
-		);
+		const statusMetadataKeys = getAllFrontmatterKeys();
 
 		let notesWithStatus = 0;
 		const statusDistribution: Record<string, number> = {};
@@ -130,9 +128,7 @@ export class StatusDashboardView extends ItemView {
 
 		const noteStatusService = new NoteStatusService(activeFile);
 		noteStatusService.populateStatuses();
-		const statusMetadataKeys = getKnownFrontmatterKeys(
-			settingsService.settings,
-		);
+		const statusMetadataKeys = getAllFrontmatterKeys();
 		const statusesByKey: Record<string, NoteStatus[]> = {};
 
 		statusMetadataKeys.forEach((key) => {
@@ -238,7 +234,7 @@ export class StatusDashboardView extends ItemView {
 
 	private findUnassignedNotes() {
 		const files = this.app.vault.getMarkdownFiles();
-		const statusKeys = getKnownFrontmatterKeys(settingsService.settings);
+		const statusKeys = getAllFrontmatterKeys();
 		const filesWithoutStatus = files.filter((file) => {
 			const cachedMetadata = this.app.metadataCache.getFileCache(file);
 			const frontmatter = cachedMetadata?.frontmatter;
@@ -272,7 +268,7 @@ export class StatusDashboardView extends ItemView {
 	}
 
 	private searchBySpecificStatus(statusName: string) {
-		const keys = getKnownFrontmatterKeys(settingsService.settings);
+		const keys = getAllFrontmatterKeys();
 		const query = keys
 			.map((key) => `[${key}:"${statusName}"]`)
 			.join(" OR ");

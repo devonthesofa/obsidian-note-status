@@ -5,7 +5,7 @@ import eventBus from "./eventBus";
 import { VIEW_TYPE_EXAMPLE } from "../integrations/views/grouped-status-view";
 import { isExperimentalFeatureEnabled } from "@/utils/experimentalFeatures";
 import { GroupedStatuses, NoteStatus } from "@/types/noteStatus";
-import { getKnownFrontmatterKeys } from "@/utils/frontmatterMappings";
+import { getAllFrontmatterKeys } from "./statusKeyHelpers";
 
 export class CommandsService {
 	private plugin: Plugin;
@@ -213,9 +213,7 @@ export class CommandsService {
 
 					if (!statuses || statuses.length === 0) return false;
 
-					const keys = getKnownFrontmatterKeys(
-						settingsService.settings,
-					);
+					const keys = getAllFrontmatterKeys();
 					const queries = Array.from(
 						new Set(
 							statuses.flatMap((status) =>

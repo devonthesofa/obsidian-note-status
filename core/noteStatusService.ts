@@ -10,10 +10,8 @@ import settingsService from "@/core/settingsService";
 import eventBus from "./eventBus";
 import statusStoreManager from "./statusStoreManager";
 import type { StatusStore } from "./statusStores/types";
-import {
-	getKnownFrontmatterKeys,
-	resolveFrontmatterKeysForStatus,
-} from "@/utils/frontmatterMappings";
+import { resolveFrontmatterKeysForStatus } from "@/utils/frontmatterMappings";
+import { getFrontmatterKeysForFile } from "./statusKeyHelpers";
 
 export abstract class BaseNoteStatusService {
 	static app: App;
@@ -137,17 +135,8 @@ export class NoteStatusService extends BaseNoteStatusService {
 		return this.file.extension === "md";
 	}
 
-	private getKeysForReading(): string[] {
-		const defaultKey = settingsService.settings.tagPrefix;
-		if (!this.isMarkdownFile()) {
-			return [defaultKey];
-		}
-		const knownKeys = getKnownFrontmatterKeys(settingsService.settings);
-		return [defaultKey, ...knownKeys.filter((key) => key !== defaultKey)];
-	}
-
 	private collectIdentifiersForFile(): string[] {
-		const keysToRead = this.getKeysForReading();
+		const keysToRead = getFrontmatterKeysForFile(this.file);
 		const seen = new Set<string>();
 		const identifiers: string[] = [];
 
@@ -263,6 +252,16 @@ export class NoteStatusService extends BaseNoteStatusService {
 	}
 
 	public getStatusesForKey(frontmatterTagName: string): NoteStatusType[] {
+		const isValidKey =
+			!this.isMarkdownFile() &&
+			frontmatterTagName !== settingsService.settings.tagPrefix
+				? false
+				: true;
+
+		if (!isValidKey) {
+			return [];
+		}
+
 		const identifiers = this.statusStore
 			.getStatuses(this.file, frontmatterTagName)
 			.map((identifier) => identifier?.toString())
@@ -334,7 +333,9 @@ export class NoteStatusService extends BaseNoteStatusService {
 	async clearStatus(frontmatterTagName: string): Promise<boolean> {
 		const keys = new Set<string>([frontmatterTagName]);
 		if (this.isMarkdownFile()) {
-			this.getKeysForReading().forEach((key) => keys.add(key));
+			getFrontmatterKeysForFile(this.file).forEach((key) =>
+				keys.add(key),
+			);
 		}
 
 		const cleared = await this.runAcrossKeys([...keys], (key) =>
@@ -392,9 +393,9 @@ export class NoteStatusService extends BaseNoteStatusService {
 				});
 			});
 
-			const knownKeys = new Set([
+			const knownKeys = new Set<string>([
 				frontmatterTagName,
-				...this.getStatusMetadataKeys(),
+				...getFrontmatterKeysForFile(this.file),
 			]);
 			knownKeys.forEach((key) => {
 				if (!keyMap.has(key)) {
@@ -530,15 +531,6 @@ export class MultipleNoteStatusService extends BaseNoteStatusService {
 		return this.files.length;
 	}
 
-	private getKeysForReading(file: TFile): string[] {
-		const defaultKey = settingsService.settings.tagPrefix;
-		if (file.extension !== "md") {
-			return [defaultKey];
-		}
-		const knownKeys = getKnownFrontmatterKeys(settingsService.settings);
-		return [defaultKey, ...knownKeys.filter((key) => key !== defaultKey)];
-	}
-
 	public populateStatuses(): void {
 		const defaultKey = settingsService.settings.tagPrefix;
 		this.statuses = { [defaultKey]: [] };
@@ -553,7 +545,7 @@ export class MultipleNoteStatusService extends BaseNoteStatusService {
 				return;
 			}
 
-			const keys = this.getKeysForReading(file);
+			const keys = getFrontmatterKeysForFile(file);
 			keys.forEach((key) => {
 				const identifiers = store.getStatuses(file, key);
 				identifiers.forEach((identifier) => {

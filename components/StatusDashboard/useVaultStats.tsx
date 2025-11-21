@@ -5,8 +5,7 @@ import {
 	BaseNoteStatusService,
 	NoteStatusService,
 } from "@/core/noteStatusService";
-import settingsService from "@/core/settingsService";
-import { getKnownFrontmatterKeys } from "@/utils/frontmatterMappings";
+import { getAllFrontmatterKeys } from "@/core/statusKeyHelpers";
 
 export interface VaultStats {
 	totalNotes: number;
@@ -34,9 +33,7 @@ export const useVaultStats = () => {
 		const files = BaseNoteStatusService.app.vault.getFiles();
 		const availableStatuses =
 			BaseNoteStatusService.getAllAvailableStatuses();
-		const statusMetadataKeys = getKnownFrontmatterKeys(
-			settingsService.settings,
-		);
+		const statusMetadataKeys = getAllFrontmatterKeys();
 
 		let notesWithStatus = 0;
 		const statusDistribution: Record<string, number> = {};

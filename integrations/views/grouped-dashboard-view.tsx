@@ -6,9 +6,8 @@ import {
 	NoteStatusService,
 } from "@/core/noteStatusService";
 import eventBus from "@/core/eventBus";
-import settingsService from "@/core/settingsService";
 import { NoteStatus } from "@/types/noteStatus";
-import { getKnownFrontmatterKeys } from "@/utils/frontmatterMappings";
+import { getAllFrontmatterKeys } from "@/core/statusKeyHelpers";
 
 export const VIEW_TYPE_GROUPED_DASHBOARD = "grouped-dashboard-view";
 
@@ -72,9 +71,7 @@ export class GroupedDashboardView extends ItemView {
 
 	private processFiles = (files: FileItem[]): GroupedByStatus => {
 		const result: GroupedByStatus = {};
-		const statusMetadataKeys = getKnownFrontmatterKeys(
-			settingsService.settings,
-		);
+		const statusMetadataKeys = getAllFrontmatterKeys();
 		const availableStatuses =
 			BaseNoteStatusService.getAllAvailableStatuses();
 
