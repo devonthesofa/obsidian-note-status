@@ -3,6 +3,7 @@ import { NoteStatusService, BaseNoteStatusService } from "./noteStatusService";
 import settingsService from "./settingsService";
 import eventBus from "./eventBus";
 import { VIEW_TYPE_EXAMPLE } from "../integrations/views/grouped-status-view";
+import { isExperimentalFeatureEnabled } from "@/utils/experimentalFeatures";
 
 export class CommandsService {
 	private plugin: Plugin;
@@ -229,15 +230,17 @@ export class CommandsService {
 		});
 		this.registeredCommands.add("search-by-status");
 
-		// Open Status Pane command
-		this.plugin.addCommand({
-			id: "open-status-pane",
-			name: "Open status pane",
-			callback: async () => {
-				await this.openStatusPane();
-			},
-		});
-		this.registeredCommands.add("open-status-pane");
+		// Open Status Pane command (experimental)
+		if (this.shouldEnableGroupedView()) {
+			this.plugin.addCommand({
+				id: "open-status-pane",
+				name: "Open status pane",
+				callback: async () => {
+					await this.openStatusPane();
+				},
+			});
+			this.registeredCommands.add("open-status-pane");
+		}
 	}
 
 	private async openStatusPane(): Promise<void> {
@@ -354,6 +357,10 @@ export class CommandsService {
 			this.app.commands.removeCommand(`note-status:${commandId}`);
 		});
 		this.registeredCommands.clear();
+	}
+
+	private shouldEnableGroupedView(): boolean {
+		return isExperimentalFeatureEnabled("groupedStatusView");
 	}
 
 	public destroy(): void {

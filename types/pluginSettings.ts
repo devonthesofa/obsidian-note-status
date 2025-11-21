@@ -28,6 +28,9 @@ export type PluginSettings = {
 	fileExplorerLeftBorder: boolean; // Whether to display a colored border on the explorer item
 	fileExplorerStatusDot: boolean; // Whether to append a small colored dot next to the filename
 	fileExplorerUnderlineFileName: boolean; // Whether to underline the filename using the status color
+	enableExperimentalFeatures: boolean; // Gate for experimental features
+	enableStatusDashboard: boolean; // Toggle for the status dashboard experiment
+	enableGroupedStatusView: boolean; // Toggle for the grouped status view experiment
 	enabledTemplates: string[]; // IDs of enabled templates
 	useCustomStatusesOnly: boolean; // Whether to use only custom statuses or include templates
 	useMultipleStatuses: boolean; // Whether to allow multiple statuses per note

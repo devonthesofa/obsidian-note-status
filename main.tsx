@@ -19,6 +19,7 @@ import {
 } from "./integrations/views/status-dashboard-view";
 import { StatusesInfoPopup } from "./integrations/popups/statusesInfoPopupIntegration";
 import statusStoreManager from "./core/statusStoreManager";
+import { isExperimentalFeatureEnabled } from "@/utils/experimentalFeatures";
 
 export default class NoteStatusPlugin extends Plugin {
 	private statusBarIntegration: StatusBarIntegration;
@@ -27,6 +28,7 @@ export default class NoteStatusPlugin extends Plugin {
 	private fileExplorerIntegration: FileExplorerIntegration;
 	private commandsIntegration: CommandsIntegration;
 	private editorToolbarIntegration: EditorToolbarIntegration;
+	private experimentalRibbonShortcuts: Map<string, HTMLElement> = new Map();
 
 	async onload() {
 		BaseNoteStatusService.initialize(this.app);
@@ -53,13 +55,7 @@ export default class NoteStatusPlugin extends Plugin {
 			(leaf) => new StatusDashboardView(leaf),
 		);
 
-		this.addRibbonIcon("list-tree", "Open grouped status view", () => {
-			this.activateView();
-		});
-
-		this.addRibbonIcon("activity", "Open status dashboard", () => {
-			this.activateDashboard();
-		});
+		this.syncExperimentalFeatureShortcuts();
 	}
 
 	async onunload() {
@@ -70,6 +66,8 @@ export default class NoteStatusPlugin extends Plugin {
 		this.commandsIntegration?.destroy();
 		this.editorToolbarIntegration?.destroy();
 		this.pluginSettingsIntegration?.destroy();
+		this.experimentalRibbonShortcuts.forEach((el) => el.remove());
+		this.experimentalRibbonShortcuts.clear();
 
 		// Clean up event subscriptions
 		eventBus.unsubscribe(
@@ -148,6 +146,58 @@ export default class NoteStatusPlugin extends Plugin {
 		}
 	}
 
+	private syncExperimentalFeatureShortcuts(): void {
+		const shortcuts = this.getExperimentalShortcuts();
+		Object.entries(shortcuts).forEach(([key, config]) => {
+			this.toggleExperimentalRibbon(key, config);
+		});
+	}
+
+	private getExperimentalShortcuts() {
+		return {
+			groupedStatusView: {
+				feature: "groupedStatusView" as const,
+				icon: "list-tree",
+				title: "Open grouped status view",
+				handler: () => this.activateView(),
+			},
+			statusDashboard: {
+				feature: "statusDashboard" as const,
+				icon: "activity",
+				title: "Open status dashboard",
+				handler: () => this.activateDashboard(),
+			},
+		};
+	}
+
+	private toggleExperimentalRibbon(
+		key: string,
+		config: {
+			feature: Parameters<typeof isExperimentalFeatureEnabled>[0];
+			icon: string;
+			title: string;
+			handler: () => void;
+		},
+	): void {
+		const isEnabled = isExperimentalFeatureEnabled(config.feature);
+		const existingIcon = this.experimentalRibbonShortcuts.get(key);
+
+		if (isEnabled && !existingIcon) {
+			const ribbonEl = this.addRibbonIcon(
+				config.icon,
+				config.title,
+				config.handler,
+			);
+			this.experimentalRibbonShortcuts.set(key, ribbonEl);
+			return;
+		}
+
+		if (!isEnabled && existingIcon) {
+			existingIcon.remove();
+			this.experimentalRibbonShortcuts.delete(key);
+		}
+	}
+
 	private async loadEventBus() {
 		// Propagate to custom event bus the new active file
 		this.app.workspace.on(
@@ -178,6 +228,13 @@ export default class NoteStatusPlugin extends Plugin {
 			({ key, value }) => {
 				if (key === "enableStatusOverviewPopup" && value === false) {
 					StatusesInfoPopup.close();
+				}
+				if (
+					key === "enableExperimentalFeatures" ||
+					key === "enableStatusDashboard" ||
+					key === "enableGroupedStatusView"
+				) {
+					this.syncExperimentalFeatureShortcuts();
 				}
 			},
 			"main-status-popup-setting-subscriptor",
