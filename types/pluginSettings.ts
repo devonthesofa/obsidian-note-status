@@ -1,5 +1,20 @@
 import { NoteStatus } from "./noteStatus";
 
+export type StatusFrontmatterMapping =
+	| {
+			id: string;
+			scope: "template";
+			templateId: string;
+			frontmatterKeys: string[];
+	  }
+	| {
+			id: string;
+			scope: "status";
+			templateId?: string;
+			statusName: string;
+			frontmatterKeys: string[];
+	  };
+
 export interface StatusTemplate {
 	id: string;
 	name: string;
@@ -51,5 +66,6 @@ export type PluginSettings = {
 	editorToolbarButtonPosition: "left" | "right" | "right-before"; // Position of the toolbar button
 	editorToolbarButtonDisplay: "all-notes" | "active-only"; // Whether to show button in all notes or only active one
 	applyStatusRecursivelyToSubfolders: boolean; // Whether to show recursive folder context option
+	statusFrontmatterMappings: StatusFrontmatterMapping[]; // Custom mappings between templates/statuses and frontmatter keys
 	[key: string]: unknown;
 };

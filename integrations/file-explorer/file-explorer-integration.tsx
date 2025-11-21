@@ -68,6 +68,7 @@ export class FileExplorerIntegration implements IElementProcessor {
 					key === "customStatuses" ||
 					key === "useMultipleStatuses" ||
 					key === "tagPrefix" ||
+					key === "statusFrontmatterMappings" ||
 					key === "strictStatuses" ||
 					key === "fileExplorerIconPosition" ||
 					key === "fileExplorerIconFrame" ||

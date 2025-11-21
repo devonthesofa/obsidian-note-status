@@ -350,6 +350,78 @@
 	border-radius: var(--radius-s);
 	background: var(--background-primary);
 }
+.status-mapping-list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-2);
+	width: 100%;
+}
+.status-mapping-row {
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	padding: var(--size-4-3);
+	background: var(--background-primary-alt);
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-2-2);
+}
+.status-mapping-empty {
+	padding: var(--size-4-3);
+	text-align: center;
+	color: var(--text-muted);
+	font-style: italic;
+	border: 1px dashed var(--background-modifier-border);
+	border-radius: var(--radius-m);
+}
+.status-mapping-row__fields {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--size-4-2);
+	width: 100%;
+}
+.status-mapping-field {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-2-1);
+	flex: 1 1 180px;
+}
+.status-mapping-field label {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+}
+.status-mapping-field small {
+	color: var(--text-faint);
+}
+.status-mapping-field select,
+.status-mapping-field input {
+	width: 100%;
+}
+.status-mapping-row__actions {
+	display: flex;
+	justify-content: flex-end;
+}
+.status-mapping-remove-btn {
+	background: var(--background-modifier-error);
+	color: var(--text-on-accent);
+	border: none;
+	border-radius: var(--radius-s);
+	padding: 4px 10px;
+	cursor: pointer;
+}
+.status-mapping-remove-btn:hover {
+	opacity: 0.9;
+}
+.status-mapping-add-btn {
+	align-self: flex-start;
+	padding: var(--size-2-2) var(--size-4-2);
+	border-radius: var(--radius-s);
+	border: 1px solid var(--background-modifier-border);
+	background: var(--interactive-normal);
+	cursor: pointer;
+}
+.status-mapping-add-btn:hover {
+	background: var(--interactive-hover);
+}
 
 .note-status-option {
 	/* Uses SelectableListItem styles */

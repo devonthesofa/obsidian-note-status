@@ -4,6 +4,8 @@ import settingsService from "./settingsService";
 import eventBus from "./eventBus";
 import { VIEW_TYPE_EXAMPLE } from "../integrations/views/grouped-status-view";
 import { isExperimentalFeatureEnabled } from "@/utils/experimentalFeatures";
+import { GroupedStatuses, NoteStatus } from "@/types/noteStatus";
+import { getKnownFrontmatterKeys } from "@/utils/frontmatterMappings";
 
 export class CommandsService {
 	private plugin: Plugin;
@@ -71,23 +73,20 @@ export class CommandsService {
 					// Get the current file data
 					const statusService = this.createStatusService(file);
 					statusService.populateStatuses();
-					const statuses =
-						statusService.statuses[
-							settingsService.settings.tagPrefix
-						] || [];
-					const currentStatus = statuses.length
-						? statuses?.[0].name
-						: undefined;
+					const flattened = this.flattenStatuses(
+						statusService.statuses,
+					);
+					const currentStatus = flattened[0];
 					let nextIndex = 0;
 					if (currentStatus) {
 						const currentIndex = allStatuses.findIndex(
-							(s) => s.name === currentStatus,
+							(s) =>
+								s.name === currentStatus.name &&
+								(s.templateId || null) ===
+									(currentStatus.templateId || null),
 						);
 						if (currentIndex !== -1) {
-							nextIndex =
-								currentIndex === -1
-									? 0
-									: (currentIndex + 1) % allStatuses.length;
+							nextIndex = (currentIndex + 1) % allStatuses.length;
 						}
 					}
 
@@ -214,10 +213,17 @@ export class CommandsService {
 
 					if (!statuses || statuses.length === 0) return false;
 
-					const tagPrefix = settingsService.settings.tagPrefix;
-					const queries = statuses.map(
-						(status) => `[${tagPrefix}:"${status}"]`,
+					const keys = getKnownFrontmatterKeys(
+						settingsService.settings,
 					);
+					const queries = Array.from(
+						new Set(
+							statuses.flatMap((status) =>
+								keys.map((key) => `[${key}:"${status}"]`),
+							),
+						),
+					);
+					if (!queries.length) return false;
 					const query = queries.join(" OR ");
 
 					// @ts-ignore
@@ -340,12 +346,38 @@ export class CommandsService {
 		});
 	}
 
+	private flattenStatuses(
+		groupedStatuses: GroupedStatuses | null | undefined,
+	): NoteStatus[] {
+		if (!groupedStatuses) {
+			return [];
+		}
+		const seen = new Set<string>();
+		const flattened: NoteStatus[] = [];
+		Object.values(groupedStatuses).forEach((list) => {
+			list.forEach((status) => {
+				const identifier = BaseNoteStatusService.formatStatusIdentifier(
+					{
+						templateId: status.templateId,
+						name: status.name,
+					},
+				);
+				if (!seen.has(identifier)) {
+					seen.add(identifier);
+					flattened.push(status);
+				}
+			});
+		});
+		return flattened;
+	}
+
 	private getFileStatuses(file: TFile): string[] {
 		const statusService = this.createStatusService(file);
 		statusService.populateStatuses();
-		const tagPrefix = settingsService.settings.tagPrefix;
-		const statuses = statusService.statuses[tagPrefix] || [];
-		return statuses.length > 0 ? statuses.map((s) => s.name) : ["unknown"];
+		const flattened = this.flattenStatuses(statusService.statuses);
+		return flattened.length > 0
+			? flattened.map((s) => s.name)
+			: ["unknown"];
 	}
 
 	/**

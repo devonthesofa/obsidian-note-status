@@ -10,6 +10,10 @@ import settingsService from "@/core/settingsService";
 import eventBus from "./eventBus";
 import statusStoreManager from "./statusStoreManager";
 import type { StatusStore } from "./statusStores/types";
+import {
+	getKnownFrontmatterKeys,
+	resolveFrontmatterKeysForStatus,
+} from "@/utils/frontmatterMappings";
 
 export abstract class BaseNoteStatusService {
 	static app: App;
@@ -129,6 +133,39 @@ export class NoteStatusService extends BaseNoteStatusService {
 		this.statusStore = statusStoreManager.getStoreForFile(file);
 	}
 
+	private isMarkdownFile(): boolean {
+		return this.file.extension === "md";
+	}
+
+	private getKeysForReading(): string[] {
+		const defaultKey = settingsService.settings.tagPrefix;
+		if (!this.isMarkdownFile()) {
+			return [defaultKey];
+		}
+		const knownKeys = getKnownFrontmatterKeys(settingsService.settings);
+		return [defaultKey, ...knownKeys.filter((key) => key !== defaultKey)];
+	}
+
+	private collectIdentifiersForFile(): string[] {
+		const keysToRead = this.getKeysForReading();
+		const seen = new Set<string>();
+		const identifiers: string[] = [];
+
+		keysToRead.forEach((key) => {
+			const values = this.statusStore.getStatuses(this.file, key);
+			values.forEach((value) => {
+				const normalized = value?.toString();
+				if (!normalized || seen.has(normalized)) {
+					return;
+				}
+				seen.add(normalized);
+				identifiers.push(normalized);
+			});
+		});
+
+		return identifiers;
+	}
+
 	private shouldStoreStatusesAsArray(): boolean {
 		if (settingsService.settings.useMultipleStatuses) {
 			return true;
@@ -141,46 +178,102 @@ export class NoteStatusService extends BaseNoteStatusService {
 		return { storeAsArray: this.shouldStoreStatusesAsArray() };
 	}
 
+	private resolveTargetKeys(
+		frontmatterTagName: string,
+		status: StatusIdentifier | NoteStatus,
+		options?: { includeSourceKey?: boolean },
+	): string[] {
+		if (!this.isMarkdownFile()) {
+			return [frontmatterTagName];
+		}
+
+		let resolved = resolveFrontmatterKeysForStatus(
+			status,
+			settingsService.settings,
+			{ isMarkdownFile: true },
+		);
+
+		const defaultKey = settingsService.settings.tagPrefix;
+		if (
+			resolved.length === 1 &&
+			resolved[0] === defaultKey &&
+			frontmatterTagName !== defaultKey
+		) {
+			resolved = [frontmatterTagName];
+		}
+
+		if (options?.includeSourceKey && frontmatterTagName) {
+			resolved = [...resolved, frontmatterTagName];
+		}
+
+		const uniqueKeys = Array.from(
+			new Set(resolved.filter((key) => key && key.trim().length)),
+		);
+		return uniqueKeys.length ? uniqueKeys : [frontmatterTagName];
+	}
+
+	private async runAcrossKeys(
+		keys: string[],
+		action: (key: string) => Promise<boolean>,
+	): Promise<boolean> {
+		let hasChanged = false;
+		for (const key of keys) {
+			const changed = await action(key);
+			if (changed) {
+				hasChanged = true;
+			}
+		}
+		return hasChanged;
+	}
+
 	private statusesAreEqual(a: string[], b: string[]): boolean {
 		if (a.length !== b.length) return false;
 		return a.every((value, index) => value === b[index]);
 	}
 
 	public populateStatuses(): void {
-		const STATUS_METADATA_KEYS = this.getStatusMetadataKeys();
-		this.statuses = Object.fromEntries(
-			STATUS_METADATA_KEYS.map((key) => [key, []]),
-		);
+		const defaultKey = settingsService.settings.tagPrefix;
+		this.statuses = { [defaultKey]: [] };
 
 		if (!this.file) {
 			return;
 		}
 
-		STATUS_METADATA_KEYS.forEach((key) => {
-			const identifiers = this.statusStore.getStatuses(this.file, key);
-			if (!identifiers.length) {
-				return;
-			}
+		const identifiers = this.collectIdentifiersForFile();
+		if (!identifiers.length) {
+			return;
+		}
 
-			let statuses = identifiers
-				.map((identifier) =>
-					this.statusNameToObject(identifier.toString()),
-				)
-				.filter(
-					(status): status is NoteStatusType => status !== undefined,
-				);
+		let statuses = identifiers
+			.map((identifier) => this.statusNameToObject(identifier))
+			.filter((status): status is NoteStatusType => status !== undefined);
 
-			if (
-				statuses.length &&
-				!settingsService.settings.useMultipleStatuses
-			) {
-				statuses = statuses.slice(0, 1);
-			}
-			this.statuses[key] = statuses;
-		});
+		if (statuses.length && !settingsService.settings.useMultipleStatuses) {
+			statuses = statuses.slice(0, 1);
+		}
+		this.statuses[defaultKey] = statuses;
 	}
 
 	async removeStatus(
+		frontmatterTagName: string,
+		status: NoteStatus,
+	): Promise<boolean> {
+		const targetKeys = this.resolveTargetKeys(frontmatterTagName, status, {
+			includeSourceKey: true,
+		});
+		const removed = await this.runAcrossKeys(targetKeys, (key) =>
+			this.removeStatusFromKey(key, status),
+		);
+
+		if (removed) {
+			eventBus.publish("status-changed", {
+				file: this.file,
+			});
+		}
+		return removed;
+	}
+
+	private async removeStatusFromKey(
 		frontmatterTagName: string,
 		status: NoteStatus,
 	): Promise<boolean> {
@@ -191,7 +284,7 @@ export class NoteStatusService extends BaseNoteStatusService {
 				})
 			: status.name;
 
-		const removed = await this.statusStore.mutateStatuses(
+		return this.statusStore.mutateStatuses(
 			this.file,
 			frontmatterTagName,
 			(current) => {
@@ -219,17 +312,29 @@ export class NoteStatusService extends BaseNoteStatusService {
 			},
 			this.getStoreOptions(),
 		);
+	}
 
-		if (removed) {
+	async clearStatus(frontmatterTagName: string): Promise<boolean> {
+		const keys = new Set<string>([frontmatterTagName]);
+		if (this.isMarkdownFile()) {
+			this.getKeysForReading().forEach((key) => keys.add(key));
+		}
+
+		const cleared = await this.runAcrossKeys([...keys], (key) =>
+			this.clearStatusForKey(key),
+		);
+		if (cleared) {
 			eventBus.publish("status-changed", {
 				file: this.file,
 			});
 		}
-		return removed;
+		return cleared;
 	}
 
-	async clearStatus(frontmatterTagName: string): Promise<boolean> {
-		const cleared = await this.statusStore.mutateStatuses(
+	private async clearStatusForKey(
+		frontmatterTagName: string,
+	): Promise<boolean> {
+		return this.statusStore.mutateStatuses(
 			this.file,
 			frontmatterTagName,
 			(current) => {
@@ -240,37 +345,50 @@ export class NoteStatusService extends BaseNoteStatusService {
 			},
 			this.getStoreOptions(),
 		);
-		if (cleared) {
-			eventBus.publish("status-changed", {
-				file: this.file,
-			});
-		}
-		return cleared;
 	}
 
 	async overrideStatuses(
 		frontmatterTagName: string,
 		statusIdentifiers: StatusIdentifier[],
 	): Promise<boolean> {
-		const formattedIdentifiers = statusIdentifiers.map((id) =>
-			typeof id === "string"
-				? id
-				: BaseNoteStatusService.formatStatusIdentifier(id),
-		);
-		const statusesToStore = settingsService.settings.useMultipleStatuses
-			? formattedIdentifiers
-			: formattedIdentifiers.slice(0, 1);
+		const limitedIdentifiers = settingsService.settings.useMultipleStatuses
+			? statusIdentifiers
+			: statusIdentifiers.slice(0, 1);
 
-		const overridden = await this.statusStore.mutateStatuses(
-			this.file,
-			frontmatterTagName,
-			(current) => {
-				if (this.statusesAreEqual(current, statusesToStore)) {
-					return { hasChanged: false };
+		if (!limitedIdentifiers.length) {
+			return this.clearStatus(frontmatterTagName);
+		}
+
+		const keyMap = new Map<string, StatusIdentifier[]>();
+		if (!this.isMarkdownFile()) {
+			keyMap.set(frontmatterTagName, limitedIdentifiers);
+		} else {
+			limitedIdentifiers.forEach((identifier) => {
+				const keys = this.resolveTargetKeys(
+					frontmatterTagName,
+					identifier,
+				);
+				keys.forEach((key) => {
+					const currentList = keyMap.get(key) ?? [];
+					currentList.push(identifier);
+					keyMap.set(key, currentList);
+				});
+			});
+
+			const knownKeys = new Set([
+				frontmatterTagName,
+				...this.getStatusMetadataKeys(),
+			]);
+			knownKeys.forEach((key) => {
+				if (!keyMap.has(key)) {
+					keyMap.set(key, []);
 				}
-				return { hasChanged: true, nextStatuses: statusesToStore };
-			},
-			this.getStoreOptions(),
+			});
+		}
+
+		const overridden = await this.runAcrossKeys(
+			Array.from(keyMap.keys()),
+			(key) => this.overrideStatusesForKey(key, keyMap.get(key) ?? []),
 		);
 
 		if (overridden) {
@@ -281,7 +399,53 @@ export class NoteStatusService extends BaseNoteStatusService {
 		return overridden;
 	}
 
+	private async overrideStatusesForKey(
+		frontmatterTagName: string,
+		statusIdentifiers: StatusIdentifier[],
+	): Promise<boolean> {
+		const formattedIdentifiers = statusIdentifiers.map((id) =>
+			typeof id === "string"
+				? id
+				: BaseNoteStatusService.formatStatusIdentifier(id),
+		);
+
+		return this.statusStore.mutateStatuses(
+			this.file,
+			frontmatterTagName,
+			(current) => {
+				if (this.statusesAreEqual(current, formattedIdentifiers)) {
+					return { hasChanged: false };
+				}
+				return {
+					hasChanged: true,
+					nextStatuses: formattedIdentifiers,
+				};
+			},
+			this.getStoreOptions(),
+		);
+	}
+
 	async addStatus(
+		frontmatterTagName: string,
+		statusIdentifier: StatusIdentifier,
+	): Promise<boolean> {
+		const targetKeys = this.resolveTargetKeys(
+			frontmatterTagName,
+			statusIdentifier,
+		);
+		const added = await this.runAcrossKeys(targetKeys, (key) =>
+			this.addStatusToKey(key, statusIdentifier),
+		);
+
+		if (added) {
+			eventBus.publish("status-changed", {
+				file: this.file,
+			});
+		}
+		return added;
+	}
+
+	private async addStatusToKey(
 		frontmatterTagName: string,
 		statusIdentifier: StatusIdentifier,
 	): Promise<boolean> {
@@ -292,7 +456,7 @@ export class NoteStatusService extends BaseNoteStatusService {
 						statusIdentifier,
 					);
 
-		const added = await this.statusStore.mutateStatuses(
+		return this.statusStore.mutateStatuses(
 			this.file,
 			frontmatterTagName,
 			(current) => {
@@ -334,13 +498,6 @@ export class NoteStatusService extends BaseNoteStatusService {
 			},
 			this.getStoreOptions(),
 		);
-
-		if (added) {
-			eventBus.publish("status-changed", {
-				file: this.file,
-			});
-		}
-		return added;
 	}
 }
 
@@ -356,14 +513,20 @@ export class MultipleNoteStatusService extends BaseNoteStatusService {
 		return this.files.length;
 	}
 
+	private getKeysForReading(file: TFile): string[] {
+		const defaultKey = settingsService.settings.tagPrefix;
+		if (file.extension !== "md") {
+			return [defaultKey];
+		}
+		const knownKeys = getKnownFrontmatterKeys(settingsService.settings);
+		return [defaultKey, ...knownKeys.filter((key) => key !== defaultKey)];
+	}
+
 	public populateStatuses(): void {
-		const STATUS_METADATA_KEYS = this.getStatusMetadataKeys();
+		const defaultKey = settingsService.settings.tagPrefix;
+		this.statuses = { [defaultKey]: [] };
 
-		this.statuses = Object.fromEntries(
-			STATUS_METADATA_KEYS.map((key) => [key, []]),
-		);
-
-		const allStatuses = new Map<string, Set<string>>();
+		const aggregated = new Set<string>();
 
 		this.files.forEach((file) => {
 			let store: StatusStore;
@@ -373,30 +536,27 @@ export class MultipleNoteStatusService extends BaseNoteStatusService {
 				return;
 			}
 
-			STATUS_METADATA_KEYS.forEach((key) => {
+			const keys = this.getKeysForReading(file);
+			keys.forEach((key) => {
 				const identifiers = store.getStatuses(file, key);
-				if (!identifiers.length) return;
-
-				if (!allStatuses.has(key)) {
-					allStatuses.set(key, new Set());
-				}
-
-				identifiers.forEach((name) =>
-					allStatuses.get(key)!.add(name.toString()),
-				);
+				identifiers.forEach((identifier) => {
+					const normalized = identifier?.toString();
+					if (normalized && !aggregated.has(normalized)) {
+						aggregated.add(normalized);
+					}
+				});
 			});
 		});
 
-		STATUS_METADATA_KEYS.forEach((key) => {
-			const statusNames = allStatuses.get(key);
-			if (statusNames) {
-				const statuses = Array.from(statusNames)
-					.map((name) => this.statusNameToObject(name))
-					.filter((s) => s !== undefined) as NoteStatusType[];
+		if (!aggregated.size) {
+			return;
+		}
 
-				this.statuses[key] = statuses;
-			}
-		});
+		const statuses = Array.from(aggregated)
+			.map((identifier) => this.statusNameToObject(identifier))
+			.filter((status): status is NoteStatusType => status !== undefined);
+
+		this.statuses[defaultKey] = statuses;
 	}
 
 	async removeStatus(

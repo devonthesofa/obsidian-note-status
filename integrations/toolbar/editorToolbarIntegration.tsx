@@ -71,6 +71,9 @@ export class EditorToolbarIntegration {
 				if (key === "tagPrefix") {
 					this.refreshAllButtons();
 				}
+				if (key === "statusFrontmatterMappings") {
+					this.refreshAllButtons();
+				}
 				if (key === "useCustomStatusesOnly") {
 					this.refreshAllButtons();
 				}

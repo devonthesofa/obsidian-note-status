@@ -50,6 +50,9 @@ export class StatusBarIntegration {
 				if (key === "tagPrefix") {
 					this.handleActiveFileChange().catch(console.error); // INFO: Force a re-read of the statuses and render
 				}
+				if (key === "statusFrontmatterMappings") {
+					this.handleActiveFileChange().catch(console.error);
+				}
 				if (key === "useCustomStatusesOnly") {
 					this.handleActiveFileChange().catch(console.error); // INFO: Force a re-read of the statuses and render
 				}
