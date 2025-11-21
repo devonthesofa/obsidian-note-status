@@ -2,7 +2,7 @@ import { NoteStatus } from "@/types/noteStatus";
 import React from "react";
 import { Input } from "@/components/atoms/Input";
 import { StatusIcon } from "@/components/atoms/StatusIcon";
-import { LucideIconPicker } from "./LucideIconPicker";
+import { IconSelectionField } from "./IconSelectionField";
 
 export type Props = {
 	status: NoteStatus;
@@ -32,44 +32,23 @@ export const CustomStatusItem: React.FC<Props> = ({
 	const isValid = status.name.trim().length > 0;
 	return (
 		<div className="custom-status-item">
-			<div className="custom-status-item__row custom-status-item__row--icons">
-				<div className="custom-status-item__field custom-status-item__field--icon">
-					<label className="custom-status-item__label">
-						Emoji icon
-					</label>
-					<Input
-						variant="text"
-						value={status.icon}
-						onChange={(value) =>
-							onCustomStatusChange(index, "icon", value || "")
-						}
-						placeholder="Example: ✅ or 🚧"
-						className="custom-status-item__input custom-status-item__input--icon"
-					/>
-					<p className="custom-status-item__hint">
-						This fallback icon is shown anywhere Lucide is not
-						available.
-					</p>
-				</div>
-
-				<div className="custom-status-item__field custom-status-item__field--lucide">
-					<label className="custom-status-item__label">
-						Lucide icon (optional)
-					</label>
-					<LucideIconPicker
-						value={status.lucideIcon || ""}
-						onChange={(value) =>
-							onCustomStatusChange(index, "lucideIcon", value)
-						}
-						placeholder="Browse Lucide icons"
-						allowClear
-					/>
-					<p className="custom-status-item__hint">
-						Matches Obsidian&apos;s toolbar icons so your status
-						button blends in.
-					</p>
-				</div>
-			</div>
+			<IconSelectionField
+				className="custom-status-item__icon-fields"
+				emojiValue={status.icon}
+				onEmojiChange={(value) =>
+					onCustomStatusChange(index, "icon", value || "")
+				}
+				emojiLabel="Emoji icon"
+				emojiPlaceholder="Example: ✅ or 🚧"
+				emojiHint="Shown anywhere Lucide is not available."
+				lucideValue={status.lucideIcon || ""}
+				onLucideChange={(value) =>
+					onCustomStatusChange(index, "lucideIcon", value)
+				}
+				lucideLabel="Lucide icon (optional)"
+				lucidePlaceholder="Browse Lucide icons"
+				lucideHint="Matches Obsidian's toolbar icons so your status button blends in."
+			/>
 
 			{/* Simple horizontal layout with remaining inputs */}
 			<div className="custom-status-item__row">

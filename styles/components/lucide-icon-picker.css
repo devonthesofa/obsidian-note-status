@@ -155,3 +155,32 @@
 	color: var(--text-muted);
 	padding: var(--size-4-2);
 }
+
+.icon-selection-field {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--size-4-2);
+}
+
+.icon-selection-field__column {
+	flex: 1;
+	min-width: 220px;
+}
+
+.icon-selection-field__label {
+	display: block;
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-medium);
+	color: var(--text-muted);
+	margin-bottom: var(--size-2-1);
+}
+
+.icon-selection-field__emoji-input {
+	max-width: 260px;
+}
+
+.icon-selection-field__hint {
+	margin-top: var(--size-2-1);
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+}
