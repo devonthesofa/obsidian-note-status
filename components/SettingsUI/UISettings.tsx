@@ -3,6 +3,7 @@ import React from "react";
 import { Input } from "../atoms/Input";
 import { Select } from "../atoms/Select";
 import { SettingItem } from "./SettingItem";
+import { LucideIconPicker } from "./LucideIconPicker";
 
 export type Props = {
 	settings: PluginSettings;
@@ -270,12 +271,12 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				name="Icon for unknown status"
 				description="Emoji or Lucide icon name displayed whenever a note does not have a status."
 			>
-				<Input
-					variant="text"
+				<LucideIconPicker
 					value={settings.unknownStatusIcon}
 					onChange={(value) => onChange("unknownStatusIcon", value)}
-					placeholder="❓"
-					style={{ maxWidth: "150px" }}
+					placeholder="Emoji or Lucide icon"
+					allowTextInput
+					allowClear
 				/>
 			</SettingItem>
 

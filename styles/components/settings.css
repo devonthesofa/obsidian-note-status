@@ -221,78 +221,108 @@
 }
 
 .lucide-icon-picker {
+	position: relative;
 	display: flex;
 	flex-direction: column;
-	gap: var(--size-2-2);
+	gap: var(--size-2-1);
 }
 
-.lucide-icon-picker__control {
+.lucide-icon-picker__text-input {
+	max-width: 220px;
+}
+
+.lucide-icon-picker__actions {
 	display: flex;
 	gap: var(--size-2-1);
 	align-items: center;
 }
 
-.lucide-icon-picker__input {
-	flex: 1;
-}
-
-.lucide-icon-picker__clear {
-	background: var(--background-modifier-border);
-	border: none;
-	padding: 4px 8px;
-	border-radius: var(--radius-s);
+.lucide-icon-picker__trigger {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-2-1);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	padding: var(--size-2-1) var(--size-4-1);
+	background: var(--background-secondary);
 	cursor: pointer;
-	font-size: var(--font-ui-smaller);
+	transition:
+		border var(--anim-duration-fast) ease,
+		background var(--anim-duration-fast) ease;
+	min-width: 220px;
+	justify-content: space-between;
 }
 
-.lucide-icon-picker__clear:hover {
-	background: var(--interactive-hover);
-	color: var(--text-normal);
+.lucide-icon-picker__trigger.is-active {
+	border-color: var(--interactive-accent);
 }
 
-.lucide-icon-picker__selected {
-	display: flex;
+.lucide-icon-picker__trigger-icon {
+	display: inline-flex;
 	align-items: center;
-	gap: var(--size-2-1);
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+}
+
+.lucide-icon-picker__trigger-label {
+	flex: 1;
+	text-align: left;
 	font-size: var(--font-ui-smaller);
 	color: var(--text-muted);
 }
 
-.lucide-icon-picker__selected-preview {
-	width: 28px;
-	height: 28px;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	background: var(--background-secondary);
-	border-radius: var(--radius-s);
+.lucide-icon-picker__clear-trigger {
+	background: transparent;
+	border: none;
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	cursor: pointer;
+	padding: var(--size-2-1) var(--size-2-2);
 }
 
-.lucide-icon-picker__grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+.lucide-icon-picker__clear-trigger:hover {
+	color: var(--text-normal);
+	text-decoration: underline;
+}
+
+.lucide-icon-picker__popover {
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 0;
+	width: min(320px, 90vw);
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	box-shadow: var(--shadow-l);
+	padding: var(--size-2-2);
+	z-index: var(--layer-popover);
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-2-1);
+}
+
+.lucide-icon-picker__search {
+	width: 100%;
+}
+
+.lucide-icon-picker__options {
+	display: flex;
+	flex-direction: column;
 	gap: var(--size-2-1);
 	max-height: 220px;
 	overflow-y: auto;
-	padding: var(--size-2-1);
-	border: 1px solid var(--background-modifier-border);
-	border-radius: var(--radius-m);
-	background: var(--background-primary-alt);
 }
 
 .lucide-icon-picker__option {
 	display: flex;
 	align-items: center;
 	gap: var(--size-2-1);
-	padding: var(--size-2-1) var(--size-2-2);
+	padding: var(--size-2-1);
 	border-radius: var(--radius-s);
 	border: 1px solid transparent;
-	background: transparent;
 	cursor: pointer;
 	font-size: var(--font-ui-smaller);
-	transition:
-		border var(--anim-duration-fast) ease,
-		background var(--anim-duration-fast) ease;
 }
 
 .lucide-icon-picker__option:hover {
@@ -302,13 +332,13 @@
 .lucide-icon-picker__option--selected {
 	border-color: var(--interactive-accent);
 	background: var(--background-modifier-success);
-	color: var(--text-normal);
 }
 
 .lucide-icon-picker__empty {
 	font-size: var(--font-ui-smaller);
 	color: var(--text-muted);
-	padding: var(--size-2-1);
+	padding: var(--size-2-2);
+	text-align: center;
 }
 
 /* Custom Status List - BEM */

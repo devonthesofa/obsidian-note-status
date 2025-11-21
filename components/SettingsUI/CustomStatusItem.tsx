@@ -61,6 +61,8 @@ export const CustomStatusItem: React.FC<Props> = ({
 						onChange={(value) =>
 							onCustomStatusChange(index, "lucideIcon", value)
 						}
+						placeholder="Browse Lucide icons"
+						allowClear
 					/>
 					<p className="custom-status-item__hint">
 						Matches Obsidian&apos;s toolbar icons so your status

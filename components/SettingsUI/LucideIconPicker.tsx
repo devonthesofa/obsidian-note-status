@@ -1,26 +1,38 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { IconName, getIconIds } from "obsidian";
 import { Input } from "@/components/atoms/Input";
 import { StatusIcon } from "@/components/atoms/StatusIcon";
+import { ObsidianIcon } from "@/components/atoms/ObsidianIcon";
 
 export interface LucideIconPickerProps {
 	value?: string;
 	onChange: (value: string) => void;
+	placeholder?: string;
+	allowTextInput?: boolean;
+	allowClear?: boolean;
 	maxResults?: number;
 }
 
-const DEFAULT_MAX_RESULTS = 36;
+const DEFAULT_MAX_RESULTS = 80;
 
 export const LucideIconPicker: React.FC<LucideIconPickerProps> = ({
 	value = "",
 	onChange,
+	placeholder = "Select Lucide icon",
+	allowTextInput = false,
+	allowClear = true,
 	maxResults = DEFAULT_MAX_RESULTS,
 }) => {
-	const [query, setQuery] = useState(value);
-
-	useEffect(() => {
-		setQuery(value || "");
-	}, [value]);
+	const [query, setQuery] = useState("");
+	const [isOpen, setIsOpen] = useState(false);
+	const containerRef = useRef<HTMLDivElement>(null);
+	const searchInputRef = useRef<HTMLInputElement>(null);
 
 	const iconIds = useMemo(() => {
 		try {
@@ -37,20 +49,57 @@ export const LucideIconPicker: React.FC<LucideIconPickerProps> = ({
 		if (!iconIds.length) {
 			return [];
 		}
-
-		const normalizedQuery = query.trim().toLowerCase();
-		const source = normalizedQuery.length
-			? iconIds.filter((name) =>
-					name.toLowerCase().includes(normalizedQuery),
-				)
+		const normalized = query.trim().toLowerCase();
+		const matches = normalized.length
+			? iconIds.filter((name) => name.toLowerCase().includes(normalized))
 			: iconIds;
+		return matches.slice(0, maxResults);
+	}, [iconIds, maxResults, query]);
 
-		return source.slice(0, maxResults);
-	}, [iconIds, query, maxResults]);
+	const closePicker = useCallback(() => {
+		setIsOpen(false);
+		setQuery("");
+	}, []);
+
+	useEffect(() => {
+		if (!isOpen) return;
+
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				containerRef.current &&
+				!containerRef.current.contains(event.target as Node)
+			) {
+				closePicker();
+			}
+		};
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === "Escape") {
+				closePicker();
+			}
+		};
+
+		document.addEventListener("mousedown", handleClickOutside);
+		document.addEventListener("keydown", handleKeyDown);
+
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+			document.removeEventListener("keydown", handleKeyDown);
+		};
+	}, [closePicker, isOpen]);
+
+	useEffect(() => {
+		if (isOpen) {
+			setTimeout(() => searchInputRef.current?.focus(), 0);
+		}
+	}, [isOpen]);
 
 	const handleSelect = (iconName: IconName) => {
 		onChange(iconName);
-		setQuery(iconName);
+		closePicker();
+	};
+
+	const handleManualInput = (text: string) => {
+		onChange(text);
 	};
 
 	const handleClear = () => {
@@ -58,20 +107,44 @@ export const LucideIconPicker: React.FC<LucideIconPickerProps> = ({
 		setQuery("");
 	};
 
+	const togglePopover = () => {
+		setIsOpen((prev) => !prev);
+	};
+
 	return (
-		<div className="lucide-icon-picker">
-			<div className="lucide-icon-picker__control">
+		<div className="lucide-icon-picker" ref={containerRef}>
+			{allowTextInput && (
 				<Input
 					variant="text"
-					value={query}
-					onChange={setQuery}
-					placeholder="Search by name (e.g. check-circle)"
-					className="lucide-icon-picker__input"
+					value={value}
+					onChange={handleManualInput}
+					placeholder="Emoji or icon name"
+					className="lucide-icon-picker__text-input"
 				/>
-				{value && (
+			)}
+
+			<div className="lucide-icon-picker__actions">
+				<button
+					type="button"
+					className={`lucide-icon-picker__trigger${isOpen ? " is-active" : ""}`}
+					onClick={togglePopover}
+				>
+					<span className="lucide-icon-picker__trigger-icon">
+						<StatusIcon icon={value} lucideIcon={value} size={16} />
+					</span>
+					<span className="lucide-icon-picker__trigger-label">
+						{value || placeholder}
+					</span>
+					<ObsidianIcon
+						name={isOpen ? "chevron-up" : "chevron-down"}
+						size={14}
+					/>
+				</button>
+
+				{allowClear && value && (
 					<button
 						type="button"
-						className="lucide-icon-picker__clear"
+						className="lucide-icon-picker__clear-trigger"
 						onClick={handleClear}
 					>
 						Clear
@@ -79,51 +152,44 @@ export const LucideIconPicker: React.FC<LucideIconPickerProps> = ({
 				)}
 			</div>
 
-			<div className="lucide-icon-picker__selected">
-				<span className="lucide-icon-picker__selected-preview">
-					<StatusIcon
-						icon={value}
-						lucideIcon={value}
-						size={18}
-						className="lucide-icon-picker__selected-icon"
-					/>
-				</span>
-				<span className="lucide-icon-picker__selected-label">
-					{value || "No Lucide icon selected"}
-				</span>
-			</div>
-
-			{!iconIds.length && (
-				<div className="lucide-icon-picker__empty">
-					Lucide icons are not available yet. Try reloading the
-					plugin.
-				</div>
-			)}
-
-			{iconIds.length > 0 && (
-				<div className="lucide-icon-picker__grid">
-					{filteredIcons.map((iconName) => {
-						const isSelected = iconName === value;
-						return (
-							<button
-								type="button"
-								key={iconName}
-								className={`lucide-icon-picker__option ${isSelected ? "lucide-icon-picker__option--selected" : ""}`}
-								onClick={() => handleSelect(iconName)}
-								title={iconName}
-							>
-								<StatusIcon
-									icon={iconName}
-									lucideIcon={iconName}
-									size={16}
-								/>
-								<span>{iconName}</span>
-							</button>
-						);
-					})}
-					{filteredIcons.length === 0 && (
+			{isOpen && (
+				<div className="lucide-icon-picker__popover">
+					{iconIds.length > 0 ? (
+						<>
+							<Input
+								ref={searchInputRef}
+								variant="search"
+								value={query}
+								onChange={setQuery}
+								placeholder="Search Lucide icons…"
+								className="lucide-icon-picker__search"
+							/>
+							<div className="lucide-icon-picker__options">
+								{filteredIcons.map((iconName) => (
+									<button
+										type="button"
+										key={iconName}
+										className={`lucide-icon-picker__option${iconName === value ? " lucide-icon-picker__option--selected" : ""}`}
+										onClick={() => handleSelect(iconName)}
+									>
+										<StatusIcon
+											icon={iconName}
+											lucideIcon={iconName}
+											size={16}
+										/>
+										<span>{iconName}</span>
+									</button>
+								))}
+								{filteredIcons.length === 0 && (
+									<div className="lucide-icon-picker__empty">
+										No icons match “{query.trim()}”.
+									</div>
+								)}
+							</div>
+						</>
+					) : (
 						<div className="lucide-icon-picker__empty">
-							No icons match "{query.trim()}"
+							Lucide icons are not available right now.
 						</div>
 					)}
 				</div>
