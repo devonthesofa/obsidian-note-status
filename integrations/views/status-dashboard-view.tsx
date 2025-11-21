@@ -58,7 +58,7 @@ export class StatusDashboardView extends ItemView {
 	}
 
 	private calculateVaultStats = (): VaultStats => {
-		const files = this.app.vault.getMarkdownFiles();
+		const files = this.app.vault.getFiles();
 		const availableStatuses =
 			BaseNoteStatusService.getAllAvailableStatuses();
 		const statusMetadataKeys = [settingsService.settings.tagPrefix];
@@ -80,49 +80,26 @@ export class StatusDashboardView extends ItemView {
 		});
 
 		files.forEach((file) => {
-			const cachedMetadata = this.app.metadataCache.getFileCache(file);
-			const frontmatter = cachedMetadata?.frontmatter;
-
-			if (!frontmatter) return;
-
+			const noteStatusService = new NoteStatusService(file);
+			noteStatusService.populateStatuses();
 			let hasAnyStatus = false;
 
 			statusMetadataKeys.forEach((key) => {
-				const value = frontmatter[key];
-				if (value) {
-					hasAnyStatus = true;
-					tagDistribution[key]++;
+				const statuses = noteStatusService.statuses[key] || [];
+				if (!statuses.length) return;
 
-					const statusNames = Array.isArray(value) ? value : [value];
-					statusNames.forEach((statusName) => {
-						const statusStr = statusName.toString();
+				hasAnyStatus = true;
+				tagDistribution[key]++;
 
-						// Determine the scoped identifier to use
-						let scopedIdentifier: string;
-
-						if (statusStr.includes(":")) {
-							// Already scoped
-							scopedIdentifier = statusStr;
-						} else {
-							// Legacy status - find first template that has this status
-							const firstTemplateWithStatus =
-								availableStatuses.find(
-									(s) => s.name === statusStr && s.templateId,
-								);
-							scopedIdentifier = firstTemplateWithStatus
-								? `${firstTemplateWithStatus.templateId}:${statusStr}`
-								: statusStr; // Fallback to unscoped if no template found
-						}
-
-						// Initialize status if not already present
-						if (
-							!statusDistribution.hasOwnProperty(scopedIdentifier)
-						) {
-							statusDistribution[scopedIdentifier] = 0;
-						}
-						statusDistribution[scopedIdentifier]++;
-					});
-				}
+				statuses.forEach((status) => {
+					const scopedIdentifier = status.templateId
+						? `${status.templateId}:${status.name}`
+						: status.name;
+					if (!statusDistribution.hasOwnProperty(scopedIdentifier)) {
+						statusDistribution[scopedIdentifier] = 0;
+					}
+					statusDistribution[scopedIdentifier]++;
+				});
 			});
 
 			if (hasAnyStatus) {
@@ -305,14 +282,14 @@ export class StatusDashboardView extends ItemView {
 		container.addClass("status-dashboard-view-container");
 
 		// Check if vault exceeds the size limit
-		const files = this.app.vault.getMarkdownFiles();
+		const files = this.app.vault.getFiles();
 		const vaultSizeLimit = settingsService.settings.vaultSizeLimit || 15000;
 
 		if (vaultSizeLimit > 0 && files.length > vaultSizeLimit) {
 			// Show disabled message
 			container.createEl("div", {
 				cls: "status-dashboard-disabled",
-				text: `Dashboard disabled: Vault has ${files.length} notes (limit: ${vaultSizeLimit}). You can adjust this limit in plugin settings.`,
+				text: `Dashboard disabled: Vault has ${files.length} files (limit: ${vaultSizeLimit}). You can adjust this limit in plugin settings.`,
 			});
 			return;
 		}
@@ -329,7 +306,7 @@ export class StatusDashboardView extends ItemView {
 		};
 
 		eventBus.subscribe(
-			"frontmatter-manually-changed",
+			"status-changed",
 			handleVaultChange,
 			"status-dashboard-vault-subscription",
 		);
@@ -366,7 +343,7 @@ export class StatusDashboardView extends ItemView {
 	async onClose() {
 		// Clean up event listeners
 		eventBus.unsubscribe(
-			"frontmatter-manually-changed",
+			"status-changed",
 			"status-dashboard-vault-subscription",
 		);
 		eventBus.unsubscribe(

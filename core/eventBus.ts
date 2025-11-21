@@ -4,7 +4,7 @@ class EventBus {
 	private events: { [K in EventName]: Map<string, EventBusEvents[K]> } = {
 		"active-file-change": new Map(),
 		"plugin-settings-changed": new Map(),
-		"frontmatter-manually-changed": new Map(),
+		"status-changed": new Map(),
 		"triggered-open-modal": new Map(),
 	};
 
@@ -32,8 +32,8 @@ class EventBus {
 		...args: Parameters<EventBusEvents["plugin-settings-changed"]>
 	): void;
 	publish(
-		event: "frontmatter-manually-changed",
-		...args: Parameters<EventBusEvents["frontmatter-manually-changed"]>
+		event: "status-changed",
+		...args: Parameters<EventBusEvents["status-changed"]>
 	): void;
 	publish(
 		event: "triggered-open-modal",

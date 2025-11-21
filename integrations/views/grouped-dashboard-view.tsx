@@ -1,7 +1,10 @@
 import { ItemView, WorkspaceLeaf, TFile } from "obsidian";
 import { Root, createRoot } from "react-dom/client";
 import { GroupedStatusView as GroupedStatusViewComponent } from "@/components/GroupedStatusView/GroupedStatusView";
-import { BaseNoteStatusService } from "@/core/noteStatusService";
+import {
+	BaseNoteStatusService,
+	NoteStatusService,
+} from "@/core/noteStatusService";
 import eventBus from "@/core/eventBus";
 import settingsService from "@/core/settingsService";
 import { NoteStatus } from "@/types/noteStatus";
@@ -62,7 +65,7 @@ export class GroupedDashboardView extends ItemView {
 	});
 
 	private getAllFiles = (): FileItem[] => {
-		const tFiles = BaseNoteStatusService.app.vault.getMarkdownFiles();
+		const tFiles = BaseNoteStatusService.app.vault.getFiles();
 		return tFiles.map(this.convertTFileToFileItem);
 	};
 
@@ -71,16 +74,6 @@ export class GroupedDashboardView extends ItemView {
 		const statusMetadataKeys = [settingsService.settings.tagPrefix];
 		const availableStatuses =
 			BaseNoteStatusService.getAllAvailableStatuses();
-		// Create maps for both scoped and legacy status lookup
-		const statusMap = new Map(
-			availableStatuses.map((s) => {
-				const key = s.templateId ? `${s.templateId}:${s.name}` : s.name;
-				return [key, s];
-			}),
-		);
-		const legacyStatusMap = new Map(
-			availableStatuses.map((s) => [s.name, s]),
-		);
 
 		statusMetadataKeys.forEach((key) => {
 			result[key] = {};
@@ -93,41 +86,27 @@ export class GroupedDashboardView extends ItemView {
 		});
 
 		files.forEach((file) => {
-			// Find the TFile to get metadata
 			const tFile = BaseNoteStatusService.app.vault.getAbstractFileByPath(
 				file.path,
 			) as TFile;
 			if (!tFile) return;
 
-			const cachedMetadata =
-				BaseNoteStatusService.app.metadataCache.getFileCache(tFile);
-			const frontmatter = cachedMetadata?.frontmatter;
-
-			if (!frontmatter) return;
+			const noteStatusService = new NoteStatusService(tFile);
+			noteStatusService.populateStatuses();
 
 			statusMetadataKeys.forEach((key) => {
-				const value = frontmatter[key];
-				if (value) {
-					const statusNames = Array.isArray(value) ? value : [value];
-					statusNames.forEach((statusName) => {
-						const statusStr = statusName.toString();
-						// Try to find status by exact match first, then by legacy name
-						let resolvedStatus = statusMap.get(statusStr);
-						if (!resolvedStatus) {
-							resolvedStatus = legacyStatusMap.get(statusStr);
-						}
+				const statusesForKey = noteStatusService.statuses[key] || [];
+				if (!statusesForKey.length) return;
 
-						if (resolvedStatus) {
-							const statusKey = resolvedStatus.templateId
-								? `${resolvedStatus.templateId}:${resolvedStatus.name}`
-								: resolvedStatus.name;
-							if (!result[key][statusKey]) {
-								result[key][statusKey] = [];
-							}
-							result[key][statusKey].push(file);
-						}
-					});
-				}
+				statusesForKey.forEach((status) => {
+					const statusKey = status.templateId
+						? `${status.templateId}:${status.name}`
+						: status.name;
+					if (!result[key][statusKey]) {
+						result[key][statusKey] = [];
+					}
+					result[key][statusKey].push(file);
+				});
 			});
 		});
 
@@ -155,7 +134,7 @@ export class GroupedDashboardView extends ItemView {
 
 	private subscribeToEvents = (onDataChange: () => void) => {
 		eventBus.subscribe(
-			"frontmatter-manually-changed",
+			"status-changed",
 			onDataChange,
 			"grouped-dashboard-view-subscription",
 		);
@@ -182,7 +161,7 @@ export class GroupedDashboardView extends ItemView {
 
 		return () => {
 			eventBus.unsubscribe(
-				"frontmatter-manually-changed",
+				"status-changed",
 				"grouped-dashboard-view-subscription",
 			);
 			eventBus.unsubscribe(

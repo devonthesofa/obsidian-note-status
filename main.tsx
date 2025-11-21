@@ -1,4 +1,4 @@
-import { Plugin, WorkspaceLeaf } from "obsidian";
+import { Plugin, WorkspaceLeaf, TFile } from "obsidian";
 import StatusBarIntegration from "integrations/status-bar/status-bar";
 import eventBus from "core/eventBus";
 import { PluginSettingIntegration } from "./integrations/settings/pluginSettings";
@@ -18,6 +18,7 @@ import {
 	VIEW_TYPE_STATUS_DASHBOARD,
 } from "./integrations/views/status-dashboard-view";
 import { StatusesInfoPopup } from "./integrations/popups/statusesInfoPopupIntegration";
+import statusStoreManager from "./core/statusStoreManager";
 
 export default class NoteStatusPlugin extends Plugin {
 	private statusBarIntegration: StatusBarIntegration;
@@ -29,6 +30,7 @@ export default class NoteStatusPlugin extends Plugin {
 
 	async onload() {
 		BaseNoteStatusService.initialize(this.app);
+		await statusStoreManager.initialize(this);
 		await this.loadPluginSettings();
 
 		// INFO: initialize all integrations
@@ -158,7 +160,7 @@ export default class NoteStatusPlugin extends Plugin {
 		// Propagate to custom event bus the manually frontmatter data
 		this.registerEvent(
 			this.app.metadataCache.on("changed", (file) => {
-				eventBus.publish("frontmatter-manually-changed", { file });
+				eventBus.publish("status-changed", { file });
 			}),
 		);
 
@@ -179,6 +181,22 @@ export default class NoteStatusPlugin extends Plugin {
 				}
 			},
 			"main-status-popup-setting-subscriptor",
+		);
+
+		this.registerEvent(
+			this.app.vault.on("rename", (file) => {
+				if (file instanceof TFile) {
+					eventBus.publish("status-changed", { file });
+				}
+			}),
+		);
+
+		this.registerEvent(
+			this.app.vault.on("delete", (file) => {
+				if (file instanceof TFile) {
+					eventBus.publish("status-changed", { file });
+				}
+			}),
 		);
 	}
 
