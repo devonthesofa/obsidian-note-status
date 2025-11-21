@@ -306,12 +306,18 @@
 	width: 100%;
 }
 
+.lucide-icon-picker__count {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+}
+
 .lucide-icon-picker__options {
-	display: flex;
-	flex-direction: column;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
 	gap: var(--size-2-1);
-	max-height: 220px;
+	max-height: 280px;
 	overflow-y: auto;
+	padding-right: var(--size-2-1);
 }
 
 .lucide-icon-picker__option {
@@ -323,6 +329,7 @@
 	border: 1px solid transparent;
 	cursor: pointer;
 	font-size: var(--font-ui-smaller);
+	background: var(--background-secondary);
 }
 
 .lucide-icon-picker__option:hover {

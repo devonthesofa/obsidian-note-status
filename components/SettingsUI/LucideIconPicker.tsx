@@ -19,7 +19,7 @@ export interface LucideIconPickerProps {
 	maxResults?: number;
 }
 
-const DEFAULT_MAX_RESULTS = 80;
+const DEFAULT_MAX_RESULTS = Infinity;
 
 export const LucideIconPicker: React.FC<LucideIconPickerProps> = ({
 	value = "",
@@ -53,7 +53,10 @@ export const LucideIconPicker: React.FC<LucideIconPickerProps> = ({
 		const matches = normalized.length
 			? iconIds.filter((name) => name.toLowerCase().includes(normalized))
 			: iconIds;
-		return matches.slice(0, maxResults);
+		if (Number.isFinite(maxResults)) {
+			return matches.slice(0, maxResults);
+		}
+		return matches;
 	}, [iconIds, maxResults, query]);
 
 	const closePicker = useCallback(() => {
@@ -164,6 +167,10 @@ export const LucideIconPicker: React.FC<LucideIconPickerProps> = ({
 								placeholder="Search Lucide icons…"
 								className="lucide-icon-picker__search"
 							/>
+							<div className="lucide-icon-picker__count">
+								Showing {filteredIcons.length} of{" "}
+								{iconIds.length} icons
+							</div>
 							<div className="lucide-icon-picker__options">
 								{filteredIcons.map((iconName) => (
 									<button
