@@ -52,4 +52,5 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	editorToolbarButtonDisplay: "all-notes", // Default to show button in all notes
 	applyStatusRecursivelyToSubfolders: false,
 	statusFrontmatterMappings: [],
+	writeMappedTagsToDefault: false,
 };

@@ -104,6 +104,19 @@ export const BehaviourSettings: React.FC<Props> = ({ settings, onChange }) => {
 			</SettingItem>
 
 			<SettingItem
+				name="Write mapped tags to default status tag"
+				description="When enabled, statuses mapped to custom frontmatter keys are also written to the default status tag."
+			>
+				<input
+					type="checkbox"
+					checked={settings.writeMappedTagsToDefault || false}
+					onChange={(e) =>
+						onChange("writeMappedTagsToDefault", e.target.checked)
+					}
+				/>
+			</SettingItem>
+
+			<SettingItem
 				name="Vault size limit"
 				description="Disable dashboard and grouped view for vaults with more notes than this limit to improve performance. Set to 0 to disable this feature."
 			>

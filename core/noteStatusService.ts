@@ -106,6 +106,44 @@ export abstract class BaseNoteStatusService {
 		return BaseNoteStatusService.resolveStatusFromIdentifier(statusName);
 	}
 
+	protected toScopedStatusName(
+		status: StatusIdentifier | NoteStatus,
+	): ScopedStatusName {
+		if (typeof status === "string") {
+			return BaseNoteStatusService.parseStatusIdentifier(status);
+		}
+		return {
+			name: status.name,
+			templateId: status.templateId,
+		};
+	}
+
+	protected hasExplicitMappingForStatus(
+		status: StatusIdentifier | NoteStatus,
+	): boolean {
+		const mappings =
+			settingsService.settings.statusFrontmatterMappings ?? [];
+		if (!mappings.length) {
+			return false;
+		}
+		const scoped = this.toScopedStatusName(status);
+		return mappings.some((mapping) => {
+			if (mapping.scope === "status") {
+				return (
+					mapping.statusName === scoped.name &&
+					(mapping.templateId || null) === (scoped.templateId || null)
+				);
+			}
+			if (mapping.scope === "template") {
+				return (
+					Boolean(scoped.templateId) &&
+					mapping.templateId === scoped.templateId
+				);
+			}
+			return false;
+		});
+	}
+
 	protected getStatusMetadataKeys(): string[] {
 		return [settingsService.settings.tagPrefix];
 	}
@@ -196,14 +234,24 @@ export class NoteStatusService extends BaseNoteStatusService {
 			settingsService.settings,
 			{ isMarkdownFile: true },
 		);
-
 		const defaultKey = settingsService.settings.tagPrefix;
+		const mappingMatched = this.hasExplicitMappingForStatus(status);
+
 		if (
 			resolved.length === 1 &&
 			resolved[0] === defaultKey &&
 			frontmatterTagName !== defaultKey
 		) {
 			resolved = [frontmatterTagName];
+		}
+
+		if (
+			mappingMatched &&
+			settingsService.settings.writeMappedTagsToDefault &&
+			defaultKey &&
+			this.isMarkdownFile()
+		) {
+			resolved = [...resolved, defaultKey];
 		}
 
 		if (options?.includeSourceKey && frontmatterTagName) {

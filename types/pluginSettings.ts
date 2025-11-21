@@ -67,5 +67,6 @@ export type PluginSettings = {
 	editorToolbarButtonDisplay: "all-notes" | "active-only"; // Whether to show button in all notes or only active one
 	applyStatusRecursivelyToSubfolders: boolean; // Whether to show recursive folder context option
 	statusFrontmatterMappings: StatusFrontmatterMapping[]; // Custom mappings between templates/statuses and frontmatter keys
+	writeMappedTagsToDefault: boolean; // Whether mapped tags should also write to the default tag
 	[key: string]: unknown;
 };
