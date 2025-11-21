@@ -42,16 +42,53 @@ const LucideIconModalContent: FC<LucideIconModalProps> = ({
 		}
 	}, []);
 
+	const computeFuzzyScore = useCallback(
+		(needle: string, haystack: string): number | null => {
+			let lastIndex = -1;
+			let score = 0;
+
+			for (let i = 0; i < needle.length; i += 1) {
+				const char = needle[i];
+				const idx = haystack.indexOf(char, lastIndex + 1);
+				if (idx === -1) {
+					return null;
+				}
+				score += idx - lastIndex;
+				lastIndex = idx;
+			}
+
+			return score + (haystack.length - lastIndex);
+		},
+		[],
+	);
+
 	const filteredIcons = useMemo(() => {
 		if (!iconIds.length) {
 			return [];
 		}
 		const normalized = query.trim().toLowerCase();
-		const matches = normalized.length
-			? iconIds.filter((name) => name.toLowerCase().includes(normalized))
-			: iconIds;
-		return matches;
-	}, [iconIds, query]);
+		if (!normalized.length) {
+			return iconIds;
+		}
+
+		const matches = iconIds
+			.map((name) => {
+				const target = name.toLowerCase();
+				const score = computeFuzzyScore(normalized, target);
+				return score === null ? null : { name, score };
+			})
+			.filter(
+				(
+					entry,
+				): entry is {
+					name: string;
+					score: number;
+				} => entry !== null,
+			)
+			.sort((a, b) => a.score - b.score || a.name.localeCompare(b.name));
+
+		return matches.map((entry) => entry.name);
+	}, [iconIds, query, computeFuzzyScore]);
 
 	const visibleIcons = useMemo(
 		() => filteredIcons.slice(0, visibleCount),
