@@ -2,6 +2,11 @@ import { StatusIconPreview } from "@/components/atoms/StatusIconPreview";
 import { GroupedStatuses } from "@/types/noteStatus";
 import React, { FC, memo } from "react";
 import { StatusIcon } from "@/components/atoms/StatusIcon";
+import {
+	getPrimaryStatus,
+	getUnknownStatusColor,
+	resolveStatusColor,
+} from "@/utils/statusColor";
 
 type Props = {
 	statuses: GroupedStatuses;
@@ -35,15 +40,12 @@ export const FileExplorerIcon: FC<Props> = memo(
 
 		const useStatusColors = iconColorMode === "status";
 
-		const getStatusColor = (color?: string) =>
-			(color && color.trim()) || "var(--text-accent)";
-
 		if (totalStatuses === 0) {
 			if (hideUnknownStatus) return null;
 
 			const icon = unknownStatusConfig?.icon || "❓";
 			const color = useStatusColors
-				? unknownStatusConfig?.color?.trim() || "#8b949e"
+				? unknownStatusConfig?.color?.trim() || getUnknownStatusColor()
 				: undefined;
 
 			return (
@@ -64,10 +66,10 @@ export const FileExplorerIcon: FC<Props> = memo(
 			);
 		}
 
-		const primaryStatus = statusEntries[0]?.[1]?.[0];
+		const primaryStatus = getPrimaryStatus(statuses);
 		if (!primaryStatus) return null;
 		const iconColor = useStatusColors
-			? getStatusColor(primaryStatus.color)
+			? resolveStatusColor(primaryStatus)
 			: undefined;
 
 		return (

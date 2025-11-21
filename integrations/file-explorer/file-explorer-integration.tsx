@@ -6,7 +6,12 @@ import {
 } from "@/core/lazyElementObserver";
 import { NoteStatusService } from "@/core/noteStatusService";
 import settingsService from "@/core/settingsService";
-import { GroupedStatuses, NoteStatus } from "@/types/noteStatus";
+import { GroupedStatuses } from "@/types/noteStatus";
+import {
+	getPrimaryStatus,
+	getUnknownStatusColor,
+	resolveStatusColor,
+} from "@/utils/statusColor";
 import { Plugin, TFile, View } from "obsidian";
 import { createRoot } from "react-dom/client";
 import { StatusesInfoPopup } from "../popups/statusesInfoPopupIntegration";
@@ -119,11 +124,10 @@ export class FileExplorerIntegration implements IElementProcessor {
 	}
 
 	private getUnknownStatusConfig() {
-		const settings = settingsService.settings;
 		return {
-			icon: settings.unknownStatusIcon || "❓",
-			lucideIcon: settings.unknownStatusLucideIcon || "",
-			color: settings.unknownStatusColor || "#8b949e",
+			icon: settingsService.settings.unknownStatusIcon || "❓",
+			lucideIcon: settingsService.settings.unknownStatusLucideIcon || "",
+			color: getUnknownStatusColor(),
 		};
 	}
 
@@ -293,13 +297,16 @@ export class FileExplorerIntegration implements IElementProcessor {
 			return;
 		}
 
-		const primaryStatus = this.getPrimaryStatus(statuses);
+		const primaryStatus = getPrimaryStatus(statuses);
 		if (!primaryStatus) {
 			this.clearFileNameColor(element);
 			return;
 		}
 
-		const color = primaryStatus.color?.trim() || this.getFallbackColor();
+		const color = resolveStatusColor(
+			primaryStatus,
+			getUnknownStatusColor(),
+		);
 		if (!color) {
 			this.clearFileNameColor(element);
 			return;
@@ -312,27 +319,6 @@ export class FileExplorerIntegration implements IElementProcessor {
 
 		element.dataset[this.FILE_NAME_COLORIZED_ATTR] = "true";
 		element.style.color = color;
-	}
-
-	private getPrimaryStatus(
-		statuses?: GroupedStatuses | null,
-	): NoteStatus | null {
-		if (!statuses) {
-			return null;
-		}
-		for (const list of Object.values(statuses)) {
-			if (list.length) {
-				return list[0];
-			}
-		}
-		return null;
-	}
-
-	private getFallbackColor(): string {
-		return (
-			settingsService.settings.unknownStatusColor?.trim() ||
-			"var(--text-accent)"
-		);
 	}
 
 	private clearFileNameColor(element: HTMLElement): void {
