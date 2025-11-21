@@ -29,6 +29,11 @@ export class FileExplorerIntegration implements IElementProcessor {
 	private readonly FILE_NAME_ORIGINAL_COLOR_ATTR = "noteStatusOriginalColor";
 	private readonly FILE_BLOCK_CLASS = "note-status-colored-block";
 	private readonly FILE_BLOCK_COLOR_VAR = "--note-status-block-color";
+	private readonly FILE_BORDER_CLASS = "note-status-border-left";
+	private readonly FILE_BORDER_COLOR_VAR = "--note-status-border-color";
+	private readonly FILE_UNDERLINE_CLASS = "note-status-underline";
+	private readonly FILE_UNDERLINE_COLOR_VAR = "--note-status-underline-color";
+	private readonly STATUS_DOT_CLASS = "note-status-dot-badge";
 
 	constructor(plugin: Plugin) {
 		this.plugin = plugin;
@@ -69,6 +74,9 @@ export class FileExplorerIntegration implements IElementProcessor {
 					key === "fileExplorerIconColorMode" ||
 					key === "fileExplorerColorFileName" ||
 					key === "fileExplorerColorBlock" ||
+					key === "fileExplorerLeftBorder" ||
+					key === "fileExplorerStatusDot" ||
+					key === "fileExplorerUnderlineFileName" ||
 					key === "unknownStatusIcon" ||
 					key === "unknownStatusLucideIcon" ||
 					key === "unknownStatusColor" ||
@@ -112,21 +120,24 @@ export class FileExplorerIntegration implements IElementProcessor {
 			}
 
 			const noteStatusService = this.getFileNoteStatusService(dataPath);
+			const statuses = noteStatusService?.statuses ?? null;
+			const primaryStatus = getPrimaryStatus(statuses);
+			const hasStatus = Boolean(primaryStatus);
+			const fallbackColor = getUnknownStatusColor();
+			const statusColor = primaryStatus
+				? resolveStatusColor(primaryStatus, fallbackColor)
+				: undefined;
+			const textElement = textEl as HTMLElement;
+			const navItem = this.getNavItemElement(textElement);
 
-			// Only render icons for markdown files
+			this.applyFileNameColor(textElement, statusColor, hasStatus);
+			this.applyFileNameUnderline(textElement, statusColor, hasStatus);
+			this.applyStatusDot(textElement, statusColor, hasStatus);
+			this.applyFileBlockColor(navItem, statusColor, hasStatus);
+			this.applyLeftBorder(navItem, statusColor, hasStatus);
+
 			if (noteStatusService) {
-				this.applyFileNameColor(
-					textEl as HTMLElement,
-					noteStatusService.statuses,
-				);
-				this.applyFileBlockColor(
-					textEl as HTMLElement,
-					noteStatusService.statuses,
-				);
 				this.render(textEl, noteStatusService.statuses);
-			} else {
-				this.applyFileNameColor(textEl as HTMLElement, null);
-				this.applyFileBlockColor(textEl as HTMLElement, null);
 			}
 		}
 	}
@@ -294,28 +305,18 @@ export class FileExplorerIntegration implements IElementProcessor {
 
 	private applyFileNameColor(
 		element?: HTMLElement | null,
-		statuses?: GroupedStatuses | null,
+		color?: string,
+		hasStatus?: boolean,
 	): void {
 		if (!element) {
 			return;
 		}
 
-		if (!settingsService.settings.fileExplorerColorFileName) {
-			this.clearFileNameColor(element);
-			return;
-		}
-
-		const primaryStatus = getPrimaryStatus(statuses);
-		if (!primaryStatus) {
-			this.clearFileNameColor(element);
-			return;
-		}
-
-		const color = resolveStatusColor(
-			primaryStatus,
-			getUnknownStatusColor(),
-		);
-		if (!color) {
+		if (
+			!settingsService.settings.fileExplorerColorFileName ||
+			!hasStatus ||
+			!color
+		) {
 			this.clearFileNameColor(element);
 			return;
 		}
@@ -330,36 +331,106 @@ export class FileExplorerIntegration implements IElementProcessor {
 	}
 
 	private applyFileBlockColor(
-		element?: HTMLElement | null,
-		statuses?: GroupedStatuses | null,
+		navItem?: HTMLElement | null,
+		color?: string,
+		hasStatus?: boolean,
 	): void {
-		const navItem = this.getNavItemElement(element);
 		if (!navItem) {
 			return;
 		}
 
-		if (!settingsService.settings.fileExplorerColorBlock) {
-			this.clearFileBlockColor(navItem);
-			return;
-		}
-
-		const primaryStatus = getPrimaryStatus(statuses);
-		if (!primaryStatus) {
-			this.clearFileBlockColor(navItem);
-			return;
-		}
-
-		const color = resolveStatusColor(
-			primaryStatus,
-			getUnknownStatusColor(),
-		);
-		if (!color) {
+		if (
+			!settingsService.settings.fileExplorerColorBlock ||
+			!hasStatus ||
+			!color
+		) {
 			this.clearFileBlockColor(navItem);
 			return;
 		}
 
 		navItem.classList.add(this.FILE_BLOCK_CLASS);
 		navItem.style.setProperty(this.FILE_BLOCK_COLOR_VAR, color);
+	}
+
+	private applyLeftBorder(
+		navItem?: HTMLElement | null,
+		color?: string,
+		hasStatus?: boolean,
+	): void {
+		if (!navItem) {
+			return;
+		}
+
+		if (
+			!settingsService.settings.fileExplorerLeftBorder ||
+			!hasStatus ||
+			!color
+		) {
+			this.clearFileLeftBorder(navItem);
+			return;
+		}
+
+		navItem.classList.add(this.FILE_BORDER_CLASS);
+		navItem.style.setProperty(this.FILE_BORDER_COLOR_VAR, color);
+	}
+
+	private applyFileNameUnderline(
+		element?: HTMLElement | null,
+		color?: string,
+		hasStatus?: boolean,
+	): void {
+		if (!element) {
+			return;
+		}
+
+		if (
+			!settingsService.settings.fileExplorerUnderlineFileName ||
+			!hasStatus ||
+			!color
+		) {
+			this.clearFileNameUnderline(element);
+			return;
+		}
+
+		element.classList.add(this.FILE_UNDERLINE_CLASS);
+		element.style.setProperty(this.FILE_UNDERLINE_COLOR_VAR, color);
+	}
+
+	private applyStatusDot(
+		element?: HTMLElement | null,
+		color?: string,
+		hasStatus?: boolean,
+	): void {
+		if (!element) {
+			return;
+		}
+
+		const existingDot = element.querySelector(
+			`.${this.STATUS_DOT_CLASS}`,
+		) as HTMLElement | null;
+		if (
+			!settingsService.settings.fileExplorerStatusDot ||
+			!hasStatus ||
+			!color
+		) {
+			if (existingDot) {
+				existingDot.remove();
+			}
+			return;
+		}
+
+		const dot =
+			existingDot ||
+			createSpan({
+				cls: this.STATUS_DOT_CLASS,
+			});
+
+		dot.setAttribute("aria-hidden", "true");
+		dot.style.backgroundColor = color;
+
+		if (!existingDot) {
+			element.appendChild(dot);
+		}
 	}
 
 	private getNavItemElement(
@@ -388,8 +459,24 @@ export class FileExplorerIntegration implements IElementProcessor {
 		delete element.dataset[this.FILE_NAME_COLORIZED_ATTR];
 	}
 
-	private clearFileBlockColor(navItem: HTMLElement): void {
+	private clearFileBlockColor(navItem?: HTMLElement | null): void {
+		if (!navItem) {
+			return;
+		}
 		navItem.classList.remove(this.FILE_BLOCK_CLASS);
 		navItem.style.removeProperty(this.FILE_BLOCK_COLOR_VAR);
+	}
+
+	private clearFileLeftBorder(navItem?: HTMLElement | null): void {
+		if (!navItem) {
+			return;
+		}
+		navItem.classList.remove(this.FILE_BORDER_CLASS);
+		navItem.style.removeProperty(this.FILE_BORDER_COLOR_VAR);
+	}
+
+	private clearFileNameUnderline(element: HTMLElement): void {
+		element.classList.remove(this.FILE_UNDERLINE_CLASS);
+		element.style.removeProperty(this.FILE_UNDERLINE_COLOR_VAR);
 	}
 }

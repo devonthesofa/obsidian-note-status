@@ -247,6 +247,41 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				/>
 			</SettingItem>
 
+			<h4>Additional status visualization in file explorer</h4>
+
+			<SettingItem
+				name="Show colored left border"
+				description="Render a subtle colored strip on the left edge of the file explorer item."
+			>
+				<input
+					type="checkbox"
+					checked={settings.fileExplorerLeftBorder || false}
+					onChange={handleChange("fileExplorerLeftBorder")}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Show colored status dot"
+				description="Append a compact colored dot next to the filename as an extra status indicator."
+			>
+				<input
+					type="checkbox"
+					checked={settings.fileExplorerStatusDot || false}
+					onChange={handleChange("fileExplorerStatusDot")}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Underline filename with status color"
+				description="Adds a colored underline below the filename without changing the text color."
+			>
+				<input
+					type="checkbox"
+					checked={settings.fileExplorerUnderlineFileName || false}
+					onChange={handleChange("fileExplorerUnderlineFileName")}
+				/>
+			</SettingItem>
+
 			<SettingItem
 				name="Status icon frame"
 				description="Choose whether to display a frame around the status icon inside the file explorer."
