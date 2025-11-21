@@ -2,6 +2,7 @@ import { NoteStatus } from "@/types/noteStatus";
 import { FC, memo, useState } from "react";
 import { getStatusTooltip } from "@/utils/statusUtils";
 import { ObsidianIcon } from "./ObsidianIcon";
+import { StatusIcon } from "./StatusIcon";
 
 export type StatusDisplayVariant = "chip" | "badge" | "template";
 
@@ -82,9 +83,12 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 					}}
 					onClick={handleClick}
 				>
-					<span className="note-status-chip-icon">
-						{status.icon ? status.icon : "📝"}
-					</span>
+					<StatusIcon
+						icon={status.icon}
+						lucideIcon={status.lucideIcon}
+						className="note-status-chip-icon"
+						size={16}
+					/>
 					<span className="note-status-chip-text">
 						{getDisplayName()}
 					</span>
@@ -121,9 +125,12 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 					onClick={handleClick}
 				>
 					<div className="status-badge-item">
-						<span className="status-badge-icon">
-							{status.icon ? status.icon : "📝"}
-						</span>
+						<StatusIcon
+							icon={status.icon}
+							lucideIcon={status.lucideIcon}
+							className="status-badge-icon"
+							size={14}
+						/>
 						<span className="status-badge-text">
 							{getDisplayName()}
 						</span>
@@ -144,7 +151,13 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 						}
 					/>
 					<span>
-						{status.icon ? status.icon : "📝"} {getDisplayName()}
+						<StatusIcon
+							icon={status.icon}
+							lucideIcon={status.lucideIcon}
+							size={14}
+							style={{ marginRight: "4px" }}
+						/>
+						{getDisplayName()}
 					</span>
 				</div>
 			);

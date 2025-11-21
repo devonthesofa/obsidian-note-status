@@ -53,6 +53,9 @@
 .status-minimal__icon {
 	font-size: 11px;
 	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	filter: grayscale(0.2);
 	transition: filter var(--anim-duration-fast) ease;
 }

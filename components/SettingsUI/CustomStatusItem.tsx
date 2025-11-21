@@ -1,13 +1,15 @@
 import { NoteStatus } from "@/types/noteStatus";
 import React from "react";
 import { Input } from "@/components/atoms/Input";
+import { StatusIcon } from "@/components/atoms/StatusIcon";
+import { LucideIconPicker } from "./LucideIconPicker";
 
 export type Props = {
 	status: NoteStatus;
 	index: number;
 	onCustomStatusChange: (
 		index: number,
-		column: "name" | "icon" | "color" | "description",
+		column: "name" | "icon" | "color" | "description" | "lucideIcon",
 		value: string,
 	) => void;
 	onCustomStatusRemove: (index: number) => void;
@@ -28,26 +30,47 @@ export const CustomStatusItem: React.FC<Props> = ({
 	canMoveDown = false,
 }) => {
 	const isValid = status.name.trim().length > 0;
-	const displayIcon = status.icon.trim() || "📝";
-
 	return (
 		<div className="custom-status-item">
-			{/* Simple horizontal layout with all inputs in a row */}
-			<div className="custom-status-item__row">
-				{/* Icon field - simple text input */}
-				<div className="custom-status-item__field">
-					<label className="custom-status-item__label">Icon</label>
+			<div className="custom-status-item__row custom-status-item__row--icons">
+				<div className="custom-status-item__field custom-status-item__field--icon">
+					<label className="custom-status-item__label">
+						Emoji icon
+					</label>
 					<Input
 						variant="text"
 						value={status.icon}
 						onChange={(value) =>
 							onCustomStatusChange(index, "icon", value || "")
 						}
-						placeholder="📝"
+						placeholder="Example: ✅ or 🚧"
 						className="custom-status-item__input custom-status-item__input--icon"
 					/>
+					<p className="custom-status-item__hint">
+						This fallback icon is shown anywhere Lucide is not
+						available.
+					</p>
 				</div>
 
+				<div className="custom-status-item__field custom-status-item__field--lucide">
+					<label className="custom-status-item__label">
+						Lucide icon (optional)
+					</label>
+					<LucideIconPicker
+						value={status.lucideIcon || ""}
+						onChange={(value) =>
+							onCustomStatusChange(index, "lucideIcon", value)
+						}
+					/>
+					<p className="custom-status-item__hint">
+						Matches Obsidian&apos;s toolbar icons so your status
+						button blends in.
+					</p>
+				</div>
+			</div>
+
+			{/* Simple horizontal layout with remaining inputs */}
+			<div className="custom-status-item__row">
 				{/* Name field */}
 				<div className="custom-status-item__field custom-status-item__field--name">
 					<label className="custom-status-item__label">
@@ -139,12 +162,13 @@ export const CustomStatusItem: React.FC<Props> = ({
 
 			{/* Preview row - shows how the status will look */}
 			<div className="custom-status-item__preview">
-				<span
+				<StatusIcon
+					icon={status.icon}
+					lucideIcon={status.lucideIcon}
 					className="custom-status-item__preview-icon"
+					size={18}
 					style={{ color: status.color }}
-				>
-					{displayIcon}
-				</span>
+				/>
 				<span
 					className="custom-status-item__preview-text"
 					style={{ color: status.color }}

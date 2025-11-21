@@ -1,10 +1,12 @@
 import React, { CSSProperties, FC, memo } from "react";
+import { StatusIcon } from "./StatusIcon";
 
 type IconFrameMode = "always" | "never";
 type IconColorMode = "status" | "theme";
 
 export interface StatusIconPreviewProps {
 	icon?: string;
+	lucideIcon?: string;
 	color?: string;
 	count?: number;
 	iconFrameMode?: IconFrameMode;
@@ -14,6 +16,7 @@ export interface StatusIconPreviewProps {
 	iconClassName?: string;
 	wrapperClassName?: string;
 	style?: CSSProperties;
+	iconSize?: number;
 	onMouseEnter?: (event: React.MouseEvent<HTMLDivElement>) => void;
 	onMouseLeave?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
@@ -21,6 +24,7 @@ export interface StatusIconPreviewProps {
 export const StatusIconPreview: FC<StatusIconPreviewProps> = memo(
 	({
 		icon,
+		lucideIcon,
 		color,
 		count,
 		iconFrameMode = "never",
@@ -30,10 +34,10 @@ export const StatusIconPreview: FC<StatusIconPreviewProps> = memo(
 		iconClassName = "",
 		wrapperClassName = "",
 		style,
+		iconSize,
 		onMouseEnter,
 		onMouseLeave,
 	}) => {
-		const iconDisplay = icon?.trim().length ? icon : "📝";
 		const useStatusColor = iconColorMode === "status";
 		const appliedColor = useStatusColor && color ? color.trim() : undefined;
 
@@ -58,7 +62,12 @@ export const StatusIconPreview: FC<StatusIconPreviewProps> = memo(
 				onMouseEnter={onMouseEnter}
 				onMouseLeave={onMouseLeave}
 			>
-				<span className="status-minimal__icon">{iconDisplay}</span>
+				<StatusIcon
+					icon={icon}
+					lucideIcon={lucideIcon}
+					size={iconSize ?? (compact ? 13 : 16)}
+					className="status-minimal__icon"
+				/>
 				{count && count > 1 && (
 					<span
 						className="status-minimal__count"

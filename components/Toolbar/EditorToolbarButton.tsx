@@ -1,6 +1,7 @@
 import React, { FC, memo } from "react";
 import { GroupedStatuses } from "@/types/noteStatus";
 import { StatusesInfoPopup } from "@/integrations/popups/statusesInfoPopupIntegration";
+import { StatusIcon } from "@/components/atoms/StatusIcon";
 
 interface EditorToolbarButtonProps {
 	statuses: GroupedStatuses;
@@ -40,12 +41,12 @@ export const EditorToolbarButton: FC<EditorToolbarButtonProps> = memo(
 					onMouseLeave={handleMouseLeave}
 					aria-label="Add status to note"
 				>
-					<span
+					<StatusIcon
+						icon={unknownStatusConfig.icon}
+						size={16}
 						className="editor-toolbar-button__icon"
 						style={{ color: unknownStatusConfig.color }}
-					>
-						{unknownStatusConfig.icon}
-					</span>
+					/>
 				</button>
 			);
 		}
@@ -63,16 +64,17 @@ export const EditorToolbarButton: FC<EditorToolbarButtonProps> = memo(
 					onMouseLeave={handleMouseLeave}
 					aria-label={`Current status: ${primaryStatus.name}. Click to change.`}
 				>
-					<span
+					<StatusIcon
+						icon={primaryStatus.icon}
+						lucideIcon={primaryStatus.lucideIcon}
+						size={16}
 						className="editor-toolbar-button__icon editor-toolbar-button__icon--has-status"
 						style={{
 							color:
 								primaryStatus.color ||
 								"var(--interactive-accent)",
 						}}
-					>
-						{primaryStatus.icon || "📝"}
-					</span>
+					/>
 				</button>
 			);
 		}
@@ -88,16 +90,17 @@ export const EditorToolbarButton: FC<EditorToolbarButtonProps> = memo(
 				aria-label={`${totalStatuses} statuses assigned. Click to change.`}
 			>
 				<div className="editor-toolbar-button__icon-container">
-					<span
+					<StatusIcon
+						icon={primaryStatus.icon}
+						lucideIcon={primaryStatus.lucideIcon}
+						size={16}
 						className="editor-toolbar-button__icon editor-toolbar-button__icon--has-status"
 						style={{
 							color:
 								primaryStatus.color ||
 								"var(--interactive-accent)",
 						}}
-					>
-						{primaryStatus.icon || "📝"}
-					</span>
+					/>
 					<span className="editor-toolbar-button__counter">
 						{totalStatuses}
 					</span>

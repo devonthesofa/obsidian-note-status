@@ -1,5 +1,6 @@
 import React from "react";
 import { PluginSettings } from "@/types/pluginSettings";
+import { StatusIcon } from "@/components/atoms/StatusIcon";
 
 export type StatusGroupProps = {
 	statuses: PluginSettings["customStatuses"];
@@ -39,9 +40,12 @@ export const StatusGroup: React.FC<StatusGroupProps> = ({
 					>
 						<div className="status-selector__content">
 							<div className="status-selector__status">
-								<span className="status-selector__icon">
-									{status.icon}
-								</span>
+								<StatusIcon
+									icon={status.icon}
+									lucideIcon={status.lucideIcon}
+									className="status-selector__icon"
+									size={16}
+								/>
 								<span className="status-selector__name">
 									{status.name}
 								</span>

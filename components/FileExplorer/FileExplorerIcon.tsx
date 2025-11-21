@@ -65,6 +65,7 @@ export const FileExplorerIcon: FC<Props> = memo(
 		return (
 			<StatusIconPreview
 				icon={primaryStatus.icon}
+				lucideIcon={primaryStatus.lucideIcon}
 				color={iconColor}
 				count={totalStatuses}
 				iconFrameMode={iconFrameMode}

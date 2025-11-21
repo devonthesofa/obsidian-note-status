@@ -1,6 +1,7 @@
 export type NoteStatus = {
 	name: string;
 	icon: string;
+	lucideIcon?: string;
 	color?: string; // Optional color property
 	description?: string; // Optional description property
 	templateId?: string; // Optional template scope for namespacing

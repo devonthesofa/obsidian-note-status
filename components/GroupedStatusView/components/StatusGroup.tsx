@@ -54,7 +54,11 @@ export const StatusGroup = ({
 				<div className="grouped-status-group__status">
 					<StatusDisplay
 						status={
-							{ ...status, icon: status.icon || "" } as NoteStatus
+							{
+								...status,
+								icon: status.icon || "",
+								lucideIcon: status.lucideIcon,
+							} as NoteStatus
 						}
 						variant="badge"
 					/>

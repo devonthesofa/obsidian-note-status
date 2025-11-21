@@ -36,10 +36,21 @@
 	margin-bottom: var(--size-4-2);
 }
 
+.custom-status-item__row--icons {
+	align-items: stretch;
+	flex-wrap: wrap;
+}
+
 .custom-status-item__field {
 	display: flex;
 	flex-direction: column;
 	gap: var(--size-2-1);
+}
+
+.custom-status-item__field--icon,
+.custom-status-item__field--lucide {
+	flex: 1;
+	min-width: 240px;
 }
 
 .custom-status-item__field--name {
@@ -82,9 +93,15 @@
 }
 
 .custom-status-item__input--icon {
-	width: 50px !important;
-	text-align: center;
-	font-size: 1.2em;
+	width: 100% !important;
+	text-align: left;
+	font-size: 1em;
+}
+
+.custom-status-item__hint {
+	margin: 0;
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
 }
 
 .custom-status-item__input--name {
@@ -201,6 +218,97 @@
 	background: var(--background-modifier-error);
 	border-radius: var(--radius-s);
 	border-left: 3px solid var(--text-error);
+}
+
+.lucide-icon-picker {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-2-2);
+}
+
+.lucide-icon-picker__control {
+	display: flex;
+	gap: var(--size-2-1);
+	align-items: center;
+}
+
+.lucide-icon-picker__input {
+	flex: 1;
+}
+
+.lucide-icon-picker__clear {
+	background: var(--background-modifier-border);
+	border: none;
+	padding: 4px 8px;
+	border-radius: var(--radius-s);
+	cursor: pointer;
+	font-size: var(--font-ui-smaller);
+}
+
+.lucide-icon-picker__clear:hover {
+	background: var(--interactive-hover);
+	color: var(--text-normal);
+}
+
+.lucide-icon-picker__selected {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-1);
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+}
+
+.lucide-icon-picker__selected-preview {
+	width: 28px;
+	height: 28px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--background-secondary);
+	border-radius: var(--radius-s);
+}
+
+.lucide-icon-picker__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+	gap: var(--size-2-1);
+	max-height: 220px;
+	overflow-y: auto;
+	padding: var(--size-2-1);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	background: var(--background-primary-alt);
+}
+
+.lucide-icon-picker__option {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-1);
+	padding: var(--size-2-1) var(--size-2-2);
+	border-radius: var(--radius-s);
+	border: 1px solid transparent;
+	background: transparent;
+	cursor: pointer;
+	font-size: var(--font-ui-smaller);
+	transition:
+		border var(--anim-duration-fast) ease,
+		background var(--anim-duration-fast) ease;
+}
+
+.lucide-icon-picker__option:hover {
+	background: var(--background-modifier-hover);
+}
+
+.lucide-icon-picker__option--selected {
+	border-color: var(--interactive-accent);
+	background: var(--background-modifier-success);
+	color: var(--text-normal);
+}
+
+.lucide-icon-picker__empty {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+	padding: var(--size-2-1);
 }
 
 /* Custom Status List - BEM */

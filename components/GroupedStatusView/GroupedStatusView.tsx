@@ -18,6 +18,7 @@ export type StatusItem = {
 	name: string;
 	color: string;
 	icon?: string;
+	lucideIcon?: string;
 };
 
 export type FilesByStatus = {
@@ -69,6 +70,7 @@ const GroupedStatusViewContent = () => {
 				name: noteStatus.name,
 				color: noteStatus.color || "white",
 				icon: noteStatus.icon,
+				lucideIcon: noteStatus.lucideIcon,
 			};
 
 			const scopedIdentifier = noteStatus.templateId

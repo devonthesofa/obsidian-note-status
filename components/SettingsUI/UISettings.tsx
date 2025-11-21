@@ -268,7 +268,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 
 			<SettingItem
 				name="Icon for unknown status"
-				description="Icon displayed whenever a note does not have a status."
+				description="Emoji or Lucide icon name displayed whenever a note does not have a status."
 			>
 				<Input
 					variant="text"

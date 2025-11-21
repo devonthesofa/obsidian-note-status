@@ -34,6 +34,7 @@ export const StatusModalOption: React.FC<StatusOptionProps> = memo(
 					<div className="note-status-option__icon-wrapper">
 						<StatusIconPreview
 							icon={status.icon}
+							lucideIcon={status.lucideIcon}
 							color={status.color}
 							iconFrameMode={iconFrameMode}
 							iconColorMode={iconColorMode}
@@ -101,7 +102,7 @@ export const StatusSelector: React.FC<Props> = ({
 		>
 			{availableStatuses.map((status, index) => (
 				<StatusModalOption
-					key={`${status.templateId || "custom"}:${status.name}:${status.description}:${status.color}:${status.icon}`}
+					key={`${status.templateId || "custom"}:${status.name}:${status.description}:${status.color}:${status.icon}:${status.lucideIcon ?? ""}`}
 					status={status}
 					isSelected={isStatusSelected(status, currentStatuses)}
 					isFocused={index === focusedIndex}
