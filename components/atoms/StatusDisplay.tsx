@@ -1,5 +1,13 @@
 import { NoteStatus } from "@/types/noteStatus";
-import { FC, ReactNode, memo, useMemo, useState } from "react";
+import {
+	CSSProperties,
+	FC,
+	MouseEvent,
+	ReactNode,
+	memo,
+	useMemo,
+	useState,
+} from "react";
 import { getStatusTooltip } from "@/utils/statusUtils";
 import { ObsidianIcon } from "./ObsidianIcon";
 import { StatusIcon } from "./StatusIcon";
@@ -9,6 +17,8 @@ export type StatusDisplayVariant = "chip" | "badge" | "template";
 interface StatusDisplayProps {
 	status: NoteStatus;
 	variant: StatusDisplayVariant;
+	badgeStyle?: "accent" | "filled" | "dot";
+	badgeContentMode?: "icon-text" | "icon" | "text" | "none";
 	removable?: boolean;
 	hasNameConflicts?: boolean;
 	templateNameMode?: "always" | "never" | "auto";
@@ -22,6 +32,8 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 		status,
 		variant,
 		removable = false,
+		badgeStyle = "accent",
+		badgeContentMode = "icon-text",
 		hasNameConflicts = false,
 		templateNameMode = "auto",
 		icon,
@@ -49,7 +61,7 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 				: status.name;
 		};
 
-		const handleRemove = (e: React.MouseEvent) => {
+		const handleRemove = (e: MouseEvent) => {
 			e.stopPropagation();
 			if (onRemove) {
 				setIsRemoving(true);
@@ -79,66 +91,88 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 		const iconNode = icon ?? defaultIcon;
 
 		if (variant === "chip") {
+			const chipClassName = [
+				"note-status-chip",
+				isRemoving ? "note-status-chip--removing" : "",
+				onClick ? "note-status-chip--clickable" : "",
+			]
+				.filter(Boolean)
+				.join(" ");
+
 			return (
 				<div
-					className="note-status-chip"
+					className={chipClassName}
 					title={getStatusTooltip(status)}
-					style={{
-						display: "inline-flex",
-						alignItems: "center",
-						gap: "6px",
-						padding: "4px 8px",
-						background: "var(--interactive-accent)",
-						color: "var(--text-on-accent)",
-						borderRadius: "var(--radius-s)",
-						fontSize: "var(--font-ui-smaller)",
-						cursor: onClick ? "pointer" : "default",
-						transition: "all 150ms ease",
-						opacity: isRemoving ? "0.5" : "1",
-					}}
+					data-clickable={!!onClick}
 					onClick={handleClick}
 				>
-					<span className="note-status-chip-icon">{iconNode}</span>
-					<span className="note-status-chip-text">
+					<span className="note-status-chip__icon">{iconNode}</span>
+					<span className="note-status-chip__text">
 						{getDisplayName()}
 					</span>
 					{removable && (
-						<div
-							className="note-status-chip-remove"
+						<button
+							type="button"
+							className="note-status-chip__remove"
 							onClick={handleRemove}
-							style={{
-								display: "flex",
-								alignItems: "center",
-								justifyContent: "center",
-								width: "16px",
-								height: "16px",
-								borderRadius: "50%",
-								background: "rgba(255, 255, 255, 0.2)",
-								cursor: "pointer",
-							}}
+							aria-label={`Remove status ${status.name}`}
 						>
 							<ObsidianIcon name="trash" size={12} />
-						</div>
+						</button>
 					)}
 				</div>
 			);
 		}
 
 		if (variant === "badge") {
+			const badgeStyleVars = status.color
+				? ({
+						"--status-accent": status.color,
+					} as CSSProperties)
+				: undefined;
+			const badgeClassName = [
+				"status-badge-container",
+				`status-badge--${badgeStyle}`,
+				onClick ? "status-badge-container--clickable" : "",
+				badgeContentMode === "none" ? "status-badge--empty" : "",
+			]
+				.filter(Boolean)
+				.join(" ");
+			const showDot = badgeStyle === "dot";
+			const showIcon =
+				badgeContentMode === "icon-text" || badgeContentMode === "icon";
+			const showText =
+				badgeContentMode === "icon-text" || badgeContentMode === "text";
+			const isEmptyBadge = badgeContentMode === "none";
+
 			return (
 				<div
-					className="status-badge-container"
-					style={{
-						backgroundColor: `${status.color}15`,
-						border: `1px solid ${status.color}30`,
-					}}
+					className={badgeClassName}
+					style={badgeStyleVars}
 					onClick={handleClick}
+					data-clickable={!!onClick}
+					title={getStatusTooltip(status)}
 				>
+					{showDot && (
+						<span className="status-badge-dot" aria-hidden="true" />
+					)}
 					<div className="status-badge-item">
-						<span className="status-badge-icon">{iconNode}</span>
-						<span className="status-badge-text">
-							{getDisplayName()}
-						</span>
+						{showIcon && (
+							<span className="status-badge-icon">
+								{iconNode}
+							</span>
+						)}
+						{showText && (
+							<span className="status-badge-text">
+								{getDisplayName()}
+							</span>
+						)}
+						{isEmptyBadge && (
+							<span
+								className="status-badge-empty"
+								aria-hidden="true"
+							/>
+						)}
 					</div>
 				</div>
 			);
@@ -146,17 +180,23 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 
 		if (variant === "template") {
 			return (
-				<div className="template-status-chip" onClick={handleClick}>
+				<div
+					className="template-status-chip"
+					onClick={handleClick}
+					data-clickable={!!onClick}
+				>
 					<span
 						className="template-status-color-dot"
 						style={
 							{
 								"--dot-color": status.color,
-							} as React.CSSProperties
+							} as CSSProperties
 						}
 					/>
-					<span>
-						<span style={{ marginRight: "4px" }}>{iconNode}</span>
+					<span className="template-status-chip__label">
+						<span className="template-status-chip__icon">
+							{iconNode}
+						</span>
 						{getDisplayName()}
 					</span>
 				</div>

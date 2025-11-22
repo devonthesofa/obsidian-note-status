@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { CSSProperties, FC, useState } from "react";
 import { NoteStatus } from "@/types/noteStatus";
 import { StatusTemplate } from "@/types/pluginSettings";
 import { GroupLabel } from "../atoms/GroupLabel";
@@ -11,6 +11,8 @@ export interface StatusBarGroupProps {
 	template: StatusTemplate;
 	maxVisible?: number;
 	templateNameMode?: "always" | "never" | "auto";
+	badgeStyle?: "accent" | "filled" | "dot";
+	badgeContentMode?: "icon-text" | "icon" | "text" | "none";
 }
 
 export const StatusBarGroup: FC<StatusBarGroupProps> = ({
@@ -18,6 +20,8 @@ export const StatusBarGroup: FC<StatusBarGroupProps> = ({
 	template,
 	maxVisible = 3,
 	templateNameMode = "auto",
+	badgeStyle = "accent",
+	badgeContentMode = "icon-text",
 }) => {
 	const [isUncollapsed, setIsUncollapsed] = useState(false);
 	const visibleStatuses = isUncollapsed
@@ -36,19 +40,24 @@ export const StatusBarGroup: FC<StatusBarGroupProps> = ({
 			<GroupLabel name={template.name} isHighlighted={isUncollapsed} />
 			<div className="status-bar-group-container">
 				{visibleStatuses.map((status, i) => (
+					// Use a wrapper so we can animate statuses when expanding
 					<div
 						key={i}
-						style={{
-							animation:
-								isUncollapsed && i >= maxVisible
-									? `status-slide-in var(--anim-duration-fast) ease-out ${i * 0.05}s both`
-									: "none",
-						}}
+						className={`status-bar-status-item${isUncollapsed && i >= maxVisible ? " status-bar-status-item--animated" : ""}`}
+						style={
+							isUncollapsed && i >= maxVisible
+								? ({
+										"--status-anim-delay": `${i * 0.05}s`,
+									} as CSSProperties)
+								: undefined
+						}
 						title={status.description}
 					>
 						<StatusDisplay
 							status={status}
 							variant="badge"
+							badgeStyle={badgeStyle}
+							badgeContentMode={badgeContentMode}
 							templateNameMode={templateNameMode}
 							hasNameConflicts={getHasConflicts(status)}
 							onClick={() => {

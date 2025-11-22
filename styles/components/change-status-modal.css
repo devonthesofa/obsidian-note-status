@@ -1,0 +1,54 @@
+/* ==========================================================================
+   Change Status Modal
+   ========================================================================== */
+
+.status-selector-group {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-2);
+	outline: none;
+}
+
+.status-selector-group:focus-visible {
+	outline: 2px solid var(--background-modifier-border-hover);
+	outline-offset: 4px;
+}
+
+.note-status-template-tabs {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-2-1);
+	padding: var(--size-2-2);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	background: var(--background-secondary);
+	margin-bottom: var(--size-2-2);
+}
+
+.note-status-template-tab {
+	border: none;
+	background: transparent;
+	color: var(--text-muted);
+	padding: var(--size-2-2) var(--size-3-1);
+	border-radius: var(--radius-s);
+	cursor: pointer;
+	transition:
+		background var(--anim-duration-fast) ease,
+		color var(--anim-duration-fast) ease,
+		box-shadow var(--anim-duration-fast) ease;
+}
+
+.note-status-template-tab:not(.is-active):hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+
+.note-status-template-tab.is-active {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	box-shadow: 0 0 0 1px var(--background-modifier-border);
+}
+
+.note-status-template-tab:focus-visible {
+	outline: 2px solid var(--background-modifier-border);
+}

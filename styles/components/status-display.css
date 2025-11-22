@@ -12,13 +12,21 @@
 	color: var(--text-on-accent);
 	border-radius: var(--radius-s);
 	font-size: var(--font-ui-smaller);
-	cursor: pointer;
-	transition: all var(--anim-duration-fast) ease;
+	cursor: default;
+	transition:
+		transform var(--anim-duration-fast) ease,
+		opacity var(--anim-duration-fast) ease,
+		box-shadow var(--anim-duration-fast) ease;
 }
 
-.note-status-chip:hover {
-	opacity: 0.9;
+.note-status-chip--clickable {
+	cursor: pointer;
+}
+
+.note-status-chip--clickable:hover {
+	opacity: 0.92;
 	transform: translateY(-1px);
+	box-shadow: var(--shadow-s);
 }
 
 .note-status-chip--removing {
@@ -28,6 +36,7 @@
 
 .note-status-chip__icon {
 	font-size: 1em;
+	display: inline-flex;
 }
 
 .note-status-chip__text {
@@ -42,28 +51,121 @@
 	height: 16px;
 	border-radius: 50%;
 	background: rgba(255, 255, 255, 0.2);
-	cursor: pointer;
 	margin-left: var(--size-2-1);
+	cursor: pointer;
+	border: none;
+	color: inherit;
+	padding: 0;
+	font: inherit;
+	line-height: 1;
 }
 
 .note-status-chip__remove:hover {
 	background: rgba(255, 255, 255, 0.3);
 }
 
+.note-status-chip__remove:focus-visible {
+	outline: 2px solid var(--background-modifier-border);
+}
+
 /* Badge variant */
 .status-badge-container {
 	display: inline-flex;
 	align-items: center;
-	padding: var(--size-2-1) var(--size-2-3);
+	gap: var(--size-2-2);
+	padding: var(--size-2-1) var(--size-4-2);
 	border-radius: var(--radius-s);
-	transition: all var(--anim-duration-fast) ease;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--background-primary);
+	position: relative;
+	overflow: hidden;
+	isolation: isolate;
+}
+
+.status-badge-container::before {
+	content: "";
+	position: absolute;
+	inset: 0 auto 0 0;
+	width: 4px;
+	background: transparent;
+	opacity: 0.85;
+	display: none;
+}
+
+.status-badge-container--clickable {
 	cursor: pointer;
+	transition:
+		background var(--anim-duration-fast) ease,
+		box-shadow var(--anim-duration-fast) ease,
+		filter var(--anim-duration-fast) ease;
+}
+
+.status-badge-container--clickable:not(.status-badge--filled):hover {
+	background: var(--background-modifier-hover);
+	box-shadow: var(--shadow-s);
+}
+
+.status-badge--accent {
+	padding-left: calc(var(--size-4-1) + 4px);
+}
+
+.status-badge--accent::before {
+	display: block;
+	background: var(--status-accent, var(--interactive-accent));
+}
+
+.status-badge--filled {
+	background: var(--status-accent, var(--interactive-accent));
+	border-color: var(--status-accent, var(--interactive-accent));
+	color: var(--text-on-accent);
+	padding-left: var(--size-4-2);
+}
+
+.status-badge--filled .status-badge-icon,
+.status-badge--filled .status-badge-text {
+	color: inherit;
+}
+
+.status-badge--filled.status-badge-container--clickable:hover {
+	filter: brightness(1.05);
+	background: var(--status-accent, var(--interactive-accent));
+	box-shadow: var(--shadow-s);
+}
+
+.status-badge--dot {
+	border: none;
+	background: transparent;
+	padding: var(--size-2-1) var(--size-2-2);
+	gap: var(--size-2-1);
+}
+
+.status-badge--dot::before {
+	display: none;
+}
+
+.status-badge--dot .status-badge-item {
+	gap: var(--size-2-2);
+}
+
+.status-badge-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--status-accent, var(--interactive-accent));
+	box-shadow: 0 0 0 1px var(--background-primary);
+}
+
+.status-badge--empty {
+	min-width: 32px;
+	justify-content: center;
 }
 
 .status-badge-item {
 	display: flex;
 	align-items: center;
 	gap: var(--size-2-1);
+	position: relative;
+	z-index: 1;
 }
 
 .status-badge-icon {
@@ -73,6 +175,12 @@
 .status-badge-text {
 	font-weight: var(--font-medium);
 	font-size: var(--font-ui-small);
+}
+
+.status-badge-empty {
+	display: inline-block;
+	min-width: var(--size-3-2);
+	height: var(--size-3-2);
 }
 
 /* Template variant */
@@ -85,6 +193,16 @@
 	border: 1px solid var(--background-modifier-border);
 	border-radius: var(--radius-m);
 	font-size: var(--font-ui-smaller);
+	cursor: default;
+	transition: background var(--anim-duration-fast) ease;
+}
+
+.template-status-chip[data-clickable="true"] {
+	cursor: pointer;
+}
+
+.template-status-chip[data-clickable="true"]:hover {
+	background: var(--background-modifier-hover);
 }
 
 .template-status-color-dot {
@@ -92,4 +210,15 @@
 	height: 8px;
 	border-radius: 50%;
 	background-color: var(--dot-color);
+}
+
+.template-status-chip__label {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-2-1);
+}
+
+.template-status-chip__icon {
+	display: inline-flex;
+	font-size: 1em;
 }

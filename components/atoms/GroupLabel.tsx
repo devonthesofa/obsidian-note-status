@@ -12,18 +12,16 @@ export const GroupLabel: FC<GroupLabelProps> = ({
 }) => {
 	if (!name) return null;
 
+	const className = [
+		"setting-item-name",
+		"group-label-container",
+		isHighlighted ? "group-label-container--highlighted" : "",
+	]
+		.filter(Boolean)
+		.join(" ");
+
 	return (
-		<span
-			className="setting-item-name group-label-container"
-			style={{
-				color: isHighlighted
-					? "var(--text-normal)"
-					: "var(--text-muted)",
-				display: "flex",
-				alignItems: "center",
-				gap: "0.5rem",
-			}}
-		>
+		<span className={className}>
 			<ObsidianIcon name="folder" size={16} />
 			{name}
 		</span>

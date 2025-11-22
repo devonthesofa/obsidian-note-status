@@ -27,37 +27,6 @@ interface SearchInputProps extends BaseInputProps {
 
 export type InputProps = TextInputProps | ColorInputProps | SearchInputProps;
 
-const getInputStyles = (variant: InputVariant): React.CSSProperties => {
-	const baseStyles: React.CSSProperties = {
-		border: "1px solid var(--background-modifier-border)",
-		borderRadius: "4px",
-		backgroundColor: "var(--background-primary)",
-		color: "var(--text-normal)",
-		fontSize: "14px",
-		outline: "none",
-	};
-
-	switch (variant) {
-		case "text":
-		case "search":
-			return {
-				...baseStyles,
-				width: "100%",
-				padding: "8px 12px",
-			};
-		case "color":
-			return {
-				...baseStyles,
-				width: "32px",
-				height: "32px",
-				padding: "2px",
-				cursor: "pointer",
-			};
-		default:
-			return baseStyles;
-	}
-};
-
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 	(
 		{
@@ -72,18 +41,30 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 		},
 		ref,
 	) => {
-		const inputStyles = getInputStyles(variant);
-		const combinedStyles = { ...inputStyles, ...style };
+		const inputType =
+			variant === "color"
+				? "color"
+				: variant === "search"
+					? "search"
+					: "text";
+		const classes = [
+			"note-status-input",
+			`note-status-input--${variant}`,
+			variant === "search" ? "search-input" : "",
+			className,
+		]
+			.filter(Boolean)
+			.join(" ");
 
 		return (
 			<input
 				ref={ref}
-				type={variant === "color" ? "color" : "text"}
+				type={inputType}
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
 				placeholder={placeholder}
-				className={className}
-				style={combinedStyles}
+				className={classes}
+				style={style}
 				onFocus={onFocus}
 				onBlur={onBlur}
 			/>

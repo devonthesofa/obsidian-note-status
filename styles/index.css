@@ -20,3 +20,6 @@
 @import "components/obsidian-icon.css";
 @import "components/toolbar-button.css";
 @import "components/frontmatter-mappings.css";
+@import "components/form-controls.css";
+@import "components/status-selector.css";
+@import "components/change-status-modal.css";

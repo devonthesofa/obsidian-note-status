@@ -1,5 +1,5 @@
 import { GroupedStatuses } from "@/types/noteStatus";
-import { FC } from "react";
+import { CSSProperties, FC } from "react";
 import {
 	StatusBarProvider,
 	Props as StatusBarContextProps,
@@ -13,6 +13,8 @@ export type Props = {
 	hideIfNotStatuses?: boolean;
 	onStatusClick: StatusBarContextProps["onStatusClick"];
 	templateNameMode?: "always" | "never" | "auto";
+	badgeStyle?: "accent" | "filled" | "dot";
+	badgeContentMode?: "icon-text" | "icon" | "text" | "none";
 	noStatusConfig?: {
 		text: string;
 		showIcon: boolean;
@@ -28,6 +30,8 @@ export const StatusBar: FC<Props> = ({
 	hideIfNotStatuses,
 	onStatusClick,
 	templateNameMode = "auto",
+	badgeStyle = "accent",
+	badgeContentMode = "icon-text",
 	noStatusConfig,
 }) => {
 	const statusEntries = Object.entries(statuses);
@@ -45,25 +49,29 @@ export const StatusBar: FC<Props> = ({
 
 		return (
 			<span
-				className="status-bar-item mod-clickable"
+				className="status-bar-item status-bar-no-status mod-clickable"
 				onClick={() => onStatusClick({ name: "", icon: "" })}
-				style={{
-					cursor: "pointer",
-					color: noStatusConfig.color,
-				}}
+				style={
+					noStatusConfig.color
+						? ({
+								"--status-empty-color": noStatusConfig.color,
+							} as CSSProperties)
+						: undefined
+				}
 			>
 				{noStatusConfig.showIcon && (
 					<StatusIcon
 						icon={noStatusConfig.icon}
 						lucideIcon={noStatusConfig.lucideIcon}
 						size={14}
-						className="status-bar-no-status-icon"
-						style={{
-							marginRight: noStatusConfig.showText ? "4px" : "0",
-						}}
+						className="status-bar-no-status__icon"
 					/>
 				)}
-				{noStatusConfig.showText && noStatusConfig.text}
+				{noStatusConfig.showText && (
+					<span className="status-bar-no-status__label">
+						{noStatusConfig.text}
+					</span>
+				)}
 			</span>
 		);
 	}
@@ -76,6 +84,8 @@ export const StatusBar: FC<Props> = ({
 						key={frontmatterTagName}
 						statuses={statusList}
 						templateNameMode={templateNameMode}
+						badgeStyle={badgeStyle}
+						badgeContentMode={badgeContentMode}
 						template={{
 							description: "Note status",
 							name: "",

@@ -80,6 +80,44 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				/>
 			</SettingItem>
 
+			<SettingItem
+				name="Status bar badge style"
+				description="Match the file explorer visuals: accent stripe, solid fill, or dot marker."
+			>
+				<Select
+					options={[
+						{ value: "accent", display: "Accent stripe (default)" },
+						{ value: "filled", display: "Solid background" },
+						{ value: "dot", display: "Dot marker" },
+					]}
+					defaultValue={settings.statusBarBadgeStyle || "accent"}
+					onChange={(value) => onChange("statusBarBadgeStyle", value)}
+				/>
+			</SettingItem>
+
+			<SettingItem
+				name="Status bar badge content"
+				description="Choose whether the badge shows icon, text, both, or an empty accent."
+			>
+				<Select
+					options={[
+						{
+							value: "icon-text",
+							display: "Icon + text (default)",
+						},
+						{ value: "icon", display: "Icon only" },
+						{ value: "text", display: "Text only" },
+						{ value: "none", display: "Empty badge (accent only)" },
+					]}
+					defaultValue={
+						settings.statusBarBadgeContentMode || "icon-text"
+					}
+					onChange={(value) =>
+						onChange("statusBarBadgeContentMode", value)
+					}
+				/>
+			</SettingItem>
+
 			<h4>No Status Display</h4>
 
 			<SettingItem
@@ -92,7 +130,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 					onChange={(value) =>
 						onChange("statusBarNoStatusText", value)
 					}
-					style={{ maxWidth: "150px" }}
+					className="ui-settings__no-status-input"
 					placeholder="No status"
 				/>
 			</SettingItem>

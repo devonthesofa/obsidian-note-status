@@ -15,6 +15,10 @@
 	gap: var(--size-2-2);
 }
 
+.ui-settings__no-status-input {
+	max-width: 150px;
+}
+
 /* Custom Status Item - BEM Methodology */
 .custom-status-item {
 	background: var(--background-secondary);
@@ -340,106 +344,4 @@
 /* Quick Commands Container */
 .quick-commands-container {
 	margin-top: var(--size-4-2);
-}
-
-/* Note Status Selector in Modal */
-.note-status-options {
-	max-height: 300px;
-	overflow-y: auto;
-	border: 1px solid var(--background-modifier-border);
-	border-radius: var(--radius-s);
-	background: var(--background-primary);
-}
-.note-status-option {
-	/* Uses SelectableListItem styles */
-	align-items: stretch;
-}
-
-.note-status-option .selectable-list-item-icon {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.note-status-option__icon-wrapper {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	padding: var(--size-2-1);
-	border-radius: var(--radius-m);
-	border: 1px solid var(--background-modifier-border);
-	background: var(--background-secondary);
-	min-width: 36px;
-	transition:
-		border-color var(--anim-duration-fast) ease,
-		background var(--anim-duration-fast) ease;
-}
-
-.note-status-option:hover .note-status-option__icon-wrapper,
-.note-status-option.selectable-list-item[data-selected="true"]
-	.note-status-option__icon-wrapper {
-	border-color: var(--interactive-accent);
-	background: var(--background-modifier-hover);
-}
-
-.note-status-option__text {
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-}
-
-.note-status-option__name {
-	font-weight: var(--font-medium);
-	color: var(--text-normal);
-}
-
-.note-status-option__description {
-	font-size: var(--font-ui-smaller);
-	color: var(--text-muted);
-}
-
-.note-status-chips {
-	display: flex;
-	flex-wrap: wrap;
-	gap: var(--size-2-2);
-	min-height: 32px;
-	align-items: center;
-}
-
-/* Selectable List Item (used by multiple components) */
-.selectable-list-item {
-	display: flex;
-	align-items: center;
-	gap: var(--size-4-2);
-	padding: var(--size-2-3) var(--size-4-2);
-	cursor: pointer;
-	border-bottom: 1px solid var(--background-modifier-border);
-	transition: background var(--anim-duration-fast) ease;
-}
-
-.selectable-list-item:hover {
-	background: var(--background-modifier-hover);
-}
-
-.selectable-list-item[data-focused="true"] {
-	outline: 2px solid var(--interactive-accent);
-	outline-offset: -2px;
-}
-
-.selectable-list-item[data-selected="true"] {
-	background: var(--background-modifier-hover);
-}
-
-.selectable-list-item-icon {
-	font-size: 16px;
-	min-width: 20px;
-}
-
-.selectable-list-item-content {
-	flex: 1;
-	font-size: var(--font-ui-small);
-}
-
-.selectable-list-item-check {
-	color: var(--interactive-accent);
 }
