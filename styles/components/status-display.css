@@ -155,6 +155,11 @@
 	box-shadow: 0 0 0 1px var(--background-primary);
 }
 
+.status-badge--empty {
+	min-width: 32px;
+	justify-content: center;
+}
+
 .status-badge-item {
 	display: flex;
 	align-items: center;
@@ -170,6 +175,12 @@
 .status-badge-text {
 	font-weight: var(--font-medium);
 	font-size: var(--font-ui-small);
+}
+
+.status-badge-empty {
+	display: inline-block;
+	min-width: var(--size-3-2);
+	height: var(--size-3-2);
 }
 
 /* Template variant */

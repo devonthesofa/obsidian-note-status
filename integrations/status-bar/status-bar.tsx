@@ -38,6 +38,12 @@ export class StatusBarIntegration {
 				if (key === "statusBarShowTemplateName") {
 					this.render(); // INFO: Force a render to set disabled or enabled
 				}
+				if (
+					key === "statusBarBadgeStyle" ||
+					key === "statusBarBadgeContentMode"
+				) {
+					this.render();
+				}
 				if (key === "enabledTemplates" || key === "templates") {
 					this.handleActiveFileChange().catch(console.error); // INFO: Force a re-read of the statuses and render
 				}
@@ -155,6 +161,9 @@ export class StatusBarIntegration {
 					settingsService.settings.statusBarShowTemplateName
 				}
 				badgeStyle={settingsService.settings.statusBarBadgeStyle}
+				badgeContentMode={
+					settingsService.settings.statusBarBadgeContentMode
+				}
 				onStatusClick={() => this.openStatusModal()}
 				noStatusConfig={this.getNoStatusConfig()}
 			/>,

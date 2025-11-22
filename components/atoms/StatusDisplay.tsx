@@ -18,6 +18,7 @@ interface StatusDisplayProps {
 	status: NoteStatus;
 	variant: StatusDisplayVariant;
 	badgeStyle?: "accent" | "filled" | "dot";
+	badgeContentMode?: "icon-text" | "icon" | "text" | "none";
 	removable?: boolean;
 	hasNameConflicts?: boolean;
 	templateNameMode?: "always" | "never" | "auto";
@@ -32,6 +33,7 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 		variant,
 		removable = false,
 		badgeStyle = "accent",
+		badgeContentMode = "icon-text",
 		hasNameConflicts = false,
 		templateNameMode = "auto",
 		icon,
@@ -132,10 +134,16 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 				"status-badge-container",
 				`status-badge--${badgeStyle}`,
 				onClick ? "status-badge-container--clickable" : "",
+				badgeContentMode === "none" ? "status-badge--empty" : "",
 			]
 				.filter(Boolean)
 				.join(" ");
 			const showDot = badgeStyle === "dot";
+			const showIcon =
+				badgeContentMode === "icon-text" || badgeContentMode === "icon";
+			const showText =
+				badgeContentMode === "icon-text" || badgeContentMode === "text";
+			const isEmptyBadge = badgeContentMode === "none";
 
 			return (
 				<div
@@ -143,15 +151,28 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 					style={badgeStyleVars}
 					onClick={handleClick}
 					data-clickable={!!onClick}
+					title={getStatusTooltip(status)}
 				>
 					{showDot && (
 						<span className="status-badge-dot" aria-hidden="true" />
 					)}
 					<div className="status-badge-item">
-						<span className="status-badge-icon">{iconNode}</span>
-						<span className="status-badge-text">
-							{getDisplayName()}
-						</span>
+						{showIcon && (
+							<span className="status-badge-icon">
+								{iconNode}
+							</span>
+						)}
+						{showText && (
+							<span className="status-badge-text">
+								{getDisplayName()}
+							</span>
+						)}
+						{isEmptyBadge && (
+							<span
+								className="status-badge-empty"
+								aria-hidden="true"
+							/>
+						)}
 					</div>
 				</div>
 			);

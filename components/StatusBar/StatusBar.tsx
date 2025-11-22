@@ -14,6 +14,7 @@ export type Props = {
 	onStatusClick: StatusBarContextProps["onStatusClick"];
 	templateNameMode?: "always" | "never" | "auto";
 	badgeStyle?: "accent" | "filled" | "dot";
+	badgeContentMode?: "icon-text" | "icon" | "text" | "none";
 	noStatusConfig?: {
 		text: string;
 		showIcon: boolean;
@@ -30,6 +31,7 @@ export const StatusBar: FC<Props> = ({
 	onStatusClick,
 	templateNameMode = "auto",
 	badgeStyle = "accent",
+	badgeContentMode = "icon-text",
 	noStatusConfig,
 }) => {
 	const statusEntries = Object.entries(statuses);
@@ -83,6 +85,7 @@ export const StatusBar: FC<Props> = ({
 						statuses={statusList}
 						templateNameMode={templateNameMode}
 						badgeStyle={badgeStyle}
+						badgeContentMode={badgeContentMode}
 						template={{
 							description: "Note status",
 							name: "",
