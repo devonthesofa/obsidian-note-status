@@ -92,7 +92,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 					onChange={(value) =>
 						onChange("statusBarNoStatusText", value)
 					}
-					style={{ maxWidth: "150px" }}
+					className="ui-settings__no-status-input"
 					placeholder="No status"
 				/>
 			</SettingItem>

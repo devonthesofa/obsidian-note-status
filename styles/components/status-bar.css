@@ -7,6 +7,25 @@
 	/* Uses Obsidian's built-in status bar item styles */
 }
 
+.status-bar-no-status {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-2-2);
+	color: var(--status-empty-color, var(--text-muted));
+}
+
+.status-bar-no-status:hover {
+	color: var(--text-normal);
+}
+
+.status-bar-no-status__icon {
+	opacity: 0.9;
+}
+
+.status-bar-no-status__label {
+	font-weight: var(--font-medium);
+}
+
 /* Enable Button */
 .status-bar-enable-button {
 	cursor: pointer;
@@ -30,6 +49,16 @@
 	gap: var(--size-2-1);
 	flex-wrap: wrap;
 	align-items: center;
+}
+
+.status-bar-status-item {
+	display: inline-flex;
+	align-items: center;
+}
+
+.status-bar-status-item--animated {
+	animation: status-slide-in var(--anim-duration-fast) ease-out
+		var(--status-anim-delay, 0s) both;
 }
 
 /* Animation for expanding status items */

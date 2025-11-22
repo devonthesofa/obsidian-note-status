@@ -96,16 +96,7 @@ export const StatusSelector: React.FC<Props> = ({
 	);
 
 	return (
-		<div
-			className="note-status-options"
-			style={{
-				maxHeight: "300px",
-				overflowY: "auto",
-				border: "1px solid var(--background-modifier-border)",
-				borderRadius: "var(--radius-s)",
-				background: "var(--background-primary)",
-			}}
-		>
+		<div className="note-status-options" role="listbox">
 			{availableStatuses.map((status, index) => (
 				<StatusModalOption
 					key={`${status.templateId || "custom"}:${status.name}:${status.description}:${status.color}:${status.icon}:${status.lucideIcon ?? ""}`}

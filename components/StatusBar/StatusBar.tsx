@@ -1,5 +1,5 @@
 import { GroupedStatuses } from "@/types/noteStatus";
-import { FC } from "react";
+import { CSSProperties, FC } from "react";
 import {
 	StatusBarProvider,
 	Props as StatusBarContextProps,
@@ -45,25 +45,29 @@ export const StatusBar: FC<Props> = ({
 
 		return (
 			<span
-				className="status-bar-item mod-clickable"
+				className="status-bar-item status-bar-no-status mod-clickable"
 				onClick={() => onStatusClick({ name: "", icon: "" })}
-				style={{
-					cursor: "pointer",
-					color: noStatusConfig.color,
-				}}
+				style={
+					noStatusConfig.color
+						? ({
+								"--status-empty-color": noStatusConfig.color,
+							} as CSSProperties)
+						: undefined
+				}
 			>
 				{noStatusConfig.showIcon && (
 					<StatusIcon
 						icon={noStatusConfig.icon}
 						lucideIcon={noStatusConfig.lucideIcon}
 						size={14}
-						className="status-bar-no-status-icon"
-						style={{
-							marginRight: noStatusConfig.showText ? "4px" : "0",
-						}}
+						className="status-bar-no-status__icon"
 					/>
 				)}
-				{noStatusConfig.showText && noStatusConfig.text}
+				{noStatusConfig.showText && (
+					<span className="status-bar-no-status__label">
+						{noStatusConfig.text}
+					</span>
+				)}
 			</span>
 		);
 	}

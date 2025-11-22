@@ -153,7 +153,7 @@ export const StatusSelectorGroup: React.FC<Props> = ({
 			ref={containerRef}
 			tabIndex={0}
 			onKeyDown={handleKeyDown}
-			style={{ outline: "none" }}
+			className="status-selector-group"
 		>
 			{templateViewOptions.length > 1 && (
 				<div
@@ -188,14 +188,7 @@ export const StatusSelectorGroup: React.FC<Props> = ({
 
 			<SettingItem name="Current statuses" vertical>
 				{filteredStatuses.length === 0 ? (
-					<div
-						style={{
-							padding: "16px",
-							textAlign: "center",
-							color: "var(--text-muted)",
-							fontStyle: "italic",
-						}}
-					>
+					<div className="status-selector-empty">
 						{searchFilter
 							? `No statuses match "${searchFilter}"`
 							: "No statuses found"}

@@ -14,16 +14,7 @@ export const CurrentStatusChips: React.FC<Props> = ({
 }) => {
 	return (
 		<SettingItem name="Current statuses" vertical>
-			<div
-				className="note-status-chips"
-				style={{
-					display: "flex",
-					flexWrap: "wrap",
-					gap: "6px",
-					minHeight: "32px",
-					alignItems: "center",
-				}}
-			>
+			<div className="note-status-chips">
 				{currentStatuses.map((status) => (
 					<StatusDisplay
 						key={`${status.templateId || "custom"}:${status.name}`}

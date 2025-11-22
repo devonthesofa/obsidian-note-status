@@ -1,0 +1,47 @@
+/* ==========================================================================
+   Shared Form Controls
+   ========================================================================== */
+
+.note-status-input {
+	width: 100%;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	background: var(--background-primary);
+	color: var(--text-normal);
+	font-size: var(--font-ui-small);
+	padding: var(--size-2-2) var(--size-2-3);
+	transition:
+		border-color var(--anim-duration-fast) ease,
+		box-shadow var(--anim-duration-fast) ease;
+}
+
+.note-status-input:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
+	box-shadow: 0 0 0 2px var(--background-modifier-accent);
+}
+
+.note-status-input--search {
+	padding-left: var(--size-4-1);
+}
+
+.note-status-input--color {
+	width: 36px;
+	height: 32px;
+	padding: var(--size-2-1);
+	cursor: pointer;
+}
+
+.note-status-input--color::-webkit-color-swatch {
+	border: none;
+	border-radius: var(--radius-s);
+}
+
+.note-status-input--color::-webkit-color-swatch-wrapper {
+	padding: 0;
+}
+
+.note-status-input:disabled {
+	opacity: 0.65;
+	cursor: not-allowed;
+}

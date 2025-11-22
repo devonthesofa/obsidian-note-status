@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { CSSProperties, FC, useState } from "react";
 import { NoteStatus } from "@/types/noteStatus";
 import { StatusTemplate } from "@/types/pluginSettings";
 import { GroupLabel } from "../atoms/GroupLabel";
@@ -36,14 +36,17 @@ export const StatusBarGroup: FC<StatusBarGroupProps> = ({
 			<GroupLabel name={template.name} isHighlighted={isUncollapsed} />
 			<div className="status-bar-group-container">
 				{visibleStatuses.map((status, i) => (
+					// Use a wrapper so we can animate statuses when expanding
 					<div
 						key={i}
-						style={{
-							animation:
-								isUncollapsed && i >= maxVisible
-									? `status-slide-in var(--anim-duration-fast) ease-out ${i * 0.05}s both`
-									: "none",
-						}}
+						className={`status-bar-status-item${isUncollapsed && i >= maxVisible ? " status-bar-status-item--animated" : ""}`}
+						style={
+							isUncollapsed && i >= maxVisible
+								? ({
+										"--status-anim-delay": `${i * 0.05}s`,
+									} as CSSProperties)
+								: undefined
+						}
 						title={status.description}
 					>
 						<StatusDisplay
