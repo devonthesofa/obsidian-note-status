@@ -11,6 +11,7 @@ export interface StatusBarGroupProps {
 	template: StatusTemplate;
 	maxVisible?: number;
 	templateNameMode?: "always" | "never" | "auto";
+	badgeStyle?: "accent" | "filled" | "dot";
 }
 
 export const StatusBarGroup: FC<StatusBarGroupProps> = ({
@@ -18,6 +19,7 @@ export const StatusBarGroup: FC<StatusBarGroupProps> = ({
 	template,
 	maxVisible = 3,
 	templateNameMode = "auto",
+	badgeStyle = "accent",
 }) => {
 	const [isUncollapsed, setIsUncollapsed] = useState(false);
 	const visibleStatuses = isUncollapsed
@@ -52,6 +54,7 @@ export const StatusBarGroup: FC<StatusBarGroupProps> = ({
 						<StatusDisplay
 							status={status}
 							variant="badge"
+							badgeStyle={badgeStyle}
 							templateNameMode={templateNameMode}
 							hasNameConflicts={getHasConflicts(status)}
 							onClick={() => {

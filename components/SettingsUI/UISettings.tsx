@@ -80,6 +80,21 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				/>
 			</SettingItem>
 
+			<SettingItem
+				name="Status bar badge style"
+				description="Match the file explorer visuals: accent stripe, solid fill, or dot marker."
+			>
+				<Select
+					options={[
+						{ value: "accent", display: "Accent stripe (default)" },
+						{ value: "filled", display: "Solid background" },
+						{ value: "dot", display: "Dot marker" },
+					]}
+					defaultValue={settings.statusBarBadgeStyle || "accent"}
+					onChange={(value) => onChange("statusBarBadgeStyle", value)}
+				/>
+			</SettingItem>
+
 			<h4>No Status Display</h4>
 
 			<SettingItem

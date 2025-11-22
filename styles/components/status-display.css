@@ -74,9 +74,8 @@
 	align-items: center;
 	gap: var(--size-2-2);
 	padding: var(--size-2-1) var(--size-4-2);
-	padding-left: calc(var(--size-4-1) + 4px);
-	border: 1px solid var(--background-modifier-border);
 	border-radius: var(--radius-s);
+	border: 1px solid var(--background-modifier-border);
 	background: var(--background-primary);
 	position: relative;
 	overflow: hidden;
@@ -88,20 +87,72 @@
 	position: absolute;
 	inset: 0 auto 0 0;
 	width: 4px;
-	background: var(--status-accent, var(--interactive-accent));
+	background: transparent;
 	opacity: 0.85;
+	display: none;
 }
 
 .status-badge-container--clickable {
 	cursor: pointer;
 	transition:
 		background var(--anim-duration-fast) ease,
-		box-shadow var(--anim-duration-fast) ease;
+		box-shadow var(--anim-duration-fast) ease,
+		filter var(--anim-duration-fast) ease;
 }
 
-.status-badge-container--clickable:hover {
+.status-badge-container--clickable:not(.status-badge--filled):hover {
 	background: var(--background-modifier-hover);
 	box-shadow: var(--shadow-s);
+}
+
+.status-badge--accent {
+	padding-left: calc(var(--size-4-1) + 4px);
+}
+
+.status-badge--accent::before {
+	display: block;
+	background: var(--status-accent, var(--interactive-accent));
+}
+
+.status-badge--filled {
+	background: var(--status-accent, var(--interactive-accent));
+	border-color: var(--status-accent, var(--interactive-accent));
+	color: var(--text-on-accent);
+	padding-left: var(--size-4-2);
+}
+
+.status-badge--filled .status-badge-icon,
+.status-badge--filled .status-badge-text {
+	color: inherit;
+}
+
+.status-badge--filled.status-badge-container--clickable:hover {
+	filter: brightness(1.05);
+	background: var(--status-accent, var(--interactive-accent));
+	box-shadow: var(--shadow-s);
+}
+
+.status-badge--dot {
+	border: none;
+	background: transparent;
+	padding: var(--size-2-1) var(--size-2-2);
+	gap: var(--size-2-1);
+}
+
+.status-badge--dot::before {
+	display: none;
+}
+
+.status-badge--dot .status-badge-item {
+	gap: var(--size-2-2);
+}
+
+.status-badge-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--status-accent, var(--interactive-accent));
+	box-shadow: 0 0 0 1px var(--background-primary);
 }
 
 .status-badge-item {

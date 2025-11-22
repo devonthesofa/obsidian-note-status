@@ -36,6 +36,7 @@ export type PluginSettings = {
 	templates: StatusTemplate[];
 	customStatuses: NoteStatus[];
 	statusBarShowTemplateName: "always" | "never" | "auto"; // How to show template names in status bar
+	statusBarBadgeStyle: "accent" | "filled" | "dot";
 	showStatusIconsInExplorer: boolean;
 	hideUnknownStatusInExplorer: boolean;
 	fileExplorerColorFileName: boolean; // Whether to color the file explorer filename text using the current status color

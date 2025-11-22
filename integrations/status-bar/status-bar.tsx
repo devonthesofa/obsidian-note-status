@@ -154,6 +154,7 @@ export class StatusBarIntegration {
 				templateNameMode={
 					settingsService.settings.statusBarShowTemplateName
 				}
+				badgeStyle={settingsService.settings.statusBarBadgeStyle}
 				onStatusClick={() => this.openStatusModal()}
 				noStatusConfig={this.getNoStatusConfig()}
 			/>,

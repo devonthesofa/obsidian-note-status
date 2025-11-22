@@ -45,6 +45,7 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	statusBarNoStatusText: "No status",
 	statusBarShowNoStatusIcon: false,
 	statusBarShowNoStatusText: true,
+	statusBarBadgeStyle: "accent",
 	vaultSizeLimit: 15000, // Disable dashboard and grouped view for vaults with more notes than this limit
 	// Editor toolbar button settings
 	showEditorToolbarButton: true, // Default to show the toolbar button

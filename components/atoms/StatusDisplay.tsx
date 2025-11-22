@@ -17,6 +17,7 @@ export type StatusDisplayVariant = "chip" | "badge" | "template";
 interface StatusDisplayProps {
 	status: NoteStatus;
 	variant: StatusDisplayVariant;
+	badgeStyle?: "accent" | "filled" | "dot";
 	removable?: boolean;
 	hasNameConflicts?: boolean;
 	templateNameMode?: "always" | "never" | "auto";
@@ -30,6 +31,7 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 		status,
 		variant,
 		removable = false,
+		badgeStyle = "accent",
 		hasNameConflicts = false,
 		templateNameMode = "auto",
 		icon,
@@ -121,19 +123,30 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 		}
 
 		if (variant === "badge") {
-			const badgeStyle = status.color
+			const badgeStyleVars = status.color
 				? ({
 						"--status-accent": status.color,
 					} as CSSProperties)
 				: undefined;
+			const badgeClassName = [
+				"status-badge-container",
+				`status-badge--${badgeStyle}`,
+				onClick ? "status-badge-container--clickable" : "",
+			]
+				.filter(Boolean)
+				.join(" ");
+			const showDot = badgeStyle === "dot";
 
 			return (
 				<div
-					className={`status-badge-container${onClick ? " status-badge-container--clickable" : ""}`}
-					style={badgeStyle}
+					className={badgeClassName}
+					style={badgeStyleVars}
 					onClick={handleClick}
 					data-clickable={!!onClick}
 				>
+					{showDot && (
+						<span className="status-badge-dot" aria-hidden="true" />
+					)}
 					<div className="status-badge-item">
 						<span className="status-badge-icon">{iconNode}</span>
 						<span className="status-badge-text">
