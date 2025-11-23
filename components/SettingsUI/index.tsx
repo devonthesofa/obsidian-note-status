@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { PluginSettings } from "@/types/pluginSettings";
-import { UISettings } from "./UISettings";
 import { TemplateSettings } from "./TemplateSettings";
 import { BehaviourSettings } from "./BehaviourSettings";
 import { CustomStatusSettings } from "./CustomStatusSettings";
 import { QuickCommandsSettings } from "./QuickCommandsSettings";
+import {
+	EditorToolbarSettings,
+	ExperimentalSettings,
+	FileExplorerSettings,
+	StatusBarSettings,
+	UnknownStatusAppearanceSettings,
+} from "./UISettings";
 
 export type Props = {
 	settings: PluginSettings;
@@ -12,11 +18,14 @@ export type Props = {
 };
 
 type SectionId =
-	| "templates"
-	| "ui"
-	| "behaviour"
-	| "custom-statuses"
-	| "quick-commands";
+	| "templates-statuses"
+	| "quick-actions"
+	| "status-bar"
+	| "editor-toolbar"
+	| "file-explorer"
+	| "unknown-appearance"
+	| "behavior-storage"
+	| "experimental-features";
 
 type SectionDefinition = {
 	id: SectionId;
@@ -42,28 +51,85 @@ const SettingsUI: React.FC<Props> = ({ settings, onChange }) => {
 
 	const sections: SectionDefinition[] = [
 		{
-			id: "templates",
-			label: "Templates",
-			description: "Enable predefined flows or build your own.",
+			id: "templates-statuses",
+			label: "Templates & Statuses",
+			description:
+				"Enable predefined workflows or define your own statuses.",
 			content: (
-				<TemplateSettings
+				<div className="note-status-settings__stack">
+					<TemplateSettings
+						settings={localSettings}
+						onChange={handleChange}
+					/>
+					<CustomStatusSettings
+						settings={localSettings}
+						onChange={handleChange}
+					/>
+				</div>
+			),
+		},
+		{
+			id: "quick-actions",
+			label: "Quick Actions",
+			description: "Choose statuses with command palette shortcuts.",
+			content: (
+				<QuickCommandsSettings
 					settings={localSettings}
 					onChange={handleChange}
 				/>
 			),
 		},
 		{
-			id: "ui",
-			label: "UI & Explorer",
-			description: "Status bar, editor, and file explorer visuals.",
+			id: "status-bar",
+			label: "Status Bar",
+			description:
+				"Icon, popup, badge style/content, and no-status behavior.",
 			content: (
-				<UISettings settings={localSettings} onChange={handleChange} />
+				<StatusBarSettings
+					settings={localSettings}
+					onChange={handleChange}
+				/>
 			),
 		},
 		{
-			id: "behaviour",
-			label: "Behavior",
-			description: "Frontmatter storage and validation rules.",
+			id: "editor-toolbar",
+			label: "Editor Toolbar",
+			description: "Button placement and visibility across panes.",
+			content: (
+				<EditorToolbarSettings
+					settings={localSettings}
+					onChange={handleChange}
+				/>
+			),
+		},
+		{
+			id: "file-explorer",
+			label: "File Explorer",
+			description:
+				"Icon placement, hiding unknown, and visual styling options.",
+			content: (
+				<FileExplorerSettings
+					settings={localSettings}
+					onChange={handleChange}
+				/>
+			),
+		},
+		{
+			id: "unknown-appearance",
+			label: "Unknown / No-Status Appearance",
+			description: "Fallback icon and color when a note lacks status.",
+			content: (
+				<UnknownStatusAppearanceSettings
+					settings={localSettings}
+					onChange={handleChange}
+				/>
+			),
+		},
+		{
+			id: "behavior-storage",
+			label: "Behavior & Storage",
+			description:
+				"Multi-status mode, tag key, mappings, and vault safeguards.",
 			content: (
 				<BehaviourSettings
 					settings={localSettings}
@@ -72,22 +138,11 @@ const SettingsUI: React.FC<Props> = ({ settings, onChange }) => {
 			),
 		},
 		{
-			id: "custom-statuses",
-			label: "Custom Statuses",
-			description: "Create and manage your own statuses.",
+			id: "experimental-features",
+			label: "Experimental Features",
+			description: "Opt into dashboard and grouped view previews.",
 			content: (
-				<CustomStatusSettings
-					settings={localSettings}
-					onChange={handleChange}
-				/>
-			),
-		},
-		{
-			id: "quick-commands",
-			label: "Quick Commands",
-			description: "Choose statuses with command palette shortcuts.",
-			content: (
-				<QuickCommandsSettings
+				<ExperimentalSettings
 					settings={localSettings}
 					onChange={handleChange}
 				/>
@@ -129,7 +184,7 @@ const SettingsUI: React.FC<Props> = ({ settings, onChange }) => {
 								className="note-status-section__chevron"
 								aria-hidden="true"
 							>
-								{isOpen ? "▾" : "▸"}
+								{isOpen ? "v" : ">"}
 							</span>
 						</button>
 						{isOpen ? (

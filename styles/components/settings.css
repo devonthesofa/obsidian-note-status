@@ -58,6 +58,12 @@
 	border-top: 1px solid var(--background-modifier-border);
 }
 
+.note-status-settings__stack {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-3);
+}
+
 /* Custom additions for Note Status settings */
 .setting-item-full {
 	width: 100%;

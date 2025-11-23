@@ -1,5 +1,5 @@
-import { PluginSettings } from "@/types/pluginSettings";
 import React from "react";
+import { PluginSettings } from "@/types/pluginSettings";
 import { Input } from "../atoms/Input";
 import { Select } from "../atoms/Select";
 import { SettingItem } from "./SettingItem";
@@ -10,15 +10,14 @@ export type Props = {
 	onChange: (key: keyof PluginSettings, value: unknown) => void;
 };
 
-export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
-	const handleChange =
+export const StatusBarSettings: React.FC<Props> = ({ settings, onChange }) => {
+	const handleCheckbox =
 		(key: keyof PluginSettings) =>
-		(e: React.ChangeEvent<HTMLInputElement>) => {
+		(e: React.ChangeEvent<HTMLInputElement>) =>
 			onChange(key, e.target.checked);
-		};
 
 	return (
-		<div className="ui-settings">
+		<div className="ui-settings__group">
 			<h3>Status Bar</h3>
 
 			<SettingItem
@@ -28,7 +27,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				<input
 					type="checkbox"
 					checked={settings.showStatusBar}
-					onChange={handleChange("showStatusBar")}
+					onChange={handleCheckbox("showStatusBar")}
 				/>
 			</SettingItem>
 
@@ -39,7 +38,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				<input
 					type="checkbox"
 					checked={settings.autoHideStatusBar}
-					onChange={handleChange("autoHideStatusBar")}
+					onChange={handleCheckbox("autoHideStatusBar")}
 				/>
 			</SettingItem>
 
@@ -50,7 +49,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				<input
 					type="checkbox"
 					checked={settings.enableStatusOverviewPopup ?? true}
-					onChange={handleChange("enableStatusOverviewPopup")}
+					onChange={handleCheckbox("enableStatusOverviewPopup")}
 				/>
 			</SettingItem>
 
@@ -142,7 +141,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				<input
 					type="checkbox"
 					checked={settings.statusBarShowNoStatusIcon || false}
-					onChange={handleChange("statusBarShowNoStatusIcon")}
+					onChange={handleCheckbox("statusBarShowNoStatusIcon")}
 				/>
 			</SettingItem>
 
@@ -153,11 +152,25 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				<input
 					type="checkbox"
 					checked={settings.statusBarShowNoStatusText ?? true}
-					onChange={handleChange("statusBarShowNoStatusText")}
+					onChange={handleCheckbox("statusBarShowNoStatusText")}
 				/>
 			</SettingItem>
+		</div>
+	);
+};
 
-			<h3>Editor</h3>
+export const EditorToolbarSettings: React.FC<Props> = ({
+	settings,
+	onChange,
+}) => {
+	const handleCheckbox =
+		(key: keyof PluginSettings) =>
+		(e: React.ChangeEvent<HTMLInputElement>) =>
+			onChange(key, e.target.checked);
+
+	return (
+		<div className="ui-settings__group">
+			<h3>Editor Toolbar</h3>
 
 			<SettingItem
 				name="Show editor toolbar button"
@@ -166,7 +179,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				<input
 					type="checkbox"
 					checked={settings.showEditorToolbarButton ?? true}
-					onChange={handleChange("showEditorToolbarButton")}
+					onChange={handleCheckbox("showEditorToolbarButton")}
 				/>
 			</SettingItem>
 
@@ -176,10 +189,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 			>
 				<Select
 					options={[
-						{
-							value: "left",
-							display: "Left side of toolbar",
-						},
+						{ value: "left", display: "Left side of toolbar" },
 						{
 							value: "right",
 							display: "Right side (after all buttons)",
@@ -204,14 +214,8 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 			>
 				<Select
 					options={[
-						{
-							value: "all-notes",
-							display: "All open notes",
-						},
-						{
-							value: "active-only",
-							display: "Active note only",
-						},
+						{ value: "all-notes", display: "All open notes" },
+						{ value: "active-only", display: "Active note only" },
 					]}
 					defaultValue={
 						settings.editorToolbarButtonDisplay || "all-notes"
@@ -221,7 +225,21 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 					}
 				/>
 			</SettingItem>
+		</div>
+	);
+};
 
+export const FileExplorerSettings: React.FC<Props> = ({
+	settings,
+	onChange,
+}) => {
+	const handleCheckbox =
+		(key: keyof PluginSettings) =>
+		(e: React.ChangeEvent<HTMLInputElement>) =>
+			onChange(key, e.target.checked);
+
+	return (
+		<div className="ui-settings__group">
 			<h3>File Explorer</h3>
 
 			<SettingItem
@@ -231,7 +249,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				<input
 					type="checkbox"
 					checked={settings.showStatusIconsInExplorer}
-					onChange={handleChange("showStatusIconsInExplorer")}
+					onChange={handleCheckbox("showStatusIconsInExplorer")}
 				/>
 			</SettingItem>
 
@@ -259,7 +277,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				<input
 					type="checkbox"
 					checked={settings.hideUnknownStatusInExplorer || false}
-					onChange={handleChange("hideUnknownStatusInExplorer")}
+					onChange={handleCheckbox("hideUnknownStatusInExplorer")}
 				/>
 			</SettingItem>
 
@@ -270,7 +288,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				<input
 					type="checkbox"
 					checked={settings.fileExplorerColorFileName || false}
-					onChange={handleChange("fileExplorerColorFileName")}
+					onChange={handleCheckbox("fileExplorerColorFileName")}
 				/>
 			</SettingItem>
 
@@ -281,7 +299,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				<input
 					type="checkbox"
 					checked={settings.fileExplorerColorBlock || false}
-					onChange={handleChange("fileExplorerColorBlock")}
+					onChange={handleCheckbox("fileExplorerColorBlock")}
 				/>
 			</SettingItem>
 
@@ -294,7 +312,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				<input
 					type="checkbox"
 					checked={settings.fileExplorerLeftBorder || false}
-					onChange={handleChange("fileExplorerLeftBorder")}
+					onChange={handleCheckbox("fileExplorerLeftBorder")}
 				/>
 			</SettingItem>
 
@@ -305,7 +323,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				<input
 					type="checkbox"
 					checked={settings.fileExplorerStatusDot || false}
-					onChange={handleChange("fileExplorerStatusDot")}
+					onChange={handleCheckbox("fileExplorerStatusDot")}
 				/>
 			</SettingItem>
 
@@ -316,7 +334,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				<input
 					type="checkbox"
 					checked={settings.fileExplorerUnderlineFileName || false}
-					onChange={handleChange("fileExplorerUnderlineFileName")}
+					onChange={handleCheckbox("fileExplorerUnderlineFileName")}
 				/>
 			</SettingItem>
 
@@ -346,10 +364,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 							value: "status",
 							display: "Use custom status colors",
 						},
-						{
-							value: "theme",
-							display: "Use theme default colors",
-						},
+						{ value: "theme", display: "Use theme default colors" },
 					]}
 					defaultValue={
 						settings.fileExplorerIconColorMode || "status"
@@ -359,7 +374,61 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 					}
 				/>
 			</SettingItem>
+		</div>
+	);
+};
 
+export const UnknownStatusAppearanceSettings: React.FC<Props> = ({
+	settings,
+	onChange,
+}) => (
+	<div className="ui-settings__group">
+		<h3>Unknown / No-Status Appearance</h3>
+
+		<SettingItem
+			name="Icon for unknown status"
+			description="Emoji or Lucide icon name displayed whenever a note does not have a status."
+			vertical
+		>
+			<IconSelectionField
+				emojiValue={settings.unknownStatusIcon}
+				onEmojiChange={(value) => onChange("unknownStatusIcon", value)}
+				emojiPlaceholder="❓"
+				emojiHint="Type any emoji or text fallback."
+				lucideValue={settings.unknownStatusLucideIcon || ""}
+				onLucideChange={(value) =>
+					onChange("unknownStatusLucideIcon", value)
+				}
+				lucidePlaceholder="Choose Lucide icon"
+				lucideHint="Matches the Obsidian toolbar style."
+			/>
+		</SettingItem>
+
+		<SettingItem
+			name="Color for unknown status"
+			description="Hex color used for unknown statuses (e.g., #8b949e)."
+		>
+			<Input
+				variant="color"
+				value={settings.unknownStatusColor || "#8b949e"}
+				onChange={(value) => onChange("unknownStatusColor", value)}
+				placeholder="No status"
+			/>
+		</SettingItem>
+	</div>
+);
+
+export const ExperimentalSettings: React.FC<Props> = ({
+	settings,
+	onChange,
+}) => {
+	const handleCheckbox =
+		(key: keyof PluginSettings) =>
+		(e: React.ChangeEvent<HTMLInputElement>) =>
+			onChange(key, e.target.checked);
+
+	return (
+		<div className="ui-settings__group">
 			<h3>Experimental features</h3>
 
 			<SettingItem
@@ -369,7 +438,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 				<input
 					type="checkbox"
 					checked={settings.enableExperimentalFeatures || false}
-					onChange={handleChange("enableExperimentalFeatures")}
+					onChange={handleCheckbox("enableExperimentalFeatures")}
 				/>
 			</SettingItem>
 
@@ -381,7 +450,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 					type="checkbox"
 					disabled={!settings.enableExperimentalFeatures}
 					checked={settings.enableStatusDashboard || false}
-					onChange={handleChange("enableStatusDashboard")}
+					onChange={handleCheckbox("enableStatusDashboard")}
 				/>
 			</SettingItem>
 
@@ -393,42 +462,7 @@ export const UISettings: React.FC<Props> = ({ settings, onChange }) => {
 					type="checkbox"
 					disabled={!settings.enableExperimentalFeatures}
 					checked={settings.enableGroupedStatusView || false}
-					onChange={handleChange("enableGroupedStatusView")}
-				/>
-			</SettingItem>
-
-			<h3>Behavior & Other</h3>
-
-			<SettingItem
-				name="Icon for unknown status"
-				description="Emoji or Lucide icon name displayed whenever a note does not have a status."
-				vertical
-			>
-				<IconSelectionField
-					emojiValue={settings.unknownStatusIcon}
-					onEmojiChange={(value) =>
-						onChange("unknownStatusIcon", value)
-					}
-					emojiPlaceholder="❓"
-					emojiHint="Type any emoji or text fallback."
-					lucideValue={settings.unknownStatusLucideIcon || ""}
-					onLucideChange={(value) =>
-						onChange("unknownStatusLucideIcon", value)
-					}
-					lucidePlaceholder="Choose Lucide icon"
-					lucideHint="Matches the Obsidian toolbar style."
-				/>
-			</SettingItem>
-
-			<SettingItem
-				name="Color for unknown status"
-				description="Hex color used for unknown statuses (e.g., #8b949e)."
-			>
-				<Input
-					variant="color"
-					value={settings.unknownStatusColor || "#8b949e"}
-					onChange={(value) => onChange("unknownStatusColor", value)}
-					placeholder="No status"
+					onChange={handleCheckbox("enableGroupedStatusView")}
 				/>
 			</SettingItem>
 		</div>
