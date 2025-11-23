@@ -4,6 +4,60 @@
 
 /* Settings use Obsidian's built-in classes mostly */
 
+.note-status-section {
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	background: var(--background-primary);
+	margin-bottom: var(--size-4-3);
+	overflow: hidden;
+}
+
+.note-status-section__header {
+	width: 100%;
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: var(--size-4-1);
+	padding: var(--size-4-2) var(--size-4-3);
+	background: var(--background-secondary);
+	border: none;
+	color: inherit;
+	cursor: pointer;
+	text-align: left;
+}
+
+.note-status-section__header:hover {
+	background: var(--background-modifier-hover);
+}
+
+.note-status-section__title-block {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-2-1);
+}
+
+.note-status-section__title-block .setting-item-name,
+.note-status-section__title-block .setting-item-description {
+	white-space: normal;
+	line-height: 1.4;
+}
+
+.note-status-section__title-block .setting-item-description {
+	color: var(--text-muted);
+}
+
+.note-status-section__chevron {
+	font-size: var(--font-ui-medium);
+	color: var(--text-muted);
+}
+
+.note-status-section__content {
+	padding: var(--size-4-3);
+	border-top: 1px solid var(--background-modifier-border);
+}
+
 /* Custom additions for Note Status settings */
 .setting-item-full {
 	width: 100%;
