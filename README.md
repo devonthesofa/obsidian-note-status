@@ -1,13 +1,17 @@
 # Note Status for Obsidian
 
 [![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/aleixsoler)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/aleixsoler)
+
 [![GitHub release](https://img.shields.io/github/v/release/devonthesofa/obsidian-note-status)](https://github.com/devonthesofa/obsidian-note-status/releases)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/devonthesofa/obsidian-note-status/release.yml)](https://github.com/devonthesofa/obsidian-note-status/actions)
 [![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22note-status%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json)](https://obsidian.md/plugins?id=note-status)
 [![GitHub License](https://img.shields.io/github/license/devonthesofa/obsidian-note-status)](https://github.com/devonthesofa/obsidian-note-status/blob/master/LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/devonthesofa/obsidian-note-status)](https://github.com/devonthesofa/obsidian-note-status/stargazers)
 
-Track the lifecycle of every file with statuses you control. Works on Markdown and non-Markdown, shows badges in the status bar and explorer, and adds commands, dashboards, and quick actions to keep notes moving.
+Track the lifecycle of every file in your vault using statuses you fully control. Note Status brings visual clarity and structured workflows to Obsidian—whether you're managing research notes, writing projects, tasks, or long-term archives.
+
+It works on both Markdown and non-Markdown files, integrates into multiple UI surfaces, and provides configurable dashboards, commands, and fast actions to keep information flowing.
 
 ## Contents
 
@@ -39,7 +43,7 @@ Track the lifecycle of every file with statuses you control. Works on Markdown a
 - **Non-Markdown**: stored in `.obsidian/plugins/obsidian-note-status/non-markdown-statuses.json`, kept in sync on rename/delete.
 - **Single vs multi**: multiple statuses by default; single-status mode can store as list (`status: [draft]`) or string (`status: draft`) for compatibility.
 
-## Screenshots (add yours)
+## Screenshots
 
 - Status assignment workflow: ![Status assignment workflow demonstration](images/status-assignment-demo.png)
 - File explorer with status icons and hover overview: ![File explorer with status icons](images/file-explorer-status-icons.png)
@@ -97,15 +101,13 @@ Works with Dataview, Templater, QuickAdd, and search. Non-Markdown uses the JSON
 
 ## API / contributing / support
 
-- Developer docs & API: see the [wiki](https://github.com/devonthesofa/obsidian-note-status/wiki).
 - Issues & feature requests: [GitHub Issues](https://github.com/devonthesofa/obsidian-note-status/issues) / [Discussions](https://github.com/devonthesofa/obsidian-note-status/discussions).
 - Contributions welcome: fork, follow dev setup in the wiki, open a PR.
 
 ## Support the project
 
 [![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/aleixsoler)
-
-**PayPal**: https://paypal.me/aleixsoler
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/aleixsoler)
 
 ---
 
