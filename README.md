@@ -18,6 +18,9 @@ It works on both Markdown and non-Markdown files, integrates into multiple UI su
 - [Feature Guide](docs/features.md): what the plugin can do across commands, UI surfaces, and workflows.
 - [Settings Reference](docs/settings.md): every option, grouped like the in-app settings.
 
+![[Pasted image 20251124181735.png]]
+![[Pasted image 20251124175911.png]]
+
 ## Quick start
 
 1. Open Settings → Note Status.
@@ -45,11 +48,30 @@ It works on both Markdown and non-Markdown files, integrates into multiple UI su
 
 ## Screenshots
 
-- Status assignment workflow: ![Status assignment workflow demonstration](images/status-assignment-demo.png)
-- File explorer with status icons and hover overview: ![File explorer with status icons](images/file-explorer-status-icons.png)
-- Status dashboard: ![Status dashboard with vault statistics](images/status-dashboard-overview1.png) ![Status dashboard with vault statistics](images/status-dashboard-overview2.png) ![Status dashboard with vault statistics](images/status-dashboard-overview3.png)
-- Grouped status view: ![Grouped status view with filtering](images/grouped-status-filtering.png)
-- Custom statuses editor: ![Custom statuses](images/custom-status-change.png)
+- Nav bar with current status
+
+    - ![[Pasted image 20251124175219.png]]
+    - ![[Pasted image 20251124175531.png]]
+
+- Status assignment:
+
+    - ![[Pasted image 20251124175250.png]]
+
+- File explorer with status icons and hover overview:
+    - ![[Pasted image 20251124175828.png]]
+- Multiple settings:
+    - ![[Pasted image 20251124181317.png]]
+- Custom templates editor:
+    - ![[Pasted image 20251124180312.png]]
+    - ![[Pasted image 20251124180453.png]]
+- Frontmatter tags mapping
+    - ![[Pasted image 20251124180719.png]]
+- Grouped status view:
+    - ![[Pasted image 20251124181043.png]]
+- Status dashboard:
+    - ![[Pasted image 20251124181152.png]]
+    - ![[Pasted image 20251124181213.png]]
+    - ![[Pasted image 20251124181233.png]]
 
 ## Installation
 
@@ -87,7 +109,7 @@ It works on both Markdown and non-Markdown files, integrates into multiple UI su
 
 ## Data format
 
-Statuses in YAML:
+Statuses in YAML(as string or array, it depends of your settings):
 
 ```yaml
 ---
@@ -98,11 +120,6 @@ obsidian-note-status:
 ```
 
 Works with Dataview, Templater, QuickAdd, and search. Non-Markdown uses the JSON store noted above.
-
-## API / contributing / support
-
-- Issues & feature requests: [GitHub Issues](https://github.com/devonthesofa/obsidian-note-status/issues) / [Discussions](https://github.com/devonthesofa/obsidian-note-status/discussions).
-- Contributions welcome: fork, follow dev setup in the wiki, open a PR.
 
 ## Support the project
 
