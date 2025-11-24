@@ -195,6 +195,45 @@ const SettingsUI: React.FC<Props> = ({ settings, onChange }) => {
 					</div>
 				);
 			})}
+
+			<div className="note-status-settings__intro">
+				<p className="note-status-settings__description">
+					Note Status keeps your vault aligned with clear,
+					configurable workflows. Tune the sections below to match how
+					you review notes, surface statuses, and keep storage tidy.
+				</p>
+				<div className="note-status-settings__support">
+					<a
+						href="https://paypal.me/aleixsoler"
+						target="_blank"
+						rel="noreferrer"
+						className="note-status-settings__badge"
+					>
+						<img
+							src="https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white"
+							alt="Support via PayPal"
+						/>
+					</a>
+					<a
+						href="https://buymeacoffee.com/aleixsoler"
+						target="_blank"
+						rel="noreferrer"
+						className="note-status-settings__badge"
+					>
+						<img
+							src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black"
+							alt="Buy me a coffee"
+						/>
+					</a>
+					<a
+						href="https://github.com/devonthesofa/obsidian-note-status"
+						target="_blank"
+						rel="noreferrer"
+					>
+						Star the project on GitHub
+					</a>
+				</div>
+			</div>
 		</div>
 	);
 };

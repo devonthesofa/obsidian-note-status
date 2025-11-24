@@ -1,149 +1,115 @@
 # Note Status for Obsidian
 
+[![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/aleixsoler)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/aleixsoler)
+
 [![GitHub release](https://img.shields.io/github/v/release/devonthesofa/obsidian-note-status)](https://github.com/devonthesofa/obsidian-note-status/releases)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/devonthesofa/obsidian-note-status/release.yml)](https://github.com/devonthesofa/obsidian-note-status/actions)
 [![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22note-status%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json)](https://obsidian.md/plugins?id=note-status)
 [![GitHub License](https://img.shields.io/github/license/devonthesofa/obsidian-note-status)](https://github.com/devonthesofa/obsidian-note-status/blob/master/LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/devonthesofa/obsidian-note-status)](https://github.com/devonthesofa/obsidian-note-status/stargazers)
 
-Track the status of your notes with a powerful, customizable status management system. Mark notes as active, completed, on hold, or create your own custom workflows.
+Track the lifecycle of every file in your vault using statuses you fully control. Note Status brings visual clarity and structured workflows to Obsidian—whether you're managing research notes, writing projects, tasks, or long-term archives.
 
-![Status assignment workflow demonstration](images/status-assignment-demo.png)
+It works on both Markdown and non-Markdown files, integrates into multiple UI surfaces, and provides configurable dashboards, commands, and fast actions to keep information flowing.
 
-_Alt: Demonstration of assigning status to a note using the toolbar dropdown_
+## Contents
 
-## 🎯 Features
+- [Feature Guide](docs/features.md): what the plugin can do across commands, UI surfaces, and workflows.
+- [Settings Reference](docs/settings.md): every option, grouped like the in-app settings.
 
-- **📋 Status Assignment** - Mark notes with workflow statuses (active, completed, on hold, etc.)
-- **🎯 Multi-Status Support** - Assign multiple statuses per note
-- **📁 File Explorer Icons** - Visual indicators next to filenames with configurable positioning
-- **🧭 Status Bar Integration** - View current status at bottom of editor
-- **⬇️ Toolbar Dropdown** - Change statuses quickly from editor toolbar
-- **📊 Status Dashboard** - Vault overview with statistics and quick actions
-- **📈 Grouped View** - Browse notes organized by status with search and filtering
-- **⚡ Batch Operations** - Update multiple files simultaneously
-- **🎨 Custom Statuses** - Create your own statuses with icons, colors, and descriptions
-- **🏷️ Template Scoping** - Organize statuses by note templates
-- **🚀 Performance Optimized** - Works with large vaults (40k+ notes tested)
+![Big picture 1](images/big-picture-1.png)
+![Big picture 1](images/big-picture-2.png)
 
-![File explorer with status icons](images/file-explorer-status-icons.png)
+## Quick start
 
-_Alt: File explorer showing multiple notes with different status icons positioned next to note names and the tooltip with status overview_
+1. Open Settings → Note Status.
+2. Expand **Templates & Statuses** and keep a built-in template or add your own/custom-only set.
+3. Pick where to see/change status: **Status Bar** or **Editor Toolbar**.
+4. Set a status from the badge or run `Change current note status`.
+5. Watch file explorer icons update; hover for the overview popup or click to change again.
+6. If enabled, open the **Status Dashboard** or **Grouped Status View** from the ribbon/commands.
 
-![Status dashboard with vault statistics](images/status-dashboard-overview1.png)
+## Key features
 
-_Alt: Status dashboard showing current note information, vault statistics with total notes and coverage percentages_
-![Status dashboard with vault statistics](images/status-dashboard-overview2.png)
+- Status picker everywhere: status bar badge, editor toolbar, explorer context menus, commands.
+- Multi-status or single-status workflows; quick-status commands for hotkeys.
+- File explorer icons with configurable placement, frames, and visual treatments (row tint, underline, dot, border).
+- Status bar badges with accent/filled/dot styles and icon/text options; template names can auto-show on conflicts.
+- Dashboards and grouped views (gated by experimental toggles and vault size limit) for vault-wide visibility and quick actions.
+- Built-in templates (Colorful, Minimal, Academic, Project) plus full custom templates and standalone custom statuses.
+- Works with YAML frontmatter and non-Markdown via a synced JSON store; frontmatter mappings let you write to multiple keys.
 
-_Alt: Status distribution chart showing different statuses with colored bars and note counts for each status type_
-![Status dashboard with vault statistics](images/status-dashboard-overview3.png)
+## Data model
 
-_Alt: Quick actions panel with organized sections for views, current note operations, clipboard actions, and tools_
+- **Markdown**: statuses live under the tag prefix (default `obsidian-note-status`). Map templates/statuses to extra YAML keys and optionally also write to the default.
+- **Non-Markdown**: stored in `.obsidian/plugins/obsidian-note-status/non-markdown-statuses.json`, kept in sync on rename/delete.
+- **Single vs multi**: multiple statuses by default; single-status mode can store as list (`status: [draft]`) or string (`status: draft`) for compatibility.
 
-## 💻 Technology Stack
+## Screenshots
 
-Built with modern web technologies for performance and reliability:
+- Nav bar with current status
 
-- **TypeScript** - Type-safe development
-- **React** - Modern UI framework
-- **esbuild** - Fast bundling and development
-- **Obsidian API** - Deep vault integration
+    - ![navbar-unnasigned](images/navbar-unnasigned.png)
+    - ![navbar-multiple](images/navbar-multiple.png)
 
-## 📦 Installation
+- Status assignment:
 
-### Community Plugin Store (Recommended)
+    - ![change-not-status-modal](images/change-not-status-modal.png)
 
-1. Open Obsidian → Settings → Community plugins
-2. Disable Safe mode → Browse → Search "Note Status"
-3. Install and Enable
+- File explorer with status icons and hover overview:
+    - ![file-explorer-and-popup](images/file-explorer-and-popup.png)
+- Multiple settings:
+    - ![settings-collapsed](images/settings-collapsed.png)
+- Custom templates editor:
+    - ![settings-collapsed](images/status-templates-1.png)
+    - ![settings-collapsed](images/custom-templates.png)
+- Frontmatter tags mapping
+    - ![frontmatter-mappings](images/frontmatter-mappings.png)
+- Grouped status view:
+    - ![status-groups-full-picture-2](images/status-groups-full-picture-2.png)
+- Status dashboard:
+    - ![status-dashboard-1](images/status-dashboard-1.png)
+    - ![status-dashboard-2](images/status-dashboard-2.png)
+    - ![status-dashboard-3](images/status-dashboard-3.png)
 
-### Manual Installation
+## Installation
 
-1. Download latest release from [GitHub Releases](https://github.com/devonthesofa/obsidian-note-status/releases)
-2. Extract `main.js`, `manifest.json`, and `styles.css` to `.obsidian/plugins/note-status/`
-3. Enable in Community plugins settings
+### Community Plugin Store (recommended)
 
-## 🚀 How to Use
+1. Obsidian → Settings → Community plugins.
+2. Disable Safe mode → Browse → search “Note Status”.
+3. Install and enable.
 
-### Quick Start
+### Manual
 
-1. **Assign Status**:
+1. Download the latest release from [GitHub Releases](https://github.com/devonthesofa/obsidian-note-status/releases).
+2. Extract `main.js`, `manifest.json`, and `styles.css` to `.obsidian/plugins/note-status/`.
+3. Enable in Community plugins settings.
 
-    1. Click the "No status" in toolbar
+## Example workflows
 
-        ![Status toolbar](images/no-status-toolbar.png)
-
-        _Alt: Editor toolbar showing "No status" button for status assignment_
-
-    2. → Select a status
-
-2. **View in Explorer**: Status icons appear next to note names
-
-    ![File explorer item](images/file-explorer-item.png)
-
-    _Alt: Single file explorer item showing a note with status icon positioned next to the filename_
-
-3. **Browse by Status or open the Dashboard**: Open from left sidebar
-
-    ![Open status view](images/open-view-buttons.png)
-
-    _Alt: Left sidebar showing ribbon buttons for opening grouped status view and status dashboard_
-
-4. **Batch Update**: Select multiple files → Right-click → Change status
-
-    ![Multiple status context](images/change-multiple-statuses.png)
-
-    _Alt: Context menu appearing when right-clicking multiple selected files, showing "Change note status" option_
-
-### Example Workflows
-
-**Personal Knowledge Management**
+**Personal knowledge**
 
 ```
 💡 idea → 📝 draft → ✏️ editing → ✅ completed → 📦 archived
 ```
 
-**Project Management**
+**Project delivery**
 
 ```
 📋 backlog → 🚦 ready → 👨‍💻 inDevelopment → 🧪 testing → 🚀 live
 ```
 
-**Academic Research**
+**Academic**
 
 ```
 🔍 research → 📑 outline → ✏️ draft → 🔬 review → 📚 final
 ```
 
-![Grouped status view with filtering](images/grouped-status-filtering.png)
+## Data format
 
-_Alt: Grouped status view showing notes organized by status with template filtering and search functionality_
-
-### Custom Statuses
-
-Create your own workflow:
-
-1. **Settings** → Note Status → Custom Statuses
-2. **Add Status** → Configure name, icon, color, description
-3. **Reorder** using arrow controls
-4. **Use** in your notes
-
-Example custom status:
-
-```
-Name: urgent
-Icon: 🔥
-Color: #FF0000
-Description: Requires immediate attention
-```
-
-![Custom statuses](images/custom-status-change.png)
-
-_Alt: Status selection modal showing custom and template statuses with icons, names, and selection interface_
-
-## 📋 Data Format
-
-Statuses are stored in YAML frontmatter:
+Statuses in YAML(as string or array, it depends of your settings):
 
 ```yaml
 ---
@@ -153,51 +119,13 @@ obsidian-note-status:
 ---
 ```
 
-Works with:
+Works with Dataview, Templater, QuickAdd, and search. Non-Markdown uses the JSON store noted above.
 
-- **Dataview queries**
-- **Templater scripts**
-- **QuickAdd macros**
-- **Global search**
-
-Non-Markdown files (PDF, Canvas, images, etc.) can't host YAML frontmatter. Their statuses live in a lightweight JSON file under `.obsidian/plugins/obsidian-note-status/non-markdown-statuses.json`, and every command/view in the plugin reads from that store transparently. External tools such as Dataview or Templater still only see Markdown/frontmatter data, so keep using Markdown files if you need those integrations.
-
-## 🛠️ API Reference
-
-For developers building integrations or contributing:
-
-📚 **[Developer Documentation](https://github.com/devonthesofa/obsidian-note-status/wiki)**
-
-Includes:
-
-- Architecture overview
-- Development setup
-- API reference
-- Contributing guide
-
-## 🤝 Contributing
-
-We welcome contributions!
-
-1. **Check** [GitHub Issues](https://github.com/devonthesofa/obsidian-note-status/issues) for bugs/features
-2. **Fork** the repository
-3. **Follow** [Development Setup](https://github.com/devonthesofa/obsidian-note-status/wiki/🔧-Development-Setup)
-4. **Submit** pull request
-
-## 🐛 Support
-
-- **📖 Documentation**: [Complete Wiki](https://github.com/devonthesofa/obsidian-note-status/wiki)
-- **🐞 Bug Reports**: [GitHub Issues](https://github.com/devonthesofa/obsidian-note-status/issues)
-- **💡 Feature Requests**: [GitHub Discussions](https://github.com/devonthesofa/obsidian-note-status/discussions)
-
-## ❤️ Support Development
-
-If you find this plugin useful:
+## Support the project
 
 [![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/aleixsoler)
-
-**PayPal**: https://paypal.me/aleixsoler
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/aleixsoler)
 
 ---
 
-**License**: MIT | **Author**: [Aleix Soler](https://aleixsoler.com)
+**License**: MIT · **Author**: [Aleix Soler](https://aleixsoler.com)
