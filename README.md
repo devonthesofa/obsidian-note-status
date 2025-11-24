@@ -65,7 +65,6 @@ It works on both Markdown and non-Markdown files, integrates into multiple UI su
     - ![settings-collapsed](images/status-templates-1.png)
     - ![settings-collapsed](images/custom-templates.png)
 - Frontmatter tags mapping
-    - ![settings-collapsed](images/custom-templates.png)
     - ![frontmatter-mappings](images/frontmatter-mappings.png)
 - Grouped status view:
     - ![status-groups-full-picture-2](images/status-groups-full-picture-2.png)
