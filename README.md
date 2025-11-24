@@ -18,8 +18,8 @@ It works on both Markdown and non-Markdown files, integrates into multiple UI su
 - [Feature Guide](docs/features.md): what the plugin can do across commands, UI surfaces, and workflows.
 - [Settings Reference](docs/settings.md): every option, grouped like the in-app settings.
 
-![[Pasted image 20251124181735.png]]
-![[Pasted image 20251124175911.png]]
+![Big picture 1](images/big-picture-1.png)
+![Big picture 1](images/big-picture-2.png)
 
 ## Quick start
 
@@ -50,28 +50,29 @@ It works on both Markdown and non-Markdown files, integrates into multiple UI su
 
 - Nav bar with current status
 
-    - ![[Pasted image 20251124175219.png]]
-    - ![[Pasted image 20251124175531.png]]
+    - ![navbar-unnasigned](images/navbar-unnasigned.png)
+    - ![navbar-multiple](images/navbar-multiple.png)
 
 - Status assignment:
 
-    - ![[Pasted image 20251124175250.png]]
+    - ![change-not-status-modal](images/change-not-status-modal.png)
 
 - File explorer with status icons and hover overview:
-    - ![[Pasted image 20251124175828.png]]
+    - ![file-explorer-and-popup](images/file-explorer-and-popup.png)
 - Multiple settings:
-    - ![[Pasted image 20251124181317.png]]
+    - ![settings-collapsed](images/settings-collapsed.png)
 - Custom templates editor:
-    - ![[Pasted image 20251124180312.png]]
-    - ![[Pasted image 20251124180453.png]]
+    - ![settings-collapsed](images/status-templates-1.png)
+    - ![settings-collapsed](images/custom-templates.png)
 - Frontmatter tags mapping
-    - ![[Pasted image 20251124180719.png]]
+    - ![settings-collapsed](images/custom-templates.png)
+    - ![frontmatter-mappings](images/frontmatter-mappings.png)
 - Grouped status view:
-    - ![[Pasted image 20251124181043.png]]
+    - ![status-groups-full-picture-2](images/status-groups-full-picture-2.png)
 - Status dashboard:
-    - ![[Pasted image 20251124181152.png]]
-    - ![[Pasted image 20251124181213.png]]
-    - ![[Pasted image 20251124181233.png]]
+    - ![status-dashboard-1](images/status-dashboard-1.png)
+    - ![status-dashboard-2](images/status-dashboard-2.png)
+    - ![status-dashboard-3](images/status-dashboard-3.png)
 
 ## Installation
 
