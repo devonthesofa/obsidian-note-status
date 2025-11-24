@@ -50,7 +50,11 @@
 
 ## Templates & custom statuses
 
-- Built-in templates: Colorful (idea → draft → inProgress → editing → pending → onHold → needsUpdate → completed → archived), Minimal (todo → inProgress → review → done), Academic (research → outline → draft → review → revision → final → published), Project (planning → backlog → ready → inDevelopment → testing → review → approved → live).
+- Built-in templates:
+    - Colorful (idea → draft → inProgress → editing → pending → onHold → needsUpdate → completed → archived)
+    - Minimal (todo → inProgress → review → done)
+    - Academic (research → outline → draft → review → revision → final → published)
+    - Project (planning → backlog → ready → inDevelopment → testing → review → approved → live).
 - Build your own templates (name, description, ordered statuses with emoji/Lucide + color). New templates auto-enable; you can edit/delete or reset built-ins anytime.
 - Custom statuses live outside templates; create, reorder, delete them, or run in “Custom only” mode to hide template statuses entirely.
 - Unknown status handling is configurable (icon/Lucide icon, color, and whether unknowns show in explorer/status bar).
@@ -72,10 +76,3 @@
 - Single-status mode can store the value as a list (`status: [in-progress]`) or plain string (`status: in-progress`) for compatibility with plugins that expect strings.
 - Non-Markdown files store statuses in `.obsidian/plugins/obsidian-note-status/non-markdown-statuses.json`. Rename/delete events stay in sync automatically.
 - Strict status validation removes unknown statuses when you edit a file’s statuses—use with caution if you expect ad-hoc values.
-
-## Screenshot ideas (add later)
-
-- Status picker modal with template tabs and search.
-- File explorer with icons/row coloring and the hover overview popup.
-- Status bar badge styles (accent/filled/dot) with and without template names.
-- Dashboard and Grouped Status View with filters.
