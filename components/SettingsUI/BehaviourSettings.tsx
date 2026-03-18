@@ -1,7 +1,8 @@
 import { PluginSettings } from "@/types/pluginSettings";
-import React from "react";
+import React, { useMemo } from "react";
 import { SettingItem } from "./SettingItem";
 import { FrontmatterMappingsSettings } from "./FrontmatterMappingsSettings";
+import { BaseNoteStatusService } from "@/core/noteStatusService";
 
 export type Props = {
 	settings: PluginSettings;
@@ -9,9 +10,50 @@ export type Props = {
 };
 
 export const BehaviourSettings: React.FC<Props> = ({ settings, onChange }) => {
+	const availableStatuses = useMemo(() => {
+		return BaseNoteStatusService.getAllAvailableStatuses();
+	}, [
+		settings.templates,
+		settings.customStatuses,
+		settings.enabledTemplates,
+	]);
+
 	return (
 		<div>
 			<h3>Status tag</h3>
+
+			<SettingItem
+				name="Default status for new notes"
+				description="Automatically apply this status to newly created notes."
+			>
+				<select
+					value={settings.defaultStatusForNewNotes || ""}
+					onChange={(e) => {
+						const value = e.target.value;
+						onChange(
+							"defaultStatusForNewNotes",
+							value === "" ? null : value,
+						);
+					}}
+				>
+					<option value="">None</option>
+					{availableStatuses.map((status) => {
+						const identifier =
+							BaseNoteStatusService.formatStatusIdentifier({
+								templateId: status.templateId,
+								name: status.name,
+							});
+						const displayName = status.templateId
+							? `${status.name} (${status.templateId})`
+							: status.name;
+						return (
+							<option key={identifier} value={identifier}>
+								{displayName}
+							</option>
+						);
+					})}
+				</select>
+			</SettingItem>
 
 			<SettingItem
 				name="Enable multiple statuses"
