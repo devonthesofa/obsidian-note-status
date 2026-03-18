@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Notice } from "obsidian";
 import { PluginSettings } from "@/types/pluginSettings";
 import { TemplateSettings } from "./TemplateSettings";
 import { BehaviourSettings } from "./BehaviourSettings";
@@ -49,6 +50,13 @@ const SettingsUI: React.FC<Props> = ({ settings, onChange }) => {
 	const handleChange = (key: keyof PluginSettings, value: unknown) => {
 		setLocalSettings((prev) => ({ ...prev, [key]: value }));
 		onChange(key, value);
+	};
+
+	const handleSupportClick = (url: string, label: string) => {
+		window.open(url);
+		navigator.clipboard.writeText(url).then(() => {
+			new Notice(`Copied ${label} URL to clipboard!`);
+		});
 	};
 
 	const sections: SectionDefinition[] = [
@@ -217,35 +225,64 @@ const SettingsUI: React.FC<Props> = ({ settings, onChange }) => {
 					you review notes, surface statuses, and keep storage tidy.
 				</p>
 				<div className="note-status-settings__support">
-					<a
-						href="https://paypal.me/aleixsoler"
-						target="_blank"
-						rel="noreferrer"
-						className="note-status-settings__badge"
+					<button
+						className="note-status-settings__support-link"
+						onClick={() =>
+							handleSupportClick(
+								"https://paypal.me/aleixsoler",
+								"PayPal",
+							)
+						}
 					>
 						<img
 							src="https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white"
-							alt="Support via PayPal"
+							alt="PayPal"
+							style={{ height: "20px" }}
 						/>
-					</a>
-					<a
-						href="https://buymeacoffee.com/aleixsoler"
-						target="_blank"
-						rel="noreferrer"
-						className="note-status-settings__badge"
+						<span className="note-status-settings__support-link-label">
+							Support via PayPal
+						</span>
+						<span className="note-status-settings__support-link-url">
+							paypal.me/aleixsoler
+						</span>
+					</button>
+					<button
+						className="note-status-settings__support-link"
+						onClick={() =>
+							handleSupportClick(
+								"https://buymeacoffee.com/aleixsoler",
+								"Buy Me a Coffee",
+							)
+						}
 					>
 						<img
 							src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black"
 							alt="Buy me a coffee"
+							style={{ height: "20px" }}
 						/>
-					</a>
-					<a
-						href="https://github.com/devonthesofa/obsidian-note-status"
-						target="_blank"
-						rel="noreferrer"
+						<span className="note-status-settings__support-link-label">
+							Buy me a coffee
+						</span>
+						<span className="note-status-settings__support-link-url">
+							buymeacoffee.com/aleixsoler
+						</span>
+					</button>
+					<button
+						className="note-status-settings__support-link"
+						onClick={() =>
+							handleSupportClick(
+								"https://github.com/devonthesofa/obsidian-note-status",
+								"GitHub",
+							)
+						}
 					>
-						Star the project on GitHub
-					</a>
+						<span className="note-status-settings__support-link-label">
+							Star on GitHub
+						</span>
+						<span className="note-status-settings__support-link-url">
+							github.com/devonthesofa/obsidian-note-status
+						</span>
+					</button>
 				</div>
 			</div>
 		</div>
