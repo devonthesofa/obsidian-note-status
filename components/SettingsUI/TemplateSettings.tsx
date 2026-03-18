@@ -4,6 +4,7 @@ import { TemplateItem } from "./TemplateItem";
 import { TemplateEditorModal } from "./TemplateEditorModal";
 import { MarketplaceShareModal } from "./MarketplaceShareModal";
 import { MarketplaceBrowseModal } from "./MarketplaceBrowseModal";
+import { ObsidianIcon } from "../atoms/ObsidianIcon";
 import {
 	generateTemplateId,
 	isTemplateNameUnique,

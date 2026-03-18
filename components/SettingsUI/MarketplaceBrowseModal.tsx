@@ -33,7 +33,7 @@ export const MarketplaceBrowseModal: React.FC<MarketplaceBrowseModalProps> = ({
 					<h2>Template Marketplace</h2>
 					<SearchFilter
 						value={searchQuery}
-						onChange={setSearchQuery}
+						onFilterChange={setSearchQuery}
 						placeholder="Search templates..."
 					/>
 				</div>
