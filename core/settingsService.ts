@@ -1,7 +1,60 @@
 import { DEFAULT_PLUGIN_SETTINGS } from "@/constants/defaultSettings";
-import { PluginSettings } from "@/types/pluginSettings";
+import { PluginSettings, SyncGroup } from "@/types/pluginSettings";
 import { Plugin, TFile, normalizePath } from "obsidian";
 import eventBus from "./eventBus";
+
+export const SETTINGS_GROUPS: Record<SyncGroup, (keyof PluginSettings)[]> = {
+	statuses: [
+		"templates",
+		"customStatuses",
+		"enabledTemplates",
+		"useCustomStatusesOnly",
+		"useMultipleStatuses",
+		"singleStatusStorageMode",
+		"strictStatuses",
+	],
+	appearance: [
+		"fileExplorerIconPosition",
+		"fileExplorerIconFrame",
+		"fileExplorerIconColorMode",
+		"statusColors",
+		"showStatusBar",
+		"autoHideStatusBar",
+		"statusBarShowTemplateName",
+		"statusBarBadgeStyle",
+		"statusBarBadgeContentMode",
+		"showStatusIconsInExplorer",
+		"hideUnknownStatusInExplorer",
+		"fileExplorerColorFileName",
+		"fileExplorerColorBlock",
+		"fileExplorerLeftBorder",
+		"fileExplorerStatusDot",
+		"fileExplorerUnderlineFileName",
+		"unknownStatusIcon",
+		"unknownStatusLucideIcon",
+		"unknownStatusColor",
+		"statusBarNoStatusText",
+		"statusBarShowNoStatusIcon",
+		"statusBarShowNoStatusText",
+		"showEditorToolbarButton",
+		"editorToolbarButtonPosition",
+		"editorToolbarButtonDisplay",
+	],
+	behavior: [
+		"tagPrefix",
+		"statusFrontmatterMappings",
+		"writeMappedTagsToDefault",
+		"applyStatusRecursivelyToSubfolders",
+		"vaultSizeLimit",
+		"enableStatusOverviewPopup",
+	],
+	features: [
+		"quickStatusCommands",
+		"enableExperimentalFeatures",
+		"enableStatusDashboard",
+		"enableGroupedStatusView",
+	],
+};
 
 class SettingsService {
 	private plugin: Plugin;
@@ -84,8 +137,22 @@ class SettingsService {
 		if (!this.settings.enableExternalStatusSync && !force) return;
 
 		const path = normalizePath(this.settings.externalStatusSyncPath);
+
+		// Filter settings based on selected groups
+		const keysToSync = new Set<keyof PluginSettings>();
+		this.settings.syncGroups.forEach((group) => {
+			SETTINGS_GROUPS[group].forEach((key) => keysToSync.add(key));
+		});
+
+		const filteredSettings: Partial<PluginSettings> = {};
+		keysToSync.forEach((key) => {
+			(filteredSettings as Record<string, unknown>)[key] =
+				this.settings[key];
+		});
+
 		const data = {
-			...this.settings,
+			...filteredSettings,
+			syncGroups: this.settings.syncGroups, // Always include meta-settings
 			updatedAt: new Date().toISOString(),
 		};
 
@@ -108,13 +175,19 @@ class SettingsService {
 			const content = await this.plugin.app.vault.adapter.read(path);
 			const data = JSON.parse(content);
 
+			// Determine which keys we should actually apply based on CURRENT settings
+			const allowedKeys = new Set<keyof PluginSettings>();
+			this.settings.syncGroups.forEach((group) => {
+				SETTINGS_GROUPS[group].forEach((key) => allowedKeys.add(key));
+			});
+
 			let hasChanged = false;
 			const keys = Object.keys(data).filter(
-				(k) => k !== "updatedAt",
+				(k) => k !== "updatedAt" && k !== "syncGroups",
 			) as Array<keyof PluginSettings>;
 
 			for (const key of keys) {
-				if (!(key in this.settings)) continue;
+				if (!(key in this.settings) || !allowedKeys.has(key)) continue;
 
 				const newValue = data[key];
 				const currentValue = this.settings[key];

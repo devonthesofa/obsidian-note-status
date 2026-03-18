@@ -22,6 +22,8 @@ export interface StatusTemplate {
 	statuses: NoteStatus[];
 }
 
+export type SyncGroup = "statuses" | "appearance" | "behavior" | "features";
+
 export type PluginSettings = {
 	fileExplorerIconPosition:
 		| "absolute-right"
@@ -72,5 +74,6 @@ export type PluginSettings = {
 	writeMappedTagsToDefault: boolean; // Whether mapped tags should also write to the default tag
 	enableExternalStatusSync: boolean; // Whether to sync statuses to an external file
 	externalStatusSyncPath: string; // Path to the external sync file
+	syncGroups: SyncGroup[]; // Selected groups of settings to synchronize
 	[key: string]: unknown;
 };
