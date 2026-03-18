@@ -57,5 +57,15 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	writeMappedTagsToDefault: false,
 	enableExternalStatusSync: false,
 	externalStatusSyncPath: "_note-status-sync.json",
-	syncGroups: ["statuses", "appearance", "behavior", "features"],
+	syncGroups: [
+		"templates",
+		"customStatuses",
+		"statusColors",
+		"uiAppearance",
+		"workflow",
+		"storage",
+		"features",
+	],
+	enableNonMarkdownSync: false,
+	nonMarkdownSyncPath: "_note-status-data.json",
 };

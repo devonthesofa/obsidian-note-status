@@ -32,8 +32,8 @@ export default class NoteStatusPlugin extends Plugin {
 
 	async onload() {
 		BaseNoteStatusService.initialize(this.app);
-		await statusStoreManager.initialize(this);
 		await this.loadPluginSettings();
+		await statusStoreManager.initialize(this);
 
 		// INFO: initialize all integrations
 		Promise.all([

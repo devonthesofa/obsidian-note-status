@@ -16,7 +16,7 @@ export const CustomStatusSettings: React.FC<Props> = ({
 	onChange,
 }) => {
 	const addNewCustomStatus = () => {
-		const currentStatuses = [...settings.customStatuses];
+		const currentStatuses = [...(settings.customStatuses || [])];
 		currentStatuses.push({
 			name: "",
 			icon: "",
@@ -27,7 +27,7 @@ export const CustomStatusSettings: React.FC<Props> = ({
 	const removeCustomStatus: CustomStatusItemProps["onCustomStatusRemove"] = (
 		index,
 	) => {
-		const currentStatuses = [...settings.customStatuses];
+		const currentStatuses = [...(settings.customStatuses || [])];
 		currentStatuses.splice(index, 1);
 		onChange("customStatuses", currentStatuses);
 	};
@@ -37,7 +37,7 @@ export const CustomStatusSettings: React.FC<Props> = ({
 		column,
 		value,
 	) => {
-		const currentStatuses = [...settings.customStatuses];
+		const currentStatuses = [...(settings.customStatuses || [])];
 
 		const target = currentStatuses[index];
 		if (target) {
@@ -48,7 +48,7 @@ export const CustomStatusSettings: React.FC<Props> = ({
 
 	const moveCustomStatusUp = (index: number) => {
 		if (index <= 0) return;
-		const currentStatuses = [...settings.customStatuses];
+		const currentStatuses = [...(settings.customStatuses || [])];
 		[currentStatuses[index - 1], currentStatuses[index]] = [
 			currentStatuses[index],
 			currentStatuses[index - 1],
@@ -57,8 +57,8 @@ export const CustomStatusSettings: React.FC<Props> = ({
 	};
 
 	const moveCustomStatusDown = (index: number) => {
-		if (index >= settings.customStatuses.length - 1) return;
-		const currentStatuses = [...settings.customStatuses];
+		const currentStatuses = [...(settings.customStatuses || [])];
+		if (index >= currentStatuses.length - 1) return;
 		[currentStatuses[index], currentStatuses[index + 1]] = [
 			currentStatuses[index + 1],
 			currentStatuses[index],
@@ -89,7 +89,7 @@ export const CustomStatusSettings: React.FC<Props> = ({
 				vertical
 			>
 				<div className="custom-status-list">
-					{settings.customStatuses.length === 0 ? (
+					{(settings.customStatuses || []).length === 0 ? (
 						<div className="custom-status-list__empty">
 							<p>
 								No custom statuses yet. Click "Add Status" below
@@ -97,7 +97,7 @@ export const CustomStatusSettings: React.FC<Props> = ({
 							</p>
 						</div>
 					) : (
-						settings.customStatuses.map((status, index) => (
+						(settings.customStatuses || []).map((status, index) => (
 							<CustomStatusItem
 								key={index}
 								status={status}
@@ -108,7 +108,8 @@ export const CustomStatusSettings: React.FC<Props> = ({
 								onMoveDown={moveCustomStatusDown}
 								canMoveUp={index > 0}
 								canMoveDown={
-									index < settings.customStatuses.length - 1
+									index <
+									(settings.customStatuses || []).length - 1
 								}
 							/>
 						))

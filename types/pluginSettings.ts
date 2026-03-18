@@ -22,7 +22,14 @@ export interface StatusTemplate {
 	statuses: NoteStatus[];
 }
 
-export type SyncGroup = "statuses" | "appearance" | "behavior" | "features";
+export type SyncGroup =
+	| "templates"
+	| "customStatuses"
+	| "statusColors"
+	| "uiAppearance"
+	| "workflow"
+	| "storage"
+	| "features";
 
 export type PluginSettings = {
 	fileExplorerIconPosition:
@@ -75,5 +82,7 @@ export type PluginSettings = {
 	enableExternalStatusSync: boolean; // Whether to sync statuses to an external file
 	externalStatusSyncPath: string; // Path to the external sync file
 	syncGroups: SyncGroup[]; // Selected groups of settings to synchronize
+	enableNonMarkdownSync: boolean; // Whether to sync non-markdown statuses to a vault file
+	nonMarkdownSyncPath: string; // Path to the non-markdown sync file
 	[key: string]: unknown;
 };

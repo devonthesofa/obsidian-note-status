@@ -4,20 +4,13 @@ import { Plugin, TFile, normalizePath } from "obsidian";
 import eventBus from "./eventBus";
 
 export const SETTINGS_GROUPS: Record<SyncGroup, (keyof PluginSettings)[]> = {
-	statuses: [
-		"templates",
-		"customStatuses",
-		"enabledTemplates",
-		"useCustomStatusesOnly",
-		"useMultipleStatuses",
-		"singleStatusStorageMode",
-		"strictStatuses",
-	],
-	appearance: [
+	templates: ["templates", "enabledTemplates"],
+	customStatuses: ["customStatuses"],
+	statusColors: ["statusColors"],
+	uiAppearance: [
 		"fileExplorerIconPosition",
 		"fileExplorerIconFrame",
 		"fileExplorerIconColorMode",
-		"statusColors",
 		"showStatusBar",
 		"autoHideStatusBar",
 		"statusBarShowTemplateName",
@@ -40,19 +33,25 @@ export const SETTINGS_GROUPS: Record<SyncGroup, (keyof PluginSettings)[]> = {
 		"editorToolbarButtonPosition",
 		"editorToolbarButtonDisplay",
 	],
-	behavior: [
+	workflow: [
+		"useCustomStatusesOnly",
+		"useMultipleStatuses",
+		"singleStatusStorageMode",
+		"strictStatuses",
+		"enableStatusOverviewPopup",
+	],
+	storage: [
 		"tagPrefix",
 		"statusFrontmatterMappings",
 		"writeMappedTagsToDefault",
 		"applyStatusRecursivelyToSubfolders",
-		"vaultSizeLimit",
-		"enableStatusOverviewPopup",
 	],
 	features: [
 		"quickStatusCommands",
 		"enableExperimentalFeatures",
 		"enableStatusDashboard",
 		"enableGroupedStatusView",
+		"vaultSizeLimit",
 	],
 };
 
@@ -140,8 +139,11 @@ class SettingsService {
 
 		// Filter settings based on selected groups
 		const keysToSync = new Set<keyof PluginSettings>();
-		this.settings.syncGroups.forEach((group) => {
-			SETTINGS_GROUPS[group].forEach((key) => keysToSync.add(key));
+		(this.settings.syncGroups || []).forEach((group) => {
+			const groupKeys = SETTINGS_GROUPS[group];
+			if (groupKeys) {
+				groupKeys.forEach((key) => keysToSync.add(key));
+			}
 		});
 
 		const filteredSettings: Partial<PluginSettings> = {};
@@ -177,8 +179,11 @@ class SettingsService {
 
 			// Determine which keys we should actually apply based on CURRENT settings
 			const allowedKeys = new Set<keyof PluginSettings>();
-			this.settings.syncGroups.forEach((group) => {
-				SETTINGS_GROUPS[group].forEach((key) => allowedKeys.add(key));
+			(this.settings.syncGroups || []).forEach((group) => {
+				const groupKeys = SETTINGS_GROUPS[group];
+				if (groupKeys) {
+					groupKeys.forEach((key) => allowedKeys.add(key));
+				}
 			});
 
 			let hasChanged = false;
