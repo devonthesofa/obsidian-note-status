@@ -73,6 +73,43 @@ It works on both Markdown and non-Markdown files, integrates into multiple UI su
     - ![status-dashboard-2](images/status-dashboard-2.png)
     - ![status-dashboard-3](images/status-dashboard-3.png)
 
+## Template Marketplace
+
+You can contribute your own status templates to the plugin! Templates are stored as JSON files in the `templates/` directory.
+
+### How to contribute
+
+1. Fork the repository.
+2. Create a new JSON file in the `templates/` folder (e.g., `templates/my-awesome-workflow.json`).
+3. Follow this format:
+    ```json
+    {
+    	"id": "my-awesome-workflow",
+    	"name": "My Awesome Workflow",
+    	"description": "A workflow for doing awesome things",
+    	"author": "Your Name",
+    	"github": "https://github.com/your-username",
+    	"statuses": [
+    		{
+    			"name": "todo",
+    			"icon": "📝",
+    			"color": "#ff0000",
+    			"templateId": "my-awesome-workflow"
+    		},
+    		{
+    			"name": "done",
+    			"icon": "✅",
+    			"color": "#00ff00",
+    			"templateId": "my-awesome-workflow"
+    		}
+    	]
+    }
+    ```
+4. Run `node scripts/generate-templates.mjs` to update the predefined templates.
+5. Submit a Pull Request!
+
+Once accepted, your template will be available to all users of the plugin.
+
 ## Installation
 
 ### Community Plugin Store (recommended)
