@@ -14,7 +14,41 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	showStatusBar: true,
 	autoHideStatusBar: false,
 	enableStatusOverviewPopup: true,
-	templates: [],
+	templates: [
+		{
+			id: "default-starter",
+			name: "Starter Template",
+			description:
+				"A simplified set of essential workflow statuses to get you started.",
+			authorGithub: "soler1212",
+			statuses: [
+				{
+					name: "todo",
+					icon: "📌",
+					color: "#F44336",
+					templateId: "default-starter",
+				},
+				{
+					name: "inProgress",
+					icon: "⚙️",
+					color: "#2196F3",
+					templateId: "default-starter",
+				},
+				{
+					name: "review",
+					icon: "👀",
+					color: "#9C27B0",
+					templateId: "default-starter",
+				},
+				{
+					name: "done",
+					icon: "✓",
+					color: "#4CAF50",
+					templateId: "default-starter",
+				},
+			],
+		},
+	],
 	customStatuses: [],
 	showStatusIconsInExplorer: true,
 	hideUnknownStatusInExplorer: true, // Default to hide unknown status
@@ -26,7 +60,7 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	enableExperimentalFeatures: true,
 	enableStatusDashboard: true,
 	enableGroupedStatusView: true,
-	enabledTemplates: [],
+	enabledTemplates: ["default-starter"],
 	useCustomStatusesOnly: false,
 	useMultipleStatuses: true,
 	singleStatusStorageMode: "list",
