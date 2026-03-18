@@ -1,9 +1,58 @@
 import { StatusTemplate } from "types/pluginSettings";
 
 /**
- * Predefined status templates
+ * Predefined status templates generated from the templates directory
  */
 export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
+	{
+		id: "academic",
+		name: "Academic research",
+		description: "Status workflow for academic research and writing",
+		statuses: [
+			{
+				name: "research",
+				icon: "🔍",
+				color: "#2196F3",
+				templateId: "academic",
+			},
+			{
+				name: "outline",
+				icon: "📑",
+				color: "#9E9E9E",
+				templateId: "academic",
+			},
+			{
+				name: "draft",
+				icon: "✏️",
+				color: "#FFC107",
+				templateId: "academic",
+			},
+			{
+				name: "review",
+				icon: "🔬",
+				color: "#9C27B0",
+				templateId: "academic",
+			},
+			{
+				name: "revision",
+				icon: "📝",
+				color: "#FF5722",
+				templateId: "academic",
+			},
+			{
+				name: "final",
+				icon: "📚",
+				color: "#4CAF50",
+				templateId: "academic",
+			},
+			{
+				name: "published",
+				icon: "🎓",
+				color: "#795548",
+				templateId: "academic",
+			},
+		],
+	},
 	{
 		id: "colorful",
 		name: "Colorful workflow",
@@ -67,6 +116,45 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		],
 	},
 	{
+		id: "creative-writing",
+		name: "Creative Writing",
+		description: "Workflow for novelists and creative writers",
+		author: "Obsidian Community",
+		github: "https://github.com/obsidian-community",
+		statuses: [
+			{
+				name: "idea",
+				icon: "🧠",
+				color: "#FFD700",
+				templateId: "creative-writing",
+			},
+			{
+				name: "outline",
+				icon: "🗺️",
+				color: "#87CEEB",
+				templateId: "creative-writing",
+			},
+			{
+				name: "first-draft",
+				icon: "✍️",
+				color: "#FFA07A",
+				templateId: "creative-writing",
+			},
+			{
+				name: "revision",
+				icon: "🔍",
+				color: "#DA70D6",
+				templateId: "creative-writing",
+			},
+			{
+				name: "final-polish",
+				icon: "✨",
+				color: "#32CD32",
+				templateId: "creative-writing",
+			},
+		],
+	},
+	{
 		id: "minimal",
 		name: "Minimal workflow",
 		description: "A simplified set of essential workflow statuses",
@@ -94,55 +182,6 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 				icon: "✓",
 				color: "#4CAF50",
 				templateId: "minimal",
-			},
-		],
-	},
-	{
-		id: "academic",
-		name: "Academic research",
-		description: "Status workflow for academic research and writing",
-		statuses: [
-			{
-				name: "research",
-				icon: "🔍",
-				color: "#2196F3",
-				templateId: "academic",
-			},
-			{
-				name: "outline",
-				icon: "📑",
-				color: "#9E9E9E",
-				templateId: "academic",
-			},
-			{
-				name: "draft",
-				icon: "✏️",
-				color: "#FFC107",
-				templateId: "academic",
-			},
-			{
-				name: "review",
-				icon: "🔬",
-				color: "#9C27B0",
-				templateId: "academic",
-			},
-			{
-				name: "revision",
-				icon: "📝",
-				color: "#FF5722",
-				templateId: "academic",
-			},
-			{
-				name: "final",
-				icon: "📚",
-				color: "#4CAF50",
-				templateId: "academic",
-			},
-			{
-				name: "published",
-				icon: "🎓",
-				color: "#795548",
-				templateId: "academic",
 			},
 		],
 	},
