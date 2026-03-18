@@ -249,8 +249,3 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		],
 	},
 ];
-
-/**
- * Default template IDs that should be enabled by default
- */
-export const DEFAULT_ENABLED_TEMPLATES = ["colorful"];

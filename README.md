@@ -113,10 +113,9 @@ You can contribute your own status templates to the plugin!
     	]
     }
     ```
-4. Run `node scripts/generate-templates.mjs` to update the predefined templates.
-5. Submit a Pull Request!
+4. Submit a Pull Request with your JSON file!
 
-Once accepted, your template will be available to all users of the plugin.
+Once accepted, maintainers will include your template in the next plugin update.
 
 ## Installation
 

@@ -59,7 +59,21 @@ export const MarketplaceBrowseModal: React.FC<MarketplaceBrowseModalProps> = ({
 										</span>
 										{template.author && (
 											<div className="marketplace-card-author">
-												by {template.author}
+												by{" "}
+												{template.github ? (
+													<a
+														href={template.github}
+														target="_blank"
+														rel="noopener noreferrer"
+														onClick={(e) =>
+															e.stopPropagation()
+														}
+													>
+														{template.author}
+													</a>
+												) : (
+													template.author
+												)}
 											</div>
 										)}
 									</div>
