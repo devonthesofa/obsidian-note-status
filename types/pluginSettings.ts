@@ -19,8 +19,7 @@ export interface StatusTemplate {
 	id: string;
 	name: string;
 	description: string;
-	author?: string;
-	github?: string;
+	authorGithub?: string;
 	statuses: NoteStatus[];
 }
 

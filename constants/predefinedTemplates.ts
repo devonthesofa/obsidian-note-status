@@ -9,8 +9,7 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		"id": "academic",
 		"name": "Academic research",
 		"description": "Status workflow for academic research and writing",
-		"author": "Obsidian Note Status",
-		"github": "https://github.com/devonthesofa/obsidian-note-status",
+		"authorGithub": "soler1212",
 		"statuses": [
 			{
 				"name": "research",
@@ -60,8 +59,7 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		"id": "colorful",
 		"name": "Colorful workflow",
 		"description": "A colorful set of workflow statuses with descriptive icons",
-		"author": "Obsidian Note Status",
-		"github": "https://github.com/devonthesofa/obsidian-note-status",
+		"authorGithub": "soler1212",
 		"statuses": [
 			{
 				"name": "idea",
@@ -123,8 +121,7 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		"id": "creative-writing",
 		"name": "Creative Writing",
 		"description": "Workflow for novelists and creative writers",
-		"author": "Obsidian Community",
-		"github": "https://github.com/obsidian-community",
+		"authorGithub": "soler1212",
 		"statuses": [
 			{
 				"name": "idea",
@@ -159,44 +156,10 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		]
 	},
 	{
-		"id": "removeme",
-		"name": "I am a test",
-		"description": "asdfasdf",
-		"author": "asfdlei",
-		"github": "https://github.com/devonthesofa/obsidian-note-status",
-		"statuses": [
-			{
-				"name": "hello",
-				"icon": "📌",
-				"color": "#F44336",
-				"templateId": "minimal"
-			},
-			{
-				"name": "inProgress",
-				"icon": "⚙️",
-				"color": "#2196F3",
-				"templateId": "minimal"
-			},
-			{
-				"name": "review",
-				"icon": "👀",
-				"color": "#9C27B0",
-				"templateId": "minimal"
-			},
-			{
-				"name": "done",
-				"icon": "✓",
-				"color": "#4CAF50",
-				"templateId": "minimal"
-			}
-		]
-	},
-	{
 		"id": "minimal",
 		"name": "Minimal workflow",
 		"description": "A simplified set of essential workflow statuses",
-		"author": "Obsidian Note Status",
-		"github": "https://github.com/devonthesofa/obsidian-note-status",
+		"authorGithub": "soler1212",
 		"statuses": [
 			{
 				"name": "todo",
@@ -228,8 +191,7 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		"id": "project",
 		"name": "Project management",
 		"description": "Status workflow for project management and tracking",
-		"author": "Obsidian Note Status",
-		"github": "https://github.com/devonthesofa/obsidian-note-status",
+		"authorGithub": "soler1212",
 		"statuses": [
 			{
 				"name": "planning",

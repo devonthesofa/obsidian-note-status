@@ -2,8 +2,7 @@
 	"id": "project",
 	"name": "Project management",
 	"description": "Status workflow for project management and tracking",
-	"author": "Obsidian Note Status",
-	"github": "https://github.com/devonthesofa/obsidian-note-status",
+	"authorGithub": "soler1212",
 	"statuses": [
 		{
 			"name": "planning",

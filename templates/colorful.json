@@ -2,8 +2,7 @@
 	"id": "colorful",
 	"name": "Colorful workflow",
 	"description": "A colorful set of workflow statuses with descriptive icons",
-	"author": "Obsidian Note Status",
-	"github": "https://github.com/devonthesofa/obsidian-note-status",
+	"authorGithub": "soler1212",
 	"statuses": [
 		{
 			"name": "idea",

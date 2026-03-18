@@ -23,8 +23,9 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 	);
 	const [name, setName] = useState(template?.name || "");
 	const [description, setDescription] = useState(template?.description || "");
-	const [author, setAuthor] = useState(template?.author || "");
-	const [github, setGithub] = useState(template?.github || "");
+	const [authorGithub, setAuthorGithub] = useState(
+		template?.authorGithub || "",
+	);
 	const [statuses, setStatuses] = useState<NoteStatus[]>(
 		template?.statuses || [
 			{
@@ -59,8 +60,7 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 			id: templateId,
 			name: name.trim(),
 			description: description.trim(),
-			author: author.trim() || undefined,
-			github: github.trim() || undefined,
+			authorGithub: authorGithub.trim() || undefined,
 			statuses: statusesWithTemplateId,
 		};
 
@@ -155,35 +155,18 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 				</SettingItem>
 
 				<SettingItem
-					name="Author (Optional)"
+					name="Author GitHub Username (Optional)"
 					description={
 						isCustom
-							? "Your name or community name"
+							? "Your GitHub username for attribution"
 							: "Original author of the marketplace template"
 					}
 				>
 					<Input
 						variant="text"
-						value={author}
-						onChange={setAuthor}
-						placeholder="e.g. Jane Doe"
-						disabled={!isCustom}
-					/>
-				</SettingItem>
-
-				<SettingItem
-					name="GitHub URL (Optional)"
-					description={
-						isCustom
-							? "Link to your GitHub profile or repository"
-							: "Official repository of the marketplace template"
-					}
-				>
-					<Input
-						variant="text"
-						value={github}
-						onChange={setGithub}
-						placeholder="e.g. https://github.com/janedoe"
+						value={authorGithub}
+						onChange={setAuthorGithub}
+						placeholder="e.g. janedoe"
 						disabled={!isCustom}
 					/>
 				</SettingItem>

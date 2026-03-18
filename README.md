@@ -90,29 +90,18 @@ You can contribute your own status templates to the plugin!
    ...
 2. Create a new JSON file in the `templates/` folder (e.g., `templates/my-awesome-workflow.json`).
 3. Follow this format:
-    ```json
-    {
-    	"id": "my-awesome-workflow",
-    	"name": "My Awesome Workflow",
-    	"description": "A workflow for doing awesome things",
-    	"author": "Your Name",
-    	"github": "https://github.com/your-username",
-    	"statuses": [
-    		{
-    			"name": "todo",
-    			"icon": "📝",
-    			"color": "#ff0000",
-    			"templateId": "my-awesome-workflow"
-    		},
-    		{
-    			"name": "done",
-    			"icon": "✅",
-    			"color": "#00ff00",
-    			"templateId": "my-awesome-workflow"
-    		}
-    	]
-    }
-    ```
+   ```json
+   {
+     "id": "my-awesome-workflow",
+     "name": "My Awesome Workflow",
+     "description": "A workflow for doing awesome things",
+     "authorGithub": "your-username",
+     "statuses": [
+       { "name": "todo", "icon": "📝", "color": "#ff0000", "templateId": "my-awesome-workflow" },
+       { "name": "done", "icon": "✅", "color": "#00ff00", "templateId": "my-awesome-workflow" }
+     ]
+   }
+   ```
 4. Submit a Pull Request with your JSON file!
 
 Once accepted and merged, your template will be automatically included in the next build and available in the marketplace for all users.

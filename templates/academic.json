@@ -2,8 +2,7 @@
 	"id": "academic",
 	"name": "Academic research",
 	"description": "Status workflow for academic research and writing",
-	"author": "Obsidian Note Status",
-	"github": "https://github.com/devonthesofa/obsidian-note-status",
+	"authorGithub": "soler1212",
 	"statuses": [
 		{
 			"name": "research",

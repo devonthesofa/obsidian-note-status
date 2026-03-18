@@ -2,8 +2,7 @@
 	"id": "creative-writing",
 	"name": "Creative Writing",
 	"description": "Workflow for novelists and creative writers",
-	"author": "Obsidian Community",
-	"github": "https://github.com/obsidian-community",
+	"authorGithub": "soler1212",
 	"statuses": [
 		{
 			"name": "idea",

@@ -84,22 +84,17 @@ export const TemplateItem: React.FC<TemplateItemProps> = ({
 					</div>
 					<div className="setting-item-description">
 						{template.description}
-						{(template.author || template.github) && (
+						{template.authorGithub && (
 							<div className="template-author-info">
 								By{" "}
-								{template.github ? (
-									<a
-										href={template.github}
-										target="_blank"
-										rel="noopener noreferrer"
-										onClick={(e) => e.stopPropagation()}
-									>
-										{template.author ||
-											template.github.split("/").pop()}
-									</a>
-								) : (
-									<span>{template.author}</span>
-								)}
+								<a
+									href={`https://github.com/${template.authorGithub}`}
+									target="_blank"
+									rel="noopener noreferrer"
+									onClick={(e) => e.stopPropagation()}
+								>
+									@{template.authorGithub}
+								</a>
 							</div>
 						)}
 					</div>

@@ -15,7 +15,7 @@ export const isCustomTemplate = (template: StatusTemplate): boolean => {
 	if (matchesPredefined) return false;
 
 	// Or has metadata from marketplace
-	const hasMetadata = !!(template.author || template.github);
+	const hasMetadata = !!template.authorGithub;
 	if (hasMetadata) return false;
 
 	return true;
