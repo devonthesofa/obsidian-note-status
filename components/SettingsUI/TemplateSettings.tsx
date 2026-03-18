@@ -3,14 +3,11 @@ import { PluginSettings, StatusTemplate } from "@/types/pluginSettings";
 import { TemplateItem } from "./TemplateItem";
 import { TemplateEditorModal } from "./TemplateEditorModal";
 import { MarketplaceShareModal } from "./MarketplaceShareModal";
+import { MarketplaceBrowseModal } from "./MarketplaceBrowseModal";
 import {
 	generateTemplateId,
 	isTemplateNameUnique,
 } from "@/utils/templateUtils";
-import {
-	DEFAULT_ENABLED_TEMPLATES,
-	PREDEFINED_TEMPLATES,
-} from "@/constants/predefinedTemplates";
 
 interface TemplateSettingsProps {
 	settings: PluginSettings;
@@ -23,6 +20,7 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 }) => {
 	const [showEditor, setShowEditor] = useState(false);
 	const [showShare, setShowShare] = useState(false);
+	const [showMarketplace, setShowMarketplace] = useState(false);
 	const [editingTemplate, setEditingTemplate] = useState<
 		StatusTemplate | undefined
 	>();
@@ -61,6 +59,24 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 		setSharingTemplate(template);
 		setShowShare(true);
 	}, []);
+
+	const handleInstallTemplate = useCallback(
+		(template: StatusTemplate) => {
+			const newId = generateTemplateId(template.name);
+			const installedTemplate: StatusTemplate = {
+				...template,
+				id: newId,
+				statuses: template.statuses.map((s) => ({
+					...s,
+					templateId: newId,
+				})),
+			};
+
+			onChange("templates", [...settings.templates, installedTemplate]);
+			handleTemplateToggle(newId, true);
+		},
+		[settings.templates, onChange, handleTemplateToggle],
+	);
 
 	const handleSaveTemplate = useCallback(
 		(template: StatusTemplate) => {
@@ -128,19 +144,6 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 		[settings.templates, settings.enabledTemplates, onChange],
 	);
 
-	const handleResetToDefaults = useCallback(() => {
-		const confirmed = confirm(
-			"Reset to default templates? This will:\n" +
-				"• Remove all custom templates\n" +
-				"• Reset enabled templates to defaults\n" +
-				"This action cannot be undone.",
-		);
-		if (!confirmed) return;
-
-		onChange("templates", [...PREDEFINED_TEMPLATES]);
-		onChange("enabledTemplates", [...DEFAULT_ENABLED_TEMPLATES]);
-	}, [onChange]);
-
 	const handleCancelEditor = useCallback(() => {
 		setShowEditor(false);
 		setEditingTemplate(undefined);
@@ -149,6 +152,14 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 	const handleCancelShare = useCallback(() => {
 		setShowShare(false);
 		setSharingTemplate(undefined);
+	}, []);
+
+	const handleOpenMarketplace = useCallback(() => {
+		setShowMarketplace(true);
+	}, []);
+
+	const handleCloseMarketplace = useCallback(() => {
+		setShowMarketplace(false);
 	}, []);
 
 	if (showEditor) {
@@ -176,30 +187,42 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 		);
 	}
 
+	if (showMarketplace) {
+		return (
+			<div>
+				<h3>Status templates</h3>
+				<MarketplaceBrowseModal
+					installedIds={settings.templates.map((t) => t.id)}
+					onInstall={handleInstallTemplate}
+					onClose={handleCloseMarketplace}
+				/>
+			</div>
+		);
+	}
+
 	return (
 		<div>
 			<h3>Status templates</h3>
 			<p>
-				Enable predefined templates to quickly add common status
-				workflows, or create your own custom templates.
+				Browse the marketplace to find common status workflows or create
+				your own custom templates.
 			</p>
 
 			{/* Custom Templates Section */}
 			<div className="template-section">
-				<h4 className="template-section-title">Custom Templates</h4>
-
 				<div className="template-settings-actions">
 					<button
-						className="mod-cta template-create-btn"
+						className="mod-cta marketplace-browse-btn"
+						onClick={handleOpenMarketplace}
+					>
+						<ObsidianIcon name="globe" size={16} />
+						Browse Marketplace
+					</button>
+					<button
+						className="template-create-btn"
 						onClick={handleCreateTemplate}
 					>
 						+ Create Template
-					</button>
-					<button
-						className="template-reset-btn"
-						onClick={handleResetToDefaults}
-					>
-						🔄 Reset to Defaults
 					</button>
 				</div>
 				<div className="template-list">

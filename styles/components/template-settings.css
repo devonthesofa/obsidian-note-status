@@ -349,6 +349,112 @@
 	text-decoration: none !important;
 }
 
+/* Marketplace Browse Modal */
+.marketplace-header-content {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	gap: var(--size-4-4);
+}
+
+.marketplace-header-content h2 {
+	margin: 0;
+	white-space: nowrap;
+}
+
+.marketplace-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	gap: var(--size-4-4);
+	padding: var(--size-2-2);
+}
+
+.marketplace-card {
+	display: flex;
+	flex-direction: column;
+	background: var(--background-primary-alt);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	padding: var(--size-4-4);
+	transition: all var(--anim-duration-fast) ease;
+}
+
+.marketplace-card:hover {
+	border-color: var(--interactive-accent);
+	box-shadow: var(--shadow-s);
+}
+
+.marketplace-card-header {
+	margin-bottom: var(--size-2-2);
+}
+
+.marketplace-card-title {
+	font-weight: var(--font-bold);
+	font-size: var(--font-ui-medium);
+	color: var(--text-normal);
+}
+
+.marketplace-card-author {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+	font-style: italic;
+}
+
+.marketplace-card-description {
+	font-size: var(--font-ui-small);
+	color: var(--text-muted);
+	margin-bottom: var(--size-4-2);
+	flex-grow: 1;
+}
+
+.marketplace-card-statuses {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--size-2-1);
+	margin-bottom: var(--size-4-4);
+}
+
+.marketplace-card-actions {
+	margin-top: auto;
+}
+
+.marketplace-install-btn {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--size-2-2);
+}
+
+.marketplace-install-btn.installed {
+	background: var(--background-modifier-success-accent) !important;
+	color: var(--text-on-accent) !important;
+	opacity: 0.8;
+	cursor: default;
+}
+
+.marketplace-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: var(--size-4-12);
+	color: var(--text-muted);
+	text-align: center;
+}
+
+.marketplace-empty p {
+	margin-top: var(--size-4-2);
+	font-size: var(--font-ui-large);
+}
+
+.marketplace-browse-btn {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-2);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
 	.template-settings-actions {
