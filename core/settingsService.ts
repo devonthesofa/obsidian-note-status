@@ -103,7 +103,34 @@ class SettingsService {
 	private async loadSettings() {
 		const loadedData = await this.plugin.loadData();
 		this.settings = this.mergeSettings(DEFAULT_PLUGIN_SETTINGS, loadedData);
+		this.deduplicateTemplates();
 		return this.settings;
+	}
+
+	/**
+	 * Removes duplicate templates with the same name, keeping the first occurrence.
+	 */
+	private deduplicateTemplates() {
+		if (!this.settings.templates) return;
+
+		const seenNames = new Set<string>();
+		const uniqueTemplates = [];
+		let hasDuplicates = false;
+
+		for (const template of this.settings.templates) {
+			const lowerName = template.name.toLowerCase().trim();
+			if (!seenNames.has(lowerName)) {
+				seenNames.add(lowerName);
+				uniqueTemplates.push(template);
+			} else {
+				hasDuplicates = true;
+			}
+		}
+
+		if (hasDuplicates) {
+			this.settings.templates = uniqueTemplates;
+			this.saveSettings().catch(console.error);
+		}
 	}
 
 	/**

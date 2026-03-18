@@ -63,6 +63,12 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 
 	const handleInstallTemplate = useCallback(
 		(template: StatusTemplate) => {
+			if (!isTemplateNameUnique(template.name, undefined)) {
+				alert(
+					`A template with the name "${template.name}" is already installed.`,
+				);
+				return;
+			}
 			const newId = generateTemplateId(template.name, settings.templates);
 			const installedTemplate: StatusTemplate = {
 				...template,
