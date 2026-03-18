@@ -70,5 +70,7 @@ export type PluginSettings = {
 	applyStatusRecursivelyToSubfolders: boolean; // Whether to show recursive folder context option
 	statusFrontmatterMappings: StatusFrontmatterMapping[]; // Custom mappings between templates/statuses and frontmatter keys
 	writeMappedTagsToDefault: boolean; // Whether mapped tags should also write to the default tag
+	enableExternalStatusSync: boolean; // Whether to sync statuses to an external file
+	externalStatusSyncPath: string; // Path to the external sync file
 	[key: string]: unknown;
 };

@@ -4,6 +4,7 @@ import { TemplateSettings } from "./TemplateSettings";
 import { BehaviourSettings } from "./BehaviourSettings";
 import { CustomStatusSettings } from "./CustomStatusSettings";
 import { QuickCommandsSettings } from "./QuickCommandsSettings";
+import { SynchronizationSettings } from "./SynchronizationSettings";
 import {
 	EditorToolbarSettings,
 	ExperimentalSettings,
@@ -25,6 +26,7 @@ type SectionId =
 	| "file-explorer"
 	| "unknown-appearance"
 	| "behavior-storage"
+	| "synchronization"
 	| "experimental-features";
 
 type SectionDefinition = {
@@ -132,6 +134,18 @@ const SettingsUI: React.FC<Props> = ({ settings, onChange }) => {
 				"Multi-status mode, tag key, mappings, and vault safeguards.",
 			content: (
 				<BehaviourSettings
+					settings={localSettings}
+					onChange={handleChange}
+				/>
+			),
+		},
+		{
+			id: "synchronization",
+			label: "Synchronization",
+			description:
+				"Keep custom statuses and templates in sync across multiple devices.",
+			content: (
+				<SynchronizationSettings
 					settings={localSettings}
 					onChange={handleChange}
 				/>
