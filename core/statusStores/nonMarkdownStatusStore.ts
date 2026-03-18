@@ -58,12 +58,57 @@ export class NonMarkdownStatusStore implements StatusStore {
 			settings.enableNonMarkdownSync &&
 			settings.nonMarkdownSyncPath
 		) {
-			return normalizePath(settings.nonMarkdownSyncPath);
+			return this.getVaultPath();
 		}
 
+		return this.getInternalPath();
+	}
+
+	private getInternalPath(): string {
 		const configDir = this.plugin.app.vault.configDir;
 		const pluginDir = `${configDir}/plugins/${this.plugin.manifest.id}`;
 		return normalizePath(`${pluginDir}/non-markdown-statuses.json`);
+	}
+
+	private getVaultPath(): string {
+		const settings = settingsService.settings;
+		return normalizePath(settings.nonMarkdownSyncPath);
+	}
+
+	async exportToVault(): Promise<void> {
+		const internalPath = this.getInternalPath();
+		const vaultPath = this.getVaultPath();
+
+		if (!(await this.plugin.app.vault.adapter.exists(internalPath))) {
+			throw new Error("No internal data found to export.");
+		}
+
+		const raw = await this.plugin.app.vault.adapter.read(internalPath);
+		await this.ensureDirectoryExists(vaultPath);
+		await this.plugin.app.vault.adapter.write(vaultPath, raw);
+
+		// Reload if vault sync is active
+		if (settingsService.settings.enableNonMarkdownSync) {
+			this.data = await this.loadFromDisk();
+		}
+	}
+
+	async importFromVault(): Promise<void> {
+		const internalPath = this.getInternalPath();
+		const vaultPath = this.getVaultPath();
+
+		if (!(await this.plugin.app.vault.adapter.exists(vaultPath))) {
+			throw new Error("No vault sync file found to import.");
+		}
+
+		const raw = await this.plugin.app.vault.adapter.read(vaultPath);
+		await this.ensureDirectoryExists(internalPath);
+		await this.plugin.app.vault.adapter.write(internalPath, raw);
+
+		// Reload if vault sync is inactive
+		if (!settingsService.settings.enableNonMarkdownSync) {
+			this.data = await this.loadFromDisk();
+		}
 	}
 
 	canHandle(file: TFile): boolean {

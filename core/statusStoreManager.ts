@@ -5,14 +5,22 @@ import { StatusStore } from "./statusStores/types";
 
 class StatusStoreManager {
 	private stores: StatusStore[] = [];
+	private nonMarkdownStore: NonMarkdownStatusStore | null = null;
 
 	async initialize(plugin: Plugin) {
 		const frontmatterStore = new FrontmatterStatusStore(plugin.app);
 		this.stores = [frontmatterStore];
 
-		const nonMarkdownStore = new NonMarkdownStatusStore(plugin);
-		await nonMarkdownStore.initialize();
-		this.registerStore(nonMarkdownStore);
+		this.nonMarkdownStore = new NonMarkdownStatusStore(plugin);
+		await this.nonMarkdownStore.initialize();
+		this.registerStore(this.nonMarkdownStore);
+	}
+
+	getNonMarkdownStore(): NonMarkdownStatusStore {
+		if (!this.nonMarkdownStore) {
+			throw new Error("NonMarkdownStatusStore is not initialized");
+		}
+		return this.nonMarkdownStore;
 	}
 
 	registerStore(store: StatusStore) {

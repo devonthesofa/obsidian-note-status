@@ -2,6 +2,7 @@ import { PluginSettings, SyncGroup } from "@/types/pluginSettings";
 import React from "react";
 import { SettingItem } from "./SettingItem";
 import settingsService from "@/core/settingsService";
+import statusStoreManager from "@/core/statusStoreManager";
 
 export type Props = {
 	settings: PluginSettings;
@@ -20,6 +21,24 @@ export const SynchronizationSettings: React.FC<Props> = ({
 	const handleImport = async () => {
 		await settingsService.loadFromExternalFile(true);
 		alert("Plugin settings imported successfully.");
+	};
+
+	const handleDataExport = async () => {
+		try {
+			await statusStoreManager.getNonMarkdownStore().exportToVault();
+			alert("Non-Markdown status data exported to vault.");
+		} catch (e) {
+			alert(`Export failed: ${e.message}`);
+		}
+	};
+
+	const handleDataImport = async () => {
+		try {
+			await statusStoreManager.getNonMarkdownStore().importFromVault();
+			alert("Non-Markdown status data imported from vault.");
+		} catch (e) {
+			alert(`Import failed: ${e.message}`);
+		}
 	};
 
 	const toggleGroup = (group: SyncGroup) => {
@@ -234,6 +253,18 @@ export const SynchronizationSettings: React.FC<Props> = ({
 						placeholder="_note-status-data.json"
 					/>
 				</SettingItem>
+
+				<div
+					className="note-status-settings__actions"
+					style={{ marginTop: "1em", display: "flex", gap: "10px" }}
+				>
+					<button onClick={handleDataExport}>
+						📤 Export internal data to vault
+					</button>
+					<button onClick={handleDataImport}>
+						📥 Import data from vault
+					</button>
+				</div>
 			</div>
 		</div>
 	);
