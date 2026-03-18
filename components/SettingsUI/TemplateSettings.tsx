@@ -63,7 +63,7 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 
 	const handleInstallTemplate = useCallback(
 		(template: StatusTemplate) => {
-			const newId = generateTemplateId(template.name);
+			const newId = generateTemplateId(template.name, settings.templates);
 			const installedTemplate: StatusTemplate = {
 				...template,
 				id: newId,
@@ -100,7 +100,10 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 				onChange("templates", updatedTemplates);
 			} else {
 				// Add new template - generate unique ID
-				const uniqueId = generateTemplateId(template.name);
+				const uniqueId = generateTemplateId(
+					template.name,
+					settings.templates,
+				);
 				finalTemplate = { ...template, id: uniqueId };
 
 				// Update statuses with the final template ID
@@ -193,7 +196,7 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 			<div>
 				<h3>Status templates</h3>
 				<MarketplaceBrowseModal
-					installedIds={settings.templates.map((t) => t.id)}
+					installedTemplates={settings.templates}
 					onInstall={handleInstallTemplate}
 					onClose={handleCloseMarketplace}
 				/>

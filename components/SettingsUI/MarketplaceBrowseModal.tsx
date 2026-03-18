@@ -6,13 +6,13 @@ import { ObsidianIcon } from "../atoms/ObsidianIcon";
 import { SearchFilter } from "../atoms/SearchFilter";
 
 interface MarketplaceBrowseModalProps {
-	installedIds: string[];
+	installedTemplates: StatusTemplate[];
 	onInstall: (template: StatusTemplate) => void;
 	onClose: () => void;
 }
 
 export const MarketplaceBrowseModal: React.FC<MarketplaceBrowseModalProps> = ({
-	installedIds,
+	installedTemplates,
 	onInstall,
 	onClose,
 }) => {
@@ -42,9 +42,11 @@ export const MarketplaceBrowseModal: React.FC<MarketplaceBrowseModalProps> = ({
 			<div className="template-editor-modal__content">
 				<div className="marketplace-grid">
 					{filteredTemplates.map((template) => {
-						const isInstalled =
-							installedIds.includes(template.id) ||
-							installedIds.includes(`custom-${template.id}`);
+						const isInstalled = installedTemplates.some(
+							(t) =>
+								t.name.toLowerCase() ===
+								template.name.toLowerCase(),
+						);
 						return (
 							<div key={template.id} className="marketplace-card">
 								<div className="marketplace-card-header">

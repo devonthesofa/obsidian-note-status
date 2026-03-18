@@ -36,9 +36,13 @@ export const isTemplateNameUnique = (
 /**
  * Generate unique template ID
  */
-export const generateTemplateId = (name: string): string => {
+export const generateTemplateId = (
+	name: string,
+	existingTemplates?: StatusTemplate[],
+): string => {
 	const baseId = name.toLowerCase().replace(/[^a-z0-9]/g, "-");
-	const allTemplates = settingsService.settings.templates;
+	const allTemplates =
+		existingTemplates || settingsService.settings.templates;
 
 	let counter = 1;
 	let id = `custom-${baseId}`;
