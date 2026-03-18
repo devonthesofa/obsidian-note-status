@@ -8,6 +8,8 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		id: "academic",
 		name: "Academic research",
 		description: "Status workflow for academic research and writing",
+		author: "Obsidian Note Status",
+		github: "https://github.com/devonthesofa/obsidian-note-status",
 		statuses: [
 			{
 				name: "research",
@@ -58,6 +60,8 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		name: "Colorful workflow",
 		description:
 			"A colorful set of workflow statuses with descriptive icons",
+		author: "Obsidian Note Status",
+		github: "https://github.com/devonthesofa/obsidian-note-status",
 		statuses: [
 			{
 				name: "idea",
@@ -158,6 +162,8 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		id: "minimal",
 		name: "Minimal workflow",
 		description: "A simplified set of essential workflow statuses",
+		author: "Obsidian Note Status",
+		github: "https://github.com/devonthesofa/obsidian-note-status",
 		statuses: [
 			{
 				name: "todo",
@@ -189,6 +195,8 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		id: "project",
 		name: "Project management",
 		description: "Status workflow for project management and tracking",
+		author: "Obsidian Note Status",
+		github: "https://github.com/devonthesofa/obsidian-note-status",
 		statuses: [
 			{
 				name: "planning",

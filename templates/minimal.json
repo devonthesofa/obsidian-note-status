@@ -2,6 +2,8 @@
 	"id": "minimal",
 	"name": "Minimal workflow",
 	"description": "A simplified set of essential workflow statuses",
+	"author": "Obsidian Note Status",
+	"github": "https://github.com/devonthesofa/obsidian-note-status",
 	"statuses": [
 		{
 			"name": "todo",
