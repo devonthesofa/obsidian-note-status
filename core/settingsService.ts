@@ -1,5 +1,6 @@
 import { DEFAULT_PLUGIN_SETTINGS } from "@/constants/defaultSettings";
 import { PluginSettings, SyncGroup } from "@/types/pluginSettings";
+import { PREDEFINED_TEMPLATES } from "@/constants/predefinedTemplates";
 import { Plugin, TFile, normalizePath } from "obsidian";
 import eventBus from "./eventBus";
 
@@ -64,7 +65,8 @@ class SettingsService {
 
 	async initialize(plugin: Plugin): Promise<void> {
 		this.plugin = plugin;
-		await this.loadSettings();
+		const loadedData = await this.loadSettings();
+		this.migrateLegacySettings(loadedData);
 
 		if (this.settings.enableExternalStatusSync) {
 			await this.loadFromExternalFile();
@@ -104,7 +106,102 @@ class SettingsService {
 		const loadedData = await this.plugin.loadData();
 		this.settings = this.mergeSettings(DEFAULT_PLUGIN_SETTINGS, loadedData);
 		this.deduplicateTemplates();
-		return this.settings;
+		return loadedData;
+	}
+
+	/**
+	 * Migrates legacy settings and ensures new users have a starter template.
+	 */
+	private migrateLegacySettings(loadedData: Partial<PluginSettings> | null) {
+		const hasTemplates =
+			this.settings.templates && this.settings.templates.length > 0;
+
+		// 1. If it's a truly new user (no data at all), give them the starter template
+		if (!loadedData) {
+			this.injectStarterTemplate();
+			return;
+		}
+
+		// 2. If it's an existing user but has no templates, they were using the old defaults
+		if (!hasTemplates) {
+			const legacyIds = [
+				"colorful",
+				"minimal",
+				"academic",
+				"project",
+				"creative-writing",
+			];
+			const enabledLegacy = (this.settings.enabledTemplates || []).filter(
+				(id) => legacyIds.includes(id),
+			);
+
+			if (enabledLegacy.length > 0) {
+				// Restore the ones they had enabled from the marketplace list
+				const toRestore = PREDEFINED_TEMPLATES.filter((t) =>
+					enabledLegacy.includes(t.id),
+				).map((t) => ({
+					...t,
+					id: t.id, // Keep original ID for legacy compatibility
+					statuses: t.statuses.map((s) => ({
+						...s,
+						templateId: t.id,
+					})),
+				}));
+
+				this.settings.templates = toRestore;
+				// Update enabled list
+				this.settings.enabledTemplates = toRestore.map((t) => t.id);
+				this.saveSettings().catch(console.error);
+			} else {
+				// If nothing was enabled, just give them the starter template
+				this.injectStarterTemplate();
+			}
+		}
+	}
+
+	/**
+	 * Injects the default starter template.
+	 */
+	private injectStarterTemplate() {
+		const starterTemplate = {
+			id: "starter",
+			name: "Starter Template",
+			description:
+				"A simplified set of essential workflow statuses to get you started.",
+			authorGithub: "soler1212",
+			statuses: [
+				{
+					name: "todo",
+					icon: "📌",
+					color: "#F44336",
+					templateId: "starter",
+				},
+				{
+					name: "inProgress",
+					icon: "⚙️",
+					color: "#2196F3",
+					templateId: "starter",
+				},
+				{
+					name: "review",
+					icon: "👀",
+					color: "#9C27B0",
+					templateId: "starter",
+				},
+				{
+					name: "done",
+					icon: "✓",
+					color: "#4CAF50",
+					templateId: "starter",
+				},
+			],
+		};
+
+		this.settings.templates = [starterTemplate];
+		if (!this.settings.enabledTemplates.includes(starterTemplate.id)) {
+			this.settings.enabledTemplates.push(starterTemplate.id);
+		}
+		this.saveSettings().catch(console.error);
 	}
 
 	/**

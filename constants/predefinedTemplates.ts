@@ -6,275 +6,273 @@ import { StatusTemplate } from "types/pluginSettings";
 
 export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 	{
-		id: "academic",
-		name: "Academic research",
-		description: "Status workflow for academic research and writing",
-		authorGithub: "soler1212",
-		statuses: [
+		"id": "academic",
+		"name": "Academic research",
+		"description": "Status workflow for academic research and writing",
+		"authorGithub": "soler1212",
+		"statuses": [
 			{
-				name: "research",
-				icon: "🔍",
-				color: "#2196F3",
-				templateId: "academic",
+				"name": "research",
+				"icon": "🔍",
+				"color": "#2196F3",
+				"templateId": "academic"
 			},
 			{
-				name: "outline",
-				icon: "📑",
-				color: "#9E9E9E",
-				templateId: "academic",
+				"name": "outline",
+				"icon": "📑",
+				"color": "#9E9E9E",
+				"templateId": "academic"
 			},
 			{
-				name: "draft",
-				icon: "✏️",
-				color: "#FFC107",
-				templateId: "academic",
+				"name": "draft",
+				"icon": "✏️",
+				"color": "#FFC107",
+				"templateId": "academic"
 			},
 			{
-				name: "review",
-				icon: "🔬",
-				color: "#9C27B0",
-				templateId: "academic",
+				"name": "review",
+				"icon": "🔬",
+				"color": "#9C27B0",
+				"templateId": "academic"
 			},
 			{
-				name: "revision",
-				icon: "📝",
-				color: "#FF5722",
-				templateId: "academic",
+				"name": "revision",
+				"icon": "📝",
+				"color": "#FF5722",
+				"templateId": "academic"
 			},
 			{
-				name: "final",
-				icon: "📚",
-				color: "#4CAF50",
-				templateId: "academic",
+				"name": "final",
+				"icon": "📚",
+				"color": "#4CAF50",
+				"templateId": "academic"
 			},
 			{
-				name: "published",
-				icon: "🎓",
-				color: "#795548",
-				templateId: "academic",
-			},
-		],
+				"name": "published",
+				"icon": "🎓",
+				"color": "#795548",
+				"templateId": "academic"
+			}
+		]
 	},
 	{
-		id: "colorful",
-		name: "Colorful workflow",
-		description:
-			"A colorful set of workflow statuses with descriptive icons",
-		authorGithub: "soler1212",
-		statuses: [
+		"id": "colorful",
+		"name": "Colorful workflow",
+		"description": "A colorful set of workflow statuses with descriptive icons",
+		"authorGithub": "soler1212",
+		"statuses": [
 			{
-				name: "idea",
-				icon: "💡",
-				color: "#FFEB3B",
-				templateId: "colorful",
+				"name": "idea",
+				"icon": "💡",
+				"color": "#FFEB3B",
+				"templateId": "colorful"
 			},
 			{
-				name: "draft",
-				icon: "📝",
-				color: "#E0E0E0",
-				templateId: "colorful",
+				"name": "draft",
+				"icon": "📝",
+				"color": "#E0E0E0",
+				"templateId": "colorful"
 			},
 			{
-				name: "inProgress",
-				icon: "🔧",
-				color: "#FFC107",
-				templateId: "colorful",
+				"name": "inProgress",
+				"icon": "🔧",
+				"color": "#FFC107",
+				"templateId": "colorful"
 			},
 			{
-				name: "editing",
-				icon: "🖊️",
-				color: "#2196F3",
-				templateId: "colorful",
+				"name": "editing",
+				"icon": "🖊️",
+				"color": "#2196F3",
+				"templateId": "colorful"
 			},
 			{
-				name: "pending",
-				icon: "⏳",
-				color: "#9C27B0",
-				templateId: "colorful",
+				"name": "pending",
+				"icon": "⏳",
+				"color": "#9C27B0",
+				"templateId": "colorful"
 			},
 			{
-				name: "onHold",
-				icon: "⏸",
-				color: "#9E9E9E",
-				templateId: "colorful",
+				"name": "onHold",
+				"icon": "⏸",
+				"color": "#9E9E9E",
+				"templateId": "colorful"
 			},
 			{
-				name: "needsUpdate",
-				icon: "🔄",
-				color: "#FF5722",
-				templateId: "colorful",
+				"name": "needsUpdate",
+				"icon": "🔄",
+				"color": "#FF5722",
+				"templateId": "colorful"
 			},
 			{
-				name: "completed",
-				icon: "✅",
-				color: "#4CAF50",
-				templateId: "colorful",
+				"name": "completed",
+				"icon": "✅",
+				"color": "#4CAF50",
+				"templateId": "colorful"
 			},
 			{
-				name: "archived",
-				icon: "📦",
-				color: "#795548",
-				templateId: "colorful",
-			},
-		],
+				"name": "archived",
+				"icon": "📦",
+				"color": "#795548",
+				"templateId": "colorful"
+			}
+		]
 	},
 	{
-		id: "creative-writing",
-		name: "Creative Writing",
-		description: "Workflow for novelists and creative writers",
-		authorGithub: "soler1212",
-		statuses: [
+		"id": "creative-writing",
+		"name": "Creative Writing",
+		"description": "Workflow for novelists and creative writers",
+		"authorGithub": "soler1212",
+		"statuses": [
 			{
-				name: "idea",
-				icon: "🧠",
-				color: "#FFD700",
-				templateId: "creative-writing",
+				"name": "idea",
+				"icon": "🧠",
+				"color": "#FFD700",
+				"templateId": "creative-writing"
 			},
 			{
-				name: "outline",
-				icon: "🗺️",
-				color: "#87CEEB",
-				templateId: "creative-writing",
+				"name": "outline",
+				"icon": "🗺️",
+				"color": "#87CEEB",
+				"templateId": "creative-writing"
 			},
 			{
-				name: "first-draft",
-				icon: "✍️",
-				color: "#FFA07A",
-				templateId: "creative-writing",
+				"name": "first-draft",
+				"icon": "✍️",
+				"color": "#FFA07A",
+				"templateId": "creative-writing"
 			},
 			{
-				name: "revision",
-				icon: "🔍",
-				color: "#DA70D6",
-				templateId: "creative-writing",
+				"name": "revision",
+				"icon": "🔍",
+				"color": "#DA70D6",
+				"templateId": "creative-writing"
 			},
 			{
-				name: "final-polish",
-				icon: "✨",
-				color: "#32CD32",
-				templateId: "creative-writing",
-			},
-		],
+				"name": "final-polish",
+				"icon": "✨",
+				"color": "#32CD32",
+				"templateId": "creative-writing"
+			}
+		]
 	},
 	{
-		id: "minimal",
-		name: "Minimal workflow",
-		description: "A simplified set of essential workflow statuses",
-		authorGithub: "soler1212",
-		statuses: [
+		"id": "default-starter",
+		"name": "Starter Template",
+		"description": "A simplified set of essential workflow statuses to get you started.",
+		"authorGithub": "soler1212",
+		"statuses": [
 			{
-				name: "todo",
-				icon: "📌",
-				color: "#F44336",
-				templateId: "minimal",
+				"name": "todo",
+				"icon": "📌",
+				"color": "#F44336",
+				"templateId": "default-starter"
 			},
 			{
-				name: "inProgress",
-				icon: "⚙️",
-				color: "#2196F3",
-				templateId: "minimal",
+				"name": "inProgress",
+				"icon": "⚙️",
+				"color": "#2196F3",
+				"templateId": "default-starter"
 			},
 			{
-				name: "review",
-				icon: "👀",
-				color: "#9C27B0",
-				templateId: "minimal",
+				"name": "review",
+				"icon": "👀",
+				"color": "#9C27B0",
+				"templateId": "default-starter"
 			},
 			{
-				name: "done",
-				icon: "✓",
-				color: "#4CAF50",
-				templateId: "minimal",
-			},
-		],
+				"name": "done",
+				"icon": "✓",
+				"color": "#4CAF50",
+				"templateId": "default-starter"
+			}
+		]
 	},
 	{
-		id: "project",
-		name: "Project management",
-		description: "Status workflow for project management and tracking",
-		authorGithub: "soler1212",
-		statuses: [
+		"id": "minimal",
+		"name": "Minimal workflow",
+		"description": "A simplified set of essential workflow statuses",
+		"authorGithub": "soler1212",
+		"statuses": [
 			{
-				name: "planning",
-				icon: "🗓️",
-				color: "#9E9E9E",
-				templateId: "project",
+				"name": "todo",
+				"icon": "📌",
+				"color": "#F44336",
+				"templateId": "minimal"
 			},
 			{
-				name: "backlog",
-				icon: "📋",
-				color: "#E0E0E0",
-				templateId: "project",
+				"name": "inProgress",
+				"icon": "⚙️",
+				"color": "#2196F3",
+				"templateId": "minimal"
 			},
 			{
-				name: "ready",
-				icon: "🚦",
-				color: "#8BC34A",
-				templateId: "project",
+				"name": "review",
+				"icon": "👀",
+				"color": "#9C27B0",
+				"templateId": "minimal"
 			},
 			{
-				name: "inDevelopment",
-				icon: "👨‍💻",
-				color: "#2196F3",
-				templateId: "project",
-			},
-			{
-				name: "testing",
-				icon: "🧪",
-				color: "#9C27B0",
-				templateId: "project",
-			},
-			{
-				name: "review",
-				icon: "👁️",
-				color: "#FFC107",
-				templateId: "project",
-			},
-			{
-				name: "approved",
-				icon: "👍",
-				color: "#4CAF50",
-				templateId: "project",
-			},
-			{
-				name: "live",
-				icon: "🚀",
-				color: "#3F51B5",
-				templateId: "project",
-			},
-		],
+				"name": "done",
+				"icon": "✓",
+				"color": "#4CAF50",
+				"templateId": "minimal"
+			}
+		]
 	},
 	{
-		id: "default-starter",
-		name: "Starter Template",
-		description:
-			"A simplified set of essential workflow statuses to get you started.",
-		authorGithub: "soler1212",
-		statuses: [
+		"id": "project",
+		"name": "Project management",
+		"description": "Status workflow for project management and tracking",
+		"authorGithub": "soler1212",
+		"statuses": [
 			{
-				name: "todo",
-				icon: "📌",
-				color: "#F44336",
-				templateId: "default-starter",
+				"name": "planning",
+				"icon": "🗓️",
+				"color": "#9E9E9E",
+				"templateId": "project"
 			},
 			{
-				name: "inProgress",
-				icon: "⚙️",
-				color: "#2196F3",
-				templateId: "default-starter",
+				"name": "backlog",
+				"icon": "📋",
+				"color": "#E0E0E0",
+				"templateId": "project"
 			},
 			{
-				name: "review",
-				icon: "👀",
-				color: "#9C27B0",
-				templateId: "default-starter",
+				"name": "ready",
+				"icon": "🚦",
+				"color": "#8BC34A",
+				"templateId": "project"
 			},
 			{
-				name: "done",
-				icon: "✓",
-				color: "#4CAF50",
-				templateId: "default-starter",
+				"name": "inDevelopment",
+				"icon": "👨‍💻",
+				"color": "#2196F3",
+				"templateId": "project"
 			},
-		],
-	},
+			{
+				"name": "testing",
+				"icon": "🧪",
+				"color": "#9C27B0",
+				"templateId": "project"
+			},
+			{
+				"name": "review",
+				"icon": "👁️",
+				"color": "#FFC107",
+				"templateId": "project"
+			},
+			{
+				"name": "approved",
+				"icon": "👍",
+				"color": "#4CAF50",
+				"templateId": "project"
+			},
+			{
+				"name": "live",
+				"icon": "🚀",
+				"color": "#3F51B5",
+				"templateId": "project"
+			}
+		]
+	}
 ];

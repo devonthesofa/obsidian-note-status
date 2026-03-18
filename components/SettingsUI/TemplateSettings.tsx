@@ -69,7 +69,15 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 				);
 				return;
 			}
-			const newId = generateTemplateId(template.name, settings.templates);
+
+			// Try to use the original ID if it's unique, otherwise generate a new one
+			const isIdUnique = !settings.templates.some(
+				(t) => t.id === template.id,
+			);
+			const newId = isIdUnique
+				? template.id
+				: generateTemplateId(template.name, settings.templates);
+
 			const installedTemplate: StatusTemplate = {
 				...template,
 				id: newId,
@@ -105,11 +113,16 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 				);
 				onChange("templates", updatedTemplates);
 			} else {
-				// Add new template - generate unique ID
-				const uniqueId = generateTemplateId(
-					template.name,
-					settings.templates,
-				);
+				// Add new template
+				// Try to use the original ID if it's unique, otherwise generate a new one
+				const isIdUnique =
+					template.id &&
+					!settings.templates.some((t) => t.id === template.id);
+
+				const uniqueId = isIdUnique
+					? template.id
+					: generateTemplateId(template.name, settings.templates);
+
 				finalTemplate = { ...template, id: uniqueId };
 
 				// Update statuses with the final template ID
