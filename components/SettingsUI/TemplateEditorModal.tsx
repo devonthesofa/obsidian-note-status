@@ -18,6 +18,8 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 }) => {
 	const [name, setName] = useState(template?.name || "");
 	const [description, setDescription] = useState(template?.description || "");
+	const [author, setAuthor] = useState(template?.author || "");
+	const [github, setGithub] = useState(template?.github || "");
 	const [statuses, setStatuses] = useState<NoteStatus[]>(
 		template?.statuses || [
 			{
@@ -52,6 +54,8 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 			id: templateId,
 			name: name.trim(),
 			description: description.trim(),
+			author: author.trim() || undefined,
+			github: github.trim() || undefined,
 			statuses: statusesWithTemplateId,
 		};
 
@@ -142,6 +146,30 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 						value={description}
 						onChange={setDescription}
 						placeholder="e.g. Status workflow for project management"
+					/>
+				</SettingItem>
+
+				<SettingItem
+					name="Author (Optional)"
+					description="Your name or community name"
+				>
+					<Input
+						variant="text"
+						value={author}
+						onChange={setAuthor}
+						placeholder="e.g. Jane Doe"
+					/>
+				</SettingItem>
+
+				<SettingItem
+					name="GitHub URL (Optional)"
+					description="Link to your GitHub profile or repository"
+				>
+					<Input
+						variant="text"
+						value={github}
+						onChange={setGithub}
+						placeholder="e.g. https://github.com/janedoe"
 					/>
 				</SettingItem>
 

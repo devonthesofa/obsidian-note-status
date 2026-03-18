@@ -229,6 +229,23 @@
 	transform: none;
 }
 
+.template-author-info {
+	display: block;
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+	margin-top: var(--size-2-1);
+	font-style: italic;
+}
+
+.template-author-info a {
+	color: var(--text-accent);
+	text-decoration: none;
+}
+
+.template-author-info a:hover {
+	text-decoration: underline;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
 	.template-settings-actions {

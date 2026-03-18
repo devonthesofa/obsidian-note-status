@@ -55,7 +55,25 @@ export const TemplateItem: React.FC<TemplateItemProps> = ({
 						)}
 					</div>
 					<div className="setting-item-description">
-						{template.description}:
+						{template.description}
+						{(template.author || template.github) && (
+							<div className="template-author-info">
+								By{" "}
+								{template.github ? (
+									<a
+										href={template.github}
+										target="_blank"
+										rel="noopener noreferrer"
+										onClick={(e) => e.stopPropagation()}
+									>
+										{template.author ||
+											template.github.split("/").pop()}
+									</a>
+								) : (
+									<span>{template.author}</span>
+								)}
+							</div>
+						)}
 					</div>
 					<div className="template-statuses">
 						{template.statuses.map((status, index) => (
