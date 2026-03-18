@@ -1,0 +1,61 @@
+{
+	"id": "colorful",
+	"name": "Colorful workflow",
+	"description": "A colorful set of workflow statuses with descriptive icons",
+	"statuses": [
+		{
+			"name": "idea",
+			"icon": "💡",
+			"color": "#FFEB3B",
+			"templateId": "colorful"
+		},
+		{
+			"name": "draft",
+			"icon": "📝",
+			"color": "#E0E0E0",
+			"templateId": "colorful"
+		},
+		{
+			"name": "inProgress",
+			"icon": "🔧",
+			"color": "#FFC107",
+			"templateId": "colorful"
+		},
+		{
+			"name": "editing",
+			"icon": "🖊️",
+			"color": "#2196F3",
+			"templateId": "colorful"
+		},
+		{
+			"name": "pending",
+			"icon": "⏳",
+			"color": "#9C27B0",
+			"templateId": "colorful"
+		},
+		{
+			"name": "onHold",
+			"icon": "⏸",
+			"color": "#9E9E9E",
+			"templateId": "colorful"
+		},
+		{
+			"name": "needsUpdate",
+			"icon": "🔄",
+			"color": "#FF5722",
+			"templateId": "colorful"
+		},
+		{
+			"name": "completed",
+			"icon": "✅",
+			"color": "#4CAF50",
+			"templateId": "colorful"
+		},
+		{
+			"name": "archived",
+			"icon": "📦",
+			"color": "#795548",
+			"templateId": "colorful"
+		}
+	]
+}

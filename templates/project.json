@@ -1,0 +1,55 @@
+{
+	"id": "project",
+	"name": "Project management",
+	"description": "Status workflow for project management and tracking",
+	"statuses": [
+		{
+			"name": "planning",
+			"icon": "🗓️",
+			"color": "#9E9E9E",
+			"templateId": "project"
+		},
+		{
+			"name": "backlog",
+			"icon": "📋",
+			"color": "#E0E0E0",
+			"templateId": "project"
+		},
+		{
+			"name": "ready",
+			"icon": "🚦",
+			"color": "#8BC34A",
+			"templateId": "project"
+		},
+		{
+			"name": "inDevelopment",
+			"icon": "👨‍💻",
+			"color": "#2196F3",
+			"templateId": "project"
+		},
+		{
+			"name": "testing",
+			"icon": "🧪",
+			"color": "#9C27B0",
+			"templateId": "project"
+		},
+		{
+			"name": "review",
+			"icon": "👁️",
+			"color": "#FFC107",
+			"templateId": "project"
+		},
+		{
+			"name": "approved",
+			"icon": "👍",
+			"color": "#4CAF50",
+			"templateId": "project"
+		},
+		{
+			"name": "live",
+			"icon": "🚀",
+			"color": "#3F51B5",
+			"templateId": "project"
+		}
+	]
+}

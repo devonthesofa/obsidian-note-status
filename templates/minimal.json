@@ -1,0 +1,31 @@
+{
+	"id": "minimal",
+	"name": "Minimal workflow",
+	"description": "A simplified set of essential workflow statuses",
+	"statuses": [
+		{
+			"name": "todo",
+			"icon": "📌",
+			"color": "#F44336",
+			"templateId": "minimal"
+		},
+		{
+			"name": "inProgress",
+			"icon": "⚙️",
+			"color": "#2196F3",
+			"templateId": "minimal"
+		},
+		{
+			"name": "review",
+			"icon": "👀",
+			"color": "#9C27B0",
+			"templateId": "minimal"
+		},
+		{
+			"name": "done",
+			"icon": "✓",
+			"color": "#4CAF50",
+			"templateId": "minimal"
+		}
+	]
+}
