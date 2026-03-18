@@ -27,7 +27,7 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 
 	const handleTemplateToggle = useCallback(
 		(templateId: string, enabled: boolean) => {
-			let newEnabledTemplates = [...settings.enabledTemplates];
+			let newEnabledTemplates = [...(settings.enabledTemplates || [])];
 			if (enabled) {
 				if (!newEnabledTemplates.includes(templateId)) {
 					newEnabledTemplates.push(templateId);
@@ -176,13 +176,13 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 					</button>
 				</div>
 				<div className="template-list">
-					{settings.templates.map((template) => (
+					{(settings.templates || []).map((template) => (
 						<TemplateItem
 							key={template.id}
 							template={template}
-							isEnabled={settings.enabledTemplates.includes(
-								template.id,
-							)}
+							isEnabled={(
+								settings.enabledTemplates || []
+							).includes(template.id)}
 							onToggle={handleTemplateToggle}
 							onEdit={handleEditTemplate}
 							onDelete={handleDeleteTemplate}

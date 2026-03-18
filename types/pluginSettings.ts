@@ -22,6 +22,15 @@ export interface StatusTemplate {
 	statuses: NoteStatus[];
 }
 
+export type SyncGroup =
+	| "templates"
+	| "customStatuses"
+	| "statusColors"
+	| "uiAppearance"
+	| "workflow"
+	| "storage"
+	| "features";
+
 export type PluginSettings = {
 	fileExplorerIconPosition:
 		| "absolute-right"
@@ -70,5 +79,10 @@ export type PluginSettings = {
 	applyStatusRecursivelyToSubfolders: boolean; // Whether to show recursive folder context option
 	statusFrontmatterMappings: StatusFrontmatterMapping[]; // Custom mappings between templates/statuses and frontmatter keys
 	writeMappedTagsToDefault: boolean; // Whether mapped tags should also write to the default tag
+	enableExternalStatusSync: boolean; // Whether to sync statuses to an external file
+	externalStatusSyncPath: string; // Path to the external sync file
+	syncGroups: SyncGroup[]; // Selected groups of settings to synchronize
+	enableNonMarkdownSync: boolean; // Whether to sync non-markdown statuses to a vault file
+	nonMarkdownSyncPath: string; // Path to the non-markdown sync file
 	[key: string]: unknown;
 };

@@ -55,4 +55,17 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	applyStatusRecursivelyToSubfolders: false,
 	statusFrontmatterMappings: [],
 	writeMappedTagsToDefault: false,
+	enableExternalStatusSync: false,
+	externalStatusSyncPath: "_note-status-sync.json",
+	syncGroups: [
+		"templates",
+		"customStatuses",
+		"statusColors",
+		"uiAppearance",
+		"workflow",
+		"storage",
+		"features",
+	],
+	enableNonMarkdownSync: false,
+	nonMarkdownSyncPath: "_note-status-data.json",
 };
