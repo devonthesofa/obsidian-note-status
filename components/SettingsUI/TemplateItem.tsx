@@ -100,16 +100,16 @@ export const TemplateItem: React.FC<TemplateItemProps> = ({
 			</SelectableListItem>
 			<div className="template-item-actions">
 				{isCustom && (
-					<button
-						onClick={(e) => {
-							e.stopPropagation();
-							window.open(submissionUrl, "_blank");
-						}}
+					<a
+						href={submissionUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						onClick={(e) => e.stopPropagation()}
 						title="Submit to Marketplace"
 						className="template-marketplace-btn"
 					>
 						<ObsidianIcon name="share" size={16} />
-					</button>
+					</a>
 				)}
 				{onEdit && (
 					<button
