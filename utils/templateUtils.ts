@@ -50,3 +50,31 @@ export const generateTemplateId = (name: string): string => {
 
 	return id;
 };
+
+/**
+ * Generate a GitHub URL to submit a template to the marketplace
+ */
+export const getMarketplaceSubmissionUrl = (
+	template: StatusTemplate,
+): string => {
+	const baseUrl =
+		"https://github.com/devonthesofa/obsidian-note-status/new/master/templates";
+	const filename = `${template.id.replace(/^custom-/, "")}.json`;
+
+	// Create a clean version of the template for the marketplace
+	const marketplaceTemplate = {
+		...template,
+		// Ensure the ID doesn't have the 'custom-' prefix for the marketplace
+		id: template.id.replace(/^custom-/, ""),
+		// Ensure statuses use the new ID
+		statuses: template.statuses.map((s) => ({
+			...s,
+			templateId: template.id.replace(/^custom-/, ""),
+		})),
+	};
+
+	const value = encodeURIComponent(
+		JSON.stringify(marketplaceTemplate, null, 2),
+	);
+	return `${baseUrl}?filename=${filename}&value=${value}`;
+};

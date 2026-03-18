@@ -75,11 +75,19 @@ It works on both Markdown and non-Markdown files, integrates into multiple UI su
 
 ## Template Marketplace
 
-You can contribute your own status templates to the plugin! Templates are stored as JSON files in the `templates/` directory.
+You can contribute your own status templates to the plugin!
 
-### How to contribute
+### How to contribute (The Easy Way)
+
+1. Create a custom template in the plugin settings.
+2. Click the **Share** (📤) icon on your custom template.
+3. It will open a GitHub page with your template content pre-filled.
+4. Click **Propose new file** and submit your Pull Request!
+
+### How to contribute (Manual)
 
 1. Fork the repository.
+   ...
 2. Create a new JSON file in the `templates/` folder (e.g., `templates/my-awesome-workflow.json`).
 3. Follow this format:
     ```json

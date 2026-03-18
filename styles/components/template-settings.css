@@ -141,6 +141,15 @@
 	justify-content: center;
 }
 
+.template-item-actions button:hover {
+	background: var(--interactive-hover);
+	color: var(--text-normal);
+}
+
+.template-marketplace-btn {
+	color: var(--text-accent);
+}
+
 /* Template Editor Modal */
 .template-editor-modal {
 	background: var(--background-primary);

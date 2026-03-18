@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { StatusTemplate } from "@/types/pluginSettings";
 import { StatusDisplay } from "../atoms/StatusDisplay";
 import { SelectableListItem } from "../atoms/SelectableListItem";
-import { isCustomTemplate } from "@/utils/templateUtils";
+import {
+	isCustomTemplate,
+	getMarketplaceSubmissionUrl,
+} from "@/utils/templateUtils";
 import { ObsidianIcon } from "../atoms/ObsidianIcon";
 
 interface TemplateItemProps {
@@ -20,6 +23,15 @@ export const TemplateItem: React.FC<TemplateItemProps> = ({
 	onEdit,
 	onDelete,
 }) => {
+	const isCustom = useMemo(
+		() => isCustomTemplate(template.id),
+		[template.id],
+	);
+	const submissionUrl = useMemo(
+		() => getMarketplaceSubmissionUrl(template),
+		[template],
+	);
+
 	const handleClick = (e: React.MouseEvent) => {
 		// Don't toggle if clicking action buttons
 		if ((e.target as HTMLElement).closest(".template-item-actions")) {
@@ -87,6 +99,18 @@ export const TemplateItem: React.FC<TemplateItemProps> = ({
 				</div>
 			</SelectableListItem>
 			<div className="template-item-actions">
+				{isCustom && (
+					<button
+						onClick={(e) => {
+							e.stopPropagation();
+							window.open(submissionUrl, "_blank");
+						}}
+						title="Submit to Marketplace"
+						className="template-marketplace-btn"
+					>
+						<ObsidianIcon name="share" size={16} />
+					</button>
+				)}
 				{onEdit && (
 					<button
 						onClick={(e) => {
