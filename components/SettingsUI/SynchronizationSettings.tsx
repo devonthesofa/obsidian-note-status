@@ -13,12 +13,12 @@ export const SynchronizationSettings: React.FC<Props> = ({
 	onChange,
 }) => {
 	const handleExport = async () => {
-		await settingsService.syncToExternalFile();
+		await settingsService.syncToExternalFile(true);
 		alert("Plugin settings exported successfully.");
 	};
 
 	const handleImport = async () => {
-		await settingsService.loadFromExternalFile();
+		await settingsService.loadFromExternalFile(true);
 		alert("Plugin settings imported successfully.");
 	};
 

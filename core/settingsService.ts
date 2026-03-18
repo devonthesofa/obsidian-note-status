@@ -80,8 +80,8 @@ class SettingsService {
 		await this.plugin.saveData(this.settings);
 	}
 
-	async syncToExternalFile() {
-		if (!this.settings.enableExternalStatusSync) return;
+	async syncToExternalFile(force = false) {
+		if (!this.settings.enableExternalStatusSync && !force) return;
 
 		const path = normalizePath(this.settings.externalStatusSyncPath);
 		const data = {
@@ -99,8 +99,8 @@ class SettingsService {
 		}
 	}
 
-	async loadFromExternalFile() {
-		if (!this.settings.enableExternalStatusSync) return;
+	async loadFromExternalFile(force = false) {
+		if (!this.settings.enableExternalStatusSync && !force) return;
 		const path = normalizePath(this.settings.externalStatusSyncPath);
 		if (!(await this.plugin.app.vault.adapter.exists(path))) return;
 
