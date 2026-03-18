@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { StatusTemplate } from "@/types/pluginSettings";
 import { NoteStatus } from "@/types/noteStatus";
 import { Input } from "@/components/atoms/Input";
 import { SettingItem } from "./SettingItem";
 import { CustomStatusItem } from "./CustomStatusItem";
+import { isCustomTemplate } from "@/utils/templateUtils";
 
 interface TemplateEditorModalProps {
 	template?: StatusTemplate;
@@ -16,6 +17,10 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 	onSave,
 	onCancel,
 }) => {
+	const isCustom = useMemo(
+		() => (template ? isCustomTemplate(template) : true),
+		[template],
+	);
 	const [name, setName] = useState(template?.name || "");
 	const [description, setDescription] = useState(template?.description || "");
 	const [author, setAuthor] = useState(template?.author || "");
@@ -151,25 +156,35 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 
 				<SettingItem
 					name="Author (Optional)"
-					description="Your name or community name"
+					description={
+						isCustom
+							? "Your name or community name"
+							: "Original author of the marketplace template"
+					}
 				>
 					<Input
 						variant="text"
 						value={author}
 						onChange={setAuthor}
 						placeholder="e.g. Jane Doe"
+						disabled={!isCustom}
 					/>
 				</SettingItem>
 
 				<SettingItem
 					name="GitHub URL (Optional)"
-					description="Link to your GitHub profile or repository"
+					description={
+						isCustom
+							? "Link to your GitHub profile or repository"
+							: "Official repository of the marketplace template"
+					}
 				>
 					<Input
 						variant="text"
 						value={github}
 						onChange={setGithub}
 						placeholder="e.g. https://github.com/janedoe"
+						disabled={!isCustom}
 					/>
 				</SettingItem>
 

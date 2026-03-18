@@ -53,11 +53,16 @@ export const MarketplaceBrowseModal: React.FC<MarketplaceBrowseModalProps> = ({
 									<div className="marketplace-card-title">
 										{template.name}
 									</div>
-									{template.author && (
-										<div className="marketplace-card-author">
-											by {template.author}
-										</div>
-									)}
+									<div className="marketplace-card-meta">
+										<span className="template-badge badge-info">
+											Marketplace
+										</span>
+										{template.author && (
+											<div className="marketplace-card-author">
+												by {template.author}
+											</div>
+										)}
+									</div>
 								</div>
 								<div className="marketplace-card-description">
 									{template.description}
