@@ -39,6 +39,7 @@ export const SETTINGS_GROUPS: Record<SyncGroup, (keyof PluginSettings)[]> = {
 		"singleStatusStorageMode",
 		"strictStatuses",
 		"enableStatusOverviewPopup",
+		"defaultStatusForNewNotes",
 	],
 	storage: [
 		"tagPrefix",

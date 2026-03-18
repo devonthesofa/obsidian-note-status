@@ -84,5 +84,6 @@ export type PluginSettings = {
 	syncGroups: SyncGroup[]; // Selected groups of settings to synchronize
 	enableNonMarkdownSync: boolean; // Whether to sync non-markdown statuses to a vault file
 	nonMarkdownSyncPath: string; // Path to the non-markdown sync file
+	defaultStatusForNewNotes: string | null; // Default status to apply to new notes
 	[key: string]: unknown;
 };
