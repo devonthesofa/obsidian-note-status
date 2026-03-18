@@ -113,10 +113,9 @@ You can contribute your own status templates to the plugin!
     	]
     }
     ```
-4. Register your template in `constants/predefinedTemplates.ts` by adding an import and adding it to the `PREDEFINED_TEMPLATES` array.
-5. Submit a Pull Request!
+4. Submit a Pull Request with your JSON file!
 
-Once accepted, your template will be available in the marketplace for all users.
+Once accepted and merged, your template will be automatically included in the next build and available in the marketplace for all users.
 
 ## Installation
 
