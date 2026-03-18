@@ -68,4 +68,5 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	],
 	enableNonMarkdownSync: false,
 	nonMarkdownSyncPath: "_note-status-data.json",
+	defaultStatusForNewNotes: null,
 };

@@ -3,7 +3,10 @@ import StatusBarIntegration from "integrations/status-bar/status-bar";
 import eventBus from "core/eventBus";
 import { PluginSettingIntegration } from "./integrations/settings/pluginSettings";
 import settingsService from "./core/settingsService";
-import { BaseNoteStatusService } from "./core/noteStatusService";
+import {
+	BaseNoteStatusService,
+	NoteStatusService,
+} from "./core/noteStatusService";
 import { StatusModalIntegration } from "./integrations/modals/statusModalIntegration";
 import ContextMenuIntegration from "./integrations/context-menu/contextMenuIntegration";
 import { FileExplorerIntegration } from "./integrations/file-explorer/file-explorer-integration";
@@ -238,6 +241,42 @@ export default class NoteStatusPlugin extends Plugin {
 				}
 			},
 			"main-status-popup-setting-subscriptor",
+		);
+
+		this.registerEvent(
+			this.app.vault.on("create", async (file) => {
+				if (
+					file instanceof TFile &&
+					file.extension === "md" &&
+					settingsService.settings.defaultStatusForNewNotes
+				) {
+					// Wait a bit to ensure metadata is processed or templates are applied
+					setTimeout(async () => {
+						// Ensure file still exists
+						if (!this.app.vault.getAbstractFileByPath(file.path)) {
+							return;
+						}
+
+						const noteStatusService = new NoteStatusService(file);
+						// Populate statuses to see if it already has any
+						noteStatusService.populateStatuses();
+
+						const groupedStatuses =
+							noteStatusService.getStatusesByAllKeys();
+						const hasStatuses = Object.values(groupedStatuses).some(
+							(statuses) => statuses.length > 0,
+						);
+
+						if (!hasStatuses) {
+							await noteStatusService.addStatus(
+								settingsService.settings.tagPrefix,
+								settingsService.settings
+									.defaultStatusForNewNotes as string,
+							);
+						}
+					}, 500); // Increased delay to allow more time for templates
+				}
+			}),
 		);
 
 		this.registerEvent(
