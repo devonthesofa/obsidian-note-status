@@ -1,9 +1,10 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { StatusTemplate } from "@/types/pluginSettings";
 import { NoteStatus } from "@/types/noteStatus";
 import { Input } from "@/components/atoms/Input";
 import { SettingItem } from "./SettingItem";
 import { CustomStatusItem } from "./CustomStatusItem";
+import { isCustomTemplate } from "@/utils/templateUtils";
 
 interface TemplateEditorModalProps {
 	template?: StatusTemplate;
@@ -16,8 +17,15 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 	onSave,
 	onCancel,
 }) => {
+	const isCustom = useMemo(
+		() => (template ? isCustomTemplate(template) : true),
+		[template],
+	);
 	const [name, setName] = useState(template?.name || "");
 	const [description, setDescription] = useState(template?.description || "");
+	const [authorGithub, setAuthorGithub] = useState(
+		template?.authorGithub || "",
+	);
 	const [statuses, setStatuses] = useState<NoteStatus[]>(
 		template?.statuses || [
 			{
@@ -52,6 +60,7 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 			id: templateId,
 			name: name.trim(),
 			description: description.trim(),
+			authorGithub: authorGithub.trim() || undefined,
 			statuses: statusesWithTemplateId,
 		};
 
@@ -142,6 +151,23 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 						value={description}
 						onChange={setDescription}
 						placeholder="e.g. Status workflow for project management"
+					/>
+				</SettingItem>
+
+				<SettingItem
+					name="Author GitHub Username (Optional)"
+					description={
+						isCustom
+							? "Your GitHub username for attribution"
+							: "Original author of the marketplace template"
+					}
+				>
+					<Input
+						variant="text"
+						value={authorGithub}
+						onChange={setAuthorGithub}
+						placeholder="e.g. janedoe"
+						disabled={!isCustom}
 					/>
 				</SettingItem>
 

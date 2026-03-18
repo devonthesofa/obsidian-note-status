@@ -2,14 +2,13 @@ import React, { useCallback, useState } from "react";
 import { PluginSettings, StatusTemplate } from "@/types/pluginSettings";
 import { TemplateItem } from "./TemplateItem";
 import { TemplateEditorModal } from "./TemplateEditorModal";
+import { MarketplaceShareModal } from "./MarketplaceShareModal";
+import { MarketplaceBrowseModal } from "./MarketplaceBrowseModal";
+import { ObsidianIcon } from "../atoms/ObsidianIcon";
 import {
 	generateTemplateId,
 	isTemplateNameUnique,
 } from "@/utils/templateUtils";
-import {
-	DEFAULT_ENABLED_TEMPLATES,
-	PREDEFINED_TEMPLATES,
-} from "@/constants/predefinedTemplates";
 
 interface TemplateSettingsProps {
 	settings: PluginSettings;
@@ -21,7 +20,12 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 	onChange,
 }) => {
 	const [showEditor, setShowEditor] = useState(false);
+	const [showShare, setShowShare] = useState(false);
+	const [showMarketplace, setShowMarketplace] = useState(false);
 	const [editingTemplate, setEditingTemplate] = useState<
+		StatusTemplate | undefined
+	>();
+	const [sharingTemplate, setSharingTemplate] = useState<
 		StatusTemplate | undefined
 	>();
 
@@ -52,6 +56,43 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 		setShowEditor(true);
 	}, []);
 
+	const handleShareTemplate = useCallback((template: StatusTemplate) => {
+		setSharingTemplate(template);
+		setShowShare(true);
+	}, []);
+
+	const handleInstallTemplate = useCallback(
+		(template: StatusTemplate) => {
+			if (!isTemplateNameUnique(template.name, undefined)) {
+				alert(
+					`A template with the name "${template.name}" is already installed.`,
+				);
+				return;
+			}
+
+			// Try to use the original ID if it's unique, otherwise generate a new one
+			const isIdUnique = !settings.templates.some(
+				(t) => t.id === template.id,
+			);
+			const newId = isIdUnique
+				? template.id
+				: generateTemplateId(template.name, settings.templates);
+
+			const installedTemplate: StatusTemplate = {
+				...template,
+				id: newId,
+				statuses: template.statuses.map((s) => ({
+					...s,
+					templateId: newId,
+				})),
+			};
+
+			onChange("templates", [...settings.templates, installedTemplate]);
+			handleTemplateToggle(newId, true);
+		},
+		[settings.templates, onChange, handleTemplateToggle],
+	);
+
 	const handleSaveTemplate = useCallback(
 		(template: StatusTemplate) => {
 			// Validate name uniqueness
@@ -72,8 +113,16 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 				);
 				onChange("templates", updatedTemplates);
 			} else {
-				// Add new template - generate unique ID
-				const uniqueId = generateTemplateId(template.name);
+				// Add new template
+				// Try to use the original ID if it's unique, otherwise generate a new one
+				const isIdUnique =
+					template.id &&
+					!settings.templates.some((t) => t.id === template.id);
+
+				const uniqueId = isIdUnique
+					? template.id
+					: generateTemplateId(template.name, settings.templates);
+
 				finalTemplate = { ...template, id: uniqueId };
 
 				// Update statuses with the final template ID
@@ -118,22 +167,22 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 		[settings.templates, settings.enabledTemplates, onChange],
 	);
 
-	const handleResetToDefaults = useCallback(() => {
-		const confirmed = confirm(
-			"Reset to default templates? This will:\n" +
-				"• Remove all custom templates\n" +
-				"• Reset enabled templates to defaults\n" +
-				"This action cannot be undone.",
-		);
-		if (!confirmed) return;
-
-		onChange("templates", [...PREDEFINED_TEMPLATES]);
-		onChange("enabledTemplates", [...DEFAULT_ENABLED_TEMPLATES]);
-	}, [onChange]);
-
 	const handleCancelEditor = useCallback(() => {
 		setShowEditor(false);
 		setEditingTemplate(undefined);
+	}, []);
+
+	const handleCancelShare = useCallback(() => {
+		setShowShare(false);
+		setSharingTemplate(undefined);
+	}, []);
+
+	const handleOpenMarketplace = useCallback(() => {
+		setShowMarketplace(true);
+	}, []);
+
+	const handleCloseMarketplace = useCallback(() => {
+		setShowMarketplace(false);
 	}, []);
 
 	if (showEditor) {
@@ -149,30 +198,54 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 		);
 	}
 
+	if (showShare && sharingTemplate) {
+		return (
+			<div>
+				<h3>Status templates</h3>
+				<MarketplaceShareModal
+					template={sharingTemplate}
+					onClose={handleCancelShare}
+				/>
+			</div>
+		);
+	}
+
+	if (showMarketplace) {
+		return (
+			<div>
+				<h3>Status templates</h3>
+				<MarketplaceBrowseModal
+					installedTemplates={settings.templates}
+					onInstall={handleInstallTemplate}
+					onClose={handleCloseMarketplace}
+				/>
+			</div>
+		);
+	}
+
 	return (
 		<div>
 			<h3>Status templates</h3>
 			<p>
-				Enable predefined templates to quickly add common status
-				workflows, or create your own custom templates.
+				Browse the marketplace to find common status workflows or create
+				your own custom templates.
 			</p>
 
 			{/* Custom Templates Section */}
 			<div className="template-section">
-				<h4 className="template-section-title">Custom Templates</h4>
-
 				<div className="template-settings-actions">
 					<button
-						className="mod-cta template-create-btn"
+						className="mod-cta marketplace-browse-btn"
+						onClick={handleOpenMarketplace}
+					>
+						<ObsidianIcon name="globe" size={16} />
+						Browse Marketplace
+					</button>
+					<button
+						className="template-create-btn"
 						onClick={handleCreateTemplate}
 					>
 						+ Create Template
-					</button>
-					<button
-						className="template-reset-btn"
-						onClick={handleResetToDefaults}
-					>
-						🔄 Reset to Defaults
 					</button>
 				</div>
 				<div className="template-list">
@@ -186,6 +259,7 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 							onToggle={handleTemplateToggle}
 							onEdit={handleEditTemplate}
 							onDelete={handleDeleteTemplate}
+							onShare={handleShareTemplate}
 						/>
 					))}
 				</div>

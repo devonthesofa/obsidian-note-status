@@ -1,0 +1,38 @@
+{
+	"id": "creative-writing",
+	"name": "Creative Writing",
+	"description": "Workflow for novelists and creative writers",
+	"authorGithub": "soler1212",
+	"statuses": [
+		{
+			"name": "idea",
+			"icon": "🧠",
+			"color": "#FFD700",
+			"templateId": "creative-writing"
+		},
+		{
+			"name": "outline",
+			"icon": "🗺️",
+			"color": "#87CEEB",
+			"templateId": "creative-writing"
+		},
+		{
+			"name": "first-draft",
+			"icon": "✍️",
+			"color": "#FFA07A",
+			"templateId": "creative-writing"
+		},
+		{
+			"name": "revision",
+			"icon": "🔍",
+			"color": "#DA70D6",
+			"templateId": "creative-writing"
+		},
+		{
+			"name": "final-polish",
+			"icon": "✨",
+			"color": "#32CD32",
+			"templateId": "creative-writing"
+		}
+	]
+}

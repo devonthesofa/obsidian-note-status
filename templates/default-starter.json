@@ -1,0 +1,32 @@
+{
+	"id": "default-starter",
+	"name": "Starter Template",
+	"description": "A simplified set of essential workflow statuses to get you started.",
+	"authorGithub": "soler1212",
+	"statuses": [
+		{
+			"name": "todo",
+			"icon": "📌",
+			"color": "#F44336",
+			"templateId": "default-starter"
+		},
+		{
+			"name": "inProgress",
+			"icon": "⚙️",
+			"color": "#2196F3",
+			"templateId": "default-starter"
+		},
+		{
+			"name": "review",
+			"icon": "👀",
+			"color": "#9C27B0",
+			"templateId": "default-starter"
+		},
+		{
+			"name": "done",
+			"icon": "✓",
+			"color": "#4CAF50",
+			"templateId": "default-starter"
+		}
+	]
+}

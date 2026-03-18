@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { StatusTemplate } from "@/types/pluginSettings";
 import { StatusDisplay } from "../atoms/StatusDisplay";
 import { SelectableListItem } from "../atoms/SelectableListItem";
-import { isCustomTemplate } from "@/utils/templateUtils";
+import { isCustomTemplate, isTemplateModified } from "@/utils/templateUtils";
 import { ObsidianIcon } from "../atoms/ObsidianIcon";
 
 interface TemplateItemProps {
@@ -11,6 +11,7 @@ interface TemplateItemProps {
 	onToggle: (templateId: string, enabled: boolean) => void;
 	onEdit?: (template: StatusTemplate) => void;
 	onDelete?: (templateId: string) => void;
+	onShare?: (template: StatusTemplate) => void;
 }
 
 export const TemplateItem: React.FC<TemplateItemProps> = ({
@@ -19,7 +20,14 @@ export const TemplateItem: React.FC<TemplateItemProps> = ({
 	onToggle,
 	onEdit,
 	onDelete,
+	onShare,
 }) => {
+	const isCustom = useMemo(() => isCustomTemplate(template), [template]);
+	const isModified = useMemo(
+		() => !isCustom && isTemplateModified(template),
+		[isCustom, template],
+	);
+
 	const handleClick = (e: React.MouseEvent) => {
 		// Don't toggle if clicking action buttons
 		if ((e.target as HTMLElement).closest(".template-item-actions")) {
@@ -29,7 +37,7 @@ export const TemplateItem: React.FC<TemplateItemProps> = ({
 	};
 
 	return (
-		<div className={`template-item ${isEnabled ? "enabled" : ""}`}>
+		<div className={`template-item ${isEnabled ? "enabled" : "disabled"}`}>
 			<SelectableListItem
 				selected={isEnabled}
 				onClick={handleClick}
@@ -48,14 +56,47 @@ export const TemplateItem: React.FC<TemplateItemProps> = ({
 						<span className="setting-item-name">
 							{template.name}
 						</span>
-						{isCustomTemplate(template.id) && (
-							<span className="template-custom-badge">
-								Custom
-							</span>
-						)}
+						<div className="template-badges">
+							{isEnabled ? (
+								<span className="template-badge badge-success">
+									Active
+								</span>
+							) : (
+								<span className="template-badge badge-muted">
+									Inactive
+								</span>
+							)}
+							{isCustom ? (
+								<span className="template-badge badge-accent">
+									Custom
+								</span>
+							) : (
+								<span className="template-badge badge-info">
+									Marketplace
+								</span>
+							)}
+							{isModified && (
+								<span className="template-badge badge-warning">
+									Modified
+								</span>
+							)}
+						</div>
 					</div>
 					<div className="setting-item-description">
-						{template.description}:
+						{template.description}
+						{template.authorGithub && (
+							<div className="template-author-info">
+								By{" "}
+								<a
+									href={`https://github.com/${template.authorGithub}`}
+									target="_blank"
+									rel="noopener noreferrer"
+									onClick={(e) => e.stopPropagation()}
+								>
+									@{template.authorGithub}
+								</a>
+							</div>
+						)}
 					</div>
 					<div className="template-statuses">
 						{template.statuses.map((status, index) => (
@@ -69,6 +110,18 @@ export const TemplateItem: React.FC<TemplateItemProps> = ({
 				</div>
 			</SelectableListItem>
 			<div className="template-item-actions">
+				{isCustom && onShare && (
+					<button
+						onClick={(e) => {
+							e.stopPropagation();
+							onShare(template);
+						}}
+						title="Submit to Marketplace"
+						className="template-marketplace-btn"
+					>
+						<ObsidianIcon name="share" size={16} />
+					</button>
+				)}
 				{onEdit && (
 					<button
 						onClick={(e) => {

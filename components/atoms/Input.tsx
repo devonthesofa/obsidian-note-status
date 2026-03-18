@@ -11,6 +11,7 @@ interface BaseInputProps {
 	style?: React.CSSProperties;
 	onFocus?: () => void;
 	onBlur?: () => void;
+	disabled?: boolean;
 }
 
 interface TextInputProps extends BaseInputProps {
@@ -38,6 +39,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 			style,
 			onFocus,
 			onBlur,
+			disabled,
 		},
 		ref,
 	) => {
@@ -67,6 +69,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 				style={style}
 				onFocus={onFocus}
 				onBlur={onBlur}
+				disabled={disabled}
 			/>
 		);
 	},
