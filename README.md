@@ -81,8 +81,8 @@ You can contribute your own status templates to the plugin!
 
 1. Create a custom template in the plugin settings.
 2. Click the **Share** (📤) icon on your custom template.
-3. It will open a GitHub page with your template content pre-filled.
-4. Click **Propose new file** and submit your Pull Request!
+3. Follow the instructions in the modal to copy the JSON and submit a Pull Request to the [official repository](https://github.com/devonthesofa/obsidian-note-status).
+4. Maintainers will review your submission and accept it if it passes the revision!
 
 ### How to contribute (Manual)
 

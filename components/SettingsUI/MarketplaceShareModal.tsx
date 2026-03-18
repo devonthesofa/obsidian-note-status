@@ -24,7 +24,6 @@ export const MarketplaceShareModal: React.FC<MarketplaceShareModalProps> = ({
 
 	const jsonString = JSON.stringify(marketplaceTemplate, null, 2);
 	const filename = `${marketplaceTemplate.id}.json`;
-	const githubUrl = `https://github.com/devonthesofa/obsidian-note-status/new/master/templates?filename=${filename}`;
 
 	const handleCopy = useCallback(() => {
 		navigator.clipboard.writeText(jsonString);
@@ -40,22 +39,47 @@ export const MarketplaceShareModal: React.FC<MarketplaceShareModalProps> = ({
 
 			<div className="template-editor-modal__content">
 				<p>
-					To share your template with the community, follow these
-					simple steps:
+					Share your template with the community by following these
+					steps:
 				</p>
 
 				<ol className="marketplace-steps">
 					<li>
-						<strong>Copy</strong> the template data below.
+						<strong>Copy</strong> the template JSON data below.
 					</li>
 					<li>
-						<strong>Click</strong> the button to open GitHub.
+						Go to the <strong>templates folder</strong> in the
+						official repository:
+						<br />
+						<a
+							href="https://github.com/devonthesofa/obsidian-note-status/tree/master/templates"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							github.com/devonthesofa/obsidian-note-status/templates
+						</a>
 					</li>
 					<li>
-						<strong>Paste</strong> the content and click "Propose
-						new file".
+						Click <strong>Add file</strong> &gt;{" "}
+						<strong>Create new file</strong>.
+					</li>
+					<li>
+						Name it <code>{filename}</code> and{" "}
+						<strong>paste</strong> the content.
+					</li>
+					<li>
+						Click <strong>Propose new file</strong> and submit the
+						Pull Request.
 					</li>
 				</ol>
+
+				<p className="marketplace-note">
+					<em>
+						Note: Submissions are reviewed by maintainers. Once
+						verified, your template will be included in the next
+						plugin update for all users!
+					</em>
+				</p>
 
 				<div className="marketplace-json-preview">
 					<div className="json-preview-header">
@@ -76,18 +100,6 @@ export const MarketplaceShareModal: React.FC<MarketplaceShareModalProps> = ({
 			</div>
 
 			<div className="template-editor-modal__actions">
-				<a
-					href={githubUrl}
-					target="_blank"
-					rel="noopener noreferrer"
-					className="mod-cta marketplace-github-link"
-					onClick={() => {
-						// Optionally close or just stay open
-					}}
-				>
-					<ObsidianIcon name="external-link" size={16} />
-					Open GitHub to Submit
-				</a>
 				<button onClick={onClose}>Close</button>
 			</div>
 		</div>

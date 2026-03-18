@@ -282,6 +282,20 @@
 	margin-bottom: var(--size-2-2);
 }
 
+.marketplace-steps li a {
+	color: var(--text-accent);
+	word-break: break-all;
+}
+
+.marketplace-note {
+	margin: var(--size-4-4) 0;
+	padding: var(--size-4-2);
+	background: var(--background-primary-alt);
+	border-left: 4px solid var(--interactive-accent);
+	border-radius: var(--radius-s);
+	font-size: var(--font-ui-small);
+}
+
 .marketplace-json-preview {
 	background: var(--background-secondary);
 	border: 1px solid var(--background-modifier-border);
