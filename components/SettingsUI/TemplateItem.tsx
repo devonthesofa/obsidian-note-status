@@ -2,10 +2,7 @@ import React, { useMemo } from "react";
 import { StatusTemplate } from "@/types/pluginSettings";
 import { StatusDisplay } from "../atoms/StatusDisplay";
 import { SelectableListItem } from "../atoms/SelectableListItem";
-import {
-	isCustomTemplate,
-	getMarketplaceSubmissionUrl,
-} from "@/utils/templateUtils";
+import { isCustomTemplate } from "@/utils/templateUtils";
 import { ObsidianIcon } from "../atoms/ObsidianIcon";
 
 interface TemplateItemProps {
@@ -14,6 +11,7 @@ interface TemplateItemProps {
 	onToggle: (templateId: string, enabled: boolean) => void;
 	onEdit?: (template: StatusTemplate) => void;
 	onDelete?: (templateId: string) => void;
+	onShare?: (template: StatusTemplate) => void;
 }
 
 export const TemplateItem: React.FC<TemplateItemProps> = ({
@@ -22,14 +20,11 @@ export const TemplateItem: React.FC<TemplateItemProps> = ({
 	onToggle,
 	onEdit,
 	onDelete,
+	onShare,
 }) => {
 	const isCustom = useMemo(
 		() => isCustomTemplate(template.id),
 		[template.id],
-	);
-	const submissionUrl = useMemo(
-		() => getMarketplaceSubmissionUrl(template),
-		[template],
 	);
 
 	const handleClick = (e: React.MouseEvent) => {
@@ -99,17 +94,17 @@ export const TemplateItem: React.FC<TemplateItemProps> = ({
 				</div>
 			</SelectableListItem>
 			<div className="template-item-actions">
-				{isCustom && (
-					<a
-						href={submissionUrl}
-						target="_blank"
-						rel="noopener noreferrer"
-						onClick={(e) => e.stopPropagation()}
+				{isCustom && onShare && (
+					<button
+						onClick={(e) => {
+							e.stopPropagation();
+							onShare(template);
+						}}
 						title="Submit to Marketplace"
 						className="template-marketplace-btn"
 					>
 						<ObsidianIcon name="share" size={16} />
-					</a>
+					</button>
 				)}
 				{onEdit && (
 					<button

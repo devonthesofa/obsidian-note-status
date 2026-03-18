@@ -2,6 +2,7 @@ import React, { useCallback, useState } from "react";
 import { PluginSettings, StatusTemplate } from "@/types/pluginSettings";
 import { TemplateItem } from "./TemplateItem";
 import { TemplateEditorModal } from "./TemplateEditorModal";
+import { MarketplaceShareModal } from "./MarketplaceShareModal";
 import {
 	generateTemplateId,
 	isTemplateNameUnique,
@@ -21,7 +22,11 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 	onChange,
 }) => {
 	const [showEditor, setShowEditor] = useState(false);
+	const [showShare, setShowShare] = useState(false);
 	const [editingTemplate, setEditingTemplate] = useState<
+		StatusTemplate | undefined
+	>();
+	const [sharingTemplate, setSharingTemplate] = useState<
 		StatusTemplate | undefined
 	>();
 
@@ -50,6 +55,11 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 	const handleEditTemplate = useCallback((template: StatusTemplate) => {
 		setEditingTemplate(template);
 		setShowEditor(true);
+	}, []);
+
+	const handleShareTemplate = useCallback((template: StatusTemplate) => {
+		setSharingTemplate(template);
+		setShowShare(true);
 	}, []);
 
 	const handleSaveTemplate = useCallback(
@@ -136,6 +146,11 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 		setEditingTemplate(undefined);
 	}, []);
 
+	const handleCancelShare = useCallback(() => {
+		setShowShare(false);
+		setSharingTemplate(undefined);
+	}, []);
+
 	if (showEditor) {
 		return (
 			<div>
@@ -144,6 +159,18 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 					template={editingTemplate}
 					onSave={handleSaveTemplate}
 					onCancel={handleCancelEditor}
+				/>
+			</div>
+		);
+	}
+
+	if (showShare && sharingTemplate) {
+		return (
+			<div>
+				<h3>Status templates</h3>
+				<MarketplaceShareModal
+					template={sharingTemplate}
+					onClose={handleCancelShare}
 				/>
 			</div>
 		);
@@ -186,6 +213,7 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 							onToggle={handleTemplateToggle}
 							onEdit={handleEditTemplate}
 							onDelete={handleDeleteTemplate}
+							onShare={handleShareTemplate}
 						/>
 					))}
 				</div>
