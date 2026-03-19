@@ -161,10 +161,16 @@ export class FileExplorerIntegration implements IElementProcessor {
 		statuses: GroupedStatuses,
 		defaultTagName: string,
 	): void {
-		// Remove existing icon
-		const existingIcon = element.querySelector(`.${this.ICON_CLASS}`);
-		if (existingIcon) {
-			existingIcon.remove();
+		// Remove existing icon (it may be a sibling or a child from older renders)
+		const existingSiblingIcon = element.parentElement?.querySelector(
+			`.${this.ICON_CLASS}`,
+		);
+		if (existingSiblingIcon) {
+			existingSiblingIcon.remove();
+		}
+		const existingChildIcon = element.querySelector(`.${this.ICON_CLASS}`);
+		if (existingChildIcon) {
+			existingChildIcon.remove();
 		}
 
 		if (!settingsService.settings.showStatusIconsInExplorer) {
@@ -179,6 +185,8 @@ export class FileExplorerIntegration implements IElementProcessor {
 			positionClassName = "custom-icon__absolute-right";
 		}
 		const icon = createSpan({ cls: [this.ICON_CLASS, positionClassName] });
+		icon.setAttribute("contenteditable", "false");
+
 		const root = createRoot(icon);
 		root.render(
 			<FileExplorerIcon
@@ -204,9 +212,9 @@ export class FileExplorerIntegration implements IElementProcessor {
 			settingsService.settings.fileExplorerIconPosition ===
 			"file-name-right"
 		) {
-			element.append(icon);
+			element.insertAdjacentElement("afterend", icon);
 		} else {
-			element.prepend(icon);
+			element.insertAdjacentElement("beforebegin", icon);
 		}
 	}
 
