@@ -2,6 +2,8 @@
 	"id": "academic",
 	"name": "Academic research",
 	"description": "Status workflow for academic research and writing",
+	"language": "English",
+	"type": "Academic",
 	"authorGithub": "soler1212",
 	"statuses": [
 		{
