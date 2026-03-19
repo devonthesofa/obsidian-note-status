@@ -43,12 +43,12 @@
 
 .note-status-template-tab:not(.is-active):hover {
 	background: var(--background-modifier-hover);
-	color: var(--text-normal);
+	color: var(--text-on-accent);
 }
 
 .note-status-template-tab.is-active {
-	background: var(--background-primary);
-	color: var(--text-normal);
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
 	box-shadow:
 		0 1px 3px rgba(0, 0, 0, 0.1),
 		0 0 0 1px var(--background-modifier-border);
