@@ -220,8 +220,12 @@ export default class NoteStatusPlugin extends Plugin {
 		// Register listeners
 		eventBus.subscribe(
 			"triggered-open-modal",
-			({ statusService }) => {
-				StatusModalIntegration.open(this.app, statusService);
+			({ statusService, activeStatus }) => {
+				StatusModalIntegration.open(
+					this.app,
+					statusService,
+					activeStatus,
+				);
 			},
 			"main-triggered-open-modal-subscriptor",
 		);

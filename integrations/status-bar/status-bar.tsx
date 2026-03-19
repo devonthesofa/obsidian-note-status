@@ -4,6 +4,7 @@ import { Plugin } from "obsidian";
 import settingsService from "@/core/settingsService";
 import { StatusBar } from "@/components/StatusBar/StatusBar";
 import { NoteStatusService } from "@/core/noteStatusService";
+import { NoteStatus } from "@/types/noteStatus";
 
 export class StatusBarIntegration {
 	private static instance: StatusBarIntegration | null = null;
@@ -101,7 +102,7 @@ export class StatusBarIntegration {
 		this.render();
 	}
 
-	private openStatusModal() {
+	private openStatusModal(activeStatus?: NoteStatus) {
 		if (!this.noteStatusService) {
 			throw new Error(
 				"open status modal failed bcse there is no noteStatusService available",
@@ -109,6 +110,7 @@ export class StatusBarIntegration {
 		}
 		eventBus.publish("triggered-open-modal", {
 			statusService: this.noteStatusService,
+			activeStatus,
 		});
 	}
 
@@ -164,7 +166,7 @@ export class StatusBarIntegration {
 				badgeContentMode={
 					settingsService.settings.statusBarBadgeContentMode
 				}
-				onStatusClick={() => this.openStatusModal()}
+				onStatusClick={(status) => this.openStatusModal(status)}
 				noStatusConfig={this.getNoStatusConfig()}
 			/>,
 		);

@@ -13,6 +13,7 @@ export interface Props {
 	templates: StatusTemplate[];
 	iconFrameMode?: "always" | "never";
 	iconColorMode?: "status" | "theme";
+	activeStatus?: NoteStatus;
 	onRemoveStatus: (
 		frontmatterTagName: string,
 		status: NoteStatus,
@@ -30,6 +31,7 @@ export const ChangeStatusModal: React.FC<Props> = ({
 	templates,
 	iconFrameMode = "never",
 	iconColorMode = "status",
+	activeStatus,
 	onRemoveStatus,
 	onSelectStatus,
 }) => {
@@ -63,6 +65,7 @@ export const ChangeStatusModal: React.FC<Props> = ({
 					templates={templates}
 					iconFrameMode={iconFrameMode}
 					iconColorMode={iconColorMode}
+					activeStatus={activeStatus}
 					onSelectedState={handleSelectedState}
 				/>
 			))}
