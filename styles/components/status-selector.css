@@ -56,8 +56,9 @@
 }
 
 .note-status-option[data-selected="true"] .note-status-option__icon-wrapper {
-	border-color: var(--interactive-success);
-	background: var(--background-modifier-success);
+	border-color: var(--interactive-accent);
+	background: var(--background-primary);
+	box-shadow: 0 0 0 1px var(--interactive-accent) inset;
 }
 
 .note-status-option__text {
@@ -119,7 +120,8 @@
 }
 
 .selectable-list-item[data-selected="true"] {
-	background: var(--background-modifier-success);
+	background: var(--background-modifier-active-hover);
+	box-shadow: var(--shadow-s);
 }
 
 .selectable-list-item-icon {
