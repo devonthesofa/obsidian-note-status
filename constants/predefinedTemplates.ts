@@ -10,6 +10,8 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		id: "academic",
 		name: "Academic research",
 		description: "Status workflow for academic research and writing",
+		language: "English",
+		type: "Academic",
 		authorGithub: "soler1212",
 		statuses: [
 			{
@@ -62,6 +64,8 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		name: "Colorful workflow",
 		description:
 			"A colorful set of workflow statuses with descriptive icons",
+		language: "English",
+		type: "General",
 		authorGithub: "soler1212",
 		statuses: [
 			{
@@ -125,6 +129,8 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		id: "creative-writing",
 		name: "Creative Writing",
 		description: "Workflow for novelists and creative writers",
+		language: "English",
+		type: "Writing",
 		authorGithub: "soler1212",
 		statuses: [
 			{
@@ -165,6 +171,8 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		name: "Starter Template",
 		description:
 			"A simplified set of essential workflow statuses to get you started.",
+		language: "English",
+		type: "General",
 		authorGithub: "soler1212",
 		statuses: [
 			{
@@ -198,6 +206,8 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		id: "minimal",
 		name: "Minimal workflow",
 		description: "A simplified set of essential workflow statuses",
+		language: "English",
+		type: "General",
 		authorGithub: "soler1212",
 		statuses: [
 			{
@@ -231,6 +241,8 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		id: "project",
 		name: "Project management",
 		description: "Status workflow for project management and tracking",
+		language: "English",
+		type: "Project Management",
 		authorGithub: "soler1212",
 		statuses: [
 			{

@@ -2,6 +2,8 @@
 	"id": "project",
 	"name": "Project management",
 	"description": "Status workflow for project management and tracking",
+	"language": "English",
+	"type": "Project Management",
 	"authorGithub": "soler1212",
 	"statuses": [
 		{

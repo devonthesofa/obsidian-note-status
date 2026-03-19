@@ -2,6 +2,8 @@
 	"id": "minimal",
 	"name": "Minimal workflow",
 	"description": "A simplified set of essential workflow statuses",
+	"language": "English",
+	"type": "General",
 	"authorGithub": "soler1212",
 	"statuses": [
 		{

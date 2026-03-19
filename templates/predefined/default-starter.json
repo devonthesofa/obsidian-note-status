@@ -2,6 +2,8 @@
 	"id": "default-starter",
 	"name": "Starter Template",
 	"description": "A simplified set of essential workflow statuses to get you started.",
+	"language": "English",
+	"type": "General",
 	"authorGithub": "soler1212",
 	"statuses": [
 		{

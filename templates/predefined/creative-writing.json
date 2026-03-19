@@ -2,6 +2,8 @@
 	"id": "creative-writing",
 	"name": "Creative Writing",
 	"description": "Workflow for novelists and creative writers",
+	"language": "English",
+	"type": "Writing",
 	"authorGithub": "soler1212",
 	"statuses": [
 		{
