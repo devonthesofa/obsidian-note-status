@@ -1,7 +1,7 @@
 {
 	"id": "note-status",
 	"name": "Note Status",
-	"version": "3.0.0",
+	"version": "3.1.0",
 	"minAppVersion": "0.15.0",
 	"description": "Track and change note statuses across your vault with templates, bulk folder actions, dashboards, and non-Markdown support.",
 	"author": "Aleix Soler",
@@ -15,6 +15,5 @@
 	"icon": "tag",
 	"repository": "https://github.com/devonthesofa/obsidian-note-status",
 	"issues": "https://github.com/devonthesofa/obsidian-note-status/issues",
-	"releaseNotes": "3.0.0: full UI refresh, new dashboards and grouped views, bulk folder actions, templates and mappings, and non-Markdown status support.",
 	"css": "styles.css"
 }
