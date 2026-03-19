@@ -24,7 +24,8 @@ export class FileExplorerIntegration implements IElementProcessor {
 	private readonly EVENT_SUBSCRIPTION_ID =
 		"file-explorer-integration-subscription1";
 	private readonly FILE_EXPLORER_TYPE = "file-explorer";
-	private readonly CONTAINER_SELECTOR = ".nav-files-container";
+	private readonly NOTEBOOK_NAVIGATOR_TYPE = "notebook-navigator";
+	private readonly CONTAINER_SELECTOR = ".nav-files-container, .nn-list-pane";
 	private readonly FILE_NAME_COLORIZED_ATTR = "noteStatusColorized";
 	private readonly FILE_NAME_ORIGINAL_COLOR_ATTR = "noteStatusOriginalColor";
 	private readonly FILE_BLOCK_CLASS = "note-status-colored-block";
@@ -114,7 +115,7 @@ export class FileExplorerIntegration implements IElementProcessor {
 		}
 		if (dataPath) {
 			const textEl = element.querySelector(
-				".nav-file-title-content, .tree-item-inner, .nav-folder-title-content",
+				".nav-file-title-content, .tree-item-inner, .nav-folder-title-content, .nn-file-name",
 			);
 			if (!textEl) {
 				return;
@@ -259,15 +260,20 @@ export class FileExplorerIntegration implements IElementProcessor {
 	}
 
 	/**
-	 * Finds file element in the file explorer
+	 * Finds file element in the file explorer views
 	 */
 	private findFileElement(filePath: string): HTMLElement | null {
-		const fileExplorerView = this.getFileExplorerView();
-		if (!fileExplorerView) return null;
+		const views = this.getFileExplorerViews();
 
-		return fileExplorerView.containerEl.querySelector(
-			`[data-path="${filePath}"]`,
-		) as HTMLElement;
+		for (const view of views) {
+			const element = view.containerEl.querySelector(
+				`[data-path="${filePath}"]`,
+			) as HTMLElement | null;
+
+			if (element) return element;
+		}
+
+		return null;
 	}
 
 	/**
@@ -288,35 +294,41 @@ export class FileExplorerIntegration implements IElementProcessor {
 	}
 
 	/**
-	 * Patches the file explorer with observers
+	 * Patches the file explorers with observers
 	 */
 	private patchFileExplorer(): void {
-		const container = this.getFileExplorerContainer();
-		if (!container) return;
+		const containers = this.getFileExplorerContainers();
+		if (containers.length === 0) return;
 
-		this.observerService.setupObservers(container);
+		this.observerService.setupObservers(containers);
 	}
 
 	/**
-	 * Gets the file explorer view
+	 * Gets the file explorer views
 	 */
-	private getFileExplorerView(): View | null {
-		const leaves = this.plugin.app.workspace.getLeavesOfType(
-			this.FILE_EXPLORER_TYPE,
-		);
-		return leaves[0]?.view || null;
+	private getFileExplorerViews(): View[] {
+		const leaves = [
+			...this.plugin.app.workspace.getLeavesOfType(
+				this.FILE_EXPLORER_TYPE,
+			),
+			...this.plugin.app.workspace.getLeavesOfType(
+				this.NOTEBOOK_NAVIGATOR_TYPE,
+			),
+		];
+		return leaves.map((leaf) => leaf.view);
 	}
 
 	/**
-	 * Gets the file explorer container element
+	 * Gets the file explorer container elements
 	 */
-	private getFileExplorerContainer(): Element | null {
-		const fileExplorerView = this.getFileExplorerView();
-		if (!fileExplorerView) return null;
+	private getFileExplorerContainers(): Element[] {
+		const views = this.getFileExplorerViews();
 
-		return fileExplorerView.containerEl.querySelector(
-			this.CONTAINER_SELECTOR,
-		);
+		return views
+			.map((view) =>
+				view.containerEl.querySelector(this.CONTAINER_SELECTOR),
+			)
+			.filter(Boolean) as Element[];
 	}
 
 	private applyFileNameColor(
@@ -455,7 +467,9 @@ export class FileExplorerIntegration implements IElementProcessor {
 		if (!element) {
 			return null;
 		}
-		return element.closest(".nav-file, .nav-folder") as HTMLElement | null;
+		return element.closest(
+			".nav-file, .nav-folder, .nn-file",
+		) as HTMLElement | null;
 	}
 
 	private clearFileNameColor(element: HTMLElement): void {
