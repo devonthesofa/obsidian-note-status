@@ -1,12 +1,15 @@
 import { StatusTemplate } from "@/types/pluginSettings";
 import settingsService from "@/core/settingsService";
-import { PREDEFINED_TEMPLATES } from "@/constants/predefinedTemplates";
+import {
+	PREDEFINED_TEMPLATES,
+	COMMUNITY_TEMPLATES,
+} from "@/constants/predefinedTemplates";
 
 /**
  * Check if a template is a custom user template (not from marketplace)
  */
 export const isCustomTemplate = (template: StatusTemplate): boolean => {
-	// Either matches an original marketplace template ID
+	// Either matches an original predefined template
 	const matchesPredefined = PREDEFINED_TEMPLATES.some(
 		(pt) =>
 			pt.id === template.id ||
@@ -14,9 +17,13 @@ export const isCustomTemplate = (template: StatusTemplate): boolean => {
 	);
 	if (matchesPredefined) return false;
 
-	// Or has metadata from marketplace
-	const hasMetadata = !!template.authorGithub;
-	if (hasMetadata) return false;
+	// Or matches an original community template
+	const matchesCommunity = COMMUNITY_TEMPLATES.some(
+		(ct) =>
+			ct.id === template.id ||
+			ct.name.toLowerCase() === template.name.toLowerCase(),
+	);
+	if (matchesCommunity) return false;
 
 	return true;
 };
@@ -25,7 +32,11 @@ export const isCustomTemplate = (template: StatusTemplate): boolean => {
  * Check if a marketplace template has been modified by the user
  */
 export const isTemplateModified = (template: StatusTemplate): boolean => {
-	const original = PREDEFINED_TEMPLATES.find(
+	const allMarketplaceTemplates = [
+		...PREDEFINED_TEMPLATES,
+		...COMMUNITY_TEMPLATES,
+	];
+	const original = allMarketplaceTemplates.find(
 		(pt) =>
 			pt.id === template.id ||
 			pt.name.toLowerCase() === template.name.toLowerCase(),
@@ -104,4 +115,3 @@ export const generateTemplateId = (
 
 	return id;
 };
-
