@@ -2,18 +2,18 @@ import { NoteStatus } from "./noteStatus";
 
 export type StatusFrontmatterMapping =
 	| {
-			id: string;
-			scope: "template";
-			templateId: string;
-			frontmatterKeys: string[];
-	  }
+		id: string;
+		scope: "template";
+		templateId: string;
+		frontmatterKeys: string[];
+	}
 	| {
-			id: string;
-			scope: "status";
-			templateId?: string;
-			statusName: string;
-			frontmatterKeys: string[];
-	  };
+		id: string;
+		scope: "status";
+		templateId?: string;
+		statusName: string;
+		frontmatterKeys: string[];
+	};
 
 export interface StatusTemplate {
 	id: string;
@@ -37,9 +37,9 @@ export type SyncGroup =
 
 export type PluginSettings = {
 	fileExplorerIconPosition:
-		| "absolute-right"
-		| "file-name-left"
-		| "file-name-right";
+	| "absolute-right"
+	| "file-name-left"
+	| "file-name-right";
 	fileExplorerIconFrame: "always" | "never";
 	fileExplorerIconColorMode: "status" | "theme";
 	statusColors: Record<string, string>;
