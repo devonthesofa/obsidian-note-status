@@ -15,27 +15,30 @@
 }
 
 .note-status-template-tabs {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
-	gap: var(--size-2-1);
-	padding: var(--size-2-2);
-	border: 1px solid var(--background-modifier-border);
+	gap: 2px;
+	padding: 4px;
+	border: 1px solid var(--background-modifier-border-hover);
 	border-radius: var(--radius-m);
-	background: var(--background-secondary);
-	margin-bottom: var(--size-2-2);
+	background: var(--background-secondary-alt);
+	margin-bottom: var(--size-4-3);
+	overflow-x: auto;
 }
 
 .note-status-template-tab {
 	border: none;
 	background: transparent;
 	color: var(--text-muted);
-	padding: var(--size-2-2) var(--size-3-1);
+	padding: var(--size-2-2) var(--size-4-2);
 	border-radius: var(--radius-s);
 	cursor: pointer;
-	transition:
-		background var(--anim-duration-fast) ease,
-		color var(--anim-duration-fast) ease,
-		box-shadow var(--anim-duration-fast) ease;
+	font-weight: var(--font-medium);
+	font-size: var(--font-ui-small);
+	transition: all var(--anim-duration-fast) ease;
+	white-space: nowrap;
+	flex: 1;
+	text-align: center;
 }
 
 .note-status-template-tab:not(.is-active):hover {
@@ -44,11 +47,16 @@
 }
 
 .note-status-template-tab.is-active {
-	background: var(--interactive-accent);
-	color: var(--text-on-accent);
-	box-shadow: 0 0 0 1px var(--background-modifier-border);
+	background: var(--background-primary);
+	color: var(--text-normal);
+	box-shadow:
+		0 1px 3px rgba(0, 0, 0, 0.1),
+		0 0 0 1px var(--background-modifier-border);
 }
 
 .note-status-template-tab:focus-visible {
-	outline: 2px solid var(--background-modifier-border);
+	outline: none;
+	box-shadow:
+		0 1px 3px rgba(0, 0, 0, 0.1),
+		0 0 0 2px var(--interactive-accent) inset;
 }
