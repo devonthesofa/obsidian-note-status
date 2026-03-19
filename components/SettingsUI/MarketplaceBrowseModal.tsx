@@ -20,26 +20,85 @@ export const MarketplaceBrowseModal: React.FC<MarketplaceBrowseModalProps> = ({
 	onClose,
 }) => {
 	const [searchQuery, setSearchQuery] = useState("");
+	const [languageFilter, setLanguageFilter] = useState("");
+	const [typeFilter, setTypeFilter] = useState("");
+
+	const allTemplates = useMemo(() => {
+		return [...PREDEFINED_TEMPLATES, ...COMMUNITY_TEMPLATES];
+	}, []);
+
+	const availableLanguages = useMemo(() => {
+		const langs = new Set<string>();
+		allTemplates.forEach((t) => {
+			if (t.language) langs.add(t.language);
+		});
+		return Array.from(langs).sort();
+	}, [allTemplates]);
+
+	const availableTypes = useMemo(() => {
+		const types = new Set<string>();
+		allTemplates.forEach((t) => {
+			if (t.type) types.add(t.type);
+		});
+		return Array.from(types).sort();
+	}, [allTemplates]);
 
 	const filteredTemplates = useMemo(() => {
-		const allTemplates = [...PREDEFINED_TEMPLATES, ...COMMUNITY_TEMPLATES];
-		return allTemplates.filter(
-			(t) =>
+		return allTemplates.filter((t) => {
+			const matchesSearch =
 				t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				t.description.toLowerCase().includes(searchQuery.toLowerCase()),
-		);
-	}, [searchQuery]);
+				t.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+			const matchesLanguage =
+				!languageFilter || t.language === languageFilter;
+			const matchesType = !typeFilter || t.type === typeFilter;
+
+			return matchesSearch && matchesLanguage && matchesType;
+		});
+	}, [allTemplates, searchQuery, languageFilter, typeFilter]);
 
 	return (
 		<div className="template-editor-modal marketplace-browse-modal">
 			<div className="template-editor-modal__header">
 				<div className="marketplace-header-content">
 					<h2>Template Marketplace</h2>
-					<SearchFilter
-						value={searchQuery}
-						onFilterChange={setSearchQuery}
-						placeholder="Search templates..."
-					/>
+					<div style={{ display: "flex", gap: "8px" }}>
+						<SearchFilter
+							value={searchQuery}
+							onFilterChange={setSearchQuery}
+							placeholder="Search templates..."
+						/>
+						{availableLanguages.length > 0 && (
+							<select
+								value={languageFilter}
+								onChange={(e) =>
+									setLanguageFilter(e.target.value)
+								}
+								className="dropdown"
+							>
+								<option value="">All Languages</option>
+								{availableLanguages.map((lang) => (
+									<option key={lang} value={lang}>
+										{lang}
+									</option>
+								))}
+							</select>
+						)}
+						{availableTypes.length > 0 && (
+							<select
+								value={typeFilter}
+								onChange={(e) => setTypeFilter(e.target.value)}
+								className="dropdown"
+							>
+								<option value="">All Types</option>
+								{availableTypes.map((type) => (
+									<option key={type} value={type}>
+										{type}
+									</option>
+								))}
+							</select>
+						)}
+					</div>
 				</div>
 			</div>
 
@@ -65,6 +124,16 @@ export const MarketplaceBrowseModal: React.FC<MarketplaceBrowseModalProps> = ({
 												? "Built-in"
 												: "Community"}
 										</span>
+										{template.type && (
+											<span className="template-badge badge-neutral">
+												{template.type}
+											</span>
+										)}
+										{template.language && (
+											<span className="template-badge badge-neutral">
+												{template.language}
+											</span>
+										)}
 										{template.authorGithub && (
 											<div className="marketplace-card-author">
 												by{" "}
