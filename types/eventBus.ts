@@ -4,6 +4,7 @@ import {
 } from "@/core/noteStatusService";
 import { PluginSettings } from "@/types/pluginSettings";
 import { TFile, WorkspaceLeaf } from "obsidian";
+import { NoteStatus } from "@/types/noteStatus";
 
 export type EventBusEvents = {
 	"active-file-change": ({ leaf }: { leaf: WorkspaceLeaf | null }) => void;
@@ -19,8 +20,10 @@ export type EventBusEvents = {
 	"status-changed": ({ file }: { file: TFile }) => void;
 	"triggered-open-modal": ({
 		statusService,
+		activeStatus,
 	}: {
 		statusService: NoteStatusService | MultipleNoteStatusService;
+		activeStatus?: NoteStatus;
 	}) => void;
 };
 

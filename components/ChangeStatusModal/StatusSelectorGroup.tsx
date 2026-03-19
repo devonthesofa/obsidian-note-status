@@ -14,6 +14,7 @@ export interface Props {
 	templates: StatusTemplate[];
 	iconFrameMode: "always" | "never";
 	iconColorMode: "status" | "theme";
+	activeStatus?: NoteStatus;
 	onSelectedState: (
 		frontmatterTagName: string,
 		status: NoteStatus,
@@ -28,6 +29,7 @@ export const StatusSelectorGroup: React.FC<Props> = ({
 	frontmatterTagName,
 	iconFrameMode,
 	iconColorMode,
+	activeStatus,
 	onSelectedState,
 }) => {
 	const TEMPLATE_ALL_VIEW = "__all__";
@@ -114,8 +116,21 @@ export const StatusSelectorGroup: React.FC<Props> = ({
 		return views;
 	}, [availableStatuses, templates]);
 
-	const [selectedTemplateId, setSelectedTemplateId] =
-		useState<string>(TEMPLATE_ALL_VIEW);
+	const [selectedTemplateId, setSelectedTemplateId] = useState<string>(() => {
+		if (activeStatus && activeStatus.templateId) {
+			return activeStatus.templateId;
+		}
+		if (currentStatuses && currentStatuses.length > 0) {
+			const statusWithTemplate = currentStatuses.find(
+				(s) => s.templateId,
+			);
+			if (statusWithTemplate) {
+				return statusWithTemplate.templateId as string;
+			}
+			return TEMPLATE_CUSTOM_VIEW;
+		}
+		return TEMPLATE_ALL_VIEW;
+	});
 
 	useEffect(() => {
 		const exists = templateViewOptions.some(

@@ -12,11 +12,13 @@ import {
 } from "@/core/noteStatusService";
 import eventBus from "@/core/eventBus";
 import settingsService from "@/core/settingsService";
+import { NoteStatus } from "@/types/noteStatus";
 
 export class StatusModalIntegration extends Modal {
 	private root: Root | null = null;
 	private static instance: StatusModalIntegration | null = null;
 	private selectorService: SelectorService;
+	private activeStatus?: NoteStatus;
 
 	constructor(app: App) {
 		super(app);
@@ -25,6 +27,7 @@ export class StatusModalIntegration extends Modal {
 	static open(
 		app: App,
 		noteStatusService: NoteStatusService | MultipleNoteStatusService,
+		activeStatus?: NoteStatus,
 	) {
 		if (StatusModalIntegration.instance) {
 			throw new Error("Status Modal is already open");
@@ -45,6 +48,7 @@ export class StatusModalIntegration extends Modal {
 			"statusModalIntegrationSubscription1",
 		);
 
+		StatusModalIntegration.instance.activeStatus = activeStatus;
 		StatusModalIntegration.instance.open();
 	}
 
@@ -125,6 +129,7 @@ export class StatusModalIntegration extends Modal {
 					settingsService.settings.fileExplorerIconColorMode ||
 					"status"
 				}
+				activeStatus={this.activeStatus}
 				onRemoveStatus={this.onRemoveStatus}
 				onSelectStatus={this.onSelectStatus}
 			/>,
