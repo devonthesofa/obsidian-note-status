@@ -46,12 +46,12 @@ export const StatusGroup = ({
 	}, [onToggle]);
 
 	return (
-		<div className="grouped-status-group">
+		<div className="grouped-status-group tree-item">
 			<div
-				className="grouped-status-group__header"
+				className="grouped-status-group__header tree-item-self is-clickable"
 				onClick={handleToggle}
 			>
-				<div className="grouped-status-group__status">
+				<div className="tree-item-inner grouped-status-group__status">
 					<StatusDisplay
 						status={
 							{
@@ -78,14 +78,16 @@ export const StatusGroup = ({
 			</div>
 
 			{isExpanded && (
-				<FileList
-					files={files}
-					groupKey={groupKey}
-					loadedCount={loadedCount}
-					onFileClick={onFileClick}
-					onScroll={onScroll}
-					onLoadMore={onLoadMore}
-				/>
+				<div className="tree-item-children">
+					<FileList
+						files={files}
+						groupKey={groupKey}
+						loadedCount={loadedCount}
+						onFileClick={onFileClick}
+						onScroll={onScroll}
+						onLoadMore={onLoadMore}
+					/>
+				</div>
 			)}
 		</div>
 	);

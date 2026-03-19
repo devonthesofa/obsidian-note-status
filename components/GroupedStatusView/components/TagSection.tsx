@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { GroupLabel } from "@/components/atoms/GroupLabel";
 import { CollapsibleCounter } from "@/components/atoms/CollapsibleCounter";
 import { FilesByStatus, FileItem, StatusItem } from "../GroupedStatusView";
@@ -51,6 +51,11 @@ export const TagSection = ({
 		[onToggleFiles],
 	);
 
+	const statusOrder = useMemo(
+		() => Array.from(statusMap.keys()),
+		[statusMap],
+	);
+
 	return (
 		<div className="grouped-status-tag-section">
 			<div className="grouped-status-tag-header" onClick={handleToggle}>
@@ -64,32 +69,38 @@ export const TagSection = ({
 
 			{isExpanded && (
 				<div className="grouped-status-tag-content">
-					{Object.entries(statusGroups).map(([statusName, files]) => {
-						if (files.length === 0) return null;
+					{Object.entries(statusGroups)
+						.sort(
+							([statusA], [statusB]) =>
+								statusOrder.indexOf(statusA) -
+								statusOrder.indexOf(statusB),
+						)
+						.map(([statusName, files]) => {
+							if (files.length === 0) return null;
 
-						const status = statusMap.get(statusName);
-						if (!status) return null;
+							const status = statusMap.get(statusName);
+							if (!status) return null;
 
-						const groupKey = `${tag}-${statusName}`;
-						const filesExpanded = expandedFiles.has(groupKey);
-						const loadedCount = getLoadedCount(groupKey);
+							const groupKey = `${tag}-${statusName}`;
+							const filesExpanded = expandedFiles.has(groupKey);
+							const loadedCount = getLoadedCount(groupKey);
 
-						return (
-							<StatusGroup
-								key={statusName}
-								statusName={statusName}
-								status={status}
-								files={files}
-								tag={tag}
-								isExpanded={filesExpanded}
-								loadedCount={loadedCount}
-								onToggle={() => handleToggleFiles(groupKey)}
-								onFileClick={onFileClick}
-								onScroll={onScroll}
-								onLoadMore={onLoadMore}
-							/>
-						);
-					})}
+							return (
+								<StatusGroup
+									key={statusName}
+									statusName={statusName}
+									status={status}
+									files={files}
+									tag={tag}
+									isExpanded={filesExpanded}
+									loadedCount={loadedCount}
+									onToggle={() => handleToggleFiles(groupKey)}
+									onFileClick={onFileClick}
+									onScroll={onScroll}
+									onLoadMore={onLoadMore}
+								/>
+							);
+						})}
 				</div>
 			)}
 		</div>

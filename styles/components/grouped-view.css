@@ -78,25 +78,18 @@
 
 /* Status Group */
 .grouped-status-group {
-	margin-bottom: var(--size-4-2);
-	background: var(--background-primary);
-	border: 1px solid var(--background-modifier-border);
+	margin-bottom: 2px;
 	border-radius: var(--radius-m);
 	overflow: hidden;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-	transition: box-shadow var(--anim-duration-fast) ease;
-}
-
-.grouped-status-group:hover {
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .grouped-status-group__header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: var(--size-4-2) var(--size-4-3);
+	padding: 4px 8px;
 	cursor: pointer;
+	border-radius: var(--radius-s);
 	transition: background var(--anim-duration-fast) ease;
 	position: relative;
 }
@@ -105,8 +98,8 @@
 	background: var(--background-modifier-hover);
 }
 
-.grouped-status-group__header:focus {
-	outline: 2px solid var(--color-accent);
+.grouped-status-group__header:focus-visible {
+	outline: 2px solid var(--interactive-accent);
 	outline-offset: -2px;
 }
 
@@ -138,40 +131,46 @@
 
 /* Files List */
 .grouped-status-files {
-	background: var(--background-secondary);
-	border-top: 1px solid var(--background-modifier-border);
+	margin-bottom: var(--size-2-2);
 }
 
 .grouped-status-files-list {
-	max-height: 300px;
+	max-height: 400px;
 	overflow-y: auto;
 }
 
 .grouped-status-file-item {
-	padding: var(--size-2-3) var(--size-4-3);
 	cursor: pointer;
 	transition: background var(--anim-duration-fast) ease;
-	border-bottom: 1px solid var(--background-modifier-border-hover);
+	border-radius: var(--radius-s);
+	margin-top: 1px;
 }
 
-.grouped-status-file-item:hover {
+.grouped-status-file-item:hover .tree-item-self {
 	background: var(--background-modifier-hover);
 }
 
-.grouped-status-file-item:last-child {
-	border-bottom: none;
+.grouped-status-file-content {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
 }
 
 .grouped-status-file-name {
 	font-weight: var(--font-medium);
 	color: var(--text-normal);
-	margin-bottom: 2px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .grouped-status-file-path {
-	font-size: var(--font-ui-small);
+	font-size: var(--font-ui-smaller);
 	color: var(--text-muted);
 	opacity: 0.8;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 /* Load More */
