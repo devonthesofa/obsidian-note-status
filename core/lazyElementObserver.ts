@@ -23,14 +23,16 @@ export class LazyElementObserver {
 	}
 
 	/**
-	 * Sets up observers for a container element
+	 * Sets up observers for multiple container elements
 	 */
-	setupObservers(container: Element): void {
+	setupObservers(containers: Element[]): void {
 		this.cleanup();
 
 		this.initializeIntersectionObserver();
-		this.initializeMutationObserver(container);
-		this.observeExistingElements(container);
+		this.initializeMutationObserver(containers);
+		containers.forEach((container) =>
+			this.observeExistingElements(container),
+		);
 	}
 
 	/**
@@ -85,14 +87,16 @@ export class LazyElementObserver {
 	/**
 	 * Initializes mutation observer for DOM changes
 	 */
-	private initializeMutationObserver(container: Element): void {
+	private initializeMutationObserver(containers: Element[]): void {
 		this.mutationObserver = new MutationObserver((mutations) =>
 			this.handleMutations(mutations),
 		);
 
-		this.mutationObserver.observe(container, {
-			childList: true,
-			subtree: true,
+		containers.forEach((container) => {
+			this.mutationObserver?.observe(container, {
+				childList: true,
+				subtree: true,
+			});
 		});
 	}
 
