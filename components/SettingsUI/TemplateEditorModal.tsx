@@ -5,6 +5,7 @@ import { Input } from "@/components/atoms/Input";
 import { SettingItem } from "./SettingItem";
 import { CustomStatusItem } from "./CustomStatusItem";
 import { isCustomTemplate } from "@/utils/templateUtils";
+import settingsService from "@/core/settingsService";
 
 interface TemplateEditorModalProps {
 	template?: StatusTemplate;
@@ -22,6 +23,10 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 		[template],
 	);
 	const [name, setName] = useState(template?.name || "");
+	const [id, setId] = useState(template?.id || "");
+	const [isIdTouched, setIsIdTouched] = useState(!!template?.id);
+	const [isIdUnlocked, setIsIdUnlocked] = useState(false);
+	const [isAuthorUnlocked, setIsAuthorUnlocked] = useState(false);
 	const [description, setDescription] = useState(template?.description || "");
 	const [authorGithub, setAuthorGithub] = useState(
 		template?.authorGithub || "",
@@ -39,15 +44,24 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 	);
 
 	const isEditing = !!template;
+	const isIdUnique =
+		isEditing && id === template?.id
+			? true
+			: !settingsService.settings.templates.some(
+					(t) => t.id === id.trim(),
+				);
+
 	const isValid =
 		name.trim().length > 0 &&
+		id.trim().length > 0 &&
+		isIdUnique &&
 		description.trim().length > 0 &&
 		statuses.some((s) => s.name.trim().length > 0);
 
 	const handleSave = useCallback(() => {
 		if (!isValid) return;
 
-		const templateId = template?.id || `custom-${Date.now()}`;
+		const templateId = id.trim();
 		const validStatuses = statuses.filter((s) => s.name.trim().length > 0);
 
 		// Update templateId for all statuses
@@ -65,7 +79,22 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 		};
 
 		onSave(savedTemplate);
-	}, [name, description, statuses, template, isValid, onSave]);
+	}, [id, name, description, authorGithub, statuses, isValid, onSave]);
+
+	const handleNameChange = useCallback(
+		(val: string) => {
+			setName(val);
+			if (!isIdTouched && !isEditing) {
+				setId(val.toLowerCase().replace(/[^a-z0-9]/g, "-"));
+			}
+		},
+		[isIdTouched, isEditing],
+	);
+
+	const handleIdChange = useCallback((val: string) => {
+		setId(val.toLowerCase().replace(/[^a-z0-9-]/g, ""));
+		setIsIdTouched(true);
+	}, []);
 
 	const handleAddStatus = useCallback(() => {
 		setStatuses((prev) => [
@@ -137,9 +166,44 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 					<Input
 						variant="text"
 						value={name}
-						onChange={setName}
+						onChange={handleNameChange}
 						placeholder="e.g. Project Workflow"
 					/>
+				</SettingItem>
+
+				<SettingItem
+					name="Template ID"
+					description={
+						"A unique identifier for your template (used in the frontmatter settings). Cannot contain spaces." +
+						(!isIdUnique && id.trim().length > 0
+							? " (This ID is already taken!)"
+							: "") +
+						(isEditing && !isIdUnlocked
+							? " Warning: Changing this ID will detach it from existing notes using it."
+							: "")
+					}
+				>
+					<div
+						style={{
+							display: "flex",
+							gap: "8px",
+							alignItems: "center",
+							width: "100%",
+						}}
+					>
+						<Input
+							variant="text"
+							value={id}
+							onChange={handleIdChange}
+							placeholder="e.g. project-workflow"
+							disabled={isEditing && !isIdUnlocked}
+						/>
+						{isEditing && !isIdUnlocked && (
+							<button onClick={() => setIsIdUnlocked(true)}>
+								Unlock
+							</button>
+						)}
+					</div>
 				</SettingItem>
 
 				<SettingItem
@@ -162,13 +226,27 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 							: "Original author of the marketplace template"
 					}
 				>
-					<Input
-						variant="text"
-						value={authorGithub}
-						onChange={setAuthorGithub}
-						placeholder="e.g. janedoe"
-						disabled={!isCustom}
-					/>
+					<div
+						style={{
+							display: "flex",
+							gap: "8px",
+							alignItems: "center",
+							width: "100%",
+						}}
+					>
+						<Input
+							variant="text"
+							value={authorGithub}
+							onChange={setAuthorGithub}
+							placeholder="e.g. janedoe"
+							disabled={!isCustom && !isAuthorUnlocked}
+						/>
+						{!isCustom && !isAuthorUnlocked && (
+							<button onClick={() => setIsAuthorUnlocked(true)}>
+								Unlock
+							</button>
+						)}
+					</div>
 				</SettingItem>
 
 				<SettingItem

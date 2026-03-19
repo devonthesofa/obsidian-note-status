@@ -117,9 +117,8 @@ class SettingsService {
 		const hasTemplates =
 			this.settings.templates && this.settings.templates.length > 0;
 
-		// 1. If it's a truly new user (no data at all), give them the starter template
+		// 1. If it's a truly new user (no data at all), wait, we now provide all templates in DEFAULT_PLUGIN_SETTINGS
 		if (!loadedData) {
-			this.injectStarterTemplate();
 			return;
 		}
 
@@ -153,56 +152,8 @@ class SettingsService {
 				// Update enabled list
 				this.settings.enabledTemplates = toRestore.map((t) => t.id);
 				this.saveSettings().catch(console.error);
-			} else {
-				// If nothing was enabled, just give them the starter template
-				this.injectStarterTemplate();
 			}
 		}
-	}
-
-	/**
-	 * Injects the default starter template.
-	 */
-	private injectStarterTemplate() {
-		const starterTemplate = {
-			id: "starter",
-			name: "Starter Template",
-			description:
-				"A simplified set of essential workflow statuses to get you started.",
-			authorGithub: "soler1212",
-			statuses: [
-				{
-					name: "todo",
-					icon: "📌",
-					color: "#F44336",
-					templateId: "starter",
-				},
-				{
-					name: "inProgress",
-					icon: "⚙️",
-					color: "#2196F3",
-					templateId: "starter",
-				},
-				{
-					name: "review",
-					icon: "👀",
-					color: "#9C27B0",
-					templateId: "starter",
-				},
-				{
-					name: "done",
-					icon: "✓",
-					color: "#4CAF50",
-					templateId: "starter",
-				},
-			],
-		};
-
-		this.settings.templates = [starterTemplate];
-		if (!this.settings.enabledTemplates.includes(starterTemplate.id)) {
-			this.settings.enabledTemplates.push(starterTemplate.id);
-		}
-		this.saveSettings().catch(console.error);
 	}
 
 	/**

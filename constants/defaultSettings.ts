@@ -1,5 +1,5 @@
 import { PluginSettings } from "types/pluginSettings";
-
+import { PREDEFINED_TEMPLATES } from "./predefinedTemplates";
 export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	fileExplorerIconPosition: "absolute-right",
 	fileExplorerIconFrame: "never",
@@ -14,7 +14,7 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	showStatusBar: true,
 	autoHideStatusBar: false,
 	enableStatusOverviewPopup: true,
-	templates: [],
+	templates: JSON.parse(JSON.stringify(PREDEFINED_TEMPLATES)),
 	customStatuses: [],
 	showStatusIconsInExplorer: true,
 	hideUnknownStatusInExplorer: true, // Default to hide unknown status
@@ -26,7 +26,7 @@ export const DEFAULT_PLUGIN_SETTINGS: PluginSettings = {
 	enableExperimentalFeatures: true,
 	enableStatusDashboard: true,
 	enableGroupedStatusView: true,
-	enabledTemplates: [],
+	enabledTemplates: PREDEFINED_TEMPLATES.map((t) => t.id),
 	useCustomStatusesOnly: false,
 	useMultipleStatuses: true,
 	singleStatusStorageMode: "list",
