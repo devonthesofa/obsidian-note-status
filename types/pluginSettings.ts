@@ -20,6 +20,8 @@ export interface StatusTemplate {
 	name: string;
 	description: string;
 	authorGithub?: string;
+	language?: string;
+	type?: string;
 	isPredefined?: boolean;
 	statuses: NoteStatus[];
 }

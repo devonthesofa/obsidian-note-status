@@ -28,6 +28,8 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 	const [isIdUnlocked, setIsIdUnlocked] = useState(false);
 	const [isAuthorUnlocked, setIsAuthorUnlocked] = useState(false);
 	const [description, setDescription] = useState(template?.description || "");
+	const [language, setLanguage] = useState(template?.language || "");
+	const [type, setType] = useState(template?.type || "");
 	const [authorGithub, setAuthorGithub] = useState(
 		template?.authorGithub || "",
 	);
@@ -74,12 +76,24 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 			id: templateId,
 			name: name.trim(),
 			description: description.trim(),
+			language: language.trim() || undefined,
+			type: type.trim() || undefined,
 			authorGithub: authorGithub.trim() || undefined,
 			statuses: statusesWithTemplateId,
 		};
 
 		onSave(savedTemplate);
-	}, [id, name, description, authorGithub, statuses, isValid, onSave]);
+	}, [
+		id,
+		name,
+		description,
+		language,
+		type,
+		authorGithub,
+		statuses,
+		isValid,
+		onSave,
+	]);
 
 	const handleNameChange = useCallback(
 		(val: string) => {
@@ -215,6 +229,30 @@ export const TemplateEditorModal: React.FC<TemplateEditorModalProps> = ({
 						value={description}
 						onChange={setDescription}
 						placeholder="e.g. Status workflow for project management"
+					/>
+				</SettingItem>
+
+				<SettingItem
+					name="Template Type (Optional)"
+					description="Categorize your template (e.g. Academic, Project Management, Writing, General)"
+				>
+					<Input
+						variant="text"
+						value={type}
+						onChange={setType}
+						placeholder="e.g. Project Management"
+					/>
+				</SettingItem>
+
+				<SettingItem
+					name="Language (Optional)"
+					description="Primary language of the statuses in this template"
+				>
+					<Input
+						variant="text"
+						value={language}
+						onChange={setLanguage}
+						placeholder="e.g. English"
 					/>
 				</SettingItem>
 
