@@ -1,6 +1,9 @@
 import React, { useState, useMemo } from "react";
 import { StatusTemplate } from "@/types/pluginSettings";
-import { PREDEFINED_TEMPLATES } from "@/constants/predefinedTemplates";
+import {
+	PREDEFINED_TEMPLATES,
+	COMMUNITY_TEMPLATES,
+} from "@/constants/predefinedTemplates";
 import { StatusDisplay } from "../atoms/StatusDisplay";
 import { ObsidianIcon } from "../atoms/ObsidianIcon";
 import { SearchFilter } from "../atoms/SearchFilter";
@@ -19,7 +22,8 @@ export const MarketplaceBrowseModal: React.FC<MarketplaceBrowseModalProps> = ({
 	const [searchQuery, setSearchQuery] = useState("");
 
 	const filteredTemplates = useMemo(() => {
-		return PREDEFINED_TEMPLATES.filter(
+		const allTemplates = [...PREDEFINED_TEMPLATES, ...COMMUNITY_TEMPLATES];
+		return allTemplates.filter(
 			(t) =>
 				t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
 				t.description.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -54,8 +58,12 @@ export const MarketplaceBrowseModal: React.FC<MarketplaceBrowseModalProps> = ({
 										{template.name}
 									</div>
 									<div className="marketplace-card-meta">
-										<span className="template-badge badge-info">
-											Marketplace
+										<span
+											className={`template-badge ${template.isPredefined ? "badge-accent" : "badge-info"}`}
+										>
+											{template.isPredefined
+												? "Built-in"
+												: "Community"}
 										</span>
 										{template.authorGithub && (
 											<div className="marketplace-card-author">
