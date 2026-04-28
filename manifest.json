@@ -1,7 +1,7 @@
 {
 	"id": "note-status",
 	"name": "Note Status",
-	"version": "3.1.0",
+	"version": "3.1.1",
 	"minAppVersion": "0.15.0",
 	"description": "Track and change note statuses across your vault with templates, bulk folder actions, dashboards, and non-Markdown support.",
 	"author": "Aleix Soler",
