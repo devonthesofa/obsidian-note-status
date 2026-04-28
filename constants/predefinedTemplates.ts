@@ -297,4 +297,48 @@ export const PREDEFINED_TEMPLATES: StatusTemplate[] = [
 		isPredefined: true,
 	},
 ];
-export const COMMUNITY_TEMPLATES: StatusTemplate[] = [];
+export const COMMUNITY_TEMPLATES: StatusTemplate[] = [
+	{
+		id: "research-note",
+		name: "Research-note",
+		description:
+			"Workflow for managing first iteration of note-taking, starting second iteration, reviewing, and completing",
+		authorGithub: "JuliaHusar",
+		statuses: [
+			{
+				name: "First Pass",
+				icon: "",
+				lucideIcon: "",
+				color: "#eb2424",
+				templateId: "research-note",
+				description: "Note creation and initial addition of content",
+			},
+			{
+				name: "Second Pass",
+				icon: "🕵️‍♀️",
+				lucideIcon: "",
+				color: "#f29718",
+				templateId: "research-note",
+				description: "Adding additional information to note",
+			},
+			{
+				name: "Review",
+				icon: "👩‍💻",
+				lucideIcon: "",
+				color: "#ede61d",
+				templateId: "research-note",
+				description:
+					"Reviewing note and adding anything that might be missed",
+			},
+			{
+				name: "Complete",
+				icon: "✅",
+				lucideIcon: "",
+				color: "#41c511",
+				templateId: "research-note",
+				description: "Note is complete",
+			},
+		],
+		isPredefined: false,
+	},
+];
