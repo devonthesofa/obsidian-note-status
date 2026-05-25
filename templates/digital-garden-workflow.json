@@ -1,0 +1,74 @@
+{
+  "id": "digital-garden-workflow",
+  "name": "Digital Garden Workflow",
+  "description": "Status workflow for a digital garden setup.",
+  "language": "English",
+  "type": "General",
+  "authorGithub": "bravishkaskytano",
+  "statuses": [
+    {
+      "name": "seed",
+      "icon": "🌰",
+      "lucideIcon": "lucide-nut",
+      "color": "#f3ad61",
+      "templateId": "digital-garden-workflow",
+      "description": "Fleeting ideas; raw, unprocessed thoughts"
+    },
+    {
+      "name": "sprout",
+      "icon": "🌱",
+      "lucideIcon": "lucide-sprout",
+      "color": "#86d72f",
+      "templateId": "digital-garden-workflow",
+      "description": "Early development; ideas that have begun to take shape"
+    },
+    {
+      "name": "sapling",
+      "icon": "🌿",
+      "lucideIcon": "lucide-wheat",
+      "color": "#507e1f",
+      "templateId": "digital-garden-workflow",
+      "description": "Structured notes; clear, standalone ideas in my own words"
+    },
+    {
+      "name": "tree",
+      "icon": "🌲",
+      "lucideIcon": "lucide-tree-pine",
+      "color": "#6d4534",
+      "templateId": "digital-garden-workflow",
+      "description": "Mature knowledge; deep, developed, and connected ideas"
+    },
+    {
+      "name": "map",
+      "icon": "🗺️",
+      "lucideIcon": "lucide-map",
+      "color": "#00a6ed",
+      "templateId": "digital-garden-workflow",
+      "description": "Big picture; collections of ideas working together"
+    },
+    {
+      "name": "compost",
+      "icon": "🍂",
+      "lucideIcon": "lucide-archive",
+      "color": "#f8312f",
+      "templateId": "digital-garden-workflow",
+      "description": "Archived; old or unused notes"
+    },
+    {
+      "name": "flower",
+      "icon": "🌸",
+      "lucideIcon": "lucide-flower",
+      "color": "#ff6dc6",
+      "templateId": "digital-garden-workflow",
+      "description": "Inspiration; unprocessed or lightly processed sources"
+    },
+    {
+      "name": "fruit",
+      "icon": "🍎",
+      "lucideIcon": "lucide-apple",
+      "color": "#8c42b2",
+      "templateId": "digital-garden-workflow",
+      "description": "Usable resources; processed sources that I have engaged with and learned from"
+    }
+  ]
+}
