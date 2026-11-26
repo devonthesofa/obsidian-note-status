@@ -15,10 +15,10 @@ La branca `fix/105/scorecard-issues` cobreix la [incidència #105](https://githu
 
 **Abast.** 7 avisos d'API i 5 camps desconeguts al manifest.
 
-- [ ] Repassar les crides que assenyala el linter a `main.tsx`, `core/commandsService.ts`, `core/statusStores/frontmatterStatusStore.ts` i les tres vistes. Verificar els requisits de les APIs que es mantinguin.
-- [ ] Validar Obsidian `1.7.2` com a mínim proposat. Les definicions oficials indiquen `1.4.4` per a `processFrontMatter` i `1.7.2` per a la signatura actual de `revealLeaf`. Confirmar el mínim amb el linter i una prova real abans de fixar-lo. [Definicions oficials de l'API](https://raw.githubusercontent.com/obsidianmd/obsidian-api/master/obsidian.d.ts)
-- [ ] Actualitzar `minAppVersion` a `manifest.json` i afegir a `versions.json` l'entrada de la nova versió amb el mínim validat. Conservar l'historial existent, verificat amb les releases publicades.
-- [ ] Treure del manifest els camps `css`, `icon`, `issues`, `license` i `repository`. Validar que Obsidian continua carregant els estils i el plugin. [Esquema del manifest](https://docs.obsidian.md/Reference/Manifest)
+- [x] Repassar les crides d'API assenyalades. Les definicions oficials indiquen `1.4.4` per a `processFrontMatter` i `1.7.2` per a la signatura asíncrona de `revealLeaf`. [Definicions oficials de l'API](https://raw.githubusercontent.com/obsidianmd/obsidian-api/master/obsidian.d.ts)
+- [x] Validar Obsidian `1.7.4`, primera versió pública de la sèrie 1.7. El vault de prova confirma la càrrega del plugin i els estils, l'escriptura de frontmatter i l'obertura de la vista agrupada i el dashboard. [Publicació d'Obsidian 1.7](https://obsidian.md/changelog/2024-10-16-desktop-v1.7.4/)
+- [x] Fixar `minAppVersion` a `1.7.4` per a la futura versió `3.1.3` i afegir-la a `versions.json` amb el mínim. Registrar també el mínim que declarava la release anterior.
+- [x] Treure del manifest els camps `css`, `icon`, `issues`, `license` i `repository`. [Esquema del manifest](https://docs.obsidian.md/Reference/Manifest)
 
 **Tancament.** El linter valida el manifest i el plugin funciona en la versió mínima amb les vistes i l'escriptura de frontmatter.
 
