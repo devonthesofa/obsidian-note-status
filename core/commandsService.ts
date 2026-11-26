@@ -103,8 +103,12 @@ export class CommandsService {
 							settingsService.settings.tagPrefix,
 							scopedIdentifier,
 						)
-						.then((resolve) => {
+						.then(() => {
 							new Notice(`Status changed to ${nextStatus.name}`);
+						})
+						.catch((error: unknown) => {
+							console.error(error);
+							new Notice("Could not change note status.");
 						});
 				}
 				return true;
@@ -128,6 +132,10 @@ export class CommandsService {
 						.clearStatus(settingsService.settings.tagPrefix)
 						.then(() => {
 							new Notice("Status cleared");
+						})
+						.catch((error: unknown) => {
+							console.error(error);
+							new Notice("Could not clear note status.");
 						});
 				}
 				return true;
@@ -148,6 +156,10 @@ export class CommandsService {
 						.writeText(statuses.join(", "))
 						.then(() => {
 							new Notice(`Copied status: ${statuses.join(", ")}`);
+						})
+						.catch((error: unknown) => {
+							console.error(error);
+							new Notice("Could not copy note status.");
 						});
 				}
 				return true;
@@ -165,20 +177,20 @@ export class CommandsService {
 				if (!checking) {
 					const statusService = this.createStatusService(file);
 					statusService.populateStatuses();
-					navigator.clipboard.readText().then((text) => {
-						const statuses = text.split(", ");
-
-						statusService
-							.overrideStatuses(
+					navigator.clipboard
+						.readText()
+						.then(async (text) => {
+							const statuses = text.split(", ");
+							await statusService.overrideStatuses(
 								settingsService.settings.tagPrefix,
 								statuses,
-							)
-							.then(() => {
-								new Notice(
-									`Pasted status: ${statuses.join(", ")}`,
-								);
-							});
-					});
+							);
+							new Notice(`Pasted status: ${statuses.join(", ")}`);
+						})
+						.catch((error: unknown) => {
+							console.error(error);
+							new Notice("Could not paste note status.");
+						});
 				}
 				return true;
 			},
@@ -239,8 +251,8 @@ export class CommandsService {
 			this.plugin.addCommand({
 				id: "open-status-pane",
 				name: "Open status pane",
-				callback: async () => {
-					await this.openStatusPane();
+				callback: () => {
+					this.openStatusPane().catch(console.error);
 				},
 			});
 			this.registeredCommands.add("open-status-pane");
@@ -277,7 +289,7 @@ export class CommandsService {
 		if (!leaf) {
 			console.error("leaf not found, unable to activate the view");
 		} else {
-			workspace.revealLeaf(leaf);
+			await workspace.revealLeaf(leaf);
 		}
 	}
 
@@ -333,6 +345,10 @@ export class CommandsService {
 							)
 							.then(() => {
 								new Notice(`Status set to ${displayName}`);
+							})
+							.catch((error: unknown) => {
+								console.error(error);
+								new Notice("Could not set note status.");
 							});
 					}
 					return true;

@@ -21,12 +21,14 @@ export const useGroupedData = ({
 	const [groupedData, setGroupedData] = useState<GroupedByStatus>({});
 	const [isLoading, setIsLoading] = useState(true);
 
-	const loadData = useCallback(async () => {
+	const loadData = useCallback(() => {
 		setIsLoading(true);
 		try {
 			const files = getAllFiles();
 			const processed = processFiles(files);
 			setGroupedData(processed);
+		} catch (error) {
+			console.error("Failed to load grouped statuses:", error);
 		} finally {
 			setIsLoading(false);
 		}

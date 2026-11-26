@@ -32,6 +32,7 @@ export default class NoteStatusPlugin extends Plugin {
 	private commandsIntegration: CommandsIntegration;
 	private editorToolbarIntegration: EditorToolbarIntegration;
 	private experimentalRibbonShortcuts: Map<string, HTMLElement> = new Map();
+	private pendingDefaultStatusTimers = new Set<number>();
 
 	async onload() {
 		BaseNoteStatusService.initialize(this.app);
@@ -39,7 +40,7 @@ export default class NoteStatusPlugin extends Plugin {
 		await statusStoreManager.initialize(this);
 
 		// INFO: initialize all integrations
-		Promise.all([
+		await Promise.all([
 			this.loadContextMenu(),
 			this.loadStatusBar(),
 			this.loadFileExplorer(),
@@ -61,7 +62,12 @@ export default class NoteStatusPlugin extends Plugin {
 		this.syncExperimentalFeatureShortcuts();
 	}
 
-	async onunload() {
+	onunload() {
+		this.pendingDefaultStatusTimers.forEach((timer) =>
+			window.clearTimeout(timer),
+		);
+		this.pendingDefaultStatusTimers.clear();
+
 		// Clean up all integrations
 		this.statusBarIntegration?.destroy();
 		this.contextMenuIntegration?.destroy();
@@ -112,7 +118,7 @@ export default class NoteStatusPlugin extends Plugin {
 		if (!leaf) {
 			console.error("leaf not found, unable to activate the view");
 		} else {
-			workspace.revealLeaf(leaf);
+			await workspace.revealLeaf(leaf);
 		}
 	}
 
@@ -145,7 +151,7 @@ export default class NoteStatusPlugin extends Plugin {
 		if (!leaf) {
 			console.error("leaf not found, unable to activate the dashboard");
 		} else {
-			workspace.revealLeaf(leaf);
+			await workspace.revealLeaf(leaf);
 		}
 	}
 
@@ -179,7 +185,7 @@ export default class NoteStatusPlugin extends Plugin {
 			feature: Parameters<typeof isExperimentalFeatureEnabled>[0];
 			icon: string;
 			title: string;
-			handler: () => void;
+			handler: () => Promise<void>;
 		},
 	): void {
 		const isEnabled = isExperimentalFeatureEnabled(config.feature);
@@ -189,7 +195,9 @@ export default class NoteStatusPlugin extends Plugin {
 			const ribbonEl = this.addRibbonIcon(
 				config.icon,
 				config.title,
-				config.handler,
+				() => {
+					config.handler().catch(console.error);
+				},
 			);
 			this.experimentalRibbonShortcuts.set(key, ribbonEl);
 			return;
@@ -203,11 +211,10 @@ export default class NoteStatusPlugin extends Plugin {
 
 	private async loadEventBus() {
 		// Propagate to custom event bus the new active file
-		this.app.workspace.on(
-			"active-leaf-change",
-			(leaf: WorkspaceLeaf | null) => {
+		this.registerEvent(
+			this.app.workspace.on("active-leaf-change", (leaf) => {
 				eventBus.publish("active-file-change", { leaf });
-			},
+			}),
 		);
 
 		// Propagate to custom event bus the manually frontmatter data
@@ -248,37 +255,18 @@ export default class NoteStatusPlugin extends Plugin {
 		);
 
 		this.registerEvent(
-			this.app.vault.on("create", async (file) => {
+			this.app.vault.on("create", (file) => {
 				if (
 					file instanceof TFile &&
 					file.extension === "md" &&
 					settingsService.settings.defaultStatusForNewNotes
 				) {
 					// Wait a bit to ensure metadata is processed or templates are applied
-					setTimeout(async () => {
-						// Ensure file still exists
-						if (!this.app.vault.getAbstractFileByPath(file.path)) {
-							return;
-						}
-
-						const noteStatusService = new NoteStatusService(file);
-						// Populate statuses to see if it already has any
-						noteStatusService.populateStatuses();
-
-						const groupedStatuses =
-							noteStatusService.getStatusesByAllKeys();
-						const hasStatuses = Object.values(groupedStatuses).some(
-							(statuses) => statuses.length > 0,
-						);
-
-						if (!hasStatuses) {
-							await noteStatusService.addStatus(
-								settingsService.settings.tagPrefix,
-								settingsService.settings
-									.defaultStatusForNewNotes as string,
-							);
-						}
-					}, 500); // Increased delay to allow more time for templates
+					const timer = window.setTimeout(() => {
+						this.pendingDefaultStatusTimers.delete(timer);
+						this.applyDefaultStatus(file).catch(console.error);
+					}, 500);
+					this.pendingDefaultStatusTimers.add(timer);
 				}
 			}),
 		);
@@ -298,6 +286,27 @@ export default class NoteStatusPlugin extends Plugin {
 				}
 			}),
 		);
+	}
+
+	private async applyDefaultStatus(file: TFile): Promise<void> {
+		const { defaultStatusForNewNotes, tagPrefix } =
+			settingsService.settings;
+		if (
+			!defaultStatusForNewNotes ||
+			file.extension !== "md" ||
+			this.app.vault.getAbstractFileByPath(file.path) !== file
+		) {
+			return;
+		}
+
+		const service = new NoteStatusService(file);
+		service.populateStatuses();
+		const hasStatuses = Object.values(service.getStatusesByAllKeys()).some(
+			(statuses) => statuses.length > 0,
+		);
+		if (!hasStatuses) {
+			await service.addStatus(tagPrefix, defaultStatusForNewNotes);
+		}
 	}
 
 	async loadPluginSettings() {

@@ -240,6 +240,7 @@ class SettingsService {
 				JSON.stringify(data, null, 2),
 			);
 		} catch (error) {
+			if (force) throw error;
 			console.error("Failed to sync settings to external file:", error);
 		}
 	}
@@ -247,11 +248,18 @@ class SettingsService {
 	async loadFromExternalFile(force = false) {
 		if (!this.settings.enableExternalStatusSync && !force) return;
 		const path = normalizePath(this.settings.externalStatusSyncPath);
-		if (!(await this.plugin.app.vault.adapter.exists(path))) return;
-
 		try {
+			if (!(await this.plugin.app.vault.adapter.exists(path))) {
+				if (force) throw new Error(`Settings file not found: ${path}`);
+				return;
+			}
 			const content = await this.plugin.app.vault.adapter.read(path);
 			const data = JSON.parse(content);
+			if (!data || typeof data !== "object" || Array.isArray(data)) {
+				throw new Error(
+					"The settings file must contain a JSON object.",
+				);
+			}
 
 			// Determine which keys we should actually apply based on CURRENT settings
 			const allowedKeys = new Set<keyof PluginSettings>();
@@ -291,6 +299,7 @@ class SettingsService {
 				await this.saveSettings();
 			}
 		} catch (error) {
+			if (force) throw error;
 			console.error("Failed to load settings from external file:", error);
 		}
 	}

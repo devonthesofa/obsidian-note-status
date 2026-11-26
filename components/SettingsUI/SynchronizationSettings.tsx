@@ -1,4 +1,5 @@
 import { PluginSettings, SyncGroup } from "@/types/pluginSettings";
+import { Notice } from "obsidian";
 import React from "react";
 import { SettingItem } from "./SettingItem";
 import settingsService from "@/core/settingsService";
@@ -9,36 +10,55 @@ export type Props = {
 	onChange: (key: keyof PluginSettings, value: unknown) => void;
 };
 
+function runSyncAction(
+	action: () => Promise<void>,
+	successMessage: string,
+	failureMessage: string,
+) {
+	Promise.resolve()
+		.then(action)
+		.then(() => new Notice(successMessage))
+		.catch((error: unknown) => {
+			console.error(failureMessage, error);
+			const detail = error instanceof Error ? ` ${error.message}` : "";
+			new Notice(failureMessage + detail);
+		});
+}
+
 export const SynchronizationSettings: React.FC<Props> = ({
 	settings,
 	onChange,
 }) => {
-	const handleExport = async () => {
-		await settingsService.syncToExternalFile(true);
-		alert("Plugin settings exported successfully.");
+	const handleExport = () => {
+		runSyncAction(
+			() => settingsService.syncToExternalFile(true),
+			"Plugin settings exported successfully.",
+			"Could not export plugin settings.",
+		);
 	};
 
-	const handleImport = async () => {
-		await settingsService.loadFromExternalFile(true);
-		alert("Plugin settings imported successfully.");
+	const handleImport = () => {
+		runSyncAction(
+			() => settingsService.loadFromExternalFile(true),
+			"Plugin settings imported successfully.",
+			"Could not import plugin settings.",
+		);
 	};
 
-	const handleDataExport = async () => {
-		try {
-			await statusStoreManager.getNonMarkdownStore().exportToVault();
-			alert("Non-Markdown status data exported to vault.");
-		} catch (e) {
-			alert(`Export failed: ${e.message}`);
-		}
+	const handleDataExport = () => {
+		runSyncAction(
+			() => statusStoreManager.getNonMarkdownStore().exportToVault(),
+			"Non-Markdown status data exported to vault.",
+			"Could not export non-Markdown status data.",
+		);
 	};
 
-	const handleDataImport = async () => {
-		try {
-			await statusStoreManager.getNonMarkdownStore().importFromVault();
-			alert("Non-Markdown status data imported from vault.");
-		} catch (e) {
-			alert(`Import failed: ${e.message}`);
-		}
+	const handleDataImport = () => {
+		runSyncAction(
+			() => statusStoreManager.getNonMarkdownStore().importFromVault(),
+			"Non-Markdown status data imported from vault.",
+			"Could not import non-Markdown status data.",
+		);
 	};
 
 	const toggleGroup = (group: SyncGroup) => {

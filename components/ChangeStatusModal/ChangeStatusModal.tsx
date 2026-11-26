@@ -1,4 +1,5 @@
 import React from "react";
+import { Notice } from "obsidian";
 import { GroupedStatuses, NoteStatus } from "@/types/noteStatus";
 import {
 	StatusSelectorGroup,
@@ -42,11 +43,11 @@ export const ChangeStatusModal: React.FC<Props> = ({
 		status,
 		action,
 	) => {
-		if (action === "select") {
-			onSelectStatus(frontmatterTagName, status);
-		} else {
-			onRemoveStatus(frontmatterTagName, status);
-		}
+		const update = action === "select" ? onSelectStatus : onRemoveStatus;
+		update(frontmatterTagName, status).catch((error: unknown) => {
+			console.error("Failed to change note status:", error);
+			new Notice("Could not change note status.");
+		});
 	};
 
 	return (

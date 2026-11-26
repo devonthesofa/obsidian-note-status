@@ -25,7 +25,7 @@ export class StatusBarIntegration {
 		eventBus.subscribe(
 			"active-file-change",
 			() => {
-				this.handleActiveFileChange();
+				this.handleActiveFileChange().catch(console.error);
 			},
 			"statusBarIntegrationSubscription1",
 		);

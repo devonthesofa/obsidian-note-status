@@ -229,7 +229,9 @@ export class StatusDashboardView extends ItemView {
 
 	private openGroupedView() {
 		const leaf = this.app.workspace.getLeaf();
-		leaf.setViewState({ type: "grouped-status-view", active: true });
+		leaf.setViewState({ type: "grouped-status-view", active: true }).catch(
+			console.error,
+		);
 	}
 
 	private findUnassignedNotes() {

@@ -88,7 +88,7 @@ export const StatusSelector: React.FC<Props> = ({
 	iconColorMode = "status",
 }) => {
 	const handleSelectStatus = useCallback(
-		async (status: NoteStatus) => {
+		(status: NoteStatus) => {
 			const selected = isStatusSelected(status, currentStatuses);
 			onToggleStatus(status, !selected);
 		},

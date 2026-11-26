@@ -26,10 +26,10 @@ La branca `fix/105/scorecard-issues` cobreix la [incidència #105](https://githu
 
 **Abast.** 20 promeses sense gestionar i 8 callbacks, propietats o mètodes amb un retorn incompatible.
 
-- [ ] Gestionar el resultat de la inicialització i de les operacions `revealLeaf`, `openFile` i `setViewState`. Esperar cada operació quan el flux en depengui i tractar els errors dels fluxos que s'executin en segon pla.
-- [ ] Revisar el selector d'estat, el proveïdor de dades agrupades, el dashboard, la barra d'estat, les comandes i la sincronització. Fer servir callbacks síncrons amb gestió explícita de rebuig quan React o Obsidian esperin un retorn `void`.
-- [ ] Donar resposta a les operacions fallides de lectura o escriptura del porta-retalls, importació i exportació. Mostrar un missatge d'èxit només quan l'operació hagi acabat.
-- [ ] Fer síncron `onunload`. Cancel·lar els temporitzadors pendents en desactivar el plugin i verificar que una assignació ajornada no sobreescrigui un estat afegit per una plantilla.
+- [x] Gestionar el resultat de la inicialització i de les operacions `revealLeaf`, `openFile` i `setViewState`. Esperar cada operació quan el flux en depengui i tractar els errors dels fluxos que s'executin en segon pla.
+- [x] Revisar el selector d'estat, el proveïdor de dades agrupades, el dashboard, la barra d'estat, les comandes i la sincronització. Fer servir callbacks síncrons amb gestió explícita de rebuig quan React o Obsidian esperin un retorn `void`.
+- [x] Donar resposta a les operacions fallides de lectura o escriptura del porta-retalls, importació i exportació. La prova amb un JSON invàlid mostra el motiu de la fallada i l'exportació correcta genera el fitxer esperat.
+- [x] Fer síncron `onunload`. Les proves a Obsidian 1.7.4 confirmen que es cancel·len els temporitzadors pendents quan es desactiva el plugin i que una nota creada amb una plantilla conserva l'estat que ja tenia.
 
 **Tancament.** Els avisos de promeses es resolen al linter. Les proves cobreixen inici, desactivació, obertura de vistes, sincronització fallida i creació de notes amb plantilla.
 

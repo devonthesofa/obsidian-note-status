@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import { Notice } from "obsidian";
 import { StatusTemplate } from "@/types/pluginSettings";
 import { ObsidianIcon } from "../atoms/ObsidianIcon";
 
@@ -26,10 +27,20 @@ export const MarketplaceShareModal: React.FC<MarketplaceShareModalProps> = ({
 	const filename = `${marketplaceTemplate.id}.json`;
 
 	const handleCopy = useCallback(() => {
-		navigator.clipboard.writeText(jsonString);
-		setCopied(true);
-		setTimeout(() => setCopied(false), 2000);
+		navigator.clipboard
+			.writeText(jsonString)
+			.then(() => setCopied(true))
+			.catch((error: unknown) => {
+				console.error(error);
+				new Notice("Could not copy template JSON.");
+			});
 	}, [jsonString]);
+
+	useEffect(() => {
+		if (!copied) return;
+		const timer = window.setTimeout(() => setCopied(false), 2000);
+		return () => window.clearTimeout(timer);
+	}, [copied]);
 
 	return (
 		<div className="template-editor-modal marketplace-share-modal">

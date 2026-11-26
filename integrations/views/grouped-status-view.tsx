@@ -113,7 +113,7 @@ export class GroupedStatusView extends ItemView {
 		) as TFile;
 		if (tFile) {
 			const leaf = BaseNoteStatusService.app.workspace.getLeaf();
-			leaf.openFile(tFile);
+			leaf.openFile(tFile).catch(console.error);
 		}
 	};
 

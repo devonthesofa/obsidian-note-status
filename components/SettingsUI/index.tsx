@@ -54,9 +54,13 @@ const SettingsUI: React.FC<Props> = ({ settings, onChange }) => {
 
 	const handleSupportClick = (url: string, label: string) => {
 		window.open(url);
-		navigator.clipboard.writeText(url).then(() => {
-			new Notice(`Copied ${label} URL to clipboard!`);
-		});
+		navigator.clipboard
+			.writeText(url)
+			.then(() => new Notice(`Copied ${label} URL to clipboard!`))
+			.catch((error: unknown) => {
+				console.error(error);
+				new Notice(`Could not copy the ${label} URL.`);
+			});
 	};
 
 	const sections: SectionDefinition[] = [
