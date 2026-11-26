@@ -4,8 +4,8 @@ Get the plugin running locally for development.
 
 ## Prerequisites
 
-- Node.js 16+
-- npm or yarn
+- Node.js 24
+- The pnpm version declared in `package.json`
 - Git
 - Obsidian installed
 
@@ -15,13 +15,13 @@ Get the plugin running locally for development.
 # Clone and setup
 git clone https://github.com/devonthesofa/obsidian-note-status.git
 cd obsidian-note-status
-npm install
+pnpm install --frozen-lockfile
 
 # Development mode (hot reload)
-npm run dev
+pnpm run dev
 
 # Build for production
-npm run build
+pnpm run build
 ```
 
 ## Development Workflow
@@ -109,23 +109,23 @@ new Setting(containerEl)
 ### Production Build
 
 ```bash
-npm run build
+pnpm run build
 # Creates: main.js, manifest.json, styles.css
 ```
 
 ### Version Bump
 
 ```bash
-npm version patch  # or minor/major
-# Updates: package.json, manifest.json, versions.json
+pnpm version patch
+# Updates package.json, manifest.json, and versions.json and creates a tag.
 ```
 
 ### Release Process
 
-1. Create git tag: `git tag 1.0.13`
-2. Push tag: `git push origin 1.0.13`
-3. GitHub Actions creates draft release
-4. Edit release notes and publish
+1. Create a tag matching the version in `manifest.json` if the version bump did not already create it.
+2. Push that tag to GitHub.
+3. Wait for GitHub Actions to build, attest, and verify the draft release files.
+4. Edit the release notes and publish the draft.
 
 ### Obsidian DevTools
 

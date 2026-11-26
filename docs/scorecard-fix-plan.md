@@ -70,9 +70,9 @@ La branca `fix/105/scorecard-issues` cobreix la [incidència #105](https://githu
 
 **Abast.** 2 observacions d'attestations per a `main.js` i `styles.css`.
 
-- [ ] Actualitzar `.github/workflows/release.yml` perquè instal·li amb `pnpm install --frozen-lockfile`, compili i generi les attestations amb `actions/attest`, amb els permisos d'OIDC i d'attestations necessaris. Retirar el lockfile d'npm quan la migració a pnpm estigui verificada.
-- [ ] Crear l'esborrany de release amb els mateixos `main.js` i `styles.css` que s'han acreditat i amb el `manifest.json` corresponent.
-- [ ] Descarregar els fitxers de la release i verificar tots dos amb `gh attestation verify` contra `devonthesofa/obsidian-note-status`. [Verificació de procedència amb GitHub](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations)
+- [x] Configurar el workflow amb instal·lació congelada de pnpm, comprovacions, compilació i attestations amb `actions/attest`. Retirar el lockfile d'npm. La comprovació amb `actionlint`, una instal·lació des de zero i la compilació des del workflow passen en local.
+- [x] Configurar la creació de l'esborrany amb els mateixos fitxers acreditats. El workflow comprova que el tag coincideix amb la versió del manifest. La prova de `pnpm version` confirma que el tag es genera sense el prefix `v`.
+- [ ] Verificar la primera execució a GitHub Actions. El workflow descarrega `main.js`, `styles.css` i `manifest.json`, els compara amb els fitxers de la compilació i executa `gh attestation verify`. [Verificació de procedència amb GitHub](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations)
 
 **Tancament.** El workflow passa i les attestations verifiquen els fitxers exactes que es distribuiran. Aquesta comprovació requereix una execució a GitHub Actions.
 

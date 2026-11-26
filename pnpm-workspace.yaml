@@ -1,2 +1,4 @@
+tagVersionPrefix: ""
+
 allowBuilds:
     esbuild: true

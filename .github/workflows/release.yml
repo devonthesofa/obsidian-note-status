@@ -1,35 +1,79 @@
 name: Release Obsidian plugin
 
 on:
-  push:
-    tags:
-      - "*"
+    push:
+        tags:
+            - "*"
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v3
+    build:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+            id-token: write
+            attestations: write
+        steps:
+            - uses: actions/checkout@v6
 
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18.x"
+            - name: Set up pnpm and Node.js
+              uses: pnpm/setup@v3
+              with:
+                  runtime: node@24
+                  install: false
 
-      - name: Build plugin
-        run: |
-          npm install
-          npm run build
+            - name: Install and check plugin
+              env:
+                  HUSKY: "0"
+              run: |
+                  pnpm install --frozen-lockfile
+                  pnpm run check
 
-      - name: Create release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          tag="${GITHUB_REF#refs/tags/}"
+            - name: Build plugin
+              env:
+                  RELEASE_TAG: ${{ github.ref_name }}
+              run: |
+                  node <<'NODE'
+                  const { version } = require("./manifest.json");
+                  if (version !== process.env.RELEASE_TAG) {
+                    throw new Error(`Release tag ${process.env.RELEASE_TAG} must match manifest version ${version}.`);
+                  }
+                  NODE
+                  pnpm run build
+                  node --check main.js
 
-          gh release create "$tag" \
-            --title="$tag" \
-            --draft \
-            main.js manifest.json styles.css
+            - name: Attest release files
+              uses: actions/attest@v4
+              with:
+                  subject-path: |
+                      main.js
+                      manifest.json
+                      styles.css
+
+            - name: Create release
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  RELEASE_TAG: ${{ github.ref_name }}
+              run: |
+                  if gh release view "$RELEASE_TAG" --json tagName >/dev/null 2>&1; then
+                    exit 0
+                  fi
+
+                  gh release create "$RELEASE_TAG" \
+                    --verify-tag \
+                    --title="$RELEASE_TAG" \
+                    --draft \
+                    main.js manifest.json styles.css
+
+            - name: Verify draft release files
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  RELEASE_TAG: ${{ github.ref_name }}
+              run: |
+                  release_dir="$(mktemp -d)"
+                  gh release download "$RELEASE_TAG" \
+                    --pattern main.js --pattern manifest.json --pattern styles.css \
+                    --dir "$release_dir"
+                  for file in main.js manifest.json styles.css; do
+                    cmp "$file" "$release_dir/$file"
+                    gh attestation verify "$release_dir/$file" --repo "$GITHUB_REPOSITORY"
+                  done
