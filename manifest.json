@@ -10,10 +10,5 @@
 		"PayPal": "https://paypal.me/aleixsoler",
 		"Buy Me a Coffee": "https://buymeacoffee.com/aleixsoler"
 	},
-	"isDesktopOnly": false,
-	"license": "MIT",
-	"icon": "tag",
-	"repository": "https://github.com/devonthesofa/obsidian-note-status",
-	"issues": "https://github.com/devonthesofa/obsidian-note-status/issues",
-	"css": "styles.css"
+	"isDesktopOnly": false
 }
