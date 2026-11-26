@@ -49,10 +49,7 @@
 }
 
 .note-status-underline {
-	text-decoration-line: underline;
-	text-decoration-thickness: 2px;
-	text-decoration-color: var(--note-status-underline-color, currentColor);
-	text-underline-offset: 3px;
+	box-shadow: inset 0 -2px var(--note-status-underline-color, currentColor);
 }
 
 .note-status-dot-badge {

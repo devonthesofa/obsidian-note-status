@@ -131,8 +131,10 @@ export class StatusBarIntegration {
 			return;
 		}
 		this.statusBarContainer = this.plugin.addStatusBarItem();
-		this.statusBarContainer.classList.add("mod-clickable");
-		this.statusBarContainer.style.padding = "unset";
+		this.statusBarContainer.classList.add(
+			"mod-clickable",
+			"note-status-bar-item",
+		);
 		this.root = createRoot(this.statusBarContainer);
 	}
 

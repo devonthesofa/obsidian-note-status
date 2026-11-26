@@ -3,8 +3,8 @@
    ========================================================================== */
 
 /* Status Bar Container */
-.status-bar-item {
-	/* Uses Obsidian's built-in status bar item styles */
+.status-bar-item.note-status-bar-item {
+	padding: unset;
 }
 
 .status-bar-no-status {

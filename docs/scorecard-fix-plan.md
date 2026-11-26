@@ -48,9 +48,9 @@ La branca `fix/105/scorecard-issues` cobreix la [incidència #105](https://githu
 
 **Abast.** 42 avisos de `!important`, 6 de subratllat i 1 d'estil estàtic assignat des del codi.
 
-- [ ] Treure els `!important` de `settings.css` i `template-settings.css` ajustant l'abast dels selectors o fent servir variables d'Obsidian. Comprovar els controls de color, els botons de plantilla i els estats d'error, focus i hover.
-- [ ] Comprovar el subratllat dels noms a `file-explorer.css` amb el mínim validat a la fase 1. Si l'avís persisteix, substituir les propietats assenyalades per una tècnica compatible que mantingui la personalització del color.
-- [ ] Moure l'estil estàtic de la barra d'estat a una classe CSS i regenerar `styles.css` amb la compilació de producció.
+- [x] Treure els `!important` de `settings.css` i `template-settings.css`. A Obsidian 1.7.4 s'han comprovat les dimensions del control de color, l'estil d'error, la selecció de plantilles i els colors del botó de còpia amb els temes clar i fosc.
+- [x] Substituir les propietats de subratllat assenyalades per una línia interior que conserva el color configurable. Comprovar-ne l'estil calculat al nom d'un fitxer de l'explorador.
+- [x] Moure l'estil estàtic de la barra d'estat a una classe CSS i regenerar `styles.css`. La compilació i la comprovació de l'estil calculat passen.
 
 **Tancament.** Els avisos de CSS es comproven sobre els fitxers font i l'artefacte compilat. Els controls i l'explorador es veuen correctament amb els temes clar i fosc.
 

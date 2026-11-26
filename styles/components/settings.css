@@ -235,12 +235,6 @@
 	/* Base input styles handled by Input component */
 }
 
-.custom-status-item__input--icon {
-	width: 100% !important;
-	text-align: left;
-	font-size: 1em;
-}
-
 .custom-status-item__hint {
 	margin: 0;
 	font-size: var(--font-ui-smaller);
@@ -251,25 +245,25 @@
 	font-weight: var(--font-medium);
 }
 
-.custom-status-item__input--name.custom-status-item__input--invalid {
-	border-color: var(--text-error) !important;
-	background: var(--background-modifier-error) !important;
+.note-status-settings input.custom-status-item__input--invalid {
+	border-color: var(--text-error);
+	background: var(--background-modifier-error);
 }
 
 .custom-status-item__input--description {
 	color: var(--text-muted);
 }
 
-.custom-status-item__input--color {
-	width: 40px !important;
-	height: 32px !important;
+.note-status-settings input.custom-status-item__input--color {
+	width: 40px;
+	height: 32px;
 	border-radius: var(--radius-s);
 	cursor: pointer;
-	border: 2px solid var(--background-modifier-border) !important;
+	border: 2px solid var(--background-modifier-border);
 }
 
-.custom-status-item__input--color:hover {
-	border-color: var(--interactive-hover) !important;
+.note-status-settings input.custom-status-item__input--color:hover {
+	border-color: var(--interactive-hover);
 }
 
 .custom-status-item__remove-btn {

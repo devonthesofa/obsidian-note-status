@@ -104,11 +104,11 @@
 		0 0 0 1px var(--interactive-accent);
 }
 
-.template-item-content {
+.template-item .selectable-list-item.template-item-content {
 	flex: 1;
-	border: none !important;
-	border-radius: 0 !important;
-	background: transparent !important;
+	border: none;
+	border-radius: 0;
+	background: transparent;
 }
 
 .template-item-main {
@@ -188,7 +188,7 @@
 	border: none;
 	cursor: pointer;
 	transition: all var(--anim-duration-fast) ease;
-	text-decoration: none !important;
+	text-decoration: none;
 }
 
 .template-item-actions button:hover,
@@ -197,8 +197,8 @@
 	color: var(--text-normal);
 }
 
-.template-marketplace-btn {
-	color: var(--text-accent) !important;
+.template-item-actions .template-marketplace-btn {
+	color: var(--text-accent);
 }
 
 /* Template Editor Modal */
@@ -351,19 +351,19 @@
 	color: var(--text-muted);
 }
 
-.copy-btn {
+.json-preview-header button.copy-btn {
 	display: flex;
 	align-items: center;
 	gap: var(--size-2-1);
-	padding: var(--size-2-1) var(--size-2-3) !important;
-	font-size: var(--font-ui-smaller) !important;
-	background: var(--interactive-accent) !important;
-	color: var(--text-on-accent) !important;
-	border: none !important;
+	padding: var(--size-2-1) var(--size-2-3);
+	font-size: var(--font-ui-smaller);
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border: none;
 }
 
-.copy-btn.success {
-	background: var(--text-success) !important;
+.json-preview-header button.copy-btn.success {
+	background: var(--text-success);
 }
 
 .marketplace-json-preview pre {
@@ -375,13 +375,6 @@
 	font-size: var(--font-ui-smaller);
 	white-space: pre-wrap;
 	word-break: break-all;
-}
-
-.marketplace-github-link {
-	display: flex;
-	align-items: center;
-	gap: var(--size-2-2);
-	text-decoration: none !important;
 }
 
 /* Marketplace Browse Modal */
@@ -469,9 +462,9 @@
 	gap: var(--size-2-2);
 }
 
-.marketplace-install-btn.installed {
-	background: var(--background-modifier-success-accent) !important;
-	color: var(--text-on-accent) !important;
+.marketplace-card-actions button.marketplace-install-btn.installed {
+	background: var(--background-modifier-success-accent);
+	color: var(--text-on-accent);
 	opacity: 0.8;
 	cursor: default;
 }
