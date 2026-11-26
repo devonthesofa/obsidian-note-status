@@ -80,9 +80,9 @@ La branca `fix/105/scorecard-issues` cobreix la [incidència #105](https://githu
 
 Completar les proves funcionals abans de crear el tag de la release. Fer la comprovació pública després de publicar-la.
 
-- [ ] Provar escriptura de frontmatter en llista i valor únic, mapatges de claus, estats d'adjunts, canvis massius i reanomenament i eliminació de fitxers.
-- [ ] Provar instal·lació i actualització des de 3.1.2 amb dades existents. Fer les comprovacions en escriptori a la versió mínima i en una versió actual, i provar els fluxos disponibles a mòbil.
-- [ ] Verificar que el porta-retalls es fa servir a partir d'accions explícites i que l'enumeració del vault es correspon amb les funcions que la necessiten. Són les altres dues observacions del Scorecard i corresponen a capacitats del plugin. La disponibilitat de l'escaneig de malware depèn d'Obsidian.
+- [x] Confirmar l'escriptura en llista i en valor únic, els mapatges de claus, els canvis massius en una carpeta i la persistència dels estats d'adjunts en assignar-los, reanomenar el fitxer i eliminar-lo.
+- [x] Comprovar la compilació amb dades prèvies a Obsidian 1.7.4 i 1.15.1. En l'emulació mòbil d'Obsidian 1.15.1, el selector obre i desa correctament l'estat mapat. [Emulació mòbil d'Obsidian](https://docs.obsidian.md/Plugins/Getting%20started/Mobile%20development)
+- [x] Comprovar les accions explícites de còpia i enganxat amb un porta-retalls simulat i identificar les enumeracions del vault que fan les vistes i el dashboard. Són les altres dues observacions del Scorecard. La disponibilitat de l'escaneig de malware depèn d'Obsidian.
 - [ ] Després que s'aprovi i es publiqui la release, comparar el Scorecard reescanejat amb l'inventari de la fase 0. Verificar la desaparició dels avisos corregibles i el reconeixement de les dues attestations. Si queda algun avís, registrar-ne la regla, el fitxer i la causa a la incidència #105.
 
 **Tancament.** Les proves del plugin passen i el Scorecard de la nova release reflecteix les correccions i les attestations.
