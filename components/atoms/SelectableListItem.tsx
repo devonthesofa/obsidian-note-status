@@ -22,7 +22,7 @@ export const SelectableListItem: React.FC<SelectableListItemProps> = ({
 }) => {
 	const handleClick = (e: React.MouseEvent) => {
 		if (onClick) {
-			setTimeout(() => {
+			e.currentTarget.win.setTimeout(() => {
 				onClick(e);
 			}, 150);
 		}

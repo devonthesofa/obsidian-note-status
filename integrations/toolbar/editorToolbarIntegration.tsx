@@ -29,7 +29,8 @@ export class EditorToolbarIntegration {
 
 	async integrate() {
 		// Initialize the current active leaf
-		const activeLeaf = this.plugin.app.workspace.activeLeaf;
+		const activeLeaf =
+			this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.leaf;
 		if (activeLeaf && this.isValidMarkdownLeaf(activeLeaf)) {
 			this.currentActiveLeaf = activeLeaf;
 		}
@@ -307,22 +308,12 @@ export class EditorToolbarIntegration {
 			return null;
 		}
 
-		const buttonElement = document.createElement("div");
-		buttonElement.className = this.BUTTON_CLASS;
+		const buttonElement = targetContainer.createDiv({
+			cls: this.BUTTON_CLASS,
+		});
 
-		// Insert button based on position setting
-		if (position === "left") {
-			// For left, insert after existing nav buttons
-			targetContainer.appendChild(buttonElement);
-		} else if (position === "right-before") {
-			// For right-before, insert at the beginning of actions
-			targetContainer.insertBefore(
-				buttonElement,
-				targetContainer.firstChild,
-			);
-		} else {
-			// For right, insert at the end of actions
-			targetContainer.appendChild(buttonElement);
+		if (position === "right-before") {
+			targetContainer.prepend(buttonElement);
 		}
 
 		return buttonElement;

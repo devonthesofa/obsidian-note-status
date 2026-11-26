@@ -9,7 +9,7 @@ const getLucideIconSet = () => {
 			if (ids?.length) {
 				cachedIconSet = new Set(ids);
 			}
-		} catch (error) {
+		} catch {
 			// Ignore – fallback detection will rely on getIcon
 			cachedIconSet = null;
 		}
@@ -20,10 +20,10 @@ const getLucideIconSet = () => {
 const iconExists = (iconName: string): boolean => {
 	const iconSet = getLucideIconSet();
 	if (iconSet?.size) {
-		return iconSet.has(iconName as IconName);
+		return iconSet.has(iconName);
 	}
 	try {
-		return !!getIcon(iconName as IconName);
+		return !!getIcon(iconName);
 	} catch {
 		return false;
 	}
@@ -35,7 +35,7 @@ export const resolveLucideIconName = (
 	for (const candidate of candidates) {
 		const trimmed = candidate?.trim();
 		if (trimmed && iconExists(trimmed)) {
-			return trimmed as IconName;
+			return trimmed;
 		}
 	}
 

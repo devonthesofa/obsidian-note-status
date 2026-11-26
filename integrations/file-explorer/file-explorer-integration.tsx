@@ -274,9 +274,9 @@ export class FileExplorerIntegration implements IElementProcessor {
 		const views = this.getFileExplorerViews();
 
 		for (const view of views) {
-			const element = view.containerEl.querySelector(
+			const element = view.containerEl.querySelector<HTMLElement>(
 				`[data-path="${filePath}"]`,
-			) as HTMLElement | null;
+			);
 
 			if (element) return element;
 		}
@@ -441,9 +441,9 @@ export class FileExplorerIntegration implements IElementProcessor {
 			return;
 		}
 
-		const existingDot = element.querySelector(
+		const existingDot = element.querySelector<HTMLElement>(
 			`.${this.STATUS_DOT_CLASS}`,
-		) as HTMLElement | null;
+		);
 		if (
 			!settingsService.settings.fileExplorerStatusDot ||
 			!hasStatus ||
@@ -475,9 +475,7 @@ export class FileExplorerIntegration implements IElementProcessor {
 		if (!element) {
 			return null;
 		}
-		return element.closest(
-			".nav-file, .nav-folder, .nn-file",
-		) as HTMLElement | null;
+		return element.closest<HTMLElement>(".nav-file, .nav-folder, .nn-file");
 	}
 
 	private clearFileNameColor(element: HTMLElement): void {

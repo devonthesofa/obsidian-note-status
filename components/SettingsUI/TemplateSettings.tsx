@@ -1,5 +1,8 @@
 import React, { useCallback, useState } from "react";
+import { Modal, Notice, Setting } from "obsidian";
 import { PluginSettings, StatusTemplate } from "@/types/pluginSettings";
+import { BaseNoteStatusService } from "@/core/noteStatusService";
+import settingsService from "@/core/settingsService";
 import { TemplateItem } from "./TemplateItem";
 import { TemplateEditorModal } from "./TemplateEditorModal";
 import { MarketplaceShareModal } from "./MarketplaceShareModal";
@@ -64,7 +67,7 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 	const handleInstallTemplate = useCallback(
 		(template: StatusTemplate) => {
 			if (!isTemplateNameUnique(template.name, undefined)) {
-				alert(
+				new Notice(
 					`A template with the name "${template.name}" is already installed.`,
 				);
 				return;
@@ -97,7 +100,7 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 		(template: StatusTemplate) => {
 			// Validate name uniqueness
 			if (!isTemplateNameUnique(template.name, editingTemplate?.id)) {
-				alert(
+				new Notice(
 					"A template with this name already exists. Please choose a different name.",
 				);
 				return;
@@ -146,25 +149,40 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 
 	const handleDeleteTemplate = useCallback(
 		(templateId: string) => {
-			// Show confirmation
-			const confirmed = confirm(
-				"Are you sure you want to delete this template? This action cannot be undone.",
-			);
-			if (!confirmed) return;
-
-			// Remove from custom templates
-			const updatedTemplates = (settings.templates || []).filter(
-				(t) => t.id !== templateId,
-			);
-			onChange("templates", updatedTemplates);
-
-			// Remove from enabled templates
-			const updatedEnabled = settings.enabledTemplates.filter(
-				(id) => id !== templateId,
-			);
-			onChange("enabledTemplates", updatedEnabled);
+			const modal = new Modal(BaseNoteStatusService.app);
+			modal.titleEl.setText("Delete template?");
+			modal.contentEl.createEl("p", {
+				text: "This permanently removes the template from Note Status.",
+			});
+			new Setting(modal.contentEl)
+				.addButton((button) =>
+					button.setButtonText("Cancel").onClick(() => modal.close()),
+				)
+				.addButton((button) =>
+					button
+						.setButtonText("Delete")
+						.setWarning()
+						.onClick(() => {
+							const { templates, enabledTemplates } =
+								settingsService.settings;
+							onChange(
+								"templates",
+								templates.filter(
+									(item) => item.id !== templateId,
+								),
+							);
+							onChange(
+								"enabledTemplates",
+								enabledTemplates.filter(
+									(id) => id !== templateId,
+								),
+							);
+							modal.close();
+						}),
+				);
+			modal.open();
 		},
-		[settings.templates, settings.enabledTemplates, onChange],
+		[onChange],
 	);
 
 	const handleCancelEditor = useCallback(() => {

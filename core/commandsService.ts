@@ -27,7 +27,7 @@ export class CommandsService {
 		// Change status of current note
 		this.plugin.addCommand({
 			id: "change-status",
-			name: "Change current note status",
+			name: "Change current status",
 			checkCallback: (checking: boolean) => {
 				const file = this.app.workspace.getActiveFile();
 				if (!file) return false;
@@ -146,7 +146,7 @@ export class CommandsService {
 		// Copy status from current note
 		this.plugin.addCommand({
 			id: "copy-status",
-			name: "Copy current note status",
+			name: "Copy current status",
 			checkCallback: (checking: boolean) => {
 				const file = this.app.workspace.getActiveFile();
 				if (!file) return false;

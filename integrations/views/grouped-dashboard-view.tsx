@@ -88,8 +88,8 @@ export class GroupedDashboardView extends ItemView {
 		files.forEach((file) => {
 			const tFile = BaseNoteStatusService.app.vault.getAbstractFileByPath(
 				file.path,
-			) as TFile;
-			if (!tFile) return;
+			);
+			if (!(tFile instanceof TFile)) return;
 
 			const noteStatusService = new NoteStatusService(tFile);
 			noteStatusService.populateStatuses();
@@ -125,8 +125,8 @@ export class GroupedDashboardView extends ItemView {
 	private handleFileClick = (file: FileItem) => {
 		const tFile = BaseNoteStatusService.app.vault.getAbstractFileByPath(
 			file.path,
-		) as TFile;
-		if (tFile) {
+		);
+		if (tFile instanceof TFile) {
 			const leaf = BaseNoteStatusService.app.workspace.getLeaf();
 			leaf.openFile(tFile).catch(console.error);
 		}

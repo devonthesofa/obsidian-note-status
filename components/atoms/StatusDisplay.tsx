@@ -65,7 +65,7 @@ export const StatusDisplay: FC<StatusDisplayProps> = memo(
 			e.stopPropagation();
 			if (onRemove) {
 				setIsRemoving(true);
-				setTimeout(() => {
+				e.currentTarget.win.setTimeout(() => {
 					onRemove();
 				}, 150);
 			}

@@ -37,10 +37,10 @@ La branca `fix/105/scorecard-issues` cobreix la [incidència #105](https://githu
 
 **Abast.** 32 avisos.
 
-- [ ] Substituir els 8 `alert` per `Notice` en sincronització i plantilles. Fer servir un modal d'Obsidian per a la confirmació d'eliminació i provar tant la confirmació com la cancel·lació.
-- [ ] Corregir els 4 temporitzadors i els 2 usos de `document` assenyalats. Fer servir la finestra o el document correctes per a la vista corresponent i substituir l'accés obsolet a `activeLeaf` per l'API pública adequada.
-- [ ] Eliminar 7 assercions redundants i substituir els 4 casts a `TFile` per comprovacions `instanceof TFile`. Provar les rutes que apunten a una carpeta o a un fitxer que ja no existeix.
-- [ ] Corregir els 2 usos de `hasOwnProperty`, els 2 noms de comandes que repeteixen el nom del plugin i la variable sense ús d'`iconUtils.ts`. Preservar els identificadors de comanda perquè continuïn funcionant les dreceres i les integracions existents.
+- [x] Substituir els 8 `alert` per `Notice` en sincronització i plantilles. El vault de prova confirma que el modal d'Obsidian elimina la plantilla només en confirmar.
+- [x] Corregir els 4 temporitzadors i els 2 usos de `document` assenyalats. Eliminar l'accés a `activeLeaf` i comprovar que el botó de la barra d'eines apareix en una finestra separada.
+- [x] Eliminar les 7 assercions redundants i substituir els 4 casts a `TFile` per comprovacions `instanceof TFile`. La vista agrupada descarta una carpeta i una ruta que no existeix al vault.
+- [x] Corregir els 2 usos de `hasOwnProperty`, els 2 noms de comandes que repeteixen el nom del plugin i la variable sense ús d'`iconUtils.ts`. Les comandes conserven els identificadors.
 
 **Tancament.** El linter valida els canvis i el selector, les comandes i les integracions de l'editor funcionen a la finestra principal i en finestres separades.
 

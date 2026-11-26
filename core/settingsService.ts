@@ -288,7 +288,7 @@ class SettingsService {
 
 					// Notify UI and other services
 					eventBus.publish("plugin-settings-changed", {
-						key: key as keyof PluginSettings,
+						key,
 						value: newValue,
 						currentSettings: this.settings,
 					});

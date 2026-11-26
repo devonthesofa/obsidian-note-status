@@ -41,9 +41,7 @@ export class StatusesInfoPopup {
 	}
 
 	private show() {
-		this.element = createDiv({ cls: "" });
-
-		document.body.appendChild(this.element);
+		this.element = activeDocument.body.createDiv();
 
 		this.root = createRoot(this.element);
 		this.root.render(

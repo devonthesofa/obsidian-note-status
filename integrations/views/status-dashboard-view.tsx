@@ -96,7 +96,12 @@ export class StatusDashboardView extends ItemView {
 					const scopedIdentifier = status.templateId
 						? `${status.templateId}:${status.name}`
 						: status.name;
-					if (!statusDistribution.hasOwnProperty(scopedIdentifier)) {
+					if (
+						!Object.prototype.hasOwnProperty.call(
+							statusDistribution,
+							scopedIdentifier,
+						)
+					) {
 						statusDistribution[scopedIdentifier] = 0;
 					}
 					statusDistribution[scopedIdentifier]++;
