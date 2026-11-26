@@ -49,12 +49,10 @@ It works on both Markdown and non-Markdown files, integrates into multiple UI su
 ## Screenshots
 
 - Nav bar with current status
-
     - ![navbar-unnasigned](images/navbar-unnasigned.png)
     - ![navbar-multiple](images/navbar-multiple.png)
 
 - Status assignment:
-
     - ![change-not-status-modal](images/change-not-status-modal.png)
 
 - File explorer with status icons and hover overview:
@@ -89,20 +87,32 @@ You can contribute your own status templates to the plugin!
 1. Fork the repository.
    ...
 2. Create a new JSON file in the `templates/` folder (e.g., `templates/my-awesome-workflow.json`).
-3. Follow this format:
-   ```json
-   {
-     "id": "my-awesome-workflow",
-     "name": "My Awesome Workflow",
-     "description": "A workflow for doing awesome things",
-     "authorGithub": "your-username",
-     "statuses": [
-       { "name": "todo", "icon": "📝", "color": "#ff0000", "templateId": "my-awesome-workflow" },
-       { "name": "done", "icon": "✅", "color": "#00ff00", "templateId": "my-awesome-workflow" }
-     ]
-   }
-   ```
-4. Submit a Pull Request with your JSON file!
+3. Submit a Pull Request with your JSON file!
+
+Use this JSON structure for the template.
+
+```json
+{
+	"id": "my-awesome-workflow",
+	"name": "My Awesome Workflow",
+	"description": "A workflow for doing awesome things",
+	"authorGithub": "your-username",
+	"statuses": [
+		{
+			"name": "todo",
+			"icon": "📝",
+			"color": "#ff0000",
+			"templateId": "my-awesome-workflow"
+		},
+		{
+			"name": "done",
+			"icon": "✅",
+			"color": "#00ff00",
+			"templateId": "my-awesome-workflow"
+		}
+	]
+}
+```
 
 Once accepted and merged, your template will be automatically included in the next build and available in the marketplace for all users.
 

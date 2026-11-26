@@ -312,7 +312,7 @@ export class StatusDashboardView extends ItemView {
 
 		if (vaultSizeLimit > 0 && files.length > vaultSizeLimit) {
 			// Show disabled message
-			container.createEl("div", {
+			container.createDiv({
 				cls: "status-dashboard-disabled",
 				text: `Dashboard disabled: Vault has ${files.length} files (limit: ${vaultSizeLimit}). You can adjust this limit in plugin settings.`,
 			});

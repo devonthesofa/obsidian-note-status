@@ -76,11 +76,7 @@ export const BehaviourSettings: React.FC<Props> = ({ settings, onChange }) => {
 					disabled={settings.useMultipleStatuses}
 					value={settings.singleStatusStorageMode || "list"}
 					onChange={(e) =>
-						onChange(
-							"singleStatusStorageMode",
-							e.target
-								.value as PluginSettings["singleStatusStorageMode"],
-						)
+						onChange("singleStatusStorageMode", e.target.value)
 					}
 				>
 					<option value="list">List (status: [in-progress])</option>

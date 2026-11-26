@@ -161,7 +161,7 @@ export const TemplateSettings: React.FC<TemplateSettingsProps> = ({
 				.addButton((button) =>
 					button
 						.setButtonText("Delete")
-						.setWarning()
+						.setClass("mod-warning")
 						.onClick(() => {
 							const { templates, enabledTemplates } =
 								settingsService.settings;

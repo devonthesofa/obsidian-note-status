@@ -58,11 +58,11 @@ La branca `fix/105/scorecard-issues` cobreix la [incidència #105](https://githu
 
 **Abast.** 4 recomanacions sobre dependències de desenvolupament i la guia de contribució que falta a **Health**.
 
-- [ ] Substituir `builtin-modules` per `node:module` a la configuració de compilació i verificar que es mantenen correctament les dependències externes del bundle.
-- [ ] Comprovar si la configuració activa fa servir `eslint-plugin-import` o `eslint-plugin-react` i eliminar les dependències que no es carreguin.
-- [ ] Substituir `lint-staged` preservant la cobertura del pre-commit. Provar un fitxer parcialment preparat per al commit i un nom de fitxer amb espais abans de donar el canvi per bo.
-- [ ] Actualitzar `pnpm-lock.yaml` amb els canvis de dependències. Integrar les regles oficials validades a la fase 0 i comprovar-les amb una instal·lació neta.
-- [ ] Afegir `CONTRIBUTING.md` amb la instal·lació, les comprovacions i el procés existent per contribuir plantilles.
+- [x] Substituir `builtin-modules` per `node:module`. La compilació de producció continua generant els tres fitxers de distribució.
+- [x] Retirar `eslint-plugin-import` i `eslint-plugin-react` com a dependències directes sense ús.
+- [x] Substituir `lint-staged` per `nano-staged`. En la prova amb un fitxer parcialment preparat i amb espais al nom, el hook formata la còpia preparada i preserva el canvi pendent.
+- [x] Actualitzar `pnpm-lock.yaml` i integrar el linter oficial amb ESLint 9 i TypeScript 5. El projecte conserva la política de tipus anterior als límits amb APIs sense tipar. `pnpm run check`, la comprovació de tipus i la compilació passen.
+- [x] Afegir `CONTRIBUTING.md` amb la instal·lació, les comprovacions i el procés existent per contribuir plantilles.
 
 **Tancament.** Passen la compilació, els linters i el pre-commit amb les dependències actualitzades.
 

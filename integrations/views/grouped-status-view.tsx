@@ -170,7 +170,7 @@ export class GroupedStatusView extends ItemView {
 
 		if (vaultSizeLimit > 0 && files.length > vaultSizeLimit) {
 			// Show disabled message
-			container.createEl("div", {
+			container.createDiv({
 				cls: "grouped-status-view-disabled",
 				text: `Grouped Status View disabled: Vault has ${files.length} files (limit: ${vaultSizeLimit}). You can adjust this limit in plugin settings.`,
 			});

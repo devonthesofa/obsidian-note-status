@@ -1,4 +1,4 @@
-import React, { FC, memo } from "react";
+import { FC, memo } from "react";
 import { GroupedStatuses } from "@/types/noteStatus";
 import { StatusesInfoPopup } from "@/integrations/popups/statusesInfoPopupIntegration";
 import { StatusIcon } from "@/components/atoms/StatusIcon";

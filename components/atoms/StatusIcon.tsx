@@ -1,4 +1,4 @@
-import React, { CSSProperties, FC } from "react";
+import { CSSProperties, FC } from "react";
 import { ObsidianIcon } from "./ObsidianIcon";
 import { resolveLucideIconName } from "@/utils/iconUtils";
 

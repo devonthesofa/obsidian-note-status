@@ -42,7 +42,7 @@ class EventBus {
 	publish(event: EventName, ...args: unknown[]) {
 		const callbacks = this.events[event];
 		callbacks.forEach((callback) => {
-			(callback as (...args: unknown[]) => void)(...args);
+			Reflect.apply(callback, undefined, args);
 		});
 	}
 }

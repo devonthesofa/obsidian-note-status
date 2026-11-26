@@ -3,7 +3,6 @@ import { StatusDisplay } from "@/components/atoms/StatusDisplay";
 import { CollapsibleCounter } from "@/components/atoms/CollapsibleCounter";
 import { FileItem, StatusItem } from "../GroupedStatusView";
 import { FileList } from "./FileList";
-import { NoteStatus } from "@/types/noteStatus";
 
 interface StatusGroupProps {
 	statusName: string;
@@ -53,13 +52,11 @@ export const StatusGroup = ({
 			>
 				<div className="tree-item-inner grouped-status-group__status">
 					<StatusDisplay
-						status={
-							{
-								...status,
-								icon: status.icon || "",
-								lucideIcon: status.lucideIcon,
-							} as NoteStatus
-						}
+						status={{
+							...status,
+							icon: status.icon || "",
+							lucideIcon: status.lucideIcon,
+						}}
 						variant="badge"
 					/>
 					{templateId && (

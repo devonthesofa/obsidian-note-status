@@ -1,6 +1,6 @@
 import { StatusIconPreview } from "@/components/atoms/StatusIconPreview";
 import { GroupedStatuses } from "@/types/noteStatus";
-import React, { FC, memo } from "react";
+import { FC, memo } from "react";
 import { StatusIcon } from "@/components/atoms/StatusIcon";
 import {
 	getPrimaryStatus,
